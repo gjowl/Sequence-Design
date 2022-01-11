@@ -1,0 +1,302 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Jan 22 18:32:38 2020
+
+@author: gloiseau
+"""
+import pandas as pd
+
+########################################################################
+#                             FUNCTIONS
+########################################################################
+def checkDataset():
+    parallel = input('Do you want to analyze only parallel data: T or F?')
+    if parallel == "T" or parallel == "t":
+        return True
+    else:
+        return False
+
+def usePreviousData():
+    answer = input("Use previously extracted data? T or F")
+    if answer == "T" or answer == "t":
+        return True
+    else:
+        return False
+
+def analyzeSolubleProteins():
+    sp = input("Analyze soluble proteins? T or F")
+    if sp == "T" or sp == "t":
+        return True
+    else:
+        return False
+
+def analyzeDistanceAngle():
+    da = input("Analyze distance and angle? T or F")
+    if da == "T" or da == "t":
+        return True
+    else:
+        return False
+
+def compareToDegrado2015():
+    cd = input("Have you compared to Degrado 2015? T or F")
+    if cd == "T" or cd == "t":
+        return True
+    else:
+        return False
+
+########################################################################
+#                       HOUSEKEEPING VARIABLES
+########################################################################
+parallel = checkDataset()
+print(parallel)
+
+#string variables
+axDist = "Axial distance"
+angle = "Angle"
+z1 = "Z' 1"
+z2 = "Z' 2"
+rot1 = "ω' 1"
+rot2 = "ω' 2"
+
+rerun = usePreviousData()
+
+data = pd.DataFrame()
+sp = analyzeSolubleProteins()
+cd = compareToDegrado2015()
+da = analyzeDistanceAngle()
+
+if sp is True:
+    proteinDir = "solubleProteins"
+else:
+    proteinDir = "membraneProteins"
+    
+if rerun is False:
+    if parallel is True:
+        data = data.append(pd.read_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_unnorm.csv', delimiter = '\t'))
+    else:
+        data = data.append(pd.read_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_antiparallel_unnorm.csv', delimiter = '\t'))
+    if sp is True:
+        ########################################################################
+        #                INPUT RESOLUTION LIMIT AND EXTRACT DATA
+        ########################################################################
+        resLimit = 3
+        
+        data = data[data["Resolution"] < resLimit]
+
+        ########################################################################
+        #       INPUT POINT OF CLOSEST APPROACH LIMIT AND EXTRACT DATA
+        ########################################################################
+        pocaLimit = 3
+
+        data = data[data["PoCA shift 1"] < pocaLimit]
+        data = data[data["PoCA shift 2"] < pocaLimit]
+    else:
+        ########################################################################
+        #                INPUT RESOLUTION LIMIT AND EXTRACT DATA
+        ########################################################################
+        resLimit = 5
+        
+        data = data[data["Resolution"] < resLimit]
+
+        ########################################################################
+        #       INPUT POINT OF CLOSEST APPROACH LIMIT AND EXTRACT DATA
+        ########################################################################
+        pocaLimit = 5
+
+        data = data[data["PoCA shift 1"] < pocaLimit]
+        data = data[data["PoCA shift 2"] < pocaLimit]
+    ########################################################################
+    #                     WRITE OUTPUT FILE AS CSV
+    ########################################################################
+    if parallel is True:
+        data.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_reduced.csv', sep='\t')
+    else:
+        data.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_antiparallel_reduced.csv', sep='\t') 
+else:
+    if parallel is True:
+        data = data.append(pd.read_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_reduced.csv', delimiter = '\t'))
+    else:
+        data = data.append(pd.read_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_antiparallel_reduced.csv', delimiter = '\t'))
+
+########################################################################
+#                  COMPARISON TO DEGRADO 2015 PAPER
+########################################################################
+if cd is False:
+    dataCD = pd.DataFrame()
+    dataCD = dataCD.append(pd.read_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_splitData.csv', delimiter = '\t'))
+    if sp is True:
+        dataCD = dataCD[dataCD[axDist] > 9]
+    else:
+        dataCD = dataCD[dataCD[axDist] > 8]
+    dataCD.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_degradoComparisonData.csv', sep='\t')
+
+########################################################################
+#                  INPUT BEST ANGLE DISTANCE LIMIT
+########################################################################
+if da is True:
+    da1 = pd.DataFrame()
+    da2 = pd.DataFrame()
+    da3 = pd.DataFrame()
+
+    da1 = data.copy(deep=True)
+    da2 = data.copy(deep=True)
+    da3 = data.copy(deep=True)
+
+    if parallel is True:
+        distLimit11 = 0
+        distLimit12 = 7.2
+        angLimit11 = -45
+        angLimit12 = -35
+
+        distLimit21 = 7.8
+        distLimit22 = 10.8
+        angLimit21 = -50
+        angLimit22 = -25
+
+        distLimit31 = 7.9
+        distLimit32 = 11.2
+        angLimit31 = 20
+        angLimit32 = 45
+
+    else:
+        distLimit11 = 7.7
+        distLimit12 = 10.8
+        angLimit11 = -160
+        angLimit12 = -135
+
+        distLimit21 = 8
+        distLimit22 = 10.4
+        angLimit21 = -65
+        angLimit22 = -55
+
+        distLimit31 = 8
+        distLimit32 = 10.8
+        angLimit31 = 115
+        angLimit32 = 145
+
+    da1 = da1[da1[axDist] >= distLimit11]
+    da1 = da1[da1[axDist] < distLimit12]
+    da1 = da1[da1[angle] >= angLimit11]
+    da1 = da1[da1[angle] < angLimit12]
+
+    da2 = da2[da2[axDist] >= distLimit21]
+    da2 = da2[da2[axDist] < distLimit22]
+    da2 = da2[da2[angle] >= angLimit21]
+    da2 = da2[da2[angle] < angLimit22]
+
+    da3 = da3[da3[axDist] >= distLimit31]
+    da3 = da3[da3[axDist] < distLimit32]
+    da3 = da3[da3[angle] >= angLimit31]
+    da3 = da3[da3[angle] < angLimit32]
+
+    ########################################################################
+    #                     WRITE OUTPUT FILE AS CSV
+    ########################################################################
+    if parallel is True:
+        da1.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da1.csv', sep='\t')
+        da2.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da2.csv', sep='\t')
+        da3.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da3.csv', sep='\t')
+    else:
+        da1.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_antiparallel_da1.csv', sep='\t')
+        da2.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_antiparallel_da2.csv', sep='\t')
+        da3.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_antiparallel_da3.csv', sep='\t')
+    
+    ########################################################################
+    #              INPUT BEST Z AND ROTATION LIMIT SUBSET 1
+    ########################################################################
+    da1z = pd.DataFrame()
+    da1rot = pd.DataFrame()
+
+    da1z = da1.copy(deep=True)
+    da1rot = da1.copy(deep=True)
+
+    z1Limit1 = 1.2
+    z1Limit2 = 3.3
+    z2Limit1 = 1.5
+    z2Limit2 = 3.3
+
+    rot1Limit1 = 35
+    rot1Limit2 = 70
+    rot2Limit1 = 25
+    rot2Limit2 = 55
+
+    da1z = da1z[da1z[z1] >= z1Limit1]
+    da1z = da1z[da1z[z1] < z1Limit2]
+    da1z = da1z[da1z[z2] >= z2Limit1]
+    da1z = da1z[da1z[z2] < z2Limit2]
+
+    da1rot = da1rot[da1rot[rot1] >= rot1Limit1]
+    da1rot = da1rot[da1rot[rot1] < rot1Limit2]
+    da1rot = da1rot[da1rot[rot2] >= rot2Limit1]
+    da1rot = da1rot[da1rot[rot2] < rot2Limit2]
+
+    ########################################################################
+    #                     WRITE OUTPUT FILE AS CSV
+    ########################################################################
+    if parallel is True:
+        da1z.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da1_subz.csv', sep='\t')
+        da1rot.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da1_subrot.csv', sep='\t')
+
+    ########################################################################
+    #                     INPUT ROTATION LIMIT SUBSET 2
+    ########################################################################
+    da21rot = pd.DataFrame()
+    da22rot = pd.DataFrame()
+    da23rot = pd.DataFrame()
+
+    da21rot = da2.copy(deep=True)
+    da22rot = da2.copy(deep=True)
+    da23rot = da2.copy(deep=True)
+
+    rot1Limit1 = 35
+    rot1Limit21 = 25
+    rot1Limit22 = 65
+    rot1Limit31 = 75
+    rot1Limit32 = 100
+
+    rot2Limit1 = 35
+    rot2Limit21 = 45
+    rot2Limit22 = 90
+    rot2Limit31 = 20
+    rot2Limit32 = 45
+
+    da21rot = da21rot[da21rot[rot1] < rot1Limit1]
+    da21rot = da21rot[da21rot[rot2] < rot2Limit1]
+
+    da22rot = da22rot[da22rot[rot1] >= rot1Limit21]
+    da22rot = da22rot[da22rot[rot1] < rot1Limit22]
+    da22rot = da22rot[da22rot[rot2] >= rot2Limit21]
+    da22rot = da22rot[da22rot[rot2] < rot2Limit22]
+
+    da23rot = da23rot[da23rot[rot1] >= rot1Limit31]
+    da23rot = da23rot[da23rot[rot1] < rot1Limit32]
+    da23rot = da23rot[da23rot[rot2] >= rot2Limit31]
+    da23rot = da23rot[da23rot[rot2] < rot2Limit32]
+
+    ########################################################################
+    #                     WRITE OUTPUT FILE AS CSV
+    ########################################################################
+    if parallel is True:
+        da21rot.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da2_sub1.csv', sep='\t')
+        da22rot.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da2_sub2.csv', sep='\t')
+        da23rot.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da2_sub3.csv', sep='\t')
+
+    ########################################################################
+    #                     INPUT ROTATION LIMIT SUBSET 3
+    ########################################################################
+    da31rot = pd.DataFrame()
+    
+    da31rot = da2.copy(deep=True)
+    
+    rot1Limit1 = 60
+    rot2Limit1 = 60
+    
+    da31rot = da31rot[da31rot[rot1] >= rot1Limit1]
+    da31rot = da31rot[da31rot[rot2] >= rot2Limit1]
+
+    ########################################################################
+    #                     WRITE OUTPUT FILE AS CSV
+    ########################################################################
+    if parallel is True:
+        da31rot.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/2020_01_20_parallel_da3_sub1.csv', sep='\t')
