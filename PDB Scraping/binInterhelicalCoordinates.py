@@ -21,6 +21,7 @@ def counter(row, string1, string2, number1, number2):
             count += 1
     return count
 
+
 def binning(row, numberBins, binTotal, string):
     binSize = binTotal/numberBins
     D = {}
@@ -103,10 +104,10 @@ def calcBins(row, numberBins, normfactor, binTotal, string):
                 previousBin = currentBin
                 currentBin = currentBin + binSize
                 binNum += 1
-    return binString    
+    return binString
 
-def calcBinsDist(row, numberBins, normfactor, addDist, binTotal, string):   
-    binString = ''        
+def calcBinsDist(row, numberBins, normfactor, addDist, binTotal, string):
+    binString = ''
     binSize = binTotal/numberBins
     previousBin = 0
     currentBin = binSize
@@ -121,7 +122,7 @@ def calcBinsDist(row, numberBins, normfactor, addDist, binTotal, string):
             previousBin = currentBin
             currentBin = currentBin + binSize
             binNum += 1
-    return binString    
+    return binString
 
 def checkDataset():
     parallel = input('Do you want to analyze only parallel data: T or F?')
@@ -129,7 +130,7 @@ def checkDataset():
         return True
     else:
         return False
-    
+
 ########################################################################
 #                            READ FILE
 ########################################################################
@@ -279,5 +280,3 @@ df['rot2'] = rot2s
 #                     WRITE OUTPUT FILE AS CSV
 ########################################################################
 df.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/binInterhelicalCoordinatesTemp.csv', sep='\t')
-
-        

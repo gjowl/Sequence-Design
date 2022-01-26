@@ -1,11 +1,20 @@
-#This script is meant to be used to analyze data from interhelicalCoordinates.cpp runs
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar  4 10:32:10 2020
 
-#TODO:
-#figure out the best order to do script:
-#   1. find all the pdbs with at least one interacting helical pair
-#   2. go into the pairGeometryReport and search for lines with all 6 coordinates
-#   3. compile these lines into a file? Or should I take the values from those and convert them to normalized values?
-#       0-1 for z` and omega` (for both helices), 0-1 for distances from 6.5-11, and -1-1 for crossing angle
+This script analyzes data from interhelicalCoordinates.cpp runs
+
+TODO:
+1. edit so that there's a list of variables that can be changed and used throughout this code
+
+1. find all the pdbs with at least one interacting helical pair
+2. go into the pairGeometryReport and search for lines with all 6 coordinates
+3. compile these lines into a file? Or should I take the values from those and convert them to normalized values?
+   0-1 for z` and omega` (for both helices), 0-1 for distances from 6.5-11, and -1-1 for crossing angle
+
+@author: gloiseau
+"""
 
 import os
 import pandas as pd
@@ -20,24 +29,23 @@ import numpy as np
 ########################################################################
 
 def getListOfDir(dirName):
-    # create a list of file and sub directories 
-    # names in the given directory 
+    # create a list of file and sub directories
+    # names in the given directory
     listOfDir = os.listdir(dirName)
     allDir = []
     # Iterate over all the entries
     for entry in listOfDir:
         # Create full path
         fullPath = os.path.join(dirName, entry)
-        # Check if entry is a directory 
+        # Check if entry is a directory
         if os.path.isdir(fullPath):
             allDir.append(fullPath)
-                
-    return allDir 
+    return allDir
 
 #checks for only "pair_" files
 def checkPairFiles(dirName):
-    # create a list of file and sub directories 
-    # names in the given directory 
+    # create a list of file and sub directories
+    # names in the given directory
     listOfDir = os.listdir(dirName)
     # Iterate over all the entries
     for entry in listOfDir:
@@ -45,12 +53,11 @@ def checkPairFiles(dirName):
         fullPath = os.path.join(dirName, entry)
         if 'pair_' in fullPath:
             return True
-
     return False
 
 def pairGeometryFile(dirName):
-    # create a list of file and sub directories 
-    # names in the given directory 
+    # create a list of file and sub directories
+    # names in the given directory
     listOfDir = os.listdir(dirName)
     pairFile = ''
     # Iterate over all the entries
@@ -59,7 +66,6 @@ def pairGeometryFile(dirName):
         fullPath = os.path.join(dirName, entry)
         if 'pairGeometry' in fullPath:
             pairFile = fullPath
-
     return pairFile
 
 def usePreviousData():
@@ -68,29 +74,29 @@ def usePreviousData():
         return True
     else:
         return False
-    
+
 def analyzeSolubleProteins():
     sp = input("Analyze soluble proteins?")
     if sp == "T" or sp == "t":
         return True
     else:
         return False
-    
+
 def getListOfFiles(dirName):
-    # create a list of file and sub directories 
-    # names in the given directory 
+    # create a list of file and sub directories
+    # names in the given directory
     listOfFile = os.listdir(dirName)
     allFiles = list()
     # Iterate over all the entries
     for entry in listOfFile:
         # Create full path
         fullPath = os.path.join(dirName, entry)
-        # If entry is a directory then get the list of files in this directory 
+        # If entry is a directory then get the list of files in this directory
         if os.path.isdir(fullPath):
             allFiles = allFiles + getListOfFiles(fullPath)
         else:
             allFiles.append(fullPath)
-    return allFiles 
+    return allFiles
 
 #Below functions for getDuplicates function
 def similar(a, b):
@@ -102,7 +108,7 @@ def checkBoolNum(dstart, dend, start, end):
         return True
     else:
         return False
-        
+
 def checkBoolStr(c1, c2):
     if c1 == c2:
         return True, False
@@ -212,34 +218,37 @@ day = '{:02d}'.format(now.day)
 hour = '{:02d}'.format(now.hour)
 minute = '{:02d}'.format(now.minute)
 
-
 rerun = usePreviousData()
 sp = analyzeSolubleProteins()
 
+currDir = os.getcwd()
+dataDir = '/data02/gloiseau/Sequence_Design_Project/interhelicalCoordinates/'
+
+#localDir = '/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/'
 if rerun is False:
     date ='{}_{}_{}'.format(year, month, day)
     cluster = input("Insert data cluster level in bc_## format: ")
 else:
     date = input("Insert date in year_month_day format for what data you would like to rerun: ")
-    
+
 if sp is True:
     proteinDir = "solubleProteins"
 else:
     proteinDir = "membraneProteins"
-#TODO: make sure I ran this right and edit it properly
 #doesn't get them in order, but I don't think that should matter
 alldata = pd.DataFrame()
 
+saveDir = currDir + proteinDir
 ########################################################################
 #                  CHECK WHICH DATABASE TO ANALYZE
 ########################################################################
 if sp is True:
     print("Analyzing soluble protein database...")
-    dirName = '/data02/gloiseau/Sequence_Design_Project/interhelicalCoordinates/' + proteinDir +'/' + cluster
+    dirName = dataDir + proteinDir +'/' + cluster
 else:
     print("Analyzing membrane protein database...")
-    dirName = '/data02/gloiseau/Sequence_Design_Project/interhelicalCoordinates/' + proteinDir +'/' + cluster
-    
+    dirName = dataDir + proteinDir +'/' + cluster
+
 ########################################################################
 #         READ PAIR CSV FILES INTO DATAFRAME AND OUTPUT AS CSV
 ########################################################################
@@ -247,27 +256,25 @@ if rerun is False:
     listOfDir = getListOfDir(dirName)
     allPairs = []
     count = 0
- 
+
     for elem in listOfDir:
         if checkPairFiles(elem):
             allPairs.append(pairGeometryFile(elem))
             count += 1
 
-    print(count)
-
     for pair in allPairs:
         df = pd.read_csv(pair, delimiter='\t')
-        alldata = alldata.append(df, sort=False) 
+        alldata = alldata.append(df, sort=False)
     alldata.describe()
     alldata.head()
-    alldata.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + date + '/allData.csv', sep='\t')
+    alldata.to_csv(currDir + proteinDir +'/' + date + '/allData.csv', sep='\t')
 print("CSV files read!")
 
 ########################################################################
 #                  SEPARATE OUT UNNECESSARY DATA
 ########################################################################
-if rerun is True: 
-    alldata = pd.read_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir + '/' + date + '/allData.csv', delimiter='\t')
+if rerun is True:
+    alldata = pd.read_csv(saveDir + '/' + date + '/allData.csv', delimiter='\t')
 
 splitdata = pd.DataFrame()
 splitdata = alldata
@@ -281,15 +288,13 @@ splitdata["Chain AB"] = r4
 splitdata["Sequence Similarity"] = r5
 splitdata["Copy of..."] = copyof
 
-splitdata.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + date + '/allData_all.csv', sep='\t')    
+splitdata.to_csv(saveDir +'/' + date + '/allData_all.csv', sep='\t')
 splitdata = splitdata[splitdata["Duplicates"] == 0]
 
 splitdata = splitdata[splitdata["Z 1"].notnull()]
 splitdata = splitdata[splitdata["ω 1"].notnull()]
 splitdata = splitdata[splitdata["Z 2"].notnull()]
 splitdata = splitdata[splitdata["ω 2"].notnull()]
-
-
 
 df = pd.DataFrame()
 
@@ -300,9 +305,7 @@ if rerun is False:
 else:
     cols = [1, 2, 4, 5, 9, 11, 12, 18, 19, 20, 24, 25, 31, 32, 35, 36, 37, 38, 39, 40, 41, 42]
 #If the code breaks because you forgot to fix things, the variables still hold it, so just comment the below out and use that
-
 df = splitdata[splitdata.columns[cols]].copy(deep=True)
-
 print("Separation of unncessary data finished!")
 
 ########################################################################
@@ -325,7 +328,7 @@ for hm in df["Helical mask 1"]:
             ratios1.append(None)
     else:
         ratios1.append(None)
-        
+
 for hm in df["Helical mask 2"]:
     if re.search(bestPattern, hm, re.IGNORECASE):
         hm1 = re.search(bestPattern, hm, re.IGNORECASE)
@@ -352,7 +355,7 @@ anti = anti[anti["Angle"] < -90]
 anti = anti.append(df[df["Angle"] > 90], sort=False)
 anti = anti[anti["Axial distance"] >= 6.2]
 
-anti.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + date + '/antiparallel.csv', sep='\t')
+anti.to_csv(saveDir +'/' + date + '/antiparallel.csv', sep='\t')
 
 parallel = pd.DataFrame()
 parallel = df.copy(deep=True)
@@ -360,7 +363,7 @@ parallel = parallel[parallel["Angle"] >= -90]
 parallel = parallel[parallel["Angle"] <= 90]
 parallel = parallel[parallel["Axial distance"] >= 6.2]
 
-parallel.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + date + '/parallel.csv', sep='\t')
+parallel.to_csv(saveDir +'/' + date + '/parallel.csv', sep='\t')
 
 ########################################################################
 #                   NORMALIZE EACH DATA COLUMN
@@ -371,7 +374,6 @@ excludeRMSD = excludeRMSD[excludeRMSD["Fit RMSD 1"] < 0.5]
 excludeRMSD = excludeRMSD[excludeRMSD["Fit RMSD 2"] < 0.5]
 
 #exclude should probably happen a little earlier
-
 #normalize all
 normdf = pd.DataFrame()
 normdf = excludeRMSD.copy(deep=True)
@@ -390,7 +392,7 @@ normpar = parallel.copy(deep=True)
 normpar = normpar[normpar["Fit RMSD 1"] < 0.5]
 normpar = normpar[normpar["Fit RMSD 2"] < 0.5]
 
-normpar.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + date + '/parallel_unnorm.csv', sep='\t')
+normpar.to_csv(saveDir +'/' + date + '/parallel_unnorm.csv', sep='\t')
 
 normpar["Z' 1"] = normpar["Z' 1"].div(6)
 normpar["Z' 2"] = normpar["Z' 2"].div(6)
@@ -406,7 +408,7 @@ normanti = anti.copy(deep=True)
 normanti = normanti[normanti["Fit RMSD 1"] < 0.5]
 normanti = normanti[normanti["Fit RMSD 2"] < 0.5]
 
-normanti.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + date + '/antiparallel_unnorm.csv', sep='\t')
+normanti.to_csv(saveDir +'/' + date + '/antiparallel_unnorm.csv', sep='\t')
 
 normanti["Z' 1"] = normanti["Z' 1"].div(6)
 normanti["Z' 2"] = normanti["Z' 2"].div(6)
@@ -416,8 +418,6 @@ normanti["Angle"] = normanti["Angle"].div(50)
 normanti["Axial distance"] = normanti["Axial distance"].sub(6.2).div(6.6)
 normanti = normanti[normanti["Axial distance"] > 0]
 
-#TODO: Find the minimum for distance (it's pretty low, so I'm going with 6 for now)
-#TODO: maximum is also a little higher, so I upped the division number
 # Rid of the numbers on the side (they don't matter)
 print("Normalization of data finished!")
 
@@ -425,16 +425,9 @@ print("Normalization of data finished!")
 #                     WRITE OUTPUT FILE AS CSV
 ########################################################################
 #The above adds on an extra column right at the beginning
-
-df.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + date + '/splitData.csv', sep='\t')
-#normdf.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + cluster + '/' + date + '_alldata_norm.csv', sep='\t')
-#normpar.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + cluster + '/' + date + '_parallel_norm.csv', sep='\t')
-#normanti.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + cluster + '/' + date + '_antiparallel_norm.csv', sep='\t')
+df.to_csv(saveDir +'/' + date + '/splitData.csv', sep='\t')
+normdf.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + cluster + '/' + date + '_alldata_norm.csv', sep='\t')
+normpar.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + cluster + '/' + date + '_parallel_norm.csv', sep='\t')
+normanti.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/' + proteinDir +'/' + cluster + '/' + date + '_antiparallel_norm.csv', sep='\t')
 
 print("finished")
-
-#with open(allPairs[0], 'r') as csvfile:
-#    reader = csv.reader(csvfile, delimiter = '\t')
-#    for row in reader:
-#        print(row[17], row[19], row[23], row[24], row[30], row[31], row[36], row[37])
-

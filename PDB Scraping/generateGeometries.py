@@ -1,4 +1,14 @@
-#This script is meant to create a list of geometries to be used to test for computational design
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar  4 10:32:10 2020
+
+This script creates a list of geometries to be used for computational design
+
+@author: gloiseau
+"""
+
+import os
 
 ########################################################################
 #                      WRITE EXECUTABLE FILE
@@ -16,7 +26,8 @@ zinc = 0.2
 
 dirName = '/data02/gloiseau/Sequence_Design_Project/interhelicalCoordinates/membraneProteins/pdbs/opm_pdbs/pdbs/'
 
-executefile = open('/exports/home/gloiseau/submit_geometries_neg_2.txt', 'w')
+currDir = os.getcwd()
+executefile = open(currDir+'/submit_geometries_neg_2.txt', 'w')
 
 args = 'arguments = "'
 config = '--config $(configFile)'
@@ -59,8 +70,5 @@ for d in range(0, 4):
                 executefile.write('queue')
                 executefile.write('\n')
                 count += 1
-
 executefile.close()
-
-#arguments = "--config $(configFile) --runNumber 54 --crossingAngle 25 --axialRotation 55 --zShift 3.6 --xShift 6 --varPos 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0"
 print("Finished!")
