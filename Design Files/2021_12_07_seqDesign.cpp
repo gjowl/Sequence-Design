@@ -39,10 +39,9 @@ using namespace std;
 static SysEnv SYSENV;
 string programName = "seqDesign";
 string programDescription = "Designs sequences for backbone geometries extracted from the PDB, optimizing specifically for vdW energies";
-//Edited with more comments from 2021_12_07 version which was used for my runs for the first CHIP order
 string programAuthor = "Gilbert Loiseau";
 string programVersion = "2";
-string programDate = "11 February 2022";
+string programDate = "24 November 2021";
 string mslVersion = MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -78,16 +77,16 @@ struct Options{
 	string backboneAA;
 	int backboneLength;
 
-	// booleans: changing these will ..TODO: add more here
+	// booleans
 	bool getGeoFromPDBData; //TRUE: randomly choose a dimeric geometry from the membrane protein pdb landscape OR FALSE: use a given dimer geometry
-	bool verbose; //TRUE: write energy outputs and calculations throughout the run to the terminal OR FALSE: only write outputs to output files
-	bool deleteTerminalHbonds; //TRUE: delete hydrogen bonds at the termini of sequences to not be considered in hydrogen bonding score OR FALSE: keep hydrogen bonds at termini
-	bool linkInterfacialPositions; //TRUE: keep interfacial positions linked (same amino acid and rotamer) when searching for the best states in stateMC (less memory) OR FALSE: unlink positions (memory intensive)
-	bool useSasa; //TRUE: use solvent accessible surface area to designated the number of rotamers at each position on the dimer OR FALSE: input set number of rotamers for both interface and non-interface
-	bool useTimeBasedSeed; //TRUE: use time based seed for all RandomNumberGenerator functions OR FALSE: use a given seed
-	bool energyLandscape; //TRUE: collect all sequences and their respective monomer and dimer energies ..TODO: add more here
-	bool useAlaAtCTerminus; //TRUE: use ALA at C terminus of sequence FALSE: use LEU at C terminus ..TODO: do I need this?
-	bool useBaseline; //TRUE: ...
+	bool verbose; //TRUE: write more outputs throughout the run
+	bool deleteTerminalHbonds; //TRUE: delete hydrogen bonds at the termini OR FALSE: keep hydrogen bonds at termini
+	bool linkInterfacialPositions; //TRUE: keeps interfacial positions linked when searching for the best states in stateMC (less memory) OR FALSE: unlinks positions (memory intensive)
+	bool useSasa; //TRUE: solvent accessible surface area used to choose the number rotamers at each position OR FALSE: give a set number of rotamers to interface vs non-interface
+	bool useTimeBasedSeed; //TRUE: use time based seed for RandomNumberGenerator OR FALSE: use given seed
+	bool energyLandscape; //TRUE: collect all sequences and their respective monomer and dimer energies
+	bool useAlaAtCTerminus; //TRUE: use ALA at C terminus of sequence FALSE: use LEU at C terminus
+	bool useBaseline; //TRUE: use ALA at C terminus of sequence FALSE: use LEU at C terminus
 
 	// repack parameters
 	int greedyCycles;
@@ -116,8 +115,15 @@ struct Options{
 	double axialRotation;
 	bool transform;
 
+	// transformation variables
+	double deltaZ;
+	double deltaAx;
+	double deltaCross;
+	double deltaX;
+
 	// crossing point
 	int thread;
+	int bbThread;
 	
 	// Monte Carlo parameters
 	int MCCycles;
@@ -4621,6 +4627,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	opt.allowed.push_back("configfile");
 	
 	opt.allowed.push_back("thread");
+	opt.allowed.push_back("bbThread");
 
 	//Alternate 
 	opt.allowed.push_back("Ids");
@@ -4813,6 +4820,13 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.warningFlag = true;
 		opt.thread = 0;
 	}
+	if (opt.thread == 0) {
+		if (opt.sequenceLength > opt.backboneLength){
+			opt.bbThread = opt.sequenceLength - opt.backboneLength + 1;
+		} else {
+			opt.bbThread = opt.backboneLength - opt.sequenceLength + 1;
+		}
+	}
 
 	//Load Rotamers using SASA values (from sgfc)
 	opt.useSasa = OP.getBool("useSasa");
@@ -4863,6 +4877,31 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.warningMessages += "MCCurve not specified using EXPONENTIAL(2)\n";
 		opt.warningFlag = true;
 		opt.MCCurve = 2;
+	}
+
+	opt.deltaZ = OP.getDouble("deltaZ");
+	if (OP.fail()) {
+		opt.warningMessages += "deltaZ not specified using 0.1\n";
+		opt.warningFlag = true;
+		opt.deltaZ = 0.1;
+	}
+	opt.deltaAx = OP.getDouble("deltaAx");
+	if (OP.fail()) {
+		opt.warningMessages += "deltaAx not specified using 1.0\n";
+		opt.warningFlag = true;
+		opt.deltaAx = 1.0;
+	}
+	opt.deltaCross = OP.getDouble("deltaCross");
+	if (OP.fail()) {
+		opt.warningMessages += "deltaCross not specified using 1.0\n";
+		opt.warningFlag = true;
+		opt.deltaCross = 1.0;
+	}
+	opt.deltaX = OP.getDouble("deltaX");
+	if (OP.fail()) {
+		opt.warningMessages += "deltaX not specified using 0.1\n";
+		opt.warningFlag = true;
+		opt.deltaX = 0.1;
 	}
 
 	opt.verbose = OP.getBool("verbose");
