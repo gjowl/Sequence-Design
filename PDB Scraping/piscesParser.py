@@ -7,6 +7,7 @@
 
 #This script is meant to take the PISCES database and take the first pdb from each line and choose one pair of interacting chains to analyze
 #I can use the chains as inputs into Alessandro's code somehow?
+import os
 import re
 import urllib.request
 
@@ -24,6 +25,7 @@ pattern = re.compile(">")
 
 count = 0
 
+currDir = os.getcwd()
 pdbList = '/exports/home/gloiseau/Downloads/pdbaa.nr'
 allProteinList = '/exports/home/gloiseau/pdbs_bitopic.txt'
 nonMembraneList = '/exports/home/gloiseau/nomembraneProt.txt'

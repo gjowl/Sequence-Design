@@ -22,6 +22,7 @@ ax2 = "ω' 2"
 ang = "Angle"
 dist = "Axial distance"
 
+#Functions
 def check(c1, c2, val):
     if c1 <= val <= c2:
         return True

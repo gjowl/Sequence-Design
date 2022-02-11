@@ -224,7 +224,6 @@ sp = analyzeSolubleProteins()
 currDir = os.getcwd()
 dataDir = '/data02/gloiseau/Sequence_Design_Project/interhelicalCoordinates/'
 
-#localDir = '/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/'
 if rerun is False:
     date ='{}_{}_{}'.format(year, month, day)
     cluster = input("Insert data cluster level in bc_## format: ")
@@ -239,6 +238,7 @@ else:
 alldata = pd.DataFrame()
 
 saveDir = currDir + proteinDir
+
 ########################################################################
 #                  CHECK WHICH DATABASE TO ANALYZE
 ########################################################################
@@ -290,12 +290,10 @@ splitdata["Copy of..."] = copyof
 
 splitdata.to_csv(saveDir +'/' + date + '/allData_all.csv', sep='\t')
 splitdata = splitdata[splitdata["Duplicates"] == 0]
-
 splitdata = splitdata[splitdata["Z 1"].notnull()]
 splitdata = splitdata[splitdata["ω 1"].notnull()]
 splitdata = splitdata[splitdata["Z 2"].notnull()]
 splitdata = splitdata[splitdata["ω 2"].notnull()]
-
 df = pd.DataFrame()
 
 #only uses the columns that I need

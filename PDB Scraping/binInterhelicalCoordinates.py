@@ -9,6 +9,7 @@ Created on Wed Jan  8 09:55:25 2020
 #TODO: Write code that bins the data from my runs and then counts them
 #1. Need to bin all into a 2d array (6 dimensions, so around 6^5; first start with 0.5 bins)
 #2. Make it output a csv
+import os
 import array as ar
 
 ########################################################################
@@ -20,7 +21,6 @@ def counter(row, string1, string2, number1, number2):
         if row[string2] == number2:
             count += 1
     return count
-
 
 def binning(row, numberBins, binTotal, string):
     binSize = binTotal/numberBins
@@ -148,10 +148,6 @@ date = '{}_{}_{}'.format(year, month, day)
 print('Date: ' + date)
 
 data = pd.DataFrame()
-
-#data = data.append(pd.read_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/2020_01_16_normRMSDsplit.csv', delimiter = '\t'))
-
-
 parallel = checkDataset()
 
 print(parallel)
@@ -243,8 +239,6 @@ normrot = 100
 ########################################################################
 print("Binning...")
 for index, row in data.iterrows():
-    #if count < 100:
-        #binsDist = addToBin(row, numberOfBins, binTotal, binsDist, "Axial distance")
     binDist = np.append(binDist, addToBinArray(row, numDistBins, binTotal, axDist))
     dists = np.append(dists, calcBinsDist(row, numDistBins, normDist, addDist, binTotal, axDist))
     binAngle = np.append(binAngle, addToBinArray(row, numAngleBins, binTotalAngle, angle))
