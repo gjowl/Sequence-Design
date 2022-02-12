@@ -1,7 +1,16 @@
+/**
+ * @Author: Gilbert Loiseau
+ * @Date:   2022/02/11
+ * @Email:  gjowl04@gmail.com
+ * @Filename: seqDesign.cpp
+ * @Last modified by:   Gilbert Loiseau
+ * @Last modified time: 2022/02/11
+ */
 #include <sstream>
 #include <iterator>
 #include <unistd.h>
 
+// MSL Functions
 #include "System.h"
 #include "CharmmSystemBuilder.h"
 #include "SystemRotamerLoader.h"
@@ -23,6 +32,8 @@
 #include "ResidueSelection.h"
 #include "BaselineEnergyBuilder.h"
 #include "BaselineInteraction.h"
+
+// Design Functions: TODO figure out which of these are necessary; a lot of this code I just added internally I believe
 #include "BaselineIMM1Interaction.h"
 #include "BaselinePairInteraction.h"
 #include "BaselineOuterPairInteraction.h"
@@ -33,15 +44,19 @@
 #include "SasaCalculator.h"
 //#include "seqDesign.h"
 
+//write in more includes here for functions files: https://www.youtube.com/watch?v=47sZhrJ1USY&ab_channel=EricLiang
+
+
 using namespace MSL;
 using namespace std;
 
 static SysEnv SYSENV;
-string programName = "seqDesign";
-string programDescription = "Designs sequences for backbone geometries extracted from the PDB, optimizing specifically for vdW energies";
+string programName = "seqDesign";//TODO: better name
+string programDescription = "Designs sequences for backbone geometries extracted from the PDB, "
+"optimizing specifically for vdW energies";
 string programAuthor = "Gilbert Loiseau";
 string programVersion = "2";
-string programDate = "24 November 2021";
+string programDate = "11 February 2022";
 string mslVersion = MSLVERSION;
 string mslDate = MSLDATE;
 
@@ -49,10 +64,11 @@ time_t startTime, endTime, spmStart, spmEnd;
 double diffTime, spmTime;
 
 /******************************************
- *  
+ *
  *  =======  OPTIONS =======
  *
  ******************************************/
+ //TODO: simplify these options and have comments for each
 struct Options{
 	// input files
 	string backboneCrd;
@@ -71,7 +87,7 @@ struct Options{
 	string sequenceEntropyFile;
 	string AACompositionPenaltyFile;
 
-	// sequence parameters 
+	// sequence parameters
 	string sequence;
 	int sequenceLength;
 	string backboneAA;
@@ -86,7 +102,8 @@ struct Options{
 	bool useTimeBasedSeed; //TRUE: use time based seed for RandomNumberGenerator OR FALSE: use given seed
 	bool energyLandscape; //TRUE: collect all sequences and their respective monomer and dimer energies
 	bool useAlaAtCTerminus; //TRUE: use ALA at C terminus of sequence FALSE: use LEU at C terminus
-	bool useBaseline; //TRUE: use ALA at C terminus of sequence FALSE: use LEU at C terminus
+	bool useBaseline; //TRUE: use  TODO...
+	bool useIMM1;
 
 	// repack parameters
 	int greedyCycles;
@@ -98,7 +115,7 @@ struct Options{
 	// load rotamers useSasa = true
 	std::vector<string> sasaRepackLevel;
 	int interfaceLevel;
-	
+
 	// tm
 	int tmStart;
 	int tmEnd;
@@ -115,16 +132,9 @@ struct Options{
 	double axialRotation;
 	bool transform;
 
-	// transformation variables
-	double deltaZ;
-	double deltaAx;
-	double deltaCross;
-	double deltaX;
-
 	// crossing point
 	int thread;
-	int bbThread;
-	
+
 	// Monte Carlo parameters
 	int MCCycles;
 	int MCMaxRejects;
@@ -134,13 +144,13 @@ struct Options{
 
 	double repackEnergyCutoff;
 	double vdwEnergyCutoff;
-	
+
 	// energy weights
 	double weight_vdw;
 	double weight_hbond;
 	double weight_solv;
 	double weight_seqEntropy;
-	
+
 	// alternate identities
 	vector<string> Ids;
 
@@ -154,6 +164,14 @@ struct Options{
 	vector<string> energyLandscapeTerms;
 	vector<string> energyTermsToOutput;
 	vector<string> energyTermList;
+
+	//SelfPairManager Options
+	bool runDEESingles;
+	bool runDEEPairs;
+	bool runSCMF;
+
+	string configfile;
+	string runNumber;
 
 	/***** MANAGEMENT VARIABLES ******/
 	string pwd; // the present working directory obtained with a getenv
@@ -177,25 +195,17 @@ struct Options{
 
 	string OPerrors; //the errors from the option parser
 	string rerunConf; // data for a configuration file that would rerun the job as the current run
-
-	string configfile;
-	string runNumber;
-	bool useIMM1;
-
-	//SelfPairManager Options
-	bool runDEESingles;
-	bool runDEEPairs;
-	bool runSCMF;
 };
 
 /**************************************************
- *  
+ *
  *  =======  INTERNAL FUNCTIONS  =======
  *
  **************************************************/
 // parse config file for given options
 Options parseOptions(int _argc, char * _argv[], Options defaults);
 
+//Keep functions that need each other to work together
 /***********************************
  *help functions
  ***********************************/
@@ -206,6 +216,7 @@ void outputErrorMessage(Options &_opt);
 /***********************************
  *geometry
  ***********************************/
+//CATM Functions
 void c2Symmetry(AtomPointerVector & _apvA, AtomPointerVector & _apvB);
 void moveZCenterOfCAMassToOrigin(AtomPointerVector& _apV, AtomPointerVector& _axis, Transforms & _trans);
 void transformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, CartesianPoint & _ori, CartesianPoint & _xAxis, CartesianPoint & _zAxis, double _zShift, double _axialRotation, double _crossingAngle, double _xShift, Transforms & _trans);
@@ -217,7 +228,7 @@ void getGeometry(Options &_opt, RandomNumberGenerator &_RNG, vector<double> &_de
 /***********************************
  *string output
  ***********************************/
-// TODO: if possible, make some of these more multipurpose
+// TODO: if possible, make some of these more multipurpose and change names, and add in one or two line examples for what they do
 string convertToPolymerSequenceNeutralPatch(string _seq, int _startResNum);
 string convertToPolymerSequenceNeutralPatchMonomer(string _seq, int _startResNum);
 string convertPolymerSeqToOneLetterSeq(Chain &_chain);
@@ -228,7 +239,7 @@ string generatePolymerSequence(string _backboneAA, int _backboneLength, int _sta
 string generateMonomerPolymerSequenceFromSequence(string _sequence, int _startResNum);
 string generateMultiIDPolymerSequence(string _seq, int _startResNum, vector<string> _alternateIds, vector<int> _interfacialPositions);
 string getInterfaceString(vector<int> _interface, int _seqLength);
-string getAlternateIdString(vector<string> _alternateIds); 
+string getAlternateIdString(vector<string> _alternateIds);
 string getInterfaceSequence(Options &_opt, string _interface, string _sequence);
 
 /***********************************
@@ -357,7 +368,7 @@ void getSasaDifference(vector<pair<string,vector<uint>>> &_sequenceStatePair, ma
 void getSasaForStartingSequence(System &_sys, string _sequence, vector<uint> _state, map<string, map<string,double>> &_sequenceEnergyMap);
 
 /******************************************
- *  
+ *
  *  =======  BEGIN MAIN =======
  *
  ******************************************/
@@ -366,11 +377,11 @@ int main(int argc, char *argv[]){
 	time_t rawtime;
 	struct tm * timeinfo;
 	char buffer[80];
-	
+
 	time(&startTime);
 	time (&rawtime);
 	timeinfo = localtime(&rawtime);
-	
+
 	strftime(buffer,sizeof(buffer),"%m_%d_%Y",timeinfo);
 	string date(buffer);
 
@@ -380,7 +391,7 @@ int main(int argc, char *argv[]){
 	Options defaults;
 	//Add in some default options that can easily be changed here
 	Options opt = parseOptions(argc, argv, defaults);
-	
+
 	if (opt.errorFlag) {
 		outputErrorMessage(opt);
 		exit(1);
@@ -414,7 +425,7 @@ int main(int argc, char *argv[]){
 	if (opt.useTimeBasedSeed){
 		RNG.setTimeBasedSeed();
 	} else {
-		RNG.setSeed(opt.seed); 
+		RNG.setSeed(opt.seed);
 	}
 
 	vector<double> densities;
@@ -435,7 +446,7 @@ int main(int argc, char *argv[]){
 
 	rerun << opt.rerunConf << endl;
 	rerun.close();
-	
+
 	/******************************************************************************
 	 *                         === GENERATE POLYGLY ===
 	 ******************************************************************************/
@@ -453,7 +464,7 @@ ATOM      3  O   DUM B   1       0.000   0.000   0.000  1.00  0.00           P\n
 ATOM      4  Z   DUM B   1       0.000   0.000   1.000  1.00  0.00           O\n\
 TER\n\
 END";
-	
+
 	PDBReader readAxis;
 	if(!readAxis.read(axis)) {
 		err << "Unable to read axis" << endl;
@@ -491,22 +502,22 @@ END";
 	 ******************************************************************************/
 	System pdb;
 	pdb.readPdb(opt.infile);
-	
+
 	// Set up chain A and chain B atom pointer vectors
 	Chain & chainA = pdb.getChain("A");
 	Chain & chainB = pdb.getChain("B");
 	AtomPointerVector & apvChainA = chainA.getAtomPointers();
 	AtomPointerVector & apvChainB = chainB.getAtomPointers();
-	
+
 	// Set up object used for transformations
-	Transforms trans; 
+	Transforms trans;
 	trans.setTransformAllCoors(true); // transform all coordinates (non-active rotamers)
 	trans.setNaturalMovements(true); // all atoms are rotated such as the total movement of the atoms is minimized
-	
-	// Transform to chosen geometry 
+
+	// Transform to chosen geometry
 	transformation(apvChainA, apvChainB, axisA, axisB, ori, xAxis, zAxis, opt.zShift, opt.axialRotation, opt.crossingAngle, opt.xShift, trans);
 	moveZCenterOfCAMassToOrigin(pdb.getAtomPointers(), helicalAxis.getAtomPointers(), trans);
-	
+
 	/******************************************************************************
 	 *  === DECLARE SYSTEM FOR POLYLEU WITH ALTERNATE IDENTITIES AT INTERFACE ===
 	 ******************************************************************************/
@@ -525,7 +536,7 @@ END";
 	CSB.setIMM1Params(15, 10);
 
 	CSB.setBuildNonBondedInteractions(false);
-	
+
 	// Setup polymer sequence and build the sequence using CharmmSystemBuilder
 	PolymerSequence PL(polySeq);
 	if(!CSB.buildSystem(PL)) {
@@ -541,7 +552,7 @@ END";
 
 	SystemRotamerLoader sysRot(sys, opt.rotLibFile);
 	sysRot.defineRotamerSamplingLevels();
-	
+
 	// Add hydrogen bond term
 	HydrogenBondBuilder hb(sys, opt.hbondFile);
 	hb.buildInteractions(50);//when this is here, the HB weight is correct
@@ -562,7 +573,7 @@ END";
 	Eset->setTermActive("SCWRL4_HBOND", true);
 	Eset->setTermActive("CHARMM_IMM1REF", true);
 	Eset->setTermActive("CHARMM_IMM1", true);
-	
+
 	// Set weights
 	Eset->setWeight("CHARMM_VDW", 1);
 	Eset->setWeight("SCWRL4_HBOND", 1);
@@ -598,7 +609,7 @@ END";
 	//TODO: make this dynamic based on the list of AAs given
 	// Get sequence entropy map
 	map<string, double> sequenceEntropyMap = readSingleParameters(opt.sequenceEntropyFile);
-	
+
 	//make into a function
 	//decided to try loading low number of rotamers for this instead of high
 	loadRotamers(sys, sysRot, opt, rotamerSamplingPerPosition);
@@ -617,7 +628,7 @@ END";
 	spm.setRunDEE(opt.runDEESingles, opt.runDEEPairs);
 	spm.setOnTheFly(false);
 	spm.setMCOptions(1000, 0.5, 5000, 3, 10, 1000, 0.01);//changed to sigmoid and added up to 5000
-	spm.saveEnergiesByTerm(true); //added back in on 09_21_2021 to get the vdw and hbond energies 
+	spm.saveEnergiesByTerm(true); //added back in on 09_21_2021 to get the vdw and hbond energies
 	spm.calculateEnergies();
 
 	//Setup running SCMF or UnbiasedMC
@@ -638,7 +649,7 @@ END";
 	time(&spmStart);
 	spm.runOptimizer();
 	time(&spmEnd);
-	
+
 	spmTime = difftime (spmEnd, spmStart);
 	vector<unsigned int> initialState = spm.getSCMFstate();
 	vector<unsigned int> bestState = spm.getBestSCMFBiasedMCState();
@@ -674,7 +685,7 @@ END";
 	sout << "HBOND:              " << hbondEnergy << endl;
 	sout << endl << "End SelfPairManager Optimization: " << spmTime << "s" << endl;
 	cout << endl << "End SelfPairManager Optimization: " << spmTime << "s" << endl;
-	
+
 	/******************************************************************************
 	 *           === METHODS FOR DETERMINING ALTERNATE SEQUENCES ===
 	 ******************************************************************************/
@@ -698,11 +709,11 @@ END";
 		stateMCLinked(sys, spm, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs, sequenceStatePair, interfacePositions, rotamerSamplingPerPosition, linkedPos, RNG, sout, err);
 	}
 
-	// I moved this on 12_6_2021: I noticed that I am getting too many threonines in my starting seqeunces, so I decided to move the baseline down here (this likely won't work for stateMCLinked, so I'll have to deal with that 
+	// I moved this on 12_6_2021: I noticed that I am getting too many threonines in my starting seqeunces, so I decided to move the baseline down here (this likely won't work for stateMCLinked, so I'll have to deal with that
 
 	//Add energies for initial sequences into the sequenceEnergyMap
 	seqs.insert(seqs.begin(), startSequence);
-	pair<string,vector<uint>> startSequenceStatePair = make_pair(startSequence, startingState); 
+	pair<string,vector<uint>> startSequenceStatePair = make_pair(startSequence, startingState);
 	sequenceStatePair.insert(sequenceStatePair.begin(), startSequenceStatePair);
 	getEnergiesForStartingSequence(opt, spm, startSequence, startingState, sequenceEnergyMap, sequenceEntropyMap);
 	getSasaForStartingSequence(sys, startSequence, startingState, sequenceEnergyMap);
@@ -744,7 +755,7 @@ END";
 }
 
 /*********************************
- *  
+ *
  *  ======= FUNCTIONS =======
  *
  *********************************/
@@ -883,7 +894,7 @@ void c2Symmetry(AtomPointerVector & _apvA, AtomPointerVector & _apvB) {
 	m[2][2] = 1.0;
 
 	// Rotate chain B around Z axis
-	Transforms trans; 
+	Transforms trans;
 	trans.rotate(_apvB, m);
 }
 
@@ -927,7 +938,7 @@ void transformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, At
 void backboneMovement(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, Transforms _trans, double _deltaMove, unsigned int moveType) {
 	 if (moveType == 0) {
 		// Z Shift
-		CartesianPoint translateA = _axisA(1).getCoor() - _axisA(0).getCoor(); // vector minus helical center 
+		CartesianPoint translateA = _axisA(1).getCoor() - _axisA(0).getCoor(); // vector minus helical center
 		translateA = translateA.getUnit() * _deltaMove; // unit vector of helical _axis times the amount to shift by
 
 		_trans.translate(_chainA, translateA);
@@ -943,7 +954,7 @@ void backboneMovement(AtomPointerVector & _chainA, AtomPointerVector & _chainB, 
 		c2Symmetry(_axisA, _axisB);
 
 	} else 	if (moveType == 2) {
-		// Crossing Angle 
+		// Crossing Angle
 		_trans.rotate(_chainA, (_deltaMove * 0.5), _axisA(0).getCoor(), _axisB(0).getCoor());
 		_trans.rotate(_axisA, (_deltaMove * 0.5), _axisA(0).getCoor(), _axisB(0).getCoor());
 
@@ -953,7 +964,7 @@ void backboneMovement(AtomPointerVector & _chainA, AtomPointerVector & _chainB, 
 	} else if (moveType == 3) {
 		// XShift
 		// Helix A interhelical distance
-		CartesianPoint translateA = _axisB(0).getCoor() - _axisA(0).getCoor(); // vector minus helical center 
+		CartesianPoint translateA = _axisB(0).getCoor() - _axisA(0).getCoor(); // vector minus helical center
 		translateA = translateA.getUnit() * _deltaMove * -0.5; // unit vector of helical axis times the amount to shift by
 		_trans.translate(_chainA, translateA);
 		_trans.translate(_axisA, translateA);
@@ -980,7 +991,7 @@ void xShiftTransformation(AtomPointerVector & _chainA, AtomPointerVector & _chai
 
 void readGeometryFile(string _filename, vector<string>& _fileVec) {
 	ifstream file;
-	file.open(_filename.c_str()); 
+	file.open(_filename.c_str());
 	if(!file.is_open()) {
 		cerr << "Unable to open " << _filename << endl;
 		exit(0);
@@ -1033,7 +1044,7 @@ void getGeometry(Options &_opt, RandomNumberGenerator &_RNG, vector<double> &_de
  *string output functions
  ***********************************/
 string convertToPolymerSequenceNeutralPatch(string _seq, int _startResNum) {
-	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to 
+	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to
 	// A:{32}ALA ILE GLY GLY GLY
 	// B:{32}ALA ILE GLY GLY GLY
 	string ps = "";
@@ -1071,7 +1082,7 @@ string convertToPolymerSequenceNeutralPatch(string _seq, int _startResNum) {
 }
 
 string convertToPolymerSequenceNeutralPatchMonomer(string _seq, int _startResNum) {
-	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to 
+	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to
 	// A:{32}ALA ILE GLY GLY GLY
 	string ps = "";
 	for(string::iterator it = _seq.begin(); it != _seq.end();it++ ) {
@@ -1145,7 +1156,7 @@ string generateBackboneSequence(string _backboneAA, int _length, bool _useAlaCap
 }
 
 string generateMonomerMultiIDPolymerSequence(string _seq, int _startResNum, vector<string> _alternateIds, vector<int> _interfacialPositions) {
-	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to 
+	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to
 	// A:{32}ALA ILE GLY GLY GLY
 	string ps = "";
 	int counter = 0;
@@ -1231,7 +1242,7 @@ string generateMonomerPolymerSequenceFromSequence(string _sequence, int _startRe
 }
 
 string generateMultiIDPolymerSequence(string _seq, int _startResNum, vector<string> _alternateIds, vector<int> _interfacialPositions) {
-	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to 
+	// convert a 1 letter _sequence like AIGGG and startResNum = 32 to
 	// A:{32}ALA ILE GLY GLY GLY
 	// B:{32}ALA ILE GLY GLY GLY
 	string ps = "";
@@ -1273,7 +1284,7 @@ string generateMultiIDPolymerSequence(string _seq, int _startResNum, vector<stri
 			ss << *it;
 			string resName = MslTools::getThreeLetterCode(ss.str());
 			//cout << pos << endl;
-			if (find(_interfacialPositions.begin(), _interfacialPositions.end(), pos) != _interfacialPositions.end()){	
+			if (find(_interfacialPositions.begin(), _interfacialPositions.end(), pos) != _interfacialPositions.end()){
 				ps = ps + " [";
 				if(resName == "HIS") {
 					ps = ps + " HSE";
@@ -1314,7 +1325,7 @@ string getInterfaceString(vector<int> _interface, int _seqLength){
 	return interfaceString;
 }
 
-string getAlternateIdString(vector<string> _alternateIds){ 
+string getAlternateIdString(vector<string> _alternateIds){
 	string alternateIdsString = "";
 	for (uint i=0; i<_alternateIds.size(); i++){
 		if (i == _alternateIds.size()-1){
@@ -1362,7 +1373,7 @@ std::vector < std::vector < bool > > getActiveMask (System &_sys) {
 		Position &pos = _sys.getPosition(_sys.getMasterPositions()[i]);
 		unsigned int activeRes = pos.getActiveIdentity();
 		residueState.push_back(activeRes);
-		
+
 		resRots[i] = std::vector<unsigned int> (pos.identitySize());
 		for (unsigned int j = 0; j < pos.identitySize(); j++) {
 			resRots[i][j] = pos.getTotalNumberOfRotamers(j);
@@ -1386,7 +1397,7 @@ std::vector < std::vector < bool > > getActiveMask (System &_sys) {
 				}
 			}
 		}
-	
+
 		//Sanity check for presence of true rotamers
 
 		bool trueRots = false;
@@ -1407,7 +1418,7 @@ std::vector < std::vector < bool > > getActiveMask (System &_sys) {
 			for (uint k = 0; k < resMask[i].size(); k++) {
 				cerr << resMask[i][k] << " ";
 			}
-			cerr << endl;	
+			cerr << endl;
 			exit(9123);
 		}
 	}
@@ -1458,21 +1469,21 @@ vector<vector<string>> convertToLinkedFormat(System &_sys, vector<int> &_interfa
 	for (uint k=0; k<_backboneLength; k++){//TODO: if you want to make it possible to do sequences that are not linked, need to change this function!
 		if (_interfacialPositions[k] == 1){
 			vector<string> tempPos;
-	
+
 			Position &posA = _sys.getPosition(k);
 			Position &posB = _sys.getPosition(k+_backboneLength);
-	
+
 			string A = posA.toString();
 			string B = posB.toString();
-	
+
 			string delimiter = " ";
-			
+
 			size_t p = 0;
 			p = A.find(delimiter);
-	
+
 			tempPos.push_back(A.substr(0, p));
 			tempPos.push_back(B.substr(0, p));
-	
+
 			stringPositions.push_back(tempPos);
 		}
 	}
@@ -1555,7 +1566,7 @@ std::vector<pair <int, double> > calculateResidueBurial (System &_sys, Options &
 	 ******************************************************************************/
 	// Read in Gly-69 to use as backbone coordinate template
 	CRDReader cRead;
-	cRead.open(_opt.backboneCrd); 
+	cRead.open(_opt.backboneCrd);
 	if(!cRead.read()) {
 		cerr << "Unable to read " << _opt.backboneCrd << endl;
 		exit(0);
@@ -1584,7 +1595,7 @@ std::vector<pair <int, double> > calculateResidueBurial (System &_sys, Options &
 		double resiSasaDimer = dimerSasa.getResidueSasa(posIdDimer);
 		double burial = resiSasaDimer/resiSasaMonomer;
 		residueBurial.push_back(pair<int,double>(i, burial));
-		
+
 		//set sasa for each residue in the b-factor
 		AtomSelection selA(_sys.getPosition(i).getAtomPointers());
 		AtomSelection selB(_sys.getPosition(i+_opt.backboneLength).getAtomPointers());
@@ -1621,7 +1632,7 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 
 	CSB.setBuildNonBondedInteractions(false);
 	//CSB.setBuildNoTerms();
-	
+
 	if(!CSB.buildSystem(_PS)) {
 		cout << "Unable to build system from " << _PS << endl;
 		exit(0);
@@ -1643,16 +1654,16 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 	Eset->setTermActive("CHARMM_U-BR", false);
 	Eset->setTermActive("CHARMM_VDW", true);
 	Eset->setTermActive("SCWRL4_HBOND", true);
-	
+
 	// Set weights
 	Eset->setWeight("CHARMM_VDW", 1);
 	Eset->setWeight("SCWRL4_HBOND", 1);
 
 	CSB.updateNonBonded(10,12,50);
-	
+
 	SystemRotamerLoader sysRot(sys, _opt.rotLibFile);
 	sysRot.defineRotamerSamplingLevels();
-	
+
 	// Add hydrogen bond term
 	HydrogenBondBuilder hb(sys, _opt.hbondFile);
 	hb.buildInteractions(50);//when this is here, the HB weight is correct
@@ -1662,7 +1673,7 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 	 ******************************************************************************/
 	System pdb;
 	pdb.readPdb(_opt.infile);//gly69 pdb file; changed from the CRD file during testing to fix a bug but both work and the bug was separate
-	
+
 	Chain & chainA = pdb.getChain("A");
 	Chain & chainB = pdb.getChain("B");
 
@@ -1688,14 +1699,14 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 	CartesianPoint xAxis(1.0,0.0,0.0);
 
 	// Objects used for transformations
-	Transforms trans; 
+	Transforms trans;
 	trans.setTransformAllCoors(true); // transform all coordinates (non-active rotamers)
 	trans.setNaturalMovements(true); // all atoms are rotated such as the total movement of the atoms is minimized
 
 	// Transformation to zShift, axialRotation, crossingAngle, and short xShift to identify potential interacting positions
 	transformation(apvChainA, apvChainB, axisA, axisB, ori, xAxis, zAxis, _opt.zShift, _opt.axialRotation, _opt.crossingAngle, _opt.xShift, trans);//one of the shortest distances given from my pdb searc
 	moveZCenterOfCAMassToOrigin(pdb.getAtomPointers(), helicalAxis.getAtomPointers(), trans);
-	
+
 	sys.assignCoordinates(pdb.getAtomPointers(),false);
 	sys.buildAllAtoms();
 
@@ -1714,7 +1725,7 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 	backboneSeq = generateBackboneSequence("L", _opt.backboneLength, _opt.useAlaAtCTerminus);
 	string variablePositionString = generateString("0", _opt.backboneLength);
 	string rotamerLevels = generateString("0", _opt.backboneLength);
-	
+
 	int numberOfRotamerLevels = _opt.sasaRepackLevel.size();
 	int highestRotamerLevel = numberOfRotamerLevels-1;
 	//make into a function
@@ -1761,9 +1772,9 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 
 	//String for the positions of the sequences that are considered interface for positions amd high rotamers
 	string rotamerSamplingString = getInterfaceString(rotamerSamplingPerPosition, _opt.backboneLength);
-	
-	// Vector for linked positions in "A,25 B,25" format 
-	
+
+	// Vector for linked positions in "A,25 B,25" format
+
 
 	// Define referenced output variables
 	_rotamerLevels = rotamerLevels;
@@ -1793,7 +1804,7 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 	cout << "PolyLeu Backbone:   " << backboneSeq << endl;
 	cout << "Variable Positions: " << variablePositionString << endl;
 	cout << "Rotamers Levels:    " << rotamerSamplingString << endl;
-	
+
 	int numPosAtInterface = 0;
 	for(string::iterator it = variablePositionString.begin(); it != variablePositionString.end();it++ ) {
 		stringstream ss;
@@ -1926,8 +1937,8 @@ void outputEnergyFile(Options &_opt, string _interface, vector<string> _allDesig
 	eout << "repackLevels" << tab;
 	eout << "interfaceLevels" << tab;
 	eout << "backboneLength" << tab;
-	eout <<	"PDBPath" << endl; 
-	
+	eout <<	"PDBPath" << endl;
+
 	cout << "Starting Sequence" << tab;
 	cout << "Baseline" << tab;
 	cout << "Sequence" << tab;
@@ -1942,7 +1953,7 @@ void outputEnergyFile(Options &_opt, string _interface, vector<string> _allDesig
 	cout << "repackLevels" << tab;
 	cout << "interfaceLevels" << tab;
 	cout << "backboneLength" << tab;
-	cout <<	"PDBPath" << endl; 
+	cout <<	"PDBPath" << endl;
 
 	for (uint i=0; i<_allDesigns.size() ; i++){
 		eout << _allDesigns[i] << endl;
@@ -1959,7 +1970,7 @@ void makeRepackConfig(Options &_opt, string _sequence, string _designDir, vector
 	//string designFileDir = "/exports/home/gloiseau/mslib/trunk_AS/designFiles/";//Running on chtc server and needed these to access the proper directories after transferring them back to our server
 	//TODO: make sure to add the designFiles directory to this directory
 	string designFileDir = "/data02/gloiseau/Sequence_Design_Project/vdwSequenceDesign/sequenceDesign/12_06_2021/";
-	
+
 	//TODO: also when I run this locally, the output for input files is poor. I'll need to fix these outputs in the future (maybe just add an inputfile directory?
 	dout << "#Input Files" << endl;
 	dout << "topFile            " << designFileDir + _opt.topFile << endl;
@@ -1970,7 +1981,7 @@ void makeRepackConfig(Options &_opt, string _sequence, string _designDir, vector
 	dout << "designPdb          " << _pdbPath << endl;
 	dout << "designCrd          " << _crdPath << endl;
 	dout << "outputDir          " << _designDir << endl << endl;
-	
+
 	dout << "#Geometry" << endl;
 	dout << "xShift             " << _opt.xShift << endl;
 	dout << "crossingAngle      " << _opt.crossingAngle << endl;
@@ -1979,7 +1990,7 @@ void makeRepackConfig(Options &_opt, string _sequence, string _designDir, vector
 	dout << "thread             " << _opt.thread << endl;
 	dout << "tmStart            " << _opt.tmStart << endl;
 	dout << "tmEnd              " << _opt.tmEnd << endl << endl;
-	
+
 	dout << "#Design Parameters" << endl;
 	dout << "sequence              " << _sequence << endl;
 	dout << "rotamerSamplingString ";
@@ -2029,7 +2040,7 @@ void makeRepackConfig(Options &_opt, string _sequence, string _designDir, vector
 	dout << "dimerVdw         " << _energyMap.at("VDWDimer") << endl;
 	dout << "dimerHbond       " << _energyMap.at("HBONDDimer") << endl;
 	dout << "dimerIMM1        " << _energyMap.at("IMM1Dimer") << endl << endl;
-	
+
 	dout << "#Total Energy" << endl;
 	dout << "Total            " << _energyMap.at("Total") << endl;
 	dout.close();
@@ -2102,7 +2113,7 @@ void makeDockingConfig(Options &_opt, string _sequence, string _designDir, strin
 	dout << "dimerVdw             " << _energyMap.at("VDWDimer") << endl;
 	dout << "dimerHbond           " << _energyMap.at("HBONDDimer") << endl;
 	dout << "dimerIMM1            " << _energyMap.at("IMM1Dimer") << endl << endl;
-	
+
 	dout << "#Total Energy" << endl;
 	dout << "Total            " << _energyMap.at("Total") << endl;
 	dout.close();
@@ -2160,7 +2171,7 @@ void outputDesignFiles(Options &_opt, string _interface, vector<int> _rotamerSam
 		string crdPath = designDir + "/" + sequence + ".crd";
 		makeRepackConfig(_opt, sequence, designDir, state, seqNumber, pdbPath, crdPath, energyMap, _rotamerSamplingPerPosition);
 		makeDockingConfig(_opt, sequence, designDir, pdbPath, energyMap, _rotamerSamplingPerPosition);
-	
+
 		// Append other important features to the end energy files lines
 		string interfaceSequence = getInterfaceSequence(_opt,_interface, sequence);
 		tmp.append(startSequence);
@@ -2189,7 +2200,7 @@ void loadMonomerRotamers(System &_sys, SystemRotamerLoader &_sysRot){
 				cerr << "Cannot load rotamers for " << pos.getResidueName() << endl;
 			}
 		}
-	}	
+	}
 }
 
 void loadRotamersSPM(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt){
@@ -2207,10 +2218,10 @@ void loadRotamersSPM(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt){
 					cout << posB.getPositionId() << ", " << posB.getResidueName() << ":" << posRot << endl;
 				}
 				if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-					if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) { 
+					if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) {
 						cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
 					}
-					if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) { 
+					if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) {
 						cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
 					}
 				}
@@ -2222,10 +2233,10 @@ void loadRotamersSPM(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt){
 				cout << posB.getPositionId() << ", " << posB.getResidueName() << ": " << posRot << endl;
 			}
 			if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-				if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) { 
+				if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) {
 					cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
 				}
-				if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) { 
+				if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) {
 					cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
 				}
 			}
@@ -2248,10 +2259,10 @@ void loadRotamersBySASABurial(System &_sys, SystemRotamerLoader &_sysRot, Option
 					cout << posB.getPositionId() << ", " << posB.getResidueName() << ":" << posRot << endl;
 				}
 				if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-					if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) { 
+					if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) {
 						cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
 					}
-					if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) { 
+					if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) {
 						cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
 					}
 				}
@@ -2263,10 +2274,10 @@ void loadRotamersBySASABurial(System &_sys, SystemRotamerLoader &_sysRot, Option
 				cout << posB.getPositionId() << ", " << posB.getResidueName() << ": " << posRot << endl;
 			}
 			if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-				if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) { 
+				if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) {
 					cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
 				}
-				if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) { 
+				if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) {
 					cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
 				}
 			}
@@ -2320,7 +2331,7 @@ void loadRotamers(System &_sys, SystemRotamerLoader &_sysRot, string _SL){
 				}
 			}
 		}
-	}	
+	}
 }
 
 void loadRotamers(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt, vector<int> &_rotamerSampling){
@@ -2399,7 +2410,7 @@ double sumEnergyVector(vector<double> _energies){
  *calculate energies
  ***********************************/
 void computeDimerEnergiesLinked(System &_sys, Options &_opt, map<string,map<string,double>> &_sequenceEnergyMap, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, PDBWriter &_writer, ofstream &_sout, ofstream &_err) {
-	
+
 	EnergySet* Eset = _sys.getEnergySet();
 	_sys.calcEnergy();
 
@@ -2412,17 +2423,17 @@ void computeDimerEnergiesLinked(System &_sys, Options &_opt, map<string,map<stri
 		string sequence = _sequenceStatePair[i].first;
 		vector<uint> stateVec = _sequenceStatePair[i].second;
 		_sys.setActiveRotamers(stateVec);
-		
+
 		//Calculate Dimer energy for output
 		double dimerEnergy = _sys.calcEnergy();
-		double finalEnergy = dimerEnergy-_sequenceEnergyMap[sequence]["Monomer"];//TODO: make this more elegant by pulling from the map 
+		double finalEnergy = dimerEnergy-_sequenceEnergyMap[sequence]["Monomer"];//TODO: make this more elegant by pulling from the map
 		_sout << "Sequence: " << sequence << endl;
 		_sout << "Dimer Energy: " << dimerEnergy << endl;
 		_sout << "Final Energy = Dimer - Monomer = " << dimerEnergy << "+" << _sequenceEnergyMap[sequence]["Monomer"]*(-1) << "=" << finalEnergy << endl << endl;
-		
+
 		map<string,double> &energyMap = _sequenceEnergyMap[sequence];
 		outputEnergiesByTermLinked(Eset, energyMap, _opt.energyTermList, "Dimer");
-		
+
 		//Setup directory for individual design
 		string repackDir = _opt.pdbOutputDir + "/" + MslTools::intToString(i);
 		string cmd = "mkdir -p " + repackDir;
@@ -2432,7 +2443,7 @@ void computeDimerEnergiesLinked(System &_sys, Options &_opt, map<string,map<stri
 		}
 		_sequenceEnergyMap[sequence]["Dimer"] = dimerEnergy;
 		_sequenceEnergyMap[sequence]["Total"] = finalEnergy;
-		
+
 		_sys.setActiveRotamers(stateVec);
 		PDBWriter designWriter;
 		designWriter.open(repackDir + "/" + MslTools::intToString(i) + ".pdb");
@@ -2440,7 +2451,7 @@ void computeDimerEnergiesLinked(System &_sys, Options &_opt, map<string,map<stri
 		designWriter.close();
 		_writer.write(_sys.getAtomPointers(), true, false, true);
 		saveEnergyDifference(_opt, _sequenceEnergyMap, sequence);
-		
+
 		//Write CRD if below energy cutoff
 		if (finalEnergy < _opt.repackEnergyCutoff){
 			CRDWriter writer;
@@ -2456,14 +2467,14 @@ void computeDimerEnergies(System &_sys, Options &_opt, map<string, map<string,do
 	time_t startTimeLMC, endTimeLMC;
 	double diffTimeLMC;
 	time(&startTimeLMC);
-	
+
 	// Initialize PDBWriter for design
 	PDBWriter writer;
 	writer.open(_opt.pdbOutputDir + "/allDesigns.pdb");
 
 	_sout << "Calculating dimer energies..." << endl;
 	cout << "Calculating dimer energies..." << endl;
-	if (_opt.linkInterfacialPositions){	
+	if (_opt.linkInterfacialPositions){
 		computeDimerEnergiesLinked(_sys, _opt, _sequenceEnergyMap, _sequenceStatePair, _rotamerSamplingPerPosition, _linkedPos, _RNG, writer, _sout, _err);
 	} else {
 		for (uint i=0; i<_sequenceStatePair.size(); i++){
@@ -2476,7 +2487,7 @@ void computeDimerEnergies(System &_sys, Options &_opt, map<string, map<string,do
 			_sequenceStatePair[i].second = state;
 		}
 	}
-	
+
 	time(&endTimeLMC);
 	diffTimeLMC = difftime (endTimeLMC, startTimeLMC);
 	writer.close();
@@ -2485,7 +2496,7 @@ void computeDimerEnergies(System &_sys, Options &_opt, map<string, map<string,do
 }
 
 void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,double>> &_sequenceEnergyMap, string &_sequence, vector<uint> &_stateVec, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, int _seqNumber, RandomNumberGenerator &_RNG, PDBWriter &_writer, ofstream &_sout, ofstream &_err) {
-	
+
 	string polySeq = convertToPolymerSequenceNeutralPatch(_sequence, _opt.thread);
 	PolymerSequence PL(polySeq);
 
@@ -2548,7 +2559,7 @@ void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,doubl
 	 *                === DELETE TERMINAL HYDROGEN BOND INTERACTIONS ===
 	 ******************************************************************************/
 	deleteTerminalHydrogenBondInteractions(sys,_opt);
-	
+
 	/******************************************************************************
 	 *              === LOAD ROTAMERS AND CHOOSE TO LINK INTERFACE ===
 	 ******************************************************************************/
@@ -2573,17 +2584,17 @@ void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,doubl
 	repackSideChains(spm, 10);
 	_stateVec = spm.getMinStates()[0];
 	sys.setActiveRotamers(_stateVec);
-	
+
 	double dimerEnergy = spm.getStateEnergy(_stateVec);
-	double finalEnergy = dimerEnergy-_sequenceEnergyMap[_sequence]["Monomer"];//TODO: make this more elegant by pulling from the map 
+	double finalEnergy = dimerEnergy-_sequenceEnergyMap[_sequence]["Monomer"];//TODO: make this more elegant by pulling from the map
 	_sout << "Dimer Energy: " << dimerEnergy << endl;
 	_sout << "Final Energy w/ IMM1 = Dimer - Monomer = " << dimerEnergy << "+" << _sequenceEnergyMap[_sequence]["Monomer"]*(-1) << "=" << finalEnergy << endl;
 	cout << "Dimer Energy: " << dimerEnergy << endl;
 	cout << "Final Energy = Dimer - Monomer = " << dimerEnergy << "+" << _sequenceEnergyMap[_sequence]["Monomer"]*(-1) << "=" << finalEnergy << endl;
-	
+
 	map<string,double> &energyMap = _sequenceEnergyMap[_sequence];
 	outputEnergiesByTerm(spm, _stateVec, energyMap, _opt.energyTermList, "Dimer", true);
-	
+
 	//Setup directory for individual design
 	string repackDir = _opt.pdbOutputDir + "/" + MslTools::intToString(_seqNumber);
 	string cmd = "mkdir -p " + repackDir;
@@ -2593,7 +2604,7 @@ void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,doubl
 	}
 	_sequenceEnergyMap[_sequence]["Dimer"] = dimerEnergy;
 	_sequenceEnergyMap[_sequence]["Total"] = finalEnergy;
-	
+
 	sys.setActiveRotamers(_stateVec);
 	PDBWriter designWriter;
 	designWriter.open(repackDir + "/" + MslTools::intToString(_seqNumber) + ".pdb");
@@ -2601,7 +2612,7 @@ void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,doubl
 	designWriter.close();
 	_writer.write(sys.getAtomPointers(), true, false, true);
 	saveEnergyDifference(_opt, _sequenceEnergyMap, _sequence);
-	
+
 	//Write CRD if below energy cutoff
 	if (finalEnergy < _opt.repackEnergyCutoff){
 		CRDWriter writer;
@@ -2612,7 +2623,7 @@ void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,doubl
 }
 
 void computeMonomerEnergyNoIMM1(Options& _opt, map<string,map<string,double>> &_sequenceEnergyMap, string &_seq, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err) {
-	
+
 	string polySeq = convertToPolymerSequenceNeutralPatchMonomer(_seq, _opt.thread);
 	PolymerSequence PS(polySeq);
 
@@ -2636,7 +2647,7 @@ void computeMonomerEnergyNoIMM1(Options& _opt, map<string,map<string,double>> &_
 	 ******************************************************************************/
 	// Read in Gly-69 to use as backbone coordinate template
 	CRDReader cRead;
-	cRead.open(_opt.backboneCrd); 
+	cRead.open(_opt.backboneCrd);
 	if(!cRead.read()) {
 		cerr << "Unable to read " << _opt.backboneCrd << endl;
 		exit(0);
@@ -2677,7 +2688,7 @@ void computeMonomerEnergyNoIMM1(Options& _opt, map<string,map<string,double>> &_
 	 *              === DELETE TERMINAL HYDROGEN BOND INTERACTIONS ===
 	 ******************************************************************************/
 	deleteTerminalHydrogenBondInteractions(monoSys,_opt);
-	
+
 	/*****************************************************************************
 	 *                 === GREEDY TO OPTIMIZE ROTAMERS ===
 	 ******************************************************************************/
@@ -2700,7 +2711,7 @@ void computeMonomerEnergyNoIMM1(Options& _opt, map<string,map<string,double>> &_
 	 ******************************************************************************/
 	repackSideChains(monoSpm, 10);
 	vector<uint> stateVec = monoSpm.getMinStates()[0];
-	
+
 	monoSys.setActiveRotamers(stateVec);
 	double monomerEnergy = monoSpm.getStateEnergy(stateVec)*2;
 
@@ -2719,7 +2730,7 @@ void computeMonomerEnergyNoIMM1(Options& _opt, map<string,map<string,double>> &_
 }
 
 void computeMonomerEnergyIMM1(Options& _opt, Transforms & _trans, map<string,map<string,double>> &_sequenceEnergyMap, string _seq, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err) {
-	
+
 	//string polySeq = convertToPolymerSequenceNeutralPatchMonomer(_seq, _opt.thread);//fixed monomer calculation issue on 05_12_2021
 	string polySeq = generateMonomerPolymerSequenceFromSequence(_seq, _opt.thread);
 	PolymerSequence PS(polySeq);
@@ -2749,7 +2760,7 @@ void computeMonomerEnergyIMM1(Options& _opt, Transforms & _trans, map<string,map
 	 ******************************************************************************/
 	// Read in Gly-69 to use as backbone coordinate template
 	CRDReader cRead;
-	cRead.open(_opt.backboneCrd); 
+	cRead.open(_opt.backboneCrd);
 	if(!cRead.read()) {
 		cerr << "Unable to read " << _opt.backboneCrd << endl;
 		exit(0);
@@ -2775,7 +2786,7 @@ void computeMonomerEnergyIMM1(Options& _opt, Transforms & _trans, map<string,map
 	 *              === DELETE TERMINAL HYDROGEN BOND INTERACTIONS ===
 	 ******************************************************************************/
 	deleteTerminalHydrogenBondInteractions(monoSys,_opt);
-	
+
 	/******************************************************************************
 	 *                     === INITIAL VARIABLE SET UP ===
 	 ******************************************************************************/
@@ -2796,7 +2807,7 @@ void computeMonomerEnergyIMM1(Options& _opt, Transforms & _trans, map<string,map
 	monoEset->setWeight("SCWRL4_HBOND", 1);
 	monoEset->setWeight("CHARMM_IMM1REF", 1);
 	monoEset->setWeight("CHARMM_IMM1", 1);
-	
+
 	/******************************************************************************
 	 *                     === HELICAL AXIS SET UP ===
 	 ******************************************************************************/
@@ -2808,7 +2819,7 @@ ATOM      3  O   DUM B   1       0.000   0.000   0.000  1.00  0.00           P\n
 ATOM      4  Z   DUM B   1       0.000   0.000   1.000  1.00  0.00           O\n\
 TER\n\
 END";
-	
+
 	PDBReader readAxis;
 	if(!readAxis.read(axis)) {
 		cout << "Unable to read axis" << endl;
@@ -2826,7 +2837,7 @@ END";
 	 ******************************************************************************/
 	loadRotamers(monoSys, monoRot, "SL95.00");
 	CSBMono.updateNonBonded(10,12,50);
-	
+
 	// Optimize Initial Starting Position (using Baseline to get back to original result)
 	SelfPairManager monoSpm;
 	monoSpm.seed(_RNG.getSeed());
@@ -2855,7 +2866,7 @@ END";
 	CartesianPoint moveAxisBOneAngstrom;
 	moveAxisBOneAngstrom.setCoor(1.0, 0.0, 0.0);
 	_trans.translate(axisB, moveAxisBOneAngstrom);
-	
+
 	monoSys.calcEnergy();
 
 	// move center of mass to origin
@@ -2884,7 +2895,7 @@ END";
 	double bestZ = -5.0;
 
 	monoSys.calcEnergy();
-	
+
 	// Repack side chains
 	monoSpm.setOnTheFly(1);
 	monoSpm.calculateEnergies();
@@ -2902,7 +2913,7 @@ END";
 
 		_trans.translate(chainA, zUnitVector);
 
-		//double currentZ = -5.0 + ((i+1)*1.0); 
+		//double currentZ = -5.0 + ((i+1)*1.0);
 		monoSpm.calculateEnergies();
 		monoSpm.runGreedyOptimizer(_opt.greedyCycles);
 		currentEnergy = monoSpm.getMinBound()[0];
@@ -2959,7 +2970,7 @@ END";
 			}
 
 			_trans.rotate(chainA, 90.0, axisA(0).getCoor(), axisA(1).getCoor());
-			
+
 		}
 	}
 
@@ -2988,7 +2999,7 @@ END";
 		//======================================
 		if (moveToPreform == 0) {
 			deltaZShift = getStandardNormal(_RNG) * 1.0;
-			CartesianPoint translateA = axisA(1).getCoor() - axisA(0).getCoor(); // vector minus helical center 
+			CartesianPoint translateA = axisA(1).getCoor() - axisA(0).getCoor(); // vector minus helical center
 			translateA = translateA.getUnit() * deltaZShift; // unit vector of helical _axis times the amount to shift by
 			_trans.translate(chainA, translateA);
 			//_fout << setiosflags(ios::fixed) << setprecision(3)<< "Zshift: " << deltaZShift << endl;
@@ -3054,19 +3065,19 @@ END";
 	double monomerEnergy = monoSpm.getStateEnergy(stateVec)*2;
 	_sout << "Monomer Energy w/ IMM1: " << monomerEnergy << endl;
 	cout << "Monomer Energy w/ IMM1: " << monomerEnergy << endl;
-	
+
 	//Setup SasaCalculator to calculate the monomer SASA
 	SasaCalculator monoSasa(monoSys.getAtomPointers());
 	monoSasa.calcSasa();
 	double monomerSasa = monoSasa.getTotalSasa();
 	double totalMonomerSasa = monomerSasa*2;
-	
+
 	// Add energy to sequence energy map
 	map<string,double> &energyMap = _sequenceEnergyMap[_seq];
 	outputEnergiesByTerm(monoSpm, stateVec, energyMap, _opt.energyTermList, "Monomer", true);
 	_sequenceEnergyMap[_seq]["Monomer"] = monomerEnergy;
 	_sequenceEnergyMap[_seq]["MonomerSasa"] = totalMonomerSasa;
-	
+
 	// Clear saved coordinates
 	monoSys.clearSavedCoor("savedBestMonomer");
 	monoSys.clearSavedCoor("bestZ");
@@ -3207,7 +3218,7 @@ map<string, double> readSingleParameters(string _baselineFile){
 		selfEnergies[MslTools::toUpper(tokens[0])] = MslTools::toDouble(tokens[1]);
 		//cout << tokens[0] << " " << tokens[1] << " " << tokens[2] << " = " << tokens[3] << endl;
 	}
-	
+
 	selfReader.close();
 	return selfEnergies;
 }
@@ -3240,7 +3251,7 @@ map<string,map<string,map<uint, double>>> readPairParameters(string _baselineFil
 			pairEnergies[MslTools::toUpper(tokens[1])][MslTools::toUpper(tokens[0])][MslTools::toInt(tokens[2])] = MslTools::toDouble(tokens[3]);
 		}
 	}
-	
+
 	pairReader.close();
 	return pairEnergies;
 }
@@ -3260,7 +3271,7 @@ void randomPointMutation(System &_sys, Options &_opt, RandomNumberGenerator &_RN
 	randId = _ids[randIdNum];
 
 	string res = _sys.getPosition(pos).getResidueName();
-	
+
 	_sys.setActiveIdentity(posId, randId);
 }
 
@@ -3283,7 +3294,7 @@ void randomPointMutationUnlinked(System &_sys, Options &_opt, RandomNumberGenera
 	randId = _ids[randIdNum];
 
 	string res = _sys.getPosition(posA).getResidueName();
-	
+
 	_sys.setActiveIdentity(posIdA, randId);
 	_sys.setActiveIdentity(posIdB, randId);
 }
@@ -3297,7 +3308,7 @@ void randomRotamerChange(System &_sys, Options &_opt, RandomNumberGenerator &_RN
 	Position &randPos = _sys.getPosition(pos);
 	string posId = randPos.getPositionId();
 	int numRots = randPos.getTotalNumberOfRotamers();
-	
+
 	// Get a random integer to pick the rotamer
 	int randRot = _RNG.getRandomInt(0, numRots-1);
 	_stateVec[pos] = randRot;
@@ -3413,7 +3424,7 @@ void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>, 
 		} else {
 			//choose random saved state and replace if better
 			int seqNumber = _RNG.getRandomInt(0, _energyStateVec.size()-1);
-			int vecPos = seqNumber;	
+			int vecPos = seqNumber;
 			vector<uint> lowStateProb = _energyStateVec[seqNumber].second;
 			string lowSeqProb = _energyVector[seqNumber].second;
 			map<string,double> energyMap = _stateEnergyMap.at(lowStateProb);
@@ -3450,7 +3461,7 @@ void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>, 
 			double totSEProb = prevSEProb+currSEProb;
 			double prevSeqProp = prevSEProb/totSEProb;
 			double currSeqProp = currSEProb/totSEProb;
-			
+
 			//Convert the probability of each sequence to an entropy term that can be added to the original energy to directly compare two sequences
 			double prevEntropy = -log(prevSeqProp)*0.592*_opt.weight_seqEntropy;
 			double currEntropy = -log(currSeqProp)*0.592*_opt.weight_seqEntropy;
@@ -3499,7 +3510,7 @@ map<int,map<int,pair<uint, uint>>> setupRotamerPositionMap(System &_sys, vector<
 //makes the best state applicable for unlinked positions by duplicating the rotamer at each interfacial position on the opposite chain
 void unlinkBestState(Options &_opt, vector<uint> &_bestState, vector<int> _rotamerSampling, int _backboneLength){
 	vector<int> linkedPositions = getLinked(_rotamerSampling, _backboneLength, _opt.interfaceLevel, _opt.sasaRepackLevel.size()-1);
-	
+
 	for (uint i=_backboneLength; i<_backboneLength*2; i++){
 		vector<int>::iterator itr;
 		itr = find(linkedPositions.begin(), linkedPositions.end(), i-_backboneLength);
@@ -3558,7 +3569,7 @@ map<string,int> getAACountMap(vector<string> _seq){
 }
 
 double calcNumberOfPermutations(map<string,int> _seqAACounts, int _seqLength){
-	//This function calculates number of permutations using following equation: n!/(n-r)! where n is number of positions and r is number of AAs	
+	//This function calculates number of permutations using following equation: n!/(n-r)! where n is number of positions and r is number of AAs
 	double numPermutation = 1;
 	double permutationDenominator = 1;
 	for(uint i=_seqLength; i>1; i--){
@@ -3663,7 +3674,7 @@ void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _c
 	double totSEProb = _prevSEProb+_currSEProb;
 	double prevSeqProp = _prevSEProb/totSEProb;
 	double currSeqProp = _currSEProb/totSEProb;
-	
+
 	//Convert the probability of each sequence to an entropy term that can be added to the original energy to directly compare two sequences
 	_prevEntropy = -log(prevSeqProp)*0.592*_opt.weight_seqEntropy;//Multiplies the energy (log proportion times RT in kcal/mol) by the sequence entropy weight (weight of 1 gives entropy same weight as other terms)
 	_currEntropy = -log(currSeqProp)*0.592*_opt.weight_seqEntropy;
@@ -3672,7 +3683,7 @@ void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _c
 	//The below includes the baseline energy, which is an estimate of monomer energy
 	_bestEnergyTotal = _bestEnergy+_prevEntropy;
 	_currEnergyTotal = _currEnergy+_currEntropy;
-	
+
 	//Output the terms if verbose
 	if (_opt.verbose){
 		cout << "Prev Prob:    " << _prevSEProb << endl;
@@ -3688,7 +3699,7 @@ void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _c
 }
 
 void calculateSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy, double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal){
-	
+
 	_prevSEProb = getSequenceEntropyProbability(_opt, _prevSeq, _entropyMap);
 	_currSEProb = getSequenceEntropyProbability(_opt, _currSeq, _entropyMap);
 
@@ -3698,7 +3709,7 @@ void calculateSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, m
 	double totSEProb = _prevSEProb+_currSEProb;
 	double prevSeqProp = _prevSEProb/totSEProb;
 	double currSeqProp = _currSEProb/totSEProb;
-	
+
 	//Convert the probability of each sequence to an entropy term that can be added to the original energy to directly compare two sequences
 	_prevEntropy = -log(prevSeqProp)*0.592*_opt.weight_seqEntropy;//Multiplies the energy (log proportion times RT in kcal/mol) by the sequence entropy weight (weight of 1 gives entropy same weight as other terms)
 	_currEntropy = -log(currSeqProp)*0.592*_opt.weight_seqEntropy;
@@ -3774,7 +3785,7 @@ void buildBaselineIMM1Interactions(System &_sys, map<string, double> &_selfMap){
 					ESet->addInteraction(new BaselineIMM1Interaction(*a,ener));
 				}
 				catch (const out_of_range& e){
-					continue;		
+					continue;
 				}
 			}
 		}
@@ -3800,7 +3811,7 @@ void buildSelfInteractions(System &_sys, map<string, double> &_selfMap){
 					ESet->addInteraction(new BaselineInteraction(*a,ener));
 				}
 				catch (const out_of_range& e){
-					continue;		
+					continue;
 				}
 			}
 		}
@@ -3819,7 +3830,7 @@ void buildPairInteractions(System &_sys, map<string,map<string,map<uint,double>>
 				if (p-positions.begin() < 1){
 					baseId1 = baseId1.append("-ACE");
 				}
-				//Changed this on 11_24_2021 for the designFiles/2021_11_22_IMM1Self and Pair baselines 
+				//Changed this on 11_24_2021 for the designFiles/2021_11_22_IMM1Self and Pair baselines
 				//if (p-positions.begin() > positions.size()-5){//
 				//	baseId1 = baseId1.append("-CT2");
 				//}
@@ -3847,7 +3858,7 @@ void buildPairInteractions(System &_sys, map<string,map<string,map<uint,double>>
 								ESet->addInteraction(new BaselinePairInteraction(*a,*b,-1*ener));//I forgot that this needs to be the opposite sign to actually counteract the energies of vdW and hydrogen bonding; switched it here but should eventually just switch in my baseline parameter file
 							}
 							catch (const out_of_range& e){
-								continue;		
+								continue;
 							}
 						}
 					}
@@ -3901,7 +3912,7 @@ void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSe
 	time_t startTimeSMC, endTimeSMC;
 	double diffTimeSMC;
 	time(&startTimeSMC);
-	
+
 	// Setup MonteCarloManager
 	MonteCarloManager MC(_opt.MCStartTemp, _opt.MCEndTemp, _opt.MCCycles, _opt.MCCurve, 50);
 	MC.setRandomNumberGenerator(&_RNG);
@@ -3914,7 +3925,7 @@ void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSe
 	vector<unsigned int> prevStateVec = _bestState;
 	vector<unsigned int> currStateVec = _bestState;
 	MC.setEner(bestEnergy);
-	
+
 	// initialize map for accepting energies
 	map<string,double> stateMCEnergies;
 	map<vector<uint>, map<string,double>> stateEnergyMap;
@@ -3993,7 +4004,7 @@ void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSe
 		outputEnergiesByTerm(_spm, currStateVec, stateMCEnergies, _opt.energyTermList, "Dimer", true);
 		double currStateEnergy = _spm.getStateEnergy(currStateVec);
 		stateMCEnergies["Dimer"] = currStateEnergy;
-		
+
 		// Convert the energy term (which actually saves the probability of the sequence in the whole _system)
 		// to the proper comparison of proportion to energy between individual sequences (done outside of the actual energy term)
 		calculateSequenceEntropy(_opt, prevStateSeq, currStateSeq, _sequenceEntropyMap, prevStateSEProb, currStateSEProb, prevStateEntropy, currStateEntropy, bestEnergy, currStateEnergy, bestEnergyTotal, currEnergyTotal);
@@ -4020,7 +4031,7 @@ void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSe
 			prevStateSeq = currStateSeq;
 			prevStateVec = currStateVec;
 			_sys.setActiveRotamers(currStateVec);
-			
+
 			//addEnergiesToStateMap(stateMCEnergies, currStateVec, ){
 
 			//}
@@ -4048,7 +4059,7 @@ void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSe
 			}
 		cycleCounter++;
 		}
-		//Reset the MC to run 100 more cycles to 
+		//Reset the MC to run 100 more cycles to
 		if (MC.getComplete() == true && MC.getCurrentT() < 546.4){
 			MC.reset(3649, 3649, 500, MonteCarloManager::EXPONENTIAL, 10);//Approximately 50% likely to accept within 5kcal, and 25% likely to accept within 10kcal
 		}
@@ -4081,7 +4092,7 @@ void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string
 	_sequenceEnergyMap[_startSequence]["VDWDimer"] = _spm.getStateEnergy(_stateVector, "CHARMM_VDW");
 	_sequenceEnergyMap[_startSequence]["HBONDDimer"] = _spm.getStateEnergy(_stateVector, "SCWRL4_HBOND");
 	_sequenceEnergyMap[_startSequence]["IMM1Dimer"] = _spm.getStateEnergy(_stateVector, "CHARMM_IMM1REF")+_spm.getStateEnergy(_stateVector, "CHARMM_IMM1");
-	
+
 	map<string,int> internalSeqCountMap;
 	map<string,int> seqCountMap;
 	double internalNumberOfPermutations;
@@ -4090,11 +4101,11 @@ void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string
 	internalAASequenceEntropySetup(_startSequence, internalSeqCountMap, internalNumberOfPermutations, _opt.backboneLength);
 	double internalSEProb = calculateSequenceProbability(internalSeqCountMap, _entropyMap, internalNumberOfPermutations);
 	double SEProb = calculateSequenceProbability(seqCountMap, _entropyMap, numberOfPermutations);
-	
+
 	_sequenceEnergyMap[_startSequence]["SequenceProbability"] = internalSEProb;
 }
 
-//Make it so that this will get all the info I need instead of having to run more code later 
+//Make it so that this will get all the info I need instead of having to run more code later
 void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_allInterfacialPositionsList, vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err){
 	/******************************************************************************
 	 *             === PREPARE NEW SYSTEM WITH NEW POLYMER SEQUENCE ===
@@ -4120,7 +4131,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	} else {
 		//fout << "CharmmSystem built for sequence" << endl;
 	}
-	
+
 	Chain & chain = sys.getChain("A");
 
 	/******************************************************************************
@@ -4135,7 +4146,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 
 	HydrogenBondBuilder hb(sys, _opt.hbondFile);
 	hb.buildInteractions(50);//when this is here, the HB weight is correct
-	
+
 	/******************************************************************************
 	 *                     === INITIAL VARIABLE SET UP ===
 	 ******************************************************************************/
@@ -4151,7 +4162,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	Eset->setTermActive("SCWRL4_HBOND", true);
 	Eset->setTermActive("CHARMM_IMM1REF", true);
 	Eset->setTermActive("CHARMM_IMM1", true);
-	
+
 	// Set weights
 	Eset->setWeight("CHARMM_VDW", _opt.weight_vdw);
 	Eset->setWeight("SCWRL4_HBOND", 1);
@@ -4162,7 +4173,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	 *                === DELETE TERMINAL HYDROGEN BOND INTERACTIONS ===
 	 ******************************************************************************/
 	deleteTerminalHydrogenBondInteractions(sys,_opt);
-	
+
 	/******************************************************************************
 	 *                     === ADD IN BASELINE ENERGIES ===
 	 ******************************************************************************/
@@ -4185,7 +4196,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	 *                        === SETUP SPM AND RUN DEE ===
 	 ******************************************************************************/
 	sys.buildAllAtoms();
-	
+
 	// Optimize Initial Starting Position (using Baseline to get back to original result)
 	SelfPairManager spm;
 	spm.seed(_RNG.getSeed());
@@ -4203,7 +4214,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	time_t startTimeSMC, endTimeSMC;
 	double diffTimeSMC;
 	time(&startTimeSMC);
-	
+
 	// Setup MonteCarloManager
 	MonteCarloManager MC(_opt.MCStartTemp, _opt.MCEndTemp, _opt.MCCycles, _opt.MCCurve, 10);
 	MC.setRandomNumberGenerator(&_RNG);
@@ -4216,7 +4227,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	vector<unsigned int> prevStateVec = _bestState;
 	vector<unsigned int> currStateVec = _bestState;
 	MC.setEner(bestEnergy);
-	
+
 	// initialize map for accepting energies
 	map<string,double> stateMCEnergies;
 	map<vector<uint>, map<string,double>> stateEnergyMap;
@@ -4298,7 +4309,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 		// Compute dimer energy
 		outputEnergiesByTerm(spm, currStateVec, stateMCEnergies, _opt.energyTermList, "Dimer", true);
 		double currStateEnergy = spm.getStateEnergy(currStateVec);
-		
+
 		// Convert the energy term (which actually saves the probability of the sequence in the whole system)
 		// to the proper comparison of proportion to energy between individual sequences (done outside of the actual energy term)
 		calculateInterfaceSequenceEntropy(_opt, prevStateSeq, currStateSeq, _sequenceEntropyMap, prevStateSEProb, currStateSEProb, prevStateEntropy, currStateEntropy, bestEnergy, currStateEnergy, bestEnergyTotal, currEnergyTotal, _allInterfacialPositionsList);
@@ -4325,7 +4336,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 			prevStateSeq = currStateSeq;
 			prevStateVec = currStateVec;
 			sys.setActiveRotamers(currStateVec);
-			
+
 			outputEnergiesByTerm(spm, currStateVec, stateMCEnergies, _opt.energyTermList, "Dimer", true);
 			double EnergyBeforeLocalMC = currStateEnergy-(spm.getStateEnergy(currStateVec, "BASELINE")+spm.getStateEnergy(currStateVec, "BASELINE_PAIR"));
 			stateMCEnergies["EnergyBeforeLocalMC"] = EnergyBeforeLocalMC;
@@ -4343,7 +4354,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 				saveSequence(_opt, _RNG, stateEnergyMap, energyVector, energyStateVec, currStateSeq, currStateVec, currStateEnergy, _sout);
 			}
 			double prevEnergy = bestEnergyTotal;
-			
+
 			if (_opt.energyLandscape){
 				map<string,double> energyMap = stateEnergyMap.at(currStateVec);
 				lout << prevStateSeq1 << "\t" << currStateSeq << "\t";
@@ -4357,7 +4368,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 			}
 		cycleCounter++;
 		}
-		//Reset the MC to run 100 more cycles to 
+		//Reset the MC to run 100 more cycles to
 		if (MC.getComplete() == true && MC.getCurrentT() < 546.4){
 			MC.reset(3649, 3649, 500, MonteCarloManager::EXPONENTIAL, 10);//Approximately 50% likely to accept within 5kcal, and 25% likely to accept within 10kcal
 		}
@@ -4388,7 +4399,7 @@ void getTotalEnergyAndWritePdbs(System &_sys, Options &_opt, map<string, map<str
 	_sequenceEnergyMap[_sequence]["Dimer"] = dimerEnergy;
 	_sequenceEnergyMap[_sequence]["Total"] = finalEnergy;
 	_sequenceEnergyMap[_sequence]["SequenceNumber"] = _seqNumber;
-	
+
 	//Setup directory for individual design
 	string repackDir = _opt.pdbOutputDir + "/" + _sequence;
 	string cmd = "mkdir -p " + repackDir;
@@ -4440,7 +4451,7 @@ void getTotalEnergyAndWritePdbs(System &_sys, Options &_opt, map<string, map<str
 	designWriter.close();
 	_writer.write(sys.getAtomPointers(), true, false, true);
 	saveEnergyDifference(_opt, _sequenceEnergyMap, _sequence);
-	
+
 	CRDWriter writer;
 	writer.open(repackDir + "/" + _sequence + ".crd");
 	writer.write(_sys.getAtomPointers(), false);
@@ -4479,7 +4490,7 @@ void getDimerSasaScores(System &_sys, vector<pair<string,vector<uint>>> &_sequen
 	for (uint i=0; i<_sequenceStatePair.size(); i++){
 		string sequence = _sequenceStatePair[i].first;
 		vector<uint> state = _sequenceStatePair[i].second;
-		
+
 		_sys.setActiveRotamers(state);
 
 		//Setup SasaCalculator to calculate the monomer SASA
@@ -4494,7 +4505,7 @@ void getDimerSasaScores(System &_sys, vector<pair<string,vector<uint>>> &_sequen
 void getSasaDifference(vector<pair<string,vector<uint>>> &_sequenceStatePair, map<string, map<string,double>> &_sequenceEnergyMap){
 	for (uint i=0; i<_sequenceStatePair.size(); i++){
 		string sequence = _sequenceStatePair[i].first;
-		
+
 		double monomerSasa = _sequenceEnergyMap[sequence]["MonomerSasa"];
 		double dimerSasa = _sequenceEnergyMap[sequence]["DimerSasa"];
 
@@ -4517,12 +4528,12 @@ void getSasaForStartingSequence(System &_sys, string _sequence, vector<uint> _st
 }
 
 /****************************************
- *  
+ *
  *  ======= CONFIG FILE OPTIONS =======
  *
  ****************************************/
 Options parseOptions(int _argc, char * _argv[], Options defaults){
-	
+
 	/******************************************
 	 *  Pass the array of argument and the name of
 	 *  a configuration file to the ArgumentParser
@@ -4530,9 +4541,9 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	 *  and collect error and warnings.
 	 *
 	 *  This function returns a Options structure
-	 *  defined at the head of this file 
+	 *  defined at the head of this file
 	 ******************************************/
-	
+
 	Options opt;
 
 	/******************************************
@@ -4541,7 +4552,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	 *  Example of configuration file:
 	 *
 	 *  /exports/home/gloiseau/mslib/trunk_AS/config/seqDesign.config
-	 *  
+	 *
 	 ******************************************/
 
 	vector<string> required;
@@ -4553,11 +4564,11 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	//opt.allowed.push_back("");
 	// optional
 	opt.allowed.push_back("getGeoFromPDBData");
-	
+
 	opt.allowed.push_back("sequence");
 	opt.allowed.push_back("backboneAA");
 	opt.allowed.push_back("backboneLength");
-	
+
 	opt.allowed.push_back("startResNum");
 	opt.allowed.push_back("sequenceStart");
 	opt.allowed.push_back("endResNum");
@@ -4577,11 +4588,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	opt.allowed.push_back("MCStartTemp");
 	opt.allowed.push_back("MCEndTemp");
 	opt.allowed.push_back("MCCurve");
-	
-	opt.allowed.push_back("deltaZ");
-	opt.allowed.push_back("deltaAx");
-	opt.allowed.push_back("deltaCross");
-	opt.allowed.push_back("deltaX");
 
 	//Weights
 	opt.allowed.push_back("weight_vdw");
@@ -4592,16 +4598,16 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	//Rotamers
 	opt.allowed.push_back("SL");
 	opt.allowed.push_back("SLInterface");
-	
+
 	//
 	opt.allowed.push_back("verbose");
 	opt.allowed.push_back("greedyOptimizer");
 	opt.allowed.push_back("greedyCycles");
 	opt.allowed.push_back("seed");
-	
+
 	// Cutoffs
 	opt.allowed.push_back("dockingEnergyCutoff");
-	
+
 	opt.allowed.push_back("printAllCrds");
 	opt.allowed.push_back("printAxes");
 	opt.allowed.push_back("printTermEnergies");
@@ -4625,11 +4631,10 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	opt.allowed.push_back("sequenceEntropyFile");
 	opt.allowed.push_back("AACompositionPenaltyFile");
 	opt.allowed.push_back("configfile");
-	
-	opt.allowed.push_back("thread");
-	opt.allowed.push_back("bbThread");
 
-	//Alternate 
+	opt.allowed.push_back("thread");
+
+	//Alternate
 	opt.allowed.push_back("Ids");
 
 	//Command Line Arguments
@@ -4641,16 +4646,16 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 
 	//RNG Arguments
 	opt.allowed.push_back("useTimeBasedSeed");
-	
+
 	opt.allowed.push_back("energyLandscape");
 	opt.allowed.push_back("useAlaAtCTerminus");
 	opt.allowed.push_back("useBaseline");
-	
+
 	//SelfPairManager Arguments
 	opt.allowed.push_back("runDEESingles");
 	opt.allowed.push_back("runDEEPairs");
 	opt.allowed.push_back("runSCMF");
-	
+
 	//Energy Terms to Output
 	opt.allowed.push_back("monomerEnergyTerms");
 	opt.allowed.push_back("monomerIMM1EnergyTerms");
@@ -4704,14 +4709,14 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 			opt.errorMessages += "Cannot read configuration file " + opt.configfile + "\n";
 		}
 	}
-	
+
 	opt.getGeoFromPDBData = OP.getBool("getGeoFromPDBData");
 	if (OP.fail()) {
 		opt.warningMessages += "getGeoFromPDBData not specified, defaulting to false\n";
 		opt.warningFlag = true;
 		opt.getGeoFromPDBData = false;
 	}
-	
+
 	opt.runNumber = OP.getString("runNumber");
 	if (OP.fail()) {
 		opt.warningMessages += "runNumber not specified, using 1\n";
@@ -4725,7 +4730,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.warningFlag = true;
 		opt.useIMM1 = false;
 	}
-	
+
 	opt.deleteTerminalHbonds = OP.getBool("deleteTerminalHbonds");
 	if (OP.fail()) {
 		opt.deleteTerminalHbonds = true;
@@ -4747,7 +4752,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.sequenceLength = 21;
 	}
 
-	
+
 	opt.tmStart = OP.getInt("tmStart");
 	if(OP.fail()) {
 		opt.warningMessages += "tmStart not specified using 1\n";
@@ -4820,13 +4825,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.warningFlag = true;
 		opt.thread = 0;
 	}
-	if (opt.thread == 0) {
-		if (opt.sequenceLength > opt.backboneLength){
-			opt.bbThread = opt.sequenceLength - opt.backboneLength + 1;
-		} else {
-			opt.bbThread = opt.backboneLength - opt.sequenceLength + 1;
-		}
-	}
 
 	//Load Rotamers using SASA values (from sgfc)
 	opt.useSasa = OP.getBool("useSasa");
@@ -4879,31 +4877,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.MCCurve = 2;
 	}
 
-	opt.deltaZ = OP.getDouble("deltaZ");
-	if (OP.fail()) {
-		opt.warningMessages += "deltaZ not specified using 0.1\n";
-		opt.warningFlag = true;
-		opt.deltaZ = 0.1;
-	}
-	opt.deltaAx = OP.getDouble("deltaAx");
-	if (OP.fail()) {
-		opt.warningMessages += "deltaAx not specified using 1.0\n";
-		opt.warningFlag = true;
-		opt.deltaAx = 1.0;
-	}
-	opt.deltaCross = OP.getDouble("deltaCross");
-	if (OP.fail()) {
-		opt.warningMessages += "deltaCross not specified using 1.0\n";
-		opt.warningFlag = true;
-		opt.deltaCross = 1.0;
-	}
-	opt.deltaX = OP.getDouble("deltaX");
-	if (OP.fail()) {
-		opt.warningMessages += "deltaX not specified using 0.1\n";
-		opt.warningFlag = true;
-		opt.deltaX = 0.1;
-	}
-
 	opt.verbose = OP.getBool("verbose");
 	if (OP.fail()) {
 		opt.warningMessages += "verbose not specified using false\n";
@@ -4922,7 +4895,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.warningFlag = true;
 		opt.greedyCycles = 10;
 	}
-	
+
 	opt.repackEnergyCutoff = OP.getDouble("repackEnergyCutoff");
 	if (OP.fail()) {
 		opt.warningMessages += "repackEnergyCutoff not specified using 5.0\n";
@@ -5062,7 +5035,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.errorMessages += "Unable to determine backboneCrd";
 		opt.errorFlag = true;
 	}
-	
+
 	opt.hbondFile = OP.getString("hbondFile");
 	if (OP.fail()) {
 		string envVar = "MSL_HBOND_CA_PAR";
@@ -5077,44 +5050,44 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	}
 
 	opt.infile = OP.getString("infile");
-	if (OP.fail()) { 
+	if (OP.fail()) {
 		opt.warningMessages += "infile not specified, default to /data01/sabs/tmRepacks/pdbFiles/69-gly-residue-helix.pdbi\n";
 		opt.warningFlag = true;
 		opt.infile = "/data01/sabs/tmRepacks/pdbFiles/69-gly-residue-helix.pdb";
 	}
-	
+
 	opt.selfEnergyFile = OP.getString("selfEnergyFile");
-	if (OP.fail()) { 
+	if (OP.fail()) {
 		opt.warningMessages += "selfEnergyFile not specified, default \n";
 		opt.warningFlag = true;
 		opt.selfEnergyFile = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/2020_10_07_meanSelf_par.txt";
 	}
 	opt.pairEnergyFile = OP.getString("pairEnergyFile");
-	if (OP.fail()) { 
+	if (OP.fail()) {
 		opt.warningMessages += "pairEnergyFile not specified, default \n";
 		opt.warningFlag = true;
 		opt.pairEnergyFile = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/2020_10_07_meanPair_par.txt";
 	}
 	opt.selfEnergyFileSPM = OP.getString("selfEnergyFileSPM");
-	if (OP.fail()) { 
+	if (OP.fail()) {
 		opt.warningMessages += "selfEnergyFileSPM not specified, default \n";
 		opt.warningFlag = true;
 		opt.selfEnergyFileSPM = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/2020_10_07_meanSelf_par.txt";
 	}
 	opt.pairEnergyFileSPM = OP.getString("pairEnergyFileSPM");
-	if (OP.fail()) { 
+	if (OP.fail()) {
 		opt.warningMessages += "pairEnergyFileSPM not specified, default \n";
 		opt.warningFlag = true;
 		opt.pairEnergyFileSPM = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/2020_10_07_meanPair_par.txt";
 	}
 	opt.sequenceEntropyFile = OP.getString("sequenceEntropyFile");
-	if (OP.fail()) { 
+	if (OP.fail()) {
 		opt.warningMessages += "sequenceEntropyFile not specified, default to /data01/sabs/tmRepacks/pdbFiles/69-gly-residue-helix.pdbi\n";
 		opt.warningFlag = true;
 		opt.sequenceEntropyFile = "/exports/home/gloiseau/mslib/trunk_AS/myProgs/gloiseau/sequenceEntropies.txt";
 	}
 	opt.AACompositionPenaltyFile = OP.getString("AACompositionPenaltyFile");
-	if (OP.fail()) { 
+	if (OP.fail()) {
 		opt.warningMessages += "AACompositionPenaltyFile not specified, default \n";
 		opt.warningFlag = true;
 		opt.AACompositionPenaltyFile = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/AACompositionPenalties.out";
@@ -5252,7 +5225,7 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.energyTermList.push_back("CHARMM_IMM1");
 		opt.energyTermList.push_back("CHARMM_IMM1REF");
 	}
-	
+
 	opt.rerunConf = OP.getConfFile();
 
 	return opt;
