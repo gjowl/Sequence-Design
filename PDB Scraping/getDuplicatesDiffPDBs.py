@@ -22,7 +22,7 @@ ax2 = "ω' 2"
 ang = "Angle"
 dist = "Axial distance"
 
-
+#Functions
 def check(c1, c2, val):
     if c1 <= val <= c2:
         return True
@@ -48,7 +48,7 @@ def checkBoolZ(dz1, dz2, z1, z2):
         return True
     else:
         return False
-    
+
 def checkBoolAx(dax1, dax2, ax1, ax2):
     dax1 = int(dax1)
     dax2 = int(dax2)
@@ -80,7 +80,7 @@ def checkBoolDist(dd, d):
         return True
     else:
         return False
-    
+
 def checkBoolStr(c1, c2):
     if c1 == c2:
         return True
@@ -95,7 +95,7 @@ def checkSeqSimilarity(dseq1, seq1):
         return True
     else:
         return False
-    
+
 def checkSeqSimilarity1(dseq1, dseq2, seq1, seq2):
     s1 = similar(dseq1, seq1)
     s2 = similar(dseq2, seq2)
@@ -239,5 +239,4 @@ df["Duplicate"] = dupl
 df["Number"] = num
 df["Copy of..."] = copy
 
-df.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/membraneProteins/2020_02_21/tmp.csv', sep='\t')     
-
+df.to_csv('/exports/home/gloiseau/Documents/interhelicalCoordAnalysis/membraneProteins/2020_02_21/tmp.csv', sep='\t')

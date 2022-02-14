@@ -3,12 +3,15 @@
 """
 Created on Mon Jan 20 12:36:57 2020
 
+This script extracts the PDB resolution from each
+
 @author: gloiseau
 """
 
 #Extract resolution from pdb files
 
 #I already have all of the pdb files, so I should be able to search in those for the resolution?
+import os
 from biopandas.pdb import PandasPdb as bpd
 import pandas as pd
 import numpy as np
@@ -31,7 +34,7 @@ def digitCounter(number):
 
 def findResInPdb(data, pdbid):
     d = data.df["OTHERS"]
-    d1 = d[d["entry"].str.contains("2 RESOLUTION.  ")] #the spaces are necessary here for some pdbs and should work for most 
+    d1 = d[d["entry"].str.contains("2 RESOLUTION.  ")] #the spaces are necessary here for some pdbs and should work for most
     resolution = str(d1["entry"])
     try:
         resolution = float(resolution[25:30])
@@ -43,8 +46,6 @@ def findResInPdb(data, pdbid):
         #binning won't work unless all resolutions are numeric; for now I just deleted them manually
         return 100, pdbid #temporary fix for all non-x-ray structures
 
-#def bpdfetch(pdbid):
-    
 def getRes(row, pdb, prevRes, prevID):
     pdbid = row["PDB Id"]
     if pdbid in prevID:
@@ -74,14 +75,14 @@ def getRes(row, pdb, prevRes, prevID):
                 #print(path)
                 return "x", pdbid
     #print("Resolution: %s" % data.df[""])
-    
+
 def checkDataset():
     parallel = input('Do you want to analyze parallel data: T or F?')
     if parallel == "T" or parallel == "t":
         return True
     else:
         return False
-    
+
 def analyzeSolubleProteins():
     sp = input("Analyze soluble proteins? T or F")
     if sp == "T" or sp == "t":
@@ -95,10 +96,11 @@ def compareToDegrado2015():
         return True
     else:
         return False
-    
+
 ########################################################################
 #                            READ FILE
 ########################################################################
+currDir = os.getcwd()
 data = pd.DataFrame()
 date = input("Insert date in year_month_day format for what data you would like to rerun: ")
 sp = analyzeSolubleProteins()
