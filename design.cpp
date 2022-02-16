@@ -4,7 +4,7 @@
  * @Email:  gjowl04@gmail.com
  * @Filename: design.cpp
  * @Last modified by:   Gilbert Loiseau
- * @Last modified time: 2022/02/14
+ * @Last modified time: 2022/02/15
  */
 
 #include <sstream>
@@ -16,14 +16,7 @@ using namespace std;
 using namespace MSL;
 
 static SysEnv SYSENV;
-string programName = "seqDesign";//TODO: better name
-string programDescription = "Designs sequences for backbone geometries extracted from the PDB, "
-"optimizing specifically for vdW energies";
-string programAuthor = "Gilbert Loiseau";
-string programVersion = "2";
-string programDate = "11 February 2022";
-string mslVersion = MSLVERSION;
-string mslDate = MSLDATE;
+
 /***********************************
  *geometry
  ***********************************/
@@ -86,77 +79,6 @@ void transformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, At
 
 	c2Symmetry(_chainA, _chainB);
 	c2Symmetry(_axisA, _axisB);
-}
-
-void backboneMovement(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, Transforms _trans, double _deltaMove, unsigned int moveType) {
-	 if (moveType == 0) {
-		// Z Shift
-		CartesianPoint translateA = _axisA(1).getCoor() - _axisA(0).getCoor(); // vector minus helical center
-		translateA = translateA.getUnit() * _deltaMove; // unit vector of helical _axis times the amount to shift by
-
-		_trans.translate(_chainA, translateA);
-
-		c2Symmetry(_chainA, _chainB);
-		c2Symmetry(_axisA, _axisB);
-
-	} else if (moveType == 1) {
-		// Axial Rotation
-		_trans.rotate(_chainA, (_deltaMove), _axisA(0).getCoor(), _axisA(1).getCoor());
-
-		c2Symmetry(_chainA, _chainB);
-		c2Symmetry(_axisA, _axisB);
-
-	} else 	if (moveType == 2) {
-		// Crossing Angle
-		_trans.rotate(_chainA, (_deltaMove * 0.5), _axisA(0).getCoor(), _axisB(0).getCoor());
-		_trans.rotate(_axisA, (_deltaMove * 0.5), _axisA(0).getCoor(), _axisB(0).getCoor());
-
-		c2Symmetry(_chainA, _chainB);
-		c2Symmetry(_axisA, _axisB);
-
-	} else if (moveType == 3) {
-		// XShift
-		// Helix A interhelical distance
-		CartesianPoint translateA = _axisB(0).getCoor() - _axisA(0).getCoor(); // vector minus helical center
-		translateA = translateA.getUnit() * _deltaMove * -0.5; // unit vector of helical axis times the amount to shift by
-		_trans.translate(_chainA, translateA);
-		_trans.translate(_axisA, translateA);
-
-		// Helix B interhelical distance
-		c2Symmetry(_chainA, _chainB);
-		c2Symmetry(_axisA, _axisB);
-
-	} else {
-		cerr << "Unknown moveType " << moveType << " in backboneMovement. Should be 0-3 " << endl;
-	}
-}
-
-void xShiftTransformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, double _xShift, Transforms & _trans) {
-	//====== X shift (Interhelical Distance) =======
-	CartesianPoint interDistVect;
-	interDistVect.setCoor((-1.0*_xShift/2.0), 0.0, 0.0);
-	_trans.translate(_chainA, interDistVect);
-	_trans.translate(_axisA, interDistVect);
-
-	c2Symmetry(_chainA, _chainB);
-	c2Symmetry(_axisA, _axisB);
-}
-
-void readGeometryFile(string _filename, vector<string>& _fileVec) {
-	ifstream file;
-	file.open(_filename.c_str());
-	if(!file.is_open()) {
-		cerr << "Unable to open " << _filename << endl;
-		exit(0);
-	}
-
-	string parameterList;
-
-	while(file) {
-		getline(file, parameterList);
-		_fileVec.push_back(parameterList);
-	}
-	file.close();
 }
 
 void getGeometry(Options &_opt, RandomNumberGenerator &_RNG, vector<double> &_densities, ofstream &_out){
@@ -905,7 +827,8 @@ void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, strin
 		int resiNum = pos.getResidueNumber();
 		int posNum = resiNum-_opt.thread;
 		string add;
-		if (levelCounter < _opt.interfaceLevel){//TODO: change this to an option so I can choose how many levels I want to have multiple IDs
+
+		if (levelCounter < _opt.interfaceLevel){
 			add = "Add all Ids at this pos";
 			interfacePositions.push_back(resiNum);
 			if (backbonePosition > 2 && backbonePosition < _opt.backboneLength-4){//backbone position goes from 0-20, so numbers need to be 3 and 4 here instead of 4 and 5 to prevent changes at the interface like others
@@ -988,80 +911,6 @@ void setupDesignDirectory(Options &_opt, string _date){
 		cout << "Unable to make directory" << endl;
 		exit(0);
 	}
-}
-
-void printConfigFile(Options & _opt, ofstream & _out) {
-	_out << "#Program " << programName << " v." << programVersion << ", " << programDate << ", (MSL v." << mslVersion << " " << mslDate << ")" << endl;
-	_out << "#All other parameters were run with the defaults as specified in the program options" << endl;
-
-	_out << setw(20) << "backboneCrd " << _opt.backboneCrd << endl;
-	_out << setw(20) << "pdbOutputDir " << _opt.pdbOutputDir << endl;
-
-	_out << setw(20) << "tmStart " << _opt.tmStart << endl;
-	_out << setw(20) << "tmEnd " << _opt.tmEnd << endl;
-
-	_out << "#Input Files" << endl;
-	_out << setw(20) << "topFile " << _opt.topFile << endl;
-	_out << setw(20) << "parFile " << _opt.parFile << endl;
-	_out << setw(20) << "geometryDensityFile " << _opt.geometryDensityFile << endl;
-	_out << setw(20) << "rotLibFile " << _opt.rotLibFile << endl;
-	_out << setw(20) << "solvFile " << _opt.solvFile << endl;
-	_out << setw(20) << "backboneCrd " << _opt.backboneCrd << endl;
-	_out << setw(20) << "hbondFile " << _opt.hbondFile << endl;
-	_out << setw(20) << "infile " << _opt.infile << endl;
-	_out << setw(20) << "selfEnergyFile " << _opt.selfEnergyFile << endl;
-	_out << setw(20) << "pairEnergyFile " << _opt.pairEnergyFile << endl;
-	_out << setw(20) << "AACompositionPenaltyFile " << _opt.AACompositionPenaltyFile << endl << endl;
-
-	_out << "#Geometry and Transformation parameters" << endl;
-	_out << setw(20) << "xShift" << _opt.xShift << endl;
-	_out << setw(20) << "crossingAngle" << _opt.crossingAngle << endl;
-	_out << setw(20) << "axialRotation" << _opt.axialRotation << endl;
-	_out << setw(20) << "zShift" << _opt.zShift << endl;
-	_out << setw(20) << "thread" << _opt.thread << endl;
-	_out << setw(20) << "backboneLength " << _opt.backboneLength << endl;
-
-	_out << "#Booleans" << endl;
-	_out << setw(20) << "verbose " << _opt.verbose << endl;
-	_out << setw(20) << "deleteTerminalHbonds" << _opt.deleteTerminalHbonds << endl;
-	_out << setw(20) << "useSasa" << _opt.useSasa << endl;
-	_out << setw(20) << "getGeoFromPDBData" << false << endl;//Since we already have the geometry output here, default to false in the rerun config
-	_out << setw(20) << "runDEESingles" << _opt.runDEESingles << endl;
-	_out << setw(20) << "runDEEPairs" << _opt.runDEEPairs << endl;
-	_out << setw(20) << "runSCMF" << _opt.runSCMF << endl;
-
-	if (_opt.useSasa == true){
-		_out << "#Load Rotamers based on SASA scores" << endl;
-		for (uint i=0; i<_opt.sasaRepackLevel.size()-1; i++){
-			_out << setw(20) << "sasaRepackLevel" << _opt.sasaRepackLevel[i] << endl;
-		}
-		_out << setw(20) << "interfaceLevel" << _opt.interfaceLevel << endl;
-	} else {
-		_out << "#Load Rotamers by interface and non interfacial positions" << endl;
-		_out << setw(20) << "SL" << _opt.SL << endl;
-		_out << setw(20) << "SLInterface" << _opt.SLInterface << endl;
-	}
-
-	_out << "#MonteCarlo Paramenters" << endl;
-	_out << setw(20) << "MCCycles" << _opt.MCCycles << endl;
-	_out << setw(20) << "MCMaxRejects" << _opt.MCMaxRejects << endl;
-	_out << setw(20) << "MCStartTemp" << _opt.MCStartTemp << endl;
-	_out << setw(20) << "MCEndTemp" << _opt.MCEndTemp << endl;
-	_out << setw(20) << "MCCurve" << _opt.MCCurve << endl;
-	_out << setw(20) << "greedyCycles" << _opt.greedyCycles << endl;
-
-	_out << "#Alternate IDs" << endl;
-	for (uint i=0; i<_opt.Ids.size()-1; i++){
-		_out << setw(20) << _opt.Ids[i] << endl;
-	}
-
-	_out << endl << "#Rerun Seed" << endl;
-	_out << setw(20) << "seed" << _opt.seed << endl;
-
-	_out << setw(20) << "weight_vdw " << _opt.weight_vdw << endl;
-	_out << setw(20) << "weight_hbond " << _opt.weight_hbond << endl;
-	_out << setw(20) << "weight_solv " << _opt.weight_solv << endl;
-	_out << setw(20) << "weight_seqEntropy " << _opt.weight_seqEntropy << endl;
 }
 
 void outputEnergyFile(Options &_opt, string _interface, vector<string> _allDesigns){
@@ -1272,16 +1121,6 @@ void makeDockingConfig(Options &_opt, string _sequence, string _designDir, strin
 	dout.close();
 }
 
-void outputRepackFile(Options &_opt, vector<string> _dockingDesigns){
-	ofstream dout;
-	string doutfile = _opt.pdbOutputDir + "/designsToRepack.out";
-	dout.open(doutfile.c_str());
-	for (uint i=0; i<_dockingDesigns.size() ; i++){
-		dout << _dockingDesigns[i] << endl;
-	}
-	dout.close();
-}
-
 void outputDesignFiles(Options &_opt, string _interface, vector<int> _rotamerSamplingPerPosition, vector<pair<string,vector<uint>>> _sequenceStatePair, map<string,map<string,double>> _sequenceEnergyMap, vector<double> _densities){
 	// Setup vector to hold energy file lines
 	vector<string> energyLines;
@@ -1351,47 +1190,6 @@ void loadMonomerRotamers(System &_sys, SystemRotamerLoader &_sysRot){
 		if (pos.getResidueName() != "GLY" && pos.getResidueName() != "ALA" && pos.getResidueName() != "PRO") {
 			if (!_sysRot.loadRotamers(&pos, pos.getResidueName(), "SL90.00")) {//lower rotamer level because I did baselines at this level
 				cerr << "Cannot load rotamers for " << pos.getResidueName() << endl;
-			}
-		}
-	}
-}
-
-void loadRotamersSPM(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt){
-	//Repack side chains based on sasa scores
-	for (uint i = 0; i < _opt.backboneLength; i++) {
-		Position &posA = _sys.getPosition(i);
-		Position &posB = _sys.getPosition(i+_opt.backboneLength);
-		if (posA.identitySize() > 1){
-			for (uint j=0; j < posA.getNumberOfIdentities(); j++){
-				posA.setActiveIdentity(j);
-				posB.setActiveIdentity(j);
-				string posRot = _opt.sasaRepackLevel[_opt.sasaRepackLevel.size()-1];
-				if (_opt.verbose){
-					cout << posA.getPositionId() << ", " << posA.getResidueName() << ":" << posRot << endl;
-					cout << posB.getPositionId() << ", " << posB.getResidueName() << ":" << posRot << endl;
-				}
-				if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-					if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) {
-						cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
-					}
-					if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) {
-						cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
-					}
-				}
-			}
-		} else {
-			string posRot = _opt.sasaRepackLevel[_opt.sasaRepackLevel.size()-1];
-			if (_opt.verbose){
-				cout << posA.getPositionId() << ", " << posA.getResidueName() << ": " << posRot << endl;
-				cout << posB.getPositionId() << ", " << posB.getResidueName() << ": " << posRot << endl;
-			}
-			if (posA.getResidueName() != "GLY" && posA.getResidueName() != "ALA" && posA.getResidueName() != "PRO") {
-				if (!_sysRot.loadRotamers(&posA, posA.getResidueName(), posRot)) {
-					cerr << "Cannot load rotamers for " << posA.getResidueName() << endl;
-				}
-				if (!_sysRot.loadRotamers(&posB, posB.getResidueName(), posRot)) {
-					cerr << "Cannot load rotamers for " << posB.getResidueName() << endl;
-				}
 			}
 		}
 	}
@@ -1605,13 +1403,11 @@ void computeDimerEnergiesLinked(System &_sys, Options &_opt, map<string,map<stri
 		_writer.write(_sys.getAtomPointers(), true, false, true);
 		saveEnergyDifference(_opt, _sequenceEnergyMap, sequence);
 
-		//Write CRD if below energy cutoff
-		if (finalEnergy < _opt.repackEnergyCutoff){
-			CRDWriter writer;
-			writer.open(repackDir + "/" + MslTools::intToString(i) + ".crd");
-			writer.write(_sys.getAtomPointers(), false);
-			writer.close();
-		}
+		//Write CRD
+		CRDWriter writer;
+		writer.open(repackDir + "/" + MslTools::intToString(i) + ".crd");
+		writer.write(_sys.getAtomPointers(), false);
+		writer.close();
 	}
 }
 
@@ -1766,13 +1562,11 @@ void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,doubl
 	_writer.write(sys.getAtomPointers(), true, false, true);
 	saveEnergyDifference(_opt, _sequenceEnergyMap, _sequence);
 
-	//Write CRD if below energy cutoff
-	if (finalEnergy < _opt.repackEnergyCutoff){
-		CRDWriter writer;
-		writer.open(repackDir + "/" + MslTools::intToString(_seqNumber) + ".crd");
-		writer.write(sys.getAtomPointers(), false);
-		writer.close();
-	}
+	//Write CRD
+	CRDWriter writer;
+	writer.open(repackDir + "/" + MslTools::intToString(_seqNumber) + ".crd");
+	writer.write(sys.getAtomPointers(), false);
+	writer.close();
 }
 
 void computeMonomerEnergyNoIMM1(Options& _opt, map<string,map<string,double>> &_sequenceEnergyMap, string &_seq, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err) {
@@ -2452,51 +2246,8 @@ void randomPointMutationUnlinked(System &_sys, Options &_opt, RandomNumberGenera
 	_sys.setActiveIdentity(posIdB, randId);
 }
 
-void randomRotamerChange(System &_sys, Options &_opt, RandomNumberGenerator &_RNG, vector<uint> _variablePositions, vector<unsigned int> &_stateVec){
-	// Get a random integer to pick through the variable positions
-	int rand = _RNG.getRandomInt(0, _variablePositions.size()-1);
-	int pos = _variablePositions[rand];
-
-	// Get the random position from the system
-	Position &randPos = _sys.getPosition(pos);
-	string posId = randPos.getPositionId();
-	int numRots = randPos.getTotalNumberOfRotamers();
-
-	// Get a random integer to pick the rotamer
-	int randRot = _RNG.getRandomInt(0, numRots-1);
-	_stateVec[pos] = randRot;
-	randPos.setActiveRotamer(randRot);
-}
-
-//This version is for unlinked positions, but keeps the AAs the same, allowing me to change rotamers for both spots but keep the same sequence (posRotLimitMap has limits for each AA)
-void randomRotamerChangeNonLinked(System &_sys, Options &_opt, RandomNumberGenerator &_RNG, map<int,map<int,pair<uint,uint>>> &_posRotLimitMap, vector<uint> _variablePositions, vector<unsigned int> &_stateVec){
-	// Get a random position from the variable positions
-	int rand = _RNG.getRandomInt(0, _variablePositions.size()-1);
-	int posA = _variablePositions[rand];
-	int posB = posA+_opt.backboneLength;
-
-	// Get the random position from the system
-	Position &randPosA = _sys.getPosition(posA);
-	Position &randPosB = _sys.getPosition(posB);
-	string posIdA = randPosA.getPositionId();
-	string posIdB = randPosB.getPositionId();
-
-	// Get rotamer upper and lower limits for the position from the map (keeps AA the same on both chains)
-	int idNum = _RNG.getRandomInt(0, randPosA.getNumberOfIdentities()-1);
-	map<int,pair<uint,uint>> posRotLimits = _posRotLimitMap.at(posA);
-	pair<uint,uint> rotLimits = posRotLimits.at(idNum);
-
-	// Get a random integer to pick the rotamer
-	int randRotA = _RNG.getRandomInt(rotLimits.first, rotLimits.second-1);
-	int randRotB = _RNG.getRandomInt(rotLimits.first, rotLimits.second-1);
-	_stateVec[posA] = randRotA;
-	_stateVec[posB] = randRotB;
-	randPosA.setActiveRotamer(randRotA);
-	randPosB.setActiveRotamer(randRotB);
-}
-
 //Checks through a vector of sequences to see if the new sequence has already been found
-void sameSequenceChecker(string &_newSeq, vector<string> &_seqs){
+void checkSequenceVector(string &_newSeq, vector<string> &_seqs){
 	bool sameSeq = false;
 	if (_seqs.size() == 0){
 		_seqs.push_back(_newSeq);
@@ -2635,29 +2386,6 @@ void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>, 
 			}
 		}
 	}
-}
-
-//Setup the map for limiting the number of rotamers per position (allows me to keep AAs the same without needing the rotamers to be symmetric)
-map<int,map<int,pair<uint, uint>>> setupRotamerPositionMap(System &_sys, vector<uint> _interfacialPositionsList){
-	map<int,map<int,pair<uint,uint>>> posRotLimitMap;
-	for (uint i=0; i<_interfacialPositionsList.size(); i++){
-		Position &pos = _sys.getPosition(_interfacialPositionsList[i]);
-		uint startNum = 0;
-		uint endNum = 0;
-		map<int,pair<uint,uint>> currIdMap;
-		for(uint j=0; j<pos.identitySize(); j++){
-			Residue &resi = pos.getIdentity(j);
-			string id = resi.getResidueName();
-			int numRots = pos.getTotalNumberOfRotamers(j);
-			//cout << id << ": " << numRots << endl;
-			endNum = endNum + numRots;
-			currIdMap.insert(make_pair(j, make_pair(startNum, endNum)));
-			//cout << _interfacialPositionsList[i] << ":" << j << "," << id << ": " << startNum << "; " << endNum << endl;
-			startNum = startNum + numRots;
-		}
-		posRotLimitMap.insert(make_pair(_interfacialPositionsList[i], currIdMap));
-	}
-	return posRotLimitMap;
 }
 
 //makes the best state applicable for unlinked positions by duplicating the rotamer at each interfacial position on the opposite chain
@@ -2911,7 +2639,7 @@ void checkIfAtomsAreBuilt(System &_sys, ofstream &_err){
 void addSequencesToVector(vector<pair<double,string>> &_energyVector, vector<string> &_allSeqs){
 	for (uint i=0; i<_energyVector.size(); i++){
 		//cout << i << ": " << _energyVector[i].first << " " << _energyVector[i].second << endl;
-		sameSequenceChecker(_energyVector[i].second, _allSeqs);
+		checkSequenceVector(_energyVector[i].second, _allSeqs);
 	}
 }
 

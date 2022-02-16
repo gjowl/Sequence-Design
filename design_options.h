@@ -4,7 +4,7 @@
  * @Email:  gjowl04@gmail.com
  * @Filename: design_options.h
  * @Last modified by:   Gilbert Loiseau
- * @Last modified time: 2022/02/14
+ * @Last modified time: 2022/02/15
  */
 
 #ifndef DESIGN_OPTIONS_H
@@ -23,39 +23,34 @@ using namespace std;
  //TODO: simplify these options and have comments for each
 struct Options{
 	// input files
-	string backboneCrd;
-	string pdbOutputDir;
-	string topFile;
-	string parFile;
-	string geometryDensityFile;
-	string solvFile;
-	string hbondFile;
-	string rotLibFile;
-	string infile;
-	string selfEnergyFile;
-	string pairEnergyFile;
-	string selfEnergyFileSPM;
-	string pairEnergyFileSPM;
-	string sequenceEntropyFile;
-	string AACompositionPenaltyFile;
+	string backboneCrd; //initial coordinates for helix backbones: crd file
+	string pdbOutputDir; //output directory for all files
+	string topFile; //topology file (default CHARMM22: defines distances between atoms)
+	string parFile; //parameter file (defines Hbonding distances)
+	string geometryDensityFile; //geometries to choose for design with...density
+	string solvFile; //solvation file
+	string hbondFile; //hydrogen bonding energy file
+	string rotLibFile; //rotamer library file
+	string infile; //initial coordinates for helix backbone: pdb file
+	string selfEnergyFile; //self energy file estimates for building baseline energies
+	string pairEnergyFile; //pair energy file estimates for building baseline energies
+	string sequenceEntropyFile; //sequence entropy file defines average propensity of each AA from my pdb analysis
+	string AACompositionPenaltyFile; //file with penalty definitions that penalizes energy of a structure based on it's AA composition
 
 	// sequence parameters
-	string sequence;
-	int sequenceLength;
-	string backboneAA;
-	int backboneLength;
+	string backboneAA; //backbone amino acid (default to L)
+	int backboneLength; //length of sequence for design (default to 21; code still needs to be reworked for other lengths; imm1 energy problem?)
 
-	// booleans
+	// booleans: changing these will ..TODO: add more here
 	bool getGeoFromPDBData; //TRUE: randomly choose a dimeric geometry from the membrane protein pdb landscape OR FALSE: use a given dimer geometry
-	bool verbose; //TRUE: write more outputs throughout the run
-	bool deleteTerminalHbonds; //TRUE: delete hydrogen bonds at the termini OR FALSE: keep hydrogen bonds at termini
-	bool linkInterfacialPositions; //TRUE: keeps interfacial positions linked when searching for the best states in stateMC (less memory) OR FALSE: unlinks positions (memory intensive)
-	bool useSasa; //TRUE: solvent accessible surface area used to choose the number rotamers at each position OR FALSE: give a set number of rotamers to interface vs non-interface
-	bool useTimeBasedSeed; //TRUE: use time based seed for RandomNumberGenerator OR FALSE: use given seed
-	bool energyLandscape; //TRUE: collect all sequences and their respective monomer and dimer energies
-	bool useAlaAtCTerminus; //TRUE: use ALA at C terminus of sequence FALSE: use LEU at C terminus
-	bool useBaseline; //TRUE: use  TODO...
-	bool useIMM1;
+	bool verbose; //TRUE: write energy outputs and calculations throughout the run to the terminal OR FALSE: only write outputs to output files
+	bool deleteTerminalHbonds; //TRUE: delete hydrogen bonds at the termini of sequences to not be considered in hydrogen bonding score OR FALSE: keep hydrogen bonds at termini
+	bool linkInterfacialPositions; //TRUE: keep interfacial positions linked (same amino acid and rotamer) when searching for the best states in stateMC (less memory) OR FALSE: unlink positions (memory intensive)
+	bool useSasa; //TRUE: use solvent accessible surface area to designated the number of rotamers at each position on the dimer OR FALSE: input set number of rotamers for both interface and non-interface
+	bool useTimeBasedSeed; //TRUE: use time based seed for all RandomNumberGenerator functions OR FALSE: use a given seed
+	bool energyLandscape; //TRUE: collect all sequences and their respective monomer and dimer energies ..TODO: add more here
+	bool useAlaAtCTerminus; //TRUE: use ALA at C terminus of sequence FALSE: use LEU at C terminus ..TODO: do I need this?
+	bool useBaseline; //TRUE: calculate and use baseline values generated as estimates of the monomer sequence OR FALSE: don't use baselines to estimate the monomer
 
 	// repack parameters
 	int greedyCycles;
@@ -64,28 +59,44 @@ struct Options{
 	// load rotamers useSasa = false
 	string SL; //number of rotamers
 	string SLInterface; //number of rotamers for interfacial AAs
-	// load rotamers useSasa = true
-	std::vector<string> sasaRepackLevel;
-	int interfaceLevel;
 
-	// tm
-	int tmStart;
-	int tmEnd;
+	// load rotamers useSasa = true
+	std::vector<string> sasaRepackLevel; //vector of levels
+	int interfaceLevel; // level for the interface
+	// Example:
+	/*
+	The number of given levels determines how many interfacial splits there are by normalized SASA value and sorted.
+
+	sasaRepackLevel.push_back("SL95.00")
+	sasaRepackLevel.push_back("SL95.00")
+	sasaRepackLevel.push_back("SL85.00")
+	sasaRepackLevel.push_back("SL60.00")
+	sasaRepackLevel.size() = 4
+	interfaceLevel = 2
+
+	All positions below level 2 are consired interfacial.
+	Since there are 4 levels, there are 4 splits, each being 25% of the total SASA value. Interfacial positions are the positions with the highest burial
+	that occur in the first two splits. SASA value is added up for the first level until it passes 25%. Those positions are considered part of level 1. Values
+	are continued to add up until reaching 50%, or level 2. And so on. In this example, all the positions that end up having a SASA value in level 1 and 2 are considered interface.
+
+	*/
+
+	// tm: do I need these?
+	int tmStart; //specifies starting residue number
+	int tmEnd; //specifies ending residue number
 
 	// the actual AAs being modeled
-	int startResNum;
-	int endResNum;
-	int sequenceStart;
+	int startResNum; //starting residue number
+	int endResNum; //end residue number
 
 	// Starting Geometry
-	double xShift;
-	double zShift;
-	double crossingAngle;
-	double axialRotation;
-	bool transform;
+	double xShift; //distance between helices
+	double zShift; //position of the crossing point between helices
+	double crossingAngle; //crossing angle between helices
+	double axialRotation; //rotation of helices
 
 	// crossing point
-	int thread;
+	int thread; //crossing point...(more detail about this and gly69?)
 
 	// Monte Carlo parameters
 	int MCCycles;
@@ -94,36 +105,32 @@ struct Options{
 	double MCEndTemp;
 	int MCCurve;
 
-	double repackEnergyCutoff;
-	double vdwEnergyCutoff;
+	bool useIMM1;
 
 	// energy weights
-	double weight_vdw;
-	double weight_hbond;
-	double weight_solv;
-	double weight_seqEntropy;
+	double weight_vdw; //weight of vdw energy contribution to total energy: default = 1
+	double weight_hbond;//weight of hbond energy contribution to total energy: default = 1
+	double weight_solv;//weight of solvation energy contribution to total energy: default = 1
+	double weight_seqEntropy;//weight of sequence entropy contribution to total energy: default = ..
 
 	// alternate identities
-	vector<string> Ids;
+	vector<string> Ids; //alternate AA identities for interfacial positions
 
 	// state Monte Carlo Options
-	int numStatesToSave;
-
-	// energy terms to output
-	vector<string> monomerEnergyTerms;
-	vector<string> monomerIMM1EnergyTerms;
-	vector<string> dimerEnergyTerms;
-	vector<string> energyLandscapeTerms;
-	vector<string> energyTermsToOutput;
-	vector<string> energyTermList;
+	int numStatesToSave; //number of sequences to save for each design run
 
 	//SelfPairManager Options
 	bool runDEESingles;
 	bool runDEEPairs;
 	bool runSCMF;
 
-	string configfile;
-	string runNumber;
+	// energy terms to output: maybe rid of and just default them?
+	vector<string> monomerEnergyTerms;
+	vector<string> monomerIMM1EnergyTerms;
+	vector<string> dimerEnergyTerms;
+	vector<string> energyLandscapeTerms;
+	vector<string> energyTermsToOutput;
+	vector<string> energyTermList;
 
 	/***** MANAGEMENT VARIABLES ******/
 	string pwd; // the present working directory obtained with a getenv
@@ -147,6 +154,9 @@ struct Options{
 
 	string OPerrors; //the errors from the option parser
 	string rerunConf; // data for a configuration file that would rerun the job as the current run
+
+	string configfile;
+	string runNumber;
 };
 
 #endif

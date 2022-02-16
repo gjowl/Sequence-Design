@@ -4,7 +4,7 @@
  * @Email:  gjowl04@gmail.com
  * @Filename: seqDesign.cpp
  * @Last modified by:   Gilbert Loiseau
- * @Last modified time: 2022/02/14
+ * @Last modified time: 2022/02/15
  */
 #include <sstream>
 #include <iterator>
@@ -44,28 +44,21 @@
 #include "SasaCalculator.h"
 #include "design.h"
 #include "design_options.h"
-//#include "seqDesign.h"
-
-//write in more includes here for functions files: https://www.youtube.com/watch?v=47sZhrJ1USY&ab_channel=EricLiang
-
 
 using namespace MSL;
 using namespace std;
 
 static SysEnv SYSENV;
-//string programName = "seqDesign";//TODO: better name
-//string programDescription = "Designs sequences for backbone geometries extracted from the PDB, "
-//"optimizing specifically for vdW energies";
-//string programAuthor = "Gilbert Loiseau";
-//string programVersion = "2";
-//string programDate = "11 February 2022";
-//string mslVersion = MSLVERSION;
-//string mslDate = MSLDATE;
+string programName = "seqDesign";//TODO: better name
+string programDescription = "Designs sequences for backbone geometries extracted from the PDB, optimizing specifically for vdW energies";
+string programAuthor = "Gilbert Loiseau";
+string programVersion = "2";
+string programDate = "11 February 2022";
+string mslVersion = MSLVERSION;
+string mslDate = MSLDATE;
 
 time_t startTime, endTime, spmStart, spmEnd;
 double diffTime, spmTime;
-
-
 
 /**************************************************
  *
@@ -83,163 +76,6 @@ void usage();
 void help(Options defaults);
 void outputErrorMessage(Options &_opt);
 
-///***********************************
-// *geometry
-// ***********************************/
-////CATM Functions
-//void c2Symmetry(AtomPointerVector & _apvA, AtomPointerVector & _apvB);
-//void moveZCenterOfCAMassToOrigin(AtomPointerVector& _apV, AtomPointerVector& _axis, Transforms & _trans);
-//void transformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, CartesianPoint & _ori, CartesianPoint & _xAxis, CartesianPoint & _zAxis, double _zShift, double _axialRotation, double _crossingAngle, double _xShift, Transforms & _trans);
-//void backboneMovement(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, Transforms _trans, double _deltaMove, unsigned int moveType);
-//void xShiftTransformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, double _xShift, Transforms & _trans);
-//void readGeometryFile(string _filename, vector<string>& _fileVec);
-//void getGeometry(Options &_opt, RandomNumberGenerator &_RNG, vector<double> &_densities, ofstream &_out);
-//
-///***********************************
-// *string output
-// ***********************************/
-//// TODO: if possible, make some of these more multipurpose and change names, and add in one or two line examples for what they do
-//string convertToPolymerSequenceNeutralPatch(string _seq, int _startResNum);
-//string convertToPolymerSequenceNeutralPatchMonomer(string _seq, int _startResNum);
-//string convertPolymerSeqToOneLetterSeq(Chain &_chain);
-//string generateString(string _backbone, int _length);
-//string generateBackboneSequence(string _backbone, int _length);
-//string generateMonomerMultiIDPolymerSequence(string _seq, int _startResNum, vector<string> _alternateIds, vector<int> _interfacialPositions);
-//string generatePolymerSequence(string _backboneAA, int _backboneLength, int _startResNum);
-//string generateMonomerPolymerSequenceFromSequence(string _sequence, int _startResNum);
-//string generateMultiIDPolymerSequence(string _seq, int _startResNum, vector<string> _alternateIds, vector<int> _interfacialPositions);
-//string getInterfaceString(vector<int> _interface, int _seqLength);
-//string getAlternateIdString(vector<string> _alternateIds);
-//string getInterfaceSequence(Options &_opt, string _interface, string _sequence);
-//
-///***********************************
-// *repack functions
-// ***********************************/
-//void repackSideChains(SelfPairManager & _spm, int _greedyCycles);
-//std::vector < std::vector < bool > > getActiveMask (System &_sys);
-//
-///***********************************
-// *define interface and rotamer sampling
-// ***********************************/
-//vector<int> getRotamerSampling(string _rotamerLevels);
-//vector<int> getLinkedPositions(vector<int> _rotamerSampling, int _interfaceLevel, int _highestRotamerLevel);
-//vector<uint> getVariablePositions(vector<int> &_interfacialPositions);
-//vector<vector<string>> convertToLinkedFormat(System &_sys, vector<int> &_interfacialPositions, int _backboneLength);
-//std::vector<pair <int, double> > calculateResidueBurial (System &_sys);
-//std::vector<pair <int, double> > calculateResidueBurial (System &_sys, Options &_opt, string _seq);
-////TODO: change all of the original interfacePositions to variablePositions and the allInterfacePositions to interfacePositions
-//void defineInterfaceAndRotamerSampling(Options &_opt, PolymerSequence _PS, string &_rotamerLevels, string &_polySeq, string &_variablePositionString, string &_rotamerSamplingString, vector<int> &_linkedPositions, vector<uint> &_interfacePositions, vector<uint> &_variablePositions, vector<int> &_rotamerSamplingPerPosition, ofstream &_out, string _axis);
-//
-///***********************************
-// *output file functions
-// ***********************************/
-//void setupDesignDirectory(Options &_opt, string _date);
-//void printConfigFile(Options & _opt, ofstream & _out);
-//void outputEnergyFile(Options &_opt, string _interface, vector<string> _allDesigns);
-//void makeRepackConfig(Options &_opt, string _sequence, string _designDir, string _designNumber, string _pdbPath, string _crdPath, map<string,double> _energyMap);
-//void makeDockingConfig(Options &_opt, string _sequence, vector<uint> _state, string _pdbPath, map<string,double> _energyMap, vector<int> _rotamerSampling);
-//void outputRepackFile(Options &_opt, vector<string> _dockingDesigns);
-//void outputDesignFiles(Options &_opt, string _interface, vector<int> _rotamerSampling, vector<pair<string,vector<uint>>> _sequenceStatePair, map<string,map<string,double>> _sequenceEnergyMap, vector<double> _densities);
-//
-///***********************************
-// *load rotamer functions
-// ***********************************/
-//void loadMonomerRotamers(System &_sys, SystemRotamerLoader &_sysRot);
-//void loadRotamersBySASABurial(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt, vector<int> &_rotamerSampling);
-//void loadInterfacialRotamers(System &_sys, SystemRotamerLoader &_sysRot, string _SL, int _numRotamerLevels, vector<int> _interface);
-//void loadRotamers(System &_sys, SystemRotamerLoader &_sysRot, string _SL);
-//void loadRotamers(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt, vector<int> &_rotamerSampling);//Uses rotamer sampling defined by SASA values to load rotamers by position
-//void loadRotamersSPM(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt);
-//
-///***********************************
-// *baseline energy helper functions
-// ***********************************/
-//vector<double> calcBaselineEnergies(System &_sys, int _seqLength);
-//vector<double> calcPairBaselineEnergies(System &_sys, int _seqLength);
-//double sumEnergyVector(vector<double> _energies);
-//
-///***********************************
-// *calculate energies
-// ***********************************/
-//void computeDimerEnergy(System &_sys, Options& _opt, map<string,map<string,double>> &_sequenceEnergyMap, string &_sequence, vector<uint> &_stateVec, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, int _seqNumber, RandomNumberGenerator &_RNG, PDBWriter &_writer, ofstream &_sout, ofstream &_err);
-//void computeDimerEnergiesLinked(System &_sys, Options &_opt, map<string,map<string,double>> &_sequenceEnergyMap, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, PDBWriter &_writer, ofstream &_sout, ofstream &_err);
-//void computeDimerEnergies(System &_sys, Options &_opt, map<string, map<string,double>> &_sequenceEnergyMap, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<int> _rotamerSamplingPerPosition, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
-//void computeMonomerEnergyNoIMM1(Options& _opt, map<string,map<string,double>> &_sequenceEnergyMap, string &_seq, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
-//void computeMonomerEnergyIMM1(Options& _opt, Transforms & _trans, map<string,map<string,double>> &_sequenceEnergyMap, string _seq, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
-//void computeMonomerEnergies(Options &_opt, Transforms &_trans, map<string, map<string,double>> &_sequenceEnergyMap, vector<string> &_seqs, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
-//
-///***********************************
-// *other helper functions
-// ***********************************/
-//void saveEnergyDifference(Options _opt, map<string,map<string,double>> &_sequenceEnergyMap, string _sequence);
-//void outputEnergiesByTerm(SelfPairManager &_spm, vector<uint> _stateVec, map<string,double> &_energyMap, vector<string> _energyTermList, string _energyDescriptor, bool _includeIMM1);
-//void outputEnergiesByTermLinked(EnergySet *_Eset, map<string,double> &_energyMap, vector<string> _energyTermList, string _energyDescriptor);
-//void deleteTerminalHydrogenBondInteractions(System &_sys, Options &_opt);
-//map<string, double> readSingleParameters(string _baselineFile);
-//map<string,map<string,map<uint, double>>> readPairParameters(string _baselineFile);
-//
-///***********************************
-// *energy builders
-// ***********************************/
-//void buildBaselineIMM1Interactions(System &_sys, map<string, double> &_selfMap);
-//void buildSelfInteractions(System &_sys, map<string, double> &_selfMap);
-//void buildPairInteractions(System &_sys, map<string,map<string,map<uint,double>>>& _pairMap);
-//void buildSequenceEntropy(System &_sys, map<string, double> &_sequenceEntropyMap, double _weight);
-//
-///***********************************
-// *stateMC helper functions
-// ***********************************/
-////gets a random position and chooses a random rotamer
-//void randomPointMutation(System &_sys, Options &_opt, RandomNumberGenerator &_RNG, vector<uint> _variablePositions, vector<string> &_ids);
-//void randomPointMutationUnlinked(System &_sys, Options &_opt, RandomNumberGenerator &_RNG, vector<uint> _variablePositions, vector<string> &_ids);
-//void randomRotamerChange(System &_sys, Options &_opt, RandomNumberGenerator &_RNG, vector<uint> _variablePositions, vector<unsigned int> &_stateVec);
-//void randomRotamerChangeNonLinked(System &_sys, Options &_opt, RandomNumberGenerator &_RNG, map<int,map<int,pair<uint,uint>>> &_posRotLimitMap, vector<uint> _variablePositions, vector<unsigned int> &_stateVec);
-//void sameSequenceChecker(string &_newSeq, vector<string> &_seqs);
-//bool sameSequenceChecker(string &_newSeq, double &_newEnergy, vector<uint> &_state, vector<pair<double,string>> &_enerSeqPair, vector<pair<double,vector<uint>>> &_energyStateVec);
-//double getMapValueFromKey(map<string,double> &_map, string _key);//TODO: move funciton to appropriate spot
-//void saveSequence(Options &_opt, vector<pair<double,string>> &_energyVector, vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy);
-//void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>, map<string,double>> &_stateEnergyMap, vector<pair<double,string>> &_energyVector, vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy, ofstream &_out);
-//map<int,map<int,pair<uint, uint>>> setupRotamerPositionMap(System &_sys, vector<uint> _interfacialPositionsList);
-//void unlinkBestState(Options &_opt, vector<uint> &_bestState, vector<int> _linkedPositions, int _backboneLength);
-//bool convertStateMapToSequenceMap(System &_sys, vector<pair<double,vector<uint>>> &_energyStateVec, map<vector<uint>, map<string,double>> &_stateEnergyMap, map<string, map<string,double>> &_sequenceEnergyMap, vector<pair<string,vector<uint>>> &_sequenceStatePair, ofstream &_out);
-//
-///***********************************
-// *sequence entropy functions
-// ***********************************/
-//map<string,int> getAACountMap(vector<string> _seq);
-//double calcNumberOfPermutations(map<string,int> _seqAACounts, int _seqLength);
-//void interfaceAASequenceEntropySetup(string _seq, map<string,int> &_seqCountMap, double &_numberOfPermutations, vector<uint> _interfacialPositionsList);
-//void internalAASequenceEntropySetup(string _seq, map<string,int> &_seqCountMap, double &_numberOfPermutations, int _seqLength);
-//void sequenceEntropySetup(string _seq, map<string,int> &_seqCountMap, double &_numberOfPermutations, int _seqLength);
-//double calculateSequenceProbability(map<string,int> &_seqCountMap, map<string,double> &_entropyMap, double _numberOfPermutations);
-////double getSequenceEntropyProbability(Options &_opt, string _sequence, map<string,double> _entropyMap);
-////double getInterfaceSequenceEntropyProbability(Options &_opt, string _sequence, map<string,double> &_entropyMap, vector<uint> _interfacialPositionsList);
-//void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy, double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal, vector<uint> _interfacePositionsList);
-//void calculateSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy, double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal);
-//
-//// other functions
-//double getStandardNormal(RandomNumberGenerator& RNG);
-//void checkIfAtomsAreBuilt(System &_sys, ofstream &_err);
-//void addSequencesToVector(vector<pair<double,string>> &_energyVector, vector<string> &_allSeqs);
-//
-///***********************************
-// *MonteCarlo functions
-// ***********************************/
-//// Linked version of the state monte carlo
-//void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
-//void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string _startSequence, vector<unsigned int> &_stateVector, map<string, map<string, double>> &_sequenceEnergyMap, map<string, double> &_entropyMap);
-//// Unlinked version of the state monte carlo
-//void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList, vector<uint> &_variablePositionsList, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
-//void getTotalEnergyAndWritePdbs(System &_sys, Options &_opt, map<string, map<string,double>> &_sequenceEnergyMap, string _sequence, vector<uint> _stateVec, vector<int> _rotamerSampling, RandomNumberGenerator &_RNG, int _seqNumber, PDBWriter &_writer, ofstream &_sout, ofstream &_err);
-//vector<uint> getAllInterfacePositions(Options &_opt, vector<int> &_rotamerSamplingPerPosition);
-//vector<uint> getInterfacePositions(Options &_opt, vector<int> &_rotamerSamplingPerPosition);
-//void getDimerSasaScores(System &_sys, vector<pair<string,vector<uint>>> &_sequenceStatePair, map<string, map<string,double>> &_sequenceEnergyMap);
-//void getSasaDifference(vector<pair<string,vector<uint>>> &_sequenceStatePair, map<string, map<string,double>> &_sequenceEnergyMap);
-//void getSasaForStartingSequence(System &_sys, string _sequence, vector<uint> _state, map<string, map<string,double>> &_sequenceEnergyMap);
-
-
-//TODO: I may have to end up keeping all of the functions that use options in here (or change the way they work; if they only use one option, all good. If not, could keep it in here to keep it simple)
-// Otherwise I may have to just initialize all of them as not options? unless I can pull in a structure of options into the h file ... right now I'm getting an undefined reference problem for options without the struct here
 /******************************************
  *
  *  =======  BEGIN MAIN =======
@@ -273,8 +109,11 @@ int main(int argc, char *argv[]){
 	/******************************************************************************
 	 *                       === SETUP OUTPUT FILES ===
 	 ******************************************************************************/
+	// summary file output
 	ofstream sout;
+	// error file output
 	ofstream err;
+	// rerun config output
 	ofstream rerun;
 
 	setupDesignDirectory(opt, date);
@@ -287,13 +126,16 @@ int main(int argc, char *argv[]){
 	err.open(errfile.c_str());
 	rerun.open(rerunfile.c_str());
 
+	rerun << opt.rerunConf << endl;
+	rerun.close();
+
 	sout << date << endl;
 	err << date << endl;
-
 
 	/******************************************************************************
 	 *               === LOAD RANDOM GEOMETRY FROM GEOMETRY FILE ===
 	 ******************************************************************************/
+	// Initialize RNG with seed (time or given seed number)
 	RandomNumberGenerator RNG;
 	if (opt.useTimeBasedSeed){
 		RNG.setTimeBasedSeed();
@@ -301,12 +143,13 @@ int main(int argc, char *argv[]){
 		RNG.setSeed(opt.seed);
 	}
 
+	// TODO:...
 	vector<double> densities;
 	if (opt.getGeoFromPDBData){
 		getGeometry(opt, RNG, densities, sout);
 	}
 
-	// Output Geometry
+	// Output the starting geometry
 	cout << "***STARTING GEOMETRY:***" << endl;
 	cout << "xShift:        " << opt.xShift << "\tDensity: " << densities[0] << endl;
 	cout << "crossingAngle: " << opt.crossingAngle << "\tDensity: " << densities[0] << endl;
@@ -317,11 +160,8 @@ int main(int argc, char *argv[]){
 	string alternateIds = getAlternateIdString(opt.Ids);
 	cout << "Amino acids for design: LEU " << alternateIds << endl;
 
-	rerun << opt.rerunConf << endl;
-	rerun.close();
-
 	/******************************************************************************
-	 *                         === GENERATE POLYGLY ===
+	 *                       === GENERATE POLYMER SEQUENCE ===
 	 ******************************************************************************/
 	string polySeq = generatePolymerSequence(opt.backboneAA, opt.backboneLength, opt.thread);
 	PolymerSequence PS(polySeq);
@@ -362,9 +202,13 @@ END";
 	string rotamerLevels;
 	string variablePositionString;
 	string rotamerSamplingString;
+	// vector of the positions that will be linked
 	vector<int> linkedPositions;
+	// vector of positions at the interface excluding termini positions
 	vector<uint> interfacePositions;
+	// vector of positions at the interface including the terminal positions
 	vector<uint> allInterfacePositions;
+	// vector of rotamer level for each position
 	vector<int> rotamerSamplingPerPosition;
 
 	// Defines the interfacial positions and the number of rotamers to give each position
@@ -373,6 +217,7 @@ END";
 	/******************************************************************************
 	 *         === COPY BACKBONE COORDINATES AND TRANSFORM TO GEOMETRY ===
 	 ******************************************************************************/
+	// initialize the gly69 backbone coordinates and transform it to the chosen geometry
 	System pdb;
 	pdb.readPdb(opt.infile);
 
@@ -394,8 +239,11 @@ END";
 	/******************************************************************************
 	 *  === DECLARE SYSTEM FOR POLYLEU WITH ALTERNATE IDENTITIES AT INTERFACE ===
 	 ******************************************************************************/
+	// Initialize system for dimer to design
 	System sys;
+	// Initialize CharmmSystemBuilder to build energy terms for design
 	CharmmSystemBuilder CSB(sys, opt.topFile, opt.parFile, opt.solvFile);
+	// Explicit definitions of which terms to use and which to not use
 	CSB.setBuildTerm("CHARMM_ELEC", false);
 	CSB.setBuildTerm("CHARMM_ANGL", false);
 	CSB.setBuildTerm("CHARMM_BOND", false);
@@ -420,9 +268,11 @@ END";
 	/******************************************************************************
 	 *                     === COPY BACKBONE COORDINATES ===
 	 ******************************************************************************/
+	// assign the coordinates of our system to the given geometry that was assigned without energies using System pdb
 	sys.assignCoordinates(pdb.getAtomPointers(),false);
 	sys.buildAllAtoms();
 
+	// initialize the object for loading rotamers into our system
 	SystemRotamerLoader sysRot(sys, opt.rotLibFile);
 	sysRot.defineRotamerSamplingLevels();
 
@@ -433,6 +283,7 @@ END";
 	/******************************************************************************
 	 *                     === INITIAL VARIABLE SET UP ===
 	 ******************************************************************************/
+	// Initialize EnergySet that contains energies for the chosen terms for our design
 	EnergySet* Eset = sys.getEnergySet();
 	// Set all terms active, besides Charmm-Elec
 	Eset->setAllTermsInactive();
@@ -448,24 +299,27 @@ END";
 	Eset->setTermActive("CHARMM_IMM1", true);
 
 	// Set weights
-	Eset->setWeight("CHARMM_VDW", 1);
-	Eset->setWeight("SCWRL4_HBOND", 1);
-	Eset->setWeight("CHARMM_IMM1REF", 1);
-	Eset->setWeight("CHARMM_IMM1", 1);
+	Eset->setWeight("CHARMM_VDW", opt.weight_vdw);
+	Eset->setWeight("SCWRL4_HBOND", opt.weight_hbond);
+	Eset->setWeight("CHARMM_IMM1REF", opt.weight_solv);
+	Eset->setWeight("CHARMM_IMM1", opt.weight_solv);
 
 	/******************************************************************************
 	 *                === DELETE TERMINAL HYDROGEN BOND INTERACTIONS ===
 	 ******************************************************************************/
+	// removes all hydrogen bonding near the termini of our helices (remnant from CATM, but used in the code that was used to get baselines so keeping it to be consistent)
 	deleteTerminalHydrogenBondInteractions(sys,opt);
 
 	/******************************************************************************
 	 *                === CHECK TO SEE IF ALL ATOMS ARE BUILT ===
 	 ******************************************************************************/
+	// check to verify that all atoms have coordinates
 	checkIfAtomsAreBuilt(sys, err);
 
 	/******************************************************************************
 	 *                     === ADD IN BASELINE ENERGIES ===
 	 ******************************************************************************/
+	//
 	if (opt.useBaseline){
 		//addBaselineToSelfPairManager();//TODO: was going to make this a function but I feel like it already exists in spm, so going to wait when I have time to look that up
 		//initialize baseline maps to calculate energy for each sequence for comparison in baselineMonomerComparison_x.out
@@ -473,20 +327,17 @@ END";
 		map<string,map<string,map<uint,double>>> pairMap = readPairParameters(opt.pairEnergyFile);
 		buildSelfInteractions(sys, selfMap);
 		buildPairInteractions(sys, pairMap);
-		//sys.calcEnergy();
 	}
 
+	// TODO: change this; I feel like this should be an option if linked is true
 	vector<vector<string>> linkedPos = convertToLinkedFormat(sys, linkedPositions, opt.backboneLength);
 	sys.setLinkedPositions(linkedPos);
 
-	//TODO: make this dynamic based on the list of AAs given
 	// Get sequence entropy map
 	map<string, double> sequenceEntropyMap = readSingleParameters(opt.sequenceEntropyFile);
 
-	//make into a function
 	//decided to try loading low number of rotamers for this instead of high
 	loadRotamers(sys, sysRot, opt, rotamerSamplingPerPosition);
-	//loadRotamersSPM(sys, sysRot, opt);
 	CSB.updateNonBonded(10,12,50);//This for some reason updates the energy terms and makes the IMM1 terms active (still need to check where, but did a couple of calcEnergy and outputs
 	sys.calcEnergy();
 
@@ -519,19 +370,25 @@ END";
 		spm.setRunUnbiasedMC(true);
 	}
 
+	// run and find a sequence using the chosen parameters (MCOptions, SCMF, DEE, etc.)
 	time(&spmStart);
 	spm.runOptimizer();
 	time(&spmEnd);
-
 	spmTime = difftime (spmEnd, spmStart);
+
+	// vector for the initial SCMF state
 	vector<unsigned int> initialState = spm.getSCMFstate();
+	// vector for the SCMF state after the biased monte carlo
 	vector<unsigned int> bestState = spm.getBestSCMFBiasedMCState();
+	// define startingState vector as the bestState from the SelfPairManager optimizer
 	vector<unsigned int> startingState = bestState;
+
+	// energy terms from the startingState
 	double bestEnergy = spm.getStateEnergy(bestState);
 	double hbondEnergy = spm.getStateEnergy(bestState, "SCWRL4_HBOND");
 	double vdwEnergy = spm.getStateEnergy(bestState, "CHARMM_VDW");
 
-
+	// checks to see if the sequence changed between the initialState and the bestState
 	sys.setActiveRotamers(initialState);
 	string initialSeq = convertPolymerSeqToOneLetterSeq(sys.getChain("A"));
 	sys.setActiveRotamers(bestState);
@@ -540,6 +397,7 @@ END";
 	string startSequence = SCMFBestSeq;//used for outputting starting sequence
 
 	// TODO: make into a function?
+	// output this information about the SelfPairManager run below
 	string seqInterface = getInterfaceSequence(opt, rotamerSamplingString, startSequence);
 	int numInterfacialPositions = linkedPos.size();
 	cout << "Initial Sequence:   " << initialSeq << endl;
@@ -562,7 +420,10 @@ END";
 	/******************************************************************************
 	 *           === METHODS FOR DETERMINING ALTERNATE SEQUENCES ===
 	 ******************************************************************************/
+	// Initialize vector to hold designed sequences
 	vector<string> seqs;
+
+	// Initialize vector to hold all designed sequences from the stateMC
 	vector<string> allSeqs;
 
 	//Initialize energyMap to hold all energies for output into a summary file
@@ -600,15 +461,18 @@ END";
 	/******************************************************************************
 	 *              === CALCULATE TOTAL ENERGIES AND WRITE PDBS ===
 	 ******************************************************************************/
-	// Initialize PDBWriter for design
+	// Initialize PDBWriter for designs
 	PDBWriter writer;
 	writer.open(opt.pdbOutputDir + "/allDesigns.pdb");
+
+	// Output these energy calculations to the summary file
 	sout << "Calculating Final Energies..." << endl;
 	for (uint i=0; i<sequenceStatePair.size(); i++){
 		string sequence = sequenceStatePair[i].first;
 		vector<uint> state = sequenceStatePair[i].second;
 		sout << "Sequence " << i+1 << ": " << sequence << endl;
 		int seqNumber = i;
+		// calculates the total energy difference between monomer and dimer and outputs individual pdbs for each sequence
 		getTotalEnergyAndWritePdbs(sys, opt, sequenceEnergyMap, sequence, state, rotamerSamplingPerPosition, RNG, seqNumber, writer, sout, err);
 	}
 	writer.close();
@@ -789,7 +653,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	opt.allowed.push_back("backboneLength");
 
 	opt.allowed.push_back("startResNum");
-	opt.allowed.push_back("sequenceStart");
 	opt.allowed.push_back("endResNum");
 	opt.allowed.push_back("tmStart");
 	opt.allowed.push_back("tmEnd");
@@ -825,8 +688,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	opt.allowed.push_back("seed");
 
 	// Cutoffs
-	opt.allowed.push_back("dockingEnergyCutoff");
-
 	opt.allowed.push_back("printAllCrds");
 	opt.allowed.push_back("printAxes");
 	opt.allowed.push_back("printTermEnergies");
@@ -845,8 +706,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 	opt.allowed.push_back("infile");
 	opt.allowed.push_back("selfEnergyFile");
 	opt.allowed.push_back("pairEnergyFile");
-	opt.allowed.push_back("selfEnergyFileSPM");
-	opt.allowed.push_back("pairEnergyFileSPM");
 	opt.allowed.push_back("sequenceEntropyFile");
 	opt.allowed.push_back("AACompositionPenaltyFile");
 	opt.allowed.push_back("configfile");
@@ -957,21 +816,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.warningFlag = true;
 	}
 
-	opt.sequence = OP.getString("sequence");
-	if(OP.fail()) {
-		opt.warningMessages += "sequence not specified using L\n";
-		opt.warningFlag = true;
-		opt.sequence = "L";
-	}
-
-	opt.sequenceLength = OP.getInt("sequenceLength");
-	if(OP.fail()) {
-		opt.warningMessages += "sequenceLength not specified using 21\n";
-		opt.warningFlag = true;
-		opt.sequenceLength = 21;
-	}
-
-
 	opt.tmStart = OP.getInt("tmStart");
 	if(OP.fail()) {
 		opt.warningMessages += "tmStart not specified using 1\n";
@@ -981,16 +825,9 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 
 	opt.tmEnd = OP.getInt("tmEnd");
 	if(OP.fail()) {
-		opt.tmEnd = opt.tmStart+opt.sequenceLength;
-		opt.warningMessages += "tmEnd not specified using " + MslTools::intToString(opt.tmStart+opt.sequenceLength) + "\n";
+		opt.tmEnd = opt.tmStart+opt.backboneLength;
+		opt.warningMessages += "tmEnd not specified using " + MslTools::intToString(opt.tmStart+opt.backboneLength) + "\n";
 		opt.warningFlag = true;
-	}
-
-	opt.sequenceStart = OP.getInt("sequenceStart");
-	if (OP.fail()) {
-		opt.warningMessages += "sequenceStart not specified using 1\n";
-		opt.warningFlag = true;
-		opt.sequenceStart = 1;
 	}
 
 	opt.startResNum = OP.getInt("startResNum");
@@ -1032,12 +869,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.getGeoFromPDBData = true;
 	}
 
-	opt.transform = OP.getBool("transform");
-	if (OP.fail()) {
-		opt.warningMessages += "transform not specified, defaulting to false\n";
-		opt.warningFlag = true;
-		opt.transform = false;
-	}
 	opt.thread = OP.getInt("thread");
 	if (OP.fail()) {
 		opt.warningMessages += "thread not specified, defaulting to 0\n";
@@ -1115,18 +946,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.greedyCycles = 10;
 	}
 
-	opt.repackEnergyCutoff = OP.getDouble("repackEnergyCutoff");
-	if (OP.fail()) {
-		opt.warningMessages += "repackEnergyCutoff not specified using 5.0\n";
-		opt.warningFlag = true;
-		opt.repackEnergyCutoff = 5.0;
-	}
-	opt.vdwEnergyCutoff = OP.getDouble("vdwEnergyCutoff");
-	if (OP.fail()) {
-		opt.warningMessages += "vdwEnergyCutoff not specified, defaulting to 0\n";
-		opt.warningFlag = true;
-		opt.vdwEnergyCutoff = 0;
-	}
 	opt.seed = OP.getInt("seed");
 	if (OP.fail()) {
 		opt.seed = 1;
@@ -1286,18 +1105,6 @@ Options parseOptions(int _argc, char * _argv[], Options defaults){
 		opt.warningMessages += "pairEnergyFile not specified, default \n";
 		opt.warningFlag = true;
 		opt.pairEnergyFile = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/2020_10_07_meanPair_par.txt";
-	}
-	opt.selfEnergyFileSPM = OP.getString("selfEnergyFileSPM");
-	if (OP.fail()) {
-		opt.warningMessages += "selfEnergyFileSPM not specified, default \n";
-		opt.warningFlag = true;
-		opt.selfEnergyFileSPM = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/2020_10_07_meanSelf_par.txt";
-	}
-	opt.pairEnergyFileSPM = OP.getString("pairEnergyFileSPM");
-	if (OP.fail()) {
-		opt.warningMessages += "pairEnergyFileSPM not specified, default \n";
-		opt.warningFlag = true;
-		opt.pairEnergyFileSPM = "/exports/home/gloiseau/mslib/trunk_AS/DesignFiles/2020_10_07_meanPair_par.txt";
 	}
 	opt.sequenceEntropyFile = OP.getString("seqEntropyFile");
 	if (OP.fail()) {
