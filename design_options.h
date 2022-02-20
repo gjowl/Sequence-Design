@@ -4,7 +4,7 @@
  * @Email:  gjowl04@gmail.com
  * @Filename: design_options.h
  * @Last modified by:   Gilbert Loiseau
- * @Last modified time: 2022/02/15
+ * @Last modified time: 2022-02-19
  */
 
 #ifndef DESIGN_OPTIONS_H
@@ -46,6 +46,7 @@ struct Options{
 	bool verbose; //TRUE: write energy outputs and calculations throughout the run to the terminal OR FALSE: only write outputs to output files
 	bool deleteTerminalHbonds; //TRUE: delete hydrogen bonds at the termini of sequences to not be considered in hydrogen bonding score OR FALSE: keep hydrogen bonds at termini
 	bool linkInterfacialPositions; //TRUE: keep interfacial positions linked (same amino acid and rotamer) when searching for the best states in stateMC (less memory) OR FALSE: unlink positions (memory intensive)
+	bool designHomodimer; //TRUE: design a homodimer sequence keeping ids same between positions on both helices OR FALSE: design a heterodimeric sequence
 	bool useSasa; //TRUE: use solvent accessible surface area to designated the number of rotamers at each position on the dimer OR FALSE: input set number of rotamers for both interface and non-interface
 	bool useTimeBasedSeed; //TRUE: use time based seed for all RandomNumberGenerator functions OR FALSE: use a given seed
 	bool energyLandscape; //TRUE: collect all sequences and their respective monomer and dimer energies ..TODO: add more here
