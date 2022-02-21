@@ -42,7 +42,7 @@
 #include "BaselineSequenceEntropyNormalized.h"
 #include "BaselinePermutation.h"
 #include "SasaCalculator.h"
-#include "design.h"
+#include "designFunctions.h"
 #include "design_options.h"
 
 using namespace MSL;
