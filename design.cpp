@@ -4,7 +4,7 @@
  * @Email:  gjowl04@gmail.com
  * @Filename: design.cpp
  * @Last modified by:   Gilbert Loiseau
- * @Last modified time: 2022/02/15
+ * @Last modified time: 2022-02-19
  */
 
 #include <sstream>
@@ -2222,7 +2222,7 @@ void randomPointMutation(System &_sys, Options &_opt, RandomNumberGenerator &_RN
 	_sys.setActiveIdentity(posId, randId);
 }
 
-
+//
 void randomPointMutationUnlinked(System &_sys, Options &_opt, RandomNumberGenerator &_RNG, vector<uint> _variablePositions, vector<string> &_ids){
 	// Get a random integer to pick through the variable positions
 	int rand = _RNG.getRandomInt(0, _variablePositions.size()-1);
@@ -2242,8 +2242,17 @@ void randomPointMutationUnlinked(System &_sys, Options &_opt, RandomNumberGenera
 
 	string res = _sys.getPosition(posA).getResidueName();
 
-	_sys.setActiveIdentity(posIdA, randId);
-	_sys.setActiveIdentity(posIdB, randId);
+	if (_opt.designHomodimer){
+		_sys.setActiveIdentity(posIdA, randId);
+		_sys.setActiveIdentity(posIdB, randId);
+	} else {
+		_sys.setActiveIdentity(posIdA, randId);
+		// get a second AA identity to choose for the other helix
+		randIdNum = _RNG.getRandomInt(0, _ids.size()-1);
+		randId = _ids[randIdNum];
+		// set the position on helix B as another random AA identity
+		_sys.setActiveIdentity(posIdB, randId);
+	}
 }
 
 //Checks through a vector of sequences to see if the new sequence has already been found
@@ -2987,7 +2996,7 @@ void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string
 }
 
 //Make it so that this will get all the info I need instead of having to run more code later
-void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_allInterfacialPositionsList, vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err){
+void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_allInterfacialPositionsList, vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err){
 	/******************************************************************************
 	 *             === PREPARE NEW SYSTEM WITH NEW POLYMER SEQUENCE ===
 	 ******************************************************************************/
@@ -3193,6 +3202,8 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 
 		// Convert the energy term (which actually saves the probability of the sequence in the whole system)
 		// to the proper comparison of proportion to energy between individual sequences (done outside of the actual energy term)
+
+		//TODO: I just realized that for heterodimers, I may need to completely remake some of these functions as with the below only taking the sequence of one helix; I may make a hetero and homo functions list?
 		calculateInterfaceSequenceEntropy(_opt, prevStateSeq, currStateSeq, _sequenceEntropyMap, prevStateSEProb, currStateSEProb, prevStateEntropy, currStateEntropy, bestEnergy, currStateEnergy, bestEnergyTotal, currEnergyTotal, _allInterfacialPositionsList);
 		MC.setEner(bestEnergyTotal);
 

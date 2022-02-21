@@ -4,7 +4,7 @@
  * @Email:  gjowl04@gmail.com
  * @Filename: seqDesign.cpp
  * @Last modified by:   Gilbert Loiseau
- * @Last modified time: 2022/02/15
+ * @Last modified time: 2022-02-19
  */
 #include <sstream>
 #include <iterator>
@@ -34,6 +34,7 @@
 #include "BaselineInteraction.h"
 
 // Design Functions: TODO figure out which of these are necessary; a lot of this code I just added internally I believe
+// *There are apparently many redundant functions in designFunctions.h that may be present in many of the other headers
 #include "BaselineIMM1Interaction.h"
 #include "BaselinePairInteraction.h"
 #include "BaselineOuterPairInteraction.h"
@@ -136,6 +137,7 @@ int main(int argc, char *argv[]){
 	 *               === LOAD RANDOM GEOMETRY FROM GEOMETRY FILE ===
 	 ******************************************************************************/
 	// Initialize RNG with seed (time or given seed number)
+	// *Look up easy RNG C++
 	RandomNumberGenerator RNG;
 	if (opt.useTimeBasedSeed){
 		RNG.setTimeBasedSeed();
@@ -143,7 +145,9 @@ int main(int argc, char *argv[]){
 		RNG.setSeed(opt.seed);
 	}
 
+
 	// TODO:...
+	// *Change this function for selecting geometries to design
 	vector<double> densities;
 	if (opt.getGeoFromPDBData){
 		getGeometry(opt, RNG, densities, sout);
@@ -163,12 +167,14 @@ int main(int argc, char *argv[]){
 	/******************************************************************************
 	 *                       === GENERATE POLYMER SEQUENCE ===
 	 ******************************************************************************/
+	// polymer sequences have: chain, starting position of chain residue, three letter AA code
 	string polySeq = generatePolymerSequence(opt.backboneAA, opt.backboneLength, opt.thread);
 	PolymerSequence PS(polySeq);
 
 	/******************************************************************************
 	 *                     === HELICAL AXIS SET UP ===
 	 ******************************************************************************/
+	 // Sets the helices to the origin
 	string axis = "\
 ATOM      1  O   DUM A   1       0.000   0.000   0.000  1.00  0.00           P\n\
 ATOM      2  Z   DUM A   1       0.000   0.000   1.000  1.00  0.00           O\n\
@@ -212,6 +218,9 @@ END";
 	vector<int> rotamerSamplingPerPosition;
 
 	// Defines the interfacial positions and the number of rotamers to give each position
+	// This takes poly-val helix to calculate the residue burial of every position and based on the burial and number
+	// of 'SASA interface level' decides rotamer level to assign to the position and also decides which of these positions are 'interfacial'
+	// PS is the actual polymerSeq object whereas polySeq is the string version of the polymerSeq
 	defineInterfaceAndRotamerSampling(opt, PS, rotamerLevels, polySeq, variablePositionString, rotamerSamplingString, linkedPositions, allInterfacePositions, interfacePositions, rotamerSamplingPerPosition, sout, axis);
 
 	/******************************************************************************
@@ -233,12 +242,16 @@ END";
 	trans.setNaturalMovements(true); // all atoms are rotated such as the total movement of the atoms is minimized
 
 	// Transform to chosen geometry
+	// Change this function to give other geometric parameters for the independent helices for the heterodimers
+	// This is directly from CATM
 	transformation(apvChainA, apvChainB, axisA, axisB, ori, xAxis, zAxis, opt.zShift, opt.axialRotation, opt.crossingAngle, opt.xShift, trans);
 	moveZCenterOfCAMassToOrigin(pdb.getAtomPointers(), helicalAxis.getAtomPointers(), trans);
 
 	/******************************************************************************
 	 *  === DECLARE SYSTEM FOR POLYLEU WITH ALTERNATE IDENTITIES AT INTERFACE ===
 	 ******************************************************************************/
+	// This makes no fucking sense but you make another system to mirror the poly-gly geometry for the sequence that you actually want to run
+
 	// Initialize system for dimer to design
 	System sys;
 	// Initialize CharmmSystemBuilder to build energy terms for design
@@ -307,19 +320,23 @@ END";
 	/******************************************************************************
 	 *                === DELETE TERMINAL HYDROGEN BOND INTERACTIONS ===
 	 ******************************************************************************/
-	// removes all hydrogen bonding near the termini of our helices (remnant from CATM, but used in the code that was used to get baselines so keeping it to be consistent)
+	// removes all hydrogen bonding near the termini of our helices
+	// (remnant from CATM, but used in the code that was used to get baselines so keeping it to be consistent)
 	deleteTerminalHydrogenBondInteractions(sys,opt);
 
 	/******************************************************************************
 	 *                === CHECK TO SEE IF ALL ATOMS ARE BUILT ===
 	 ******************************************************************************/
 	// check to verify that all atoms have coordinates
+	// See if this is integratable into the system that is built previously for the helix of interest
 	checkIfAtomsAreBuilt(sys, err);
 
 	/******************************************************************************
 	 *                     === ADD IN BASELINE ENERGIES ===
 	 ******************************************************************************/
-	//
+	// This should already be ready to go for two independent hetero monomers
+	// Would need to rerun this if wanting to expand library of AAs
+
 	if (opt.useBaseline){
 		//addBaselineToSelfPairManager();//TODO: was going to make this a function but I feel like it already exists in spm, so going to wait when I have time to look that up
 		//initialize baseline maps to calculate energy for each sequence for comparison in baselineMonomerComparison_x.out
@@ -330,8 +347,10 @@ END";
 	}
 
 	// TODO: change this; I feel like this should be an option if linked is true
-	vector<vector<string>> linkedPos = convertToLinkedFormat(sys, linkedPositions, opt.backboneLength);
-	sys.setLinkedPositions(linkedPos);
+	if (opt.linkInterfacialPositions){
+		vector<vector<string>> linkedPos = convertToLinkedFormat(sys, linkedPositions, opt.backboneLength);
+		sys.setLinkedPositions(linkedPos);
+	}
 
 	// Get sequence entropy map
 	map<string, double> sequenceEntropyMap = readSingleParameters(opt.sequenceEntropyFile);
@@ -345,6 +364,7 @@ END";
 	 *                        === SETUP SPM AND RUN SCMF ===
 	 ******************************************************************************/
 	//TODO: make it so that this part is optional: if I submit a sequence to start, don't even do this. Just find the interface, greedy for best sequence, and continue
+	// DEE takes forever, apparently this is coded awfully (blame Alessandro)
 	SelfPairManager spm;
 	spm.seed(RNG.getSeed());
 	spm.setSystem(&sys);
@@ -377,6 +397,7 @@ END";
 	spmTime = difftime (spmEnd, spmStart);
 
 	// vector for the initial SCMF state
+	// This is fucking stupid
 	vector<unsigned int> initialState = spm.getSCMFstate();
 	// vector for the SCMF state after the biased monte carlo
 	vector<unsigned int> bestState = spm.getBestSCMFBiasedMCState();
@@ -399,7 +420,6 @@ END";
 	// TODO: make into a function?
 	// output this information about the SelfPairManager run below
 	string seqInterface = getInterfaceSequence(opt, rotamerSamplingString, startSequence);
-	int numInterfacialPositions = linkedPos.size();
 	cout << "Initial Sequence:   " << initialSeq << endl;
 	cout << "Best Sequence:      " << startSequence << endl;
 	cout << "Interface Sequence: " << seqInterface << endl;
@@ -436,11 +456,14 @@ END";
 	 *      === MONTE CARLO TO RANDOMIZE SEQUENCES FROM BEST SCMF STATE ===
 	 ******************************************************************************/
 	// Unlink the best state from SCMF if not using linked positions during the state Monte Carlo
+	// Will likely need to change this function for heterodimers but try and use it first
 	if (!opt.linkInterfacialPositions){
 		unlinkBestState(opt, bestState, rotamerSamplingPerPosition, opt.backboneLength);
-		stateMCUnlinked(sys, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs, sequenceStatePair, allInterfacePositions, interfacePositions, rotamerSamplingPerPosition, linkedPos, RNG, sout, err);
+		stateMCUnlinked(sys, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs, '\n'
+		sequenceStatePair, allInterfacePositions, interfacePositions, rotamerSamplingPerPosition, linkedPos, RNG, sout, err);
 	} else {
-		stateMCLinked(sys, spm, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs, sequenceStatePair, interfacePositions, rotamerSamplingPerPosition, linkedPos, RNG, sout, err);
+		stateMCLinked(sys, spm, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs, '\n'
+		sequenceStatePair, interfacePositions, rotamerSamplingPerPosition, linkedPos, RNG, sout, err);
 	}
 
 	// I moved this on 12_6_2021: I noticed that I am getting too many threonines in my starting seqeunces, so I decided to move the baseline down here (this likely won't work for stateMCLinked, so I'll have to deal with that
