@@ -7,8 +7,8 @@
  * @Last modified time: 2022-02-19
  */
 
-#ifndef DESIGN_OPTIONS_H
-#define DESIGN_OPTIONS_H
+#ifndef DESIGNOPTIONS_H
+#define DESIGNOPTIONS_H
 
 #include <sstream>
 #include <vector>

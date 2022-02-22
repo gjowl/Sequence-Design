@@ -8,6 +8,6 @@
  */
 
 
-#include "design_options.h"
+#include "designOptions.h"
 
 using namespace std;
