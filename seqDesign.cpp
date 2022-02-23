@@ -4,7 +4,7 @@
  * @Email:  gjowl04@gmail.com
  * @Filename: seqDesign.cpp
  * @Last modified by:   Gilbert Loiseau
- * @Last modified time: 2022-02-19
+ * @Last modified time: 2022/02/22
  */
 #include <sstream>
 #include <iterator>
@@ -333,9 +333,7 @@ END";
 
 	// TODO: change this; I feel like this should be an option if linked is true
 	vector<vector<string>> linkedPos = convertToLinkedFormat(sys, linkedPositions, opt.backboneLength);
-	if (opt.linkInterfacialPositions){
-		sys.setLinkedPositions(linkedPos);
-	}
+	sys.setLinkedPositions(linkedPos);
 
 	// Get sequence entropy map
 	map<string, double> sequenceEntropyMap = readSingleParameters(opt.sequenceEntropyFile);
@@ -442,14 +440,10 @@ END";
 	 ******************************************************************************/
 	// Unlink the best state from SCMF if not using linked positions during the state Monte Carlo
 	// Will likely need to change this function for heterodimers but try and use it first
-	if (!opt.linkInterfacialPositions){
-		unlinkBestState(opt, bestState, rotamerSamplingPerPosition, opt.backboneLength);
-		stateMCUnlinked(sys, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs,
+	// TODO: should be working now, but going to test in lab tomorrow. need to attach an example config file to my github
+	unlinkBestState(opt, bestState, rotamerSamplingPerPosition, opt.backboneLength);
+	stateMCUnlinked(sys, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs,
 			sequenceStatePair, allInterfacePositions, interfacePositions, rotamerSamplingPerPosition, RNG, sout, err);
-	} else {
-		stateMCLinked(sys, spm, opt, PL, sequenceEnergyMap, sequenceEntropyMap, bestState, seqs, allSeqs,
-			sequenceStatePair, interfacePositions, rotamerSamplingPerPosition, linkedPos, RNG, sout, err);
-	}
 
 	// I moved this on 12_6_2021: I noticed that I am getting too many threonines in my starting seqeunces, so I decided to move the baseline down here (this likely won't work for stateMCLinked, so I'll have to deal with that
 

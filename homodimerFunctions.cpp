@@ -1,3 +1,12 @@
+/**
+ * @Author: Gilbert Loiseau
+ * @Date:   2022/02/22
+ * @Email:  gjowl04@gmail.com
+ * @Filename: homodimerFunctions.cpp
+ * @Last modified by:   Gilbert Loiseau
+ * @Last modified time: 2022/02/22
+ */
+
 
 #include <sstream>
 #include <iterator>
@@ -36,7 +45,9 @@ void c2Symmetry(AtomPointerVector & _apvA, AtomPointerVector & _apvB) {
 	trans.rotate(_apvB, m);
 }
 
-void transformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA, AtomPointerVector & _axisB, CartesianPoint & _ori, CartesianPoint & _xAxis, CartesianPoint & _zAxis, double _zShift, double _axialRotation, double _crossingAngle, double _xShift, Transforms & _trans) {
+void transformation(AtomPointerVector & _chainA, AtomPointerVector & _chainB, AtomPointerVector & _axisA,
+	AtomPointerVector & _axisB, CartesianPoint & _ori, CartesianPoint & _xAxis, CartesianPoint & _zAxis,
+	double _zShift, double _axialRotation, double _crossingAngle, double _xShift, Transforms & _trans) {
 	//====== Z Shift (Crossing Point) ======
 	CartesianPoint zShiftCP(0.0, 0.0, _zShift);
 	_trans.translate(_chainA, zShiftCP);
@@ -197,7 +208,10 @@ vector<int> getLinkedPositions(vector<int> _rotamerSampling, int _interfaceLevel
 	return positionsToLink;
 }
 
-//Identify which positions are found at the identified interface (example: Sequence LLLLIGLLIGLLIGLLLL would be 000011001100110000 where positions at interface are 1, others are 0)
+//Identify which positions are found at the identified interface
+//Example: Sequence:  LLLLIGLLIGLLIGLLLL
+//         Interface: 000011001100110000
+// Positions at interface are 1 and non-interfacial are 0
 vector<int> getLinked(vector<int> _rotamerSampling, int _backboneLength, int _interfaceLevel, int _highestRotamerLevel){
 	vector<int> linkedPositions;
 	for (uint i=0; i<_backboneLength; i++){
@@ -324,7 +338,8 @@ void checkSequenceVector(string &_newSeq, vector<string> &_seqs){
 }
 
 //new functions for saving sequences in order and not having repeats (makes sure I will save x best sequences rather than x-duplicates)
-bool sameSequenceChecker(string &_newSeq, double &_newEnergy, vector<uint> &_state, vector<pair<double,string>> &_enerSeqPair, vector<pair<double,vector<uint>>> &_energyStateVec){
+bool sameSequenceChecker(string &_newSeq, double &_newEnergy, vector<uint> &_state,
+vector<pair<double,string>> &_enerSeqPair, vector<pair<double,vector<uint>>> &_energyStateVec){
 	bool sameSeq = false;
 	if (_enerSeqPair.size() == 0){
 		sameSeq = false;
@@ -344,7 +359,8 @@ bool sameSequenceChecker(string &_newSeq, double &_newEnergy, vector<uint> &_sta
 	return sameSeq;
 }
 
-void saveSequence(Options &_opt, vector<pair<double,string>> &_energyVector, vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy){
+void saveSequence(Options &_opt, vector<pair<double,string>> &_energyVector,
+vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy){
 	bool sameSeq = sameSequenceChecker(_sequence, _energy, _state, _energyVector, _energyStateVec);
 	if (sameSeq == false){
 		if (_energyVector.size() < _opt.numStatesToSave){
@@ -376,7 +392,9 @@ double getMapValueFromKey(map<string,double> &_map, string _key){
 	return value;
 }
 
-void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>, map<string,double>> &_stateEnergyMap, vector<pair<double,string>> &_energyVector, vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy, ofstream &_out){
+void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>,
+map<string,double>> &_stateEnergyMap, vector<pair<double,string>> &_energyVector,
+vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy, ofstream &_out){
 	bool sameSeq = sameSequenceChecker(_sequence, _energy, _state, _energyVector, _energyStateVec);
 	if (sameSeq == false){
 		if (_energyVector.size() < _opt.numStatesToSave){
@@ -445,7 +463,9 @@ void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>, 
 	}
 }
 
-bool convertStateMapToSequenceMap(System &_sys, vector<pair<double,vector<uint>>> &_energyStateVec, map<vector<uint>, map<string,double>> &_stateEnergyMap, map<string, map<string,double>> &_sequenceEnergyMap, vector<pair<string,vector<uint>>> &_sequenceStatePair, ofstream &_out){
+bool convertStateMapToSequenceMap(System &_sys, vector<pair<double,vector<uint>>> &_energyStateVec,
+map<vector<uint>, map<string,double>> &_stateEnergyMap, map<string, map<string,double>> &_sequenceEnergyMap,
+vector<pair<string,vector<uint>>> &_sequenceStatePair, ofstream &_out){
 	//convert stateEnergyMap to sequenceEnergyMap
 	map<vector<uint>,map<string,double>>::iterator itr;
 	bool nonClashing = false;
@@ -477,7 +497,8 @@ void addSequencesToVector(vector<pair<double,string>> &_energyVector, vector<str
 	}
 }
 
-void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string _startSequence, vector<unsigned int> &_stateVector, map<string, map<string, double>> &_sequenceEnergyMap, map<string, double> &_entropyMap){
+void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string _startSequence,
+vector<unsigned int> &_stateVector, map<string, map<string, double>> &_sequenceEnergyMap, map<string, double> &_entropyMap){
 	if (_opt.useBaseline){
 		double baseline = _spm.getStateEnergy(_stateVector, "BASELINE")+_spm.getStateEnergy(_stateVector, "BASELINE_PAIR");
 		_sequenceEnergyMap[_startSequence]["Dimer"] = _spm.getStateEnergy(_stateVector)-baseline;
@@ -501,7 +522,8 @@ void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string
 	_sequenceEnergyMap[_startSequence]["SequenceProbability"] = internalSEProb;
 }
 
-void outputEnergiesByTerm(SelfPairManager &_spm, vector<uint> _stateVec, map<string,double> &_energyMap, vector<string> _energyTermList, string _energyDescriptor, bool _includeIMM1){
+void outputEnergiesByTerm(SelfPairManager &_spm, vector<uint> _stateVec, map<string,double> &_energyMap,
+vector<string> _energyTermList, string _energyDescriptor, bool _includeIMM1){
 	if (_includeIMM1 == false){//No IMM1 Energy (for the Monte Carlos, both dimer and monomer)
 		for (uint i=0; i<_energyTermList.size(); i++){
 			string energyTerm = _energyTermList[i]; //CHARMM_ and SCWRL4_ terms
@@ -768,7 +790,9 @@ double getSequenceEntropyProbability(Options &_opt, string _sequence, map<string
 	return seqProb;
 }
 
-void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy, double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal, vector<uint> _interfacePositionsList){
+void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq,
+map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy,
+double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal, vector<uint> _interfacePositionsList){
 
 	_prevSEProb = getInterfaceSequenceEntropyProbability(_opt, _prevSeq, _entropyMap, _interfacePositionsList);
 	_currSEProb = getInterfaceSequenceEntropyProbability(_opt, _currSeq, _entropyMap, _interfacePositionsList);
@@ -802,7 +826,9 @@ void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _c
 	}
 }
 
-void calculateSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy, double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal){
+void calculateSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq,
+map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy,
+double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal){
 
 	_prevSEProb = getSequenceEntropyProbability(_opt, _prevSeq, _entropyMap);
 	_currSEProb = getSequenceEntropyProbability(_opt, _currSeq, _entropyMap);
@@ -955,7 +981,11 @@ std::vector < std::vector < bool > > getActiveMask (System &_sys) {
 /***********************************
  * MonteCarlo Functions
  ***********************************/
-void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err){
+void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSequence &_PS,
+map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap,
+vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs,
+vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList,
+vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err){
 	/******************************************************************************
 	 *                     === ADD IN BASELINE ENERGIES ===
 	 ******************************************************************************/
@@ -1062,7 +1092,9 @@ void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSe
 
 		// Convert the energy term (which actually saves the probability of the sequence in the whole _system)
 		// to the proper comparison of proportion to energy between individual sequences (done outside of the actual energy term)
-		calculateSequenceEntropy(_opt, prevStateSeq, currStateSeq, _sequenceEntropyMap, prevStateSEProb, currStateSEProb, prevStateEntropy, currStateEntropy, bestEnergy, currStateEnergy, bestEnergyTotal, currEnergyTotal);
+		calculateSequenceEntropy(_opt, prevStateSeq, currStateSeq, _sequenceEntropyMap,
+			prevStateSEProb, currStateSEProb, prevStateEntropy, currStateEntropy, bestEnergy,
+			currStateEnergy, bestEnergyTotal, currEnergyTotal);
 		MC.setEner(bestEnergyTotal);
 
 		// MC accept and reject conditions
@@ -1138,7 +1170,11 @@ void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSe
 
 
 //Make it so that this will get all the info I need instead of having to run more code later
-void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_allInterfacialPositionsList, vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err){
+void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS,
+map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap,
+vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs,
+vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_allInterfacialPositionsList,
+vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err){
 	/******************************************************************************
 	 *             === PREPARE NEW SYSTEM WITH NEW POLYMER SEQUENCE ===
 	 ******************************************************************************/
@@ -1165,6 +1201,7 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	}
 
 	Chain & chain = sys.getChain("A");
+
 
 	/******************************************************************************
 	 *           === TRANSFORM HELICES TO INITIAL STARTING POSITION ===
@@ -1238,6 +1275,9 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	//spm.updateWeights();
 	spm.setOnTheFly(false);
 	spm.saveEnergiesByTerm(true);
+	if (_opt.verbose){
+		cout << "Calculating self and pair energy terms..." << endl;
+	}
 	spm.calculateEnergies();
 
 	/******************************************************************************
@@ -1298,6 +1338,14 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 	lout << "zShift: " << _opt.zShift << endl << endl;
 	lout << "Number of MCCycles: " << _opt.MCCycles << endl;
 	lout << "PrevSequence\tCurrSequence\tTotal\tDimer\tBaseline\tVDW\tHBOND\tEnergyDifferencew/prevSeq\tPrevEnergy\tCurrEnergy\tPrevEntropy\tCurrEntropy\tCurrentTemp" << endl;
+	if (_opt.verbose){
+		cout << "***STARTING GEOMETRY:***" << endl;
+		cout << "xShift: " << _opt.xShift << endl;
+		cout << "crossingAngle: " << _opt.crossingAngle << endl;
+		cout << "axialRotation: " << _opt.axialRotation << endl;
+		cout << "zShift: " << _opt.zShift << endl << endl;
+		cout << "Number of MCCycles: " << _opt.MCCycles << endl;
+	}
 
 	/******************************************************************************
 	 *                      === BEGIN STATE MONTE CARLO ===
@@ -1326,7 +1374,9 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 		}
 		// Reset the energy map to save energies from new state after changing the rotamer
 		stateMCEnergies.clear();
+		cout << 1 << endl;
 		randomPointMutationUnlinked(sys, _opt, _RNG, _interfacialPositionsList, ids);
+		cout << 2 << endl;
 
 		// Set a mask and run a greedy to get the best state for the sequence
 		//sys.setActiveRotamers(currStateVec);
@@ -1427,7 +1477,9 @@ void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<stri
 /***********************************
  *Other functions
  ***********************************/
-void getTotalEnergyAndWritePdbs(System &_sys, Options &_opt, map<string, map<string,double>> &_sequenceEnergyMap, string _sequence, vector<uint> _stateVec, vector<int> _rotamerSampling, RandomNumberGenerator &_RNG, int _seqNumber, PDBWriter &_writer, ofstream &_sout, ofstream &_err){
+void getTotalEnergyAndWritePdbs(System &_sys, Options &_opt, map<string, map<string,double>> &_sequenceEnergyMap,
+string _sequence, vector<uint> _stateVec, vector<int> _rotamerSampling, RandomNumberGenerator &_RNG, int _seqNumber,
+PDBWriter &_writer, ofstream &_sout, ofstream &_err){
 	double dimerEnergy = _sequenceEnergyMap[_sequence]["Dimer"];
 	double finalEnergy = dimerEnergy-_sequenceEnergyMap[_sequence]["Monomer"];
 	_sout << "Dimer Energy: " << dimerEnergy << endl;

@@ -1,3 +1,12 @@
+/**
+ * @Author: Gilbert Loiseau
+ * @Date:   2022/02/22
+ * @Email:  gjowl04@gmail.com
+ * @Filename: homodimerFunctions.h
+ * @Last modified by:   Gilbert Loiseau
+ * @Last modified time: 2022/02/22
+ */
+
 
 #ifndef HOMODIMERFUNCTIONS_H
 #define HOMODIMERFUNCTIONS_H
@@ -84,25 +93,40 @@ void randomPointMutationUnlinked(System &_sys, Options &_opt, RandomNumberGenera
   vector<uint> _variablePositions, vector<string> &_ids);
 //TODO: are the below different
 void checkSequenceVector(string &_newSeq, vector<string> &_seqs);
-bool sameSequenceChecker(string &_newSeq, double &_newEnergy, vector<uint> &_state, vector<pair<double,string>> &_enerSeqPair, vector<pair<double,vector<uint>>> &_energyStateVec);
+bool sameSequenceChecker(string &_newSeq, double &_newEnergy, vector<uint> &_state,
+  vector<pair<double,string>> &_enerSeqPair, vector<pair<double,vector<uint>>> &_energyStateVec);
 double getMapValueFromKey(map<string,double> &_map, string _key);//TODO: move funciton to appropriate spot
 // save the sequence into a vector<pair<double(energy),string(sequence)>> that holds the most stable sequences from our monte carlo search
-void saveSequence(Options &_opt, vector<pair<double,string>> &_energyVector, vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy);
-void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>, map<string,double>> &_stateEnergyMap, vector<pair<double,string>> &_energyVector, vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy, ofstream &_out);
+void saveSequence(Options &_opt, vector<pair<double,string>> &_energyVector,
+  vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy);
+void saveSequence(Options &_opt, RandomNumberGenerator &_RNG, map<vector<uint>,
+  map<string,double>> &_stateEnergyMap, vector<pair<double,string>> &_energyVector,
+  vector<pair<double,vector<uint>>> &_energyStateVec, string _sequence, vector<uint> _state, double _energy, ofstream &_out);
 //unlinks a state vector, replicating the state vector of the linked structure (i.e. for a sequence with 5 AAs and 5 rotamers each: linked: 0,1,2,3,4; unlinked: 0,1,2,3,4,0,1,2,3,4)
 void unlinkBestState(Options &_opt, vector<uint> &_bestState, vector<int> _linkedPositions, int _backboneLength);
 // converts the map of saved states and energies to saved sequences and energies for use through the rest of the code
-bool convertStateMapToSequenceMap(System &_sys, vector<pair<double,vector<uint>>> &_energyStateVec, map<vector<uint>, map<string,double>> &_stateEnergyMap, map<string, map<string,double>> &_sequenceEnergyMap, vector<pair<string,vector<uint>>> &_sequenceStatePair, ofstream &_out);
+bool convertStateMapToSequenceMap(System &_sys, vector<pair<double,vector<uint>>> &_energyStateVec,
+  map<vector<uint>, map<string,double>> &_stateEnergyMap, map<string, map<string,double>> &_sequenceEnergyMap,
+  vector<pair<string,vector<uint>>> &_sequenceStatePair, ofstream &_out);
 
 /***********************************
  *MonteCarlo functions
  ***********************************/
 // stateMC: iterates through hundreds to thousands of sequences to find sequences that fit the given geometry
 // Linked version
-void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList, vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
+void stateMCLinked(System &_sys, SelfPairManager &_spm, Options &_opt, PolymerSequence &_PS,
+  map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap,
+  vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs,
+  vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList,
+  vector<int> &_rotamerSampling, vector<vector<string>> &_linkedPos, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
 // Unlinked version
-void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS, map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap, vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs, vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList, vector<uint> &_variablePositionsList, vector<int> &_rotamerSampling, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
-void outputEnergiesByTerm(SelfPairManager &_spm, vector<uint> _stateVec, map<string,double> &_energyMap, vector<string> _energyTermList, string _energyDescriptor, bool _includeIMM1);
+void stateMCUnlinked(System &_sys, Options &_opt, PolymerSequence &_PS,
+  map<string, map<string,double>> &_sequenceEnergyMap, map<string,double> &_sequenceEntropyMap,
+  vector<unsigned int> &_bestState, vector<string> &_seqs, vector<string> &_allSeqs,
+  vector<pair<string,vector<uint>>> &_sequenceStatePair, vector<uint> &_interfacialPositionsList,
+  vector<uint> &_variablePositionsList, vector<int> &_rotamerSampling, RandomNumberGenerator &_RNG, ofstream &_sout, ofstream &_err);
+void outputEnergiesByTerm(SelfPairManager &_spm, vector<uint> _stateVec, map<string,double> &_energyMap,
+  vector<string> _energyTermList, string _energyDescriptor, bool _includeIMM1);
 void outputEnergiesByTermLinked(EnergySet *_Eset, map<string,double> &_energyMap, vector<string> _energyTermList, string _energyDescriptor);
 // adds sequences from the vector<pair<double,string>> energyVector to the vector of all sequences if it's not already in there
 void addSequencesToVector(vector<pair<double,string>> &_energyVector, vector<string> &_allSeqs);
@@ -121,12 +145,16 @@ double calcNumberOfPermutations(map<string,int> _seqAACounts, int _seqLength);
 void interfaceAASequenceEntropySetup(string _seq, map<string,int> &_seqCountMap, double &_numberOfPermutations, vector<uint> _interfacialPositionsList);
 // TODO: figure out if I just forgot to change these to interfacial for the starting sequence
 // function that implements the above functions to calculate the sequence entropy of the interface
-void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy, double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal, vector<uint> _interfacePositionsList);
+void calculateInterfaceSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq,
+  map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy,
+  double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal, vector<uint> _interfacePositionsList);
 void internalAASequenceEntropySetup(string _seq, map<string,int> &_seqCountMap, double &_numberOfPermutations, int _seqLength);
 void sequenceEntropySetup(string _seq, map<string,int> &_seqCountMap, double &_numberOfPermutations, int _seqLength);
 double calculateSequenceProbability(map<string,int> &_seqCountMap, map<string,double> &_entropyMap, double _numberOfPermutations);
 // function that implements the above functions to calculate the sequence entropy
-void calculateSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq, map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy, double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal);
+void calculateSequenceEntropy(Options &_opt, string _prevSeq, string _currSeq,
+  map<string,double> _entropyMap, double &_prevSEProb, double &_currSEProb, double &_prevEntropy,
+  double &_currEntropy, double _bestEnergy, double _currEnergy, double &_bestEnergyTotal, double &_currEnergyTotal);
 // helper functions for computing monomer energy (actually not sure what it does yet)
 double getStandardNormal(RandomNumberGenerator& RNG);
 
@@ -142,9 +170,12 @@ void buildSequenceEntropy(System &_sys, map<string, double> &_sequenceEntropyMap
  *Other functions
  ***********************************/
 // adds the energies for the initial sequence accepted by the SelfPairManager (uses DeadEndElimination and/or SelfConsistentMeanField to get a sequence)
-void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string _startSequence, vector<unsigned int> &_stateVector, map<string, map<string, double>> &_sequenceEnergyMap, map<string, double> &_entropyMap);
+void getEnergiesForStartingSequence(Options &_opt, SelfPairManager &_spm, string _startSequence,
+  vector<unsigned int> &_stateVector, map<string, map<string, double>> &_sequenceEnergyMap, map<string, double> &_entropyMap);
 //
-void getTotalEnergyAndWritePdbs(System &_sys, Options &_opt, map<string, map<string,double>> &_sequenceEnergyMap, string _sequence, vector<uint> _stateVec, vector<int> _rotamerSampling, RandomNumberGenerator &_RNG, int _seqNumber, PDBWriter &_writer, ofstream &_sout, ofstream &_err);
+void getTotalEnergyAndWritePdbs(System &_sys, Options &_opt, map<string, map<string,double>> &_sequenceEnergyMap,
+  string _sequence, vector<uint> _stateVec, vector<int> _rotamerSampling, RandomNumberGenerator &_RNG, int _seqNumber,
+  PDBWriter &_writer, ofstream &_sout, ofstream &_err);
 //
 void getDimerSasaScores(System &_sys, vector<pair<string,vector<uint>>> &_sequenceStatePair, map<string, map<string,double>> &_sequenceEnergyMap);
 //
@@ -171,4 +202,5 @@ void loadInterfacialRotamers(System &_sys, SystemRotamerLoader &_sysRot, string 
 void loadRotamers(System &_sys, SystemRotamerLoader &_sysRot, Options &_opt, vector<int> &_rotamerSampling);
 map<string, double> readSingleParameters(string _baselineFile);
 map<string,map<string,map<uint, double>>> readPairParameters(string _baselineFile);
+
 #endif
