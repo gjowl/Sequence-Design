@@ -2,13 +2,12 @@
 # @Date:   2021-12-19
 # @Filename: pythonTips.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2021-12-19
+# @Last modified time: 2022/03/17
 """
 Videos that I got some of these examples from:
 25 nooby Python habits: https://www.youtube.com/watch?v=qUeud6DvOWI&ab_channel=mCoding
 """
 # Python Programming Tips and Shortcuts
-
 
 # Checking for type
 """
@@ -16,7 +15,6 @@ If you want to write a check for a type of variable (i.e. string is a string and
 do not use the == . This isn't always clear, especially for a subtype of a type (Liskov rule?). Instead, use isinstance(type, typeToCompare)
 """
 # Example:
-
 Point = namedtuple('Point', ['x', 'y'])
 p = Point(1,2)
 if p == tuple:

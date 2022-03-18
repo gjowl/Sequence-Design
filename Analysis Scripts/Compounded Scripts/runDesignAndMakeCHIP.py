@@ -2,9 +2,7 @@
 # @Date:   2021-12-25
 # @Filename: runDesignAndMakeCHIP.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2022-01-07
-
-
+# @Last modified time: 2022/03/17
 
 """
 This file will run multiple python scripts for compiling and then analyzing design data.
@@ -12,10 +10,11 @@ This file will run multiple python scripts for compiling and then analyzing desi
 
 # everything in each of these files has hardcoded files that they read and write in order to run this whole set of scripts
 # TODO: is there a way to make it so that they're not all hardcoded?
-#TODO: would be great to also have a way to automatically download packages that aren't downloaded to run the code
+# TODO: would be great to also have a way to automatically download packages that aren't downloaded to run the code
 
 if __name__ == '__main__':
     currDir_path = os.path.dirname(os.path.realpath(__file__))
+    analysisCodeDir_path = currDir_path + '/Analysis Scripts'
 
     requirementsFile = currDir_path + '/requirements.txt'
     # download the required packages for these programs, list of which is found in requirements.txt
@@ -30,7 +29,7 @@ if __name__ == '__main__':
         os.mkdir(outputDir)
     else:
         print('Output Directory: ' + outputDir + ' exists.')
-#TODO: remember, I ran the design on an external server. Can I make a way to do that here? likely not?
+    #TODO: remember, I ran the design on an external server. Can I make a way to do that here? likely not?
     # Compiles design energy files from all design directories
     exec(open(currDir_path+'/compileAllDesignEnergyFiles.py').read())
     #TODO: add in a wait time

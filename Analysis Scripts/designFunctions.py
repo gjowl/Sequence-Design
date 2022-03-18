@@ -4,7 +4,7 @@ Created on Mon Sep 13 18:37:30 2021
 @author: gjowl
 """
 """
-This file is contains all of the functions for analysis of my design runs for use in 2021_11_02_designAnalyzer
+This file contains all of the functions for analysis of my design runs for use in 2021_11_02_designAnalyzer
 """
 from datetime import date
 from scipy import stats
