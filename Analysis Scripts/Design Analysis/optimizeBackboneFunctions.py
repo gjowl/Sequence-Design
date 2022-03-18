@@ -4,23 +4,24 @@
 # @Last modified by:   Gilbert Loiseau
 # @Last modified time: 2022-01-07
 
-from datetime import date
-from scipy import stats
-from matplotlib import gridspec
+# Multipurpose functions
+"""
+This file contains a list of functions that are used in the following programs:
+    -
+"""
 import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import re
-import seaborn as sns
-import logomaker as lm
 import random as rand
 import gc
-from utility import *
-from designFunctions import *
+from datetime import date
+from scipy import stats
+from utilityFunctions import *
+from analyzerFunctions import *
 
 
-# Multipurpose functions
 # gets the first bin using lowest value in dataframe and minimum bin value given
 def getFirstBin(df, binMin, colName):
     minValue = df[colName].min()
@@ -211,3 +212,36 @@ def assignSequencesToSegments(df, numSegments, maxNumberPerSegment):
     except RecursionError as re:
         print("Segments for CHIP are filled!")
     return dfOutput
+
+# function for generating a redundant library of sequences
+def makeRedundantLibrary(dfMutants, binList, numSequences, seed, segNumber):
+    dfSegments = pd.DataFrame()
+    if dfSegments.empty is True:
+        dfRandomSequences = generateSegment(dfMutants, binList, numSequences, 5, 3, seed+segNumber)
+        dfRandomSequences['SegmentNumber'] = segNumber
+        dfSegments = dfSegments.append(dfRandomSequences)
+        name = "Segment" + str(num)
+    else:
+        removePrevSeqList = list(set(dfMutants['runNumber'])-set(dfSegments['runNumber']))
+        tmpDf = dfMutants[dfMutants['runNumber'].isin(removePrevSeqList)]
+        sequenceNumbersPerBin = numberSequenceInBin(tmpDf, binList, -40)
+        #for bin, num in zip(binList, sequenceNumbersPerBin):
+        #    print(bin, ": ", num)
+        dfRandomSequences = generateSegment(tmpDf, binList, numSequences, 5, 3, seed+segNumber)
+        dfRandomSequences['SegmentNumber'] = segNumber
+        dfSegments = dfSegments.append(dfRandomSequences)
+        name = "Segment" + str(segNumber)
+        #plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
+        plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)
+    return dfSegments
+
+# function for generating a nonredundant library of sequences
+def makeNonRedundantLibrary(dfMutants, binList, numSequences, seed, segNumber):
+    dfSegments = pd.DataFrame()
+    dfRandomSequences = generateSegment(dfMutants, binList, numSequences, 5, 3, seed+segNumber)
+    dfRandomSequences['SegmentNumber'] = segNumber
+    dfSegments = dfSegments.append(dfRandomSequences)
+    name = "Segment" + str(segNumber)
+    #plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
+    #plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)
+    return dfSegments

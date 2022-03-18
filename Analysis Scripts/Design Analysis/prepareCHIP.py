@@ -15,14 +15,12 @@ TODO:
 """
 from datetime import date
 from scipy import stats
-from matplotlib import gridspec
 import os
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import re
 import random as rand
-from utility import *
+from utilityFunctions import *
 import dnachisel
 from dnachisel.biotools import reverse_translate
 
@@ -78,12 +76,12 @@ def getCHIPFile(df, dfFwdP, dfRevP, gpaSeq, g83ISeq, cut1, cut2, randomDNALength
     outputDf = pd.DataFrame.from_dict(dictOutput)
     return outputDf
 
-# Local Variables
-outputDir = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\"
-inputFile = outputDir + 'optimizedBackboneAnalysis.xlsx'
-inputFile = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\2022_1_5_CHIP\\CHIP1_Segments.xlsx"
-primerFile = "C:\\Users\\gjowl\\Downloads\\Primers.csv"
-outputFile = outputDir + 'CHIP.xlsx'
+# Variables
+currDir_path = os.path.dirname(os.path.realpath(__file__))
+outputDir = currDir_path + '/Analysis'
+inputFile = outputDir + '/optimizedBackboneAnalysis.xlsx'
+primerFile = outputDir+"/Primers.csv"
+outputFile = outputDir + '/CHIP.xlsx'
 writer = pd.ExcelWriter(outputFile)
 cutSite1 = 'gctagc'
 cutSite2 = 'gatc'
@@ -97,7 +95,8 @@ rand.seed(seed)
 # Read in CHIP primer file
 dfPrimer = pd.read_csv(primerFile, sep=',')
 
-# Separate Primers and primer names and add to corresponding dataframes
+# Separate Primers and primer names
+#go through list of primers
 dfForwardPrimer = dfPrimer.iloc[0::2]
 dfReversePrimer = dfPrimer.iloc[1::2]
 dfForwardPrimer = dfForwardPrimer.reset_index()
@@ -114,7 +113,6 @@ g83ISeq = reverse_translate(g83I)
 
 # convert AA sequences to DNA sequences and
 dfCHIP = getCHIPFile(dfAllSequences, dfForwardPrimer, dfReversePrimer, gpaSeq, g83ISeq, cutSite1, cutSite2, randomDNALength)
-
 writeDataframeToSpreadsheet(dfCHIP, writer, 'CHIP')
 
 writer.close()

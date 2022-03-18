@@ -5,7 +5,7 @@
 # @Last modified time: 2021-12-25
 
 """
-This searches for all of the optimizationEnergyFile.csv contained anywhere within the starting directory.
+This searches for all of the optimizationEnergyFile.csv output from my seqDesign.cpp runs contained anywhere within the starting directory.
 It then compiles all of them into a file for analysis by optimizedBackboneAnalysis.csv
 """
 

@@ -1,14 +1,16 @@
 """
 Created on Mon Sep 13 18:37:30 2021
 
+This file contains a list of functions that are used in the following scripts:
+    -analyzeDesignData.py
+    -optimizedBackboneAnalysis.py
+    -optimizeBackboneFunctions.py
+
 @author: gjowl
 """
-"""
-This file is contains all of the functions for analysis of my design runs for use in 2021_11_02_designAnalyzer
-"""
+
 from datetime import date
 from scipy import stats
-from matplotlib import gridspec
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,15 +24,21 @@ import logging
 ##############################################
 #                 FUNCTIONS
 ##############################################
+#Takes a set of sequences and compares them to another set of sequences, searching specifically for similarities with the interface
+#def findSeq(interface):
+#    for currSeq in seqList:
+#        #iterate through currSeq to see if the combination is possible
+#        for i in len(seq):
+#            if seq[i] != -:
+#                find
 
-#TODO: finish this so that it sets up a comparison between my designs and the PDB sequences I got them from
 def compareDesignAndPDBSequences(sequences):
-    #1. read in the sequences from my dataset
+    #TODO: write in code to read in the sequences from my pdb dataset and compare to the sequences here
+    #1. read in teh sequences from my dataset
     for seq in sequences:
         findSeq(seqToCompare)
     #2. setup a finder that will recognize any sequence similar (-can be anything but all the matching parts have to be the same)
 
-# Plots a kde plot for a dataframe that contains the below hardcoded column titles
 def plotKde(df, xAxis, yAxis):
     #Variable set up depending on data that I'm running
     if xAxis == "Distance":
@@ -107,7 +115,33 @@ def plotKde(df, xAxis, yAxis):
     #fid.close()
     return Z
 
-#plots an overlay of the points over the kde plot
+#Plotting Functions
+#def plotOverlay(Z, xAxis, yAxis, xmax, xmin, ymax, ymin, xData, yData, outputDir):
+#    # Plotting code below
+#    fig, ax = plt.subplots()
+#    plt.grid(True)
+#    plt.xlabel(xAxis + " (Å)")
+#    plt.ylabel(yAxis + " (°)")
+#    plt.title('')
+#    ax.use_sticky_edges = False
+#    q = ax.imshow(np.rot90(Z), cmap=plt.cm.Blues,
+#        extent=[xmin, xmax, ymin, ymax], aspect="auto")
+#
+#    # Plots the datapoints onto the graph
+#    ax.plot(xData, yData, 'k.', markersize=1.33, color = "Red")
+#    ax.set_xlim([xmin, xmax])
+#    ax.set_ylim([ymin, ymax])
+#    ax.set_xticks([6,7,8,9,10,11,12])
+#    axes = plt.gca()
+#
+#    #save and show plot figure
+#    today = date.today()
+#    today = today.strftime("%Y_%m_%d")
+#    plt.colorbar(q)
+#    #plt.savefig(outputDir +xAxis+"_v_"+yAxis+".png", bbox_inches='tight', dpi=150)
+#    plt.show()
+#    plt.close()
+
 def plotOverlay(Z, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData, yData, outputDir):
     # Plotting code below
     fig, ax = plt.subplots()
@@ -133,7 +167,6 @@ def plotOverlay(Z, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData,
     plt.savefig(outputDir+filename+".png", bbox_inches='tight', dpi=150)
     plt.close()
 
-# plots a contour plot version of a kde plot
 def plotContour(df, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData, yData, outputDir):
     figSNS, axSNS = plt.subplots()
     sns.kdeplot(df[xAxis], df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, shade_lowest=False, ax=axSNS)
@@ -148,8 +181,6 @@ def plotContour(df, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData
     plt.savefig(outputDir+filename+"_contour.png", bbox_inches='tight', dpi=150)
     plt.close()
 
-# Plots a kde plot for a dataframe that contains the below hardcoded column titles; more variable than the first version,
-# outputs to a directory
 def plotKde(df, xAxis, yAxis, title, filename, outputDir):
     #Variable set up depending on data that I'm running
     xmin = 6
@@ -187,7 +218,6 @@ def plotKde(df, xAxis, yAxis, title, filename, outputDir):
     fid.close()
     return Z
 
-# plot the difference kde between two difference dataframes
 def plotDifferenceKde(df1, df2, xAxis, yAxis, title, filename, outputDir):
     #Variable set up depending on data that I'm running
     xmin = 6
@@ -210,9 +240,12 @@ def plotDifferenceKde(df1, df2, xAxis, yAxis, title, filename, outputDir):
     kernel2.set_bandwidth(bw_method='silverman')
     Z1 = np.reshape(kernel1(positions).T, X.shape)
     Z2 = np.reshape(kernel2(positions).T, X.shape)
+
+
+    #print(Z2)
     Z = Z2-Z1
     print(Z)
-
+    #print(Z)
     # Setup for plotting code
     plt.rc('font', size=10)
     plt.rc('xtick', labelsize=10)
@@ -233,7 +266,6 @@ def plotDifferenceKde(df1, df2, xAxis, yAxis, title, filename, outputDir):
     fid.close()
     return Z
 
-# plot the difference kde between a given dataframe and a list of dataframes
 def plotKdeOverlayForDfList(dfKde, listDf, dfNames, filenames, xAxis, yAxis, outputDir):
     #Variable set up depending on data that I'm running
     xmin = 6
@@ -820,7 +852,6 @@ def writeConfigurationFile(df, fileName, batchName, baseDir, executable):
     designPDBList = df["Design Directory"]
     queue = 'queue\n'
     with open(fileName) as submitFile:
-
         submitFile.write('batch_name = ' + batchName + '\n')
         submitFile.write('baseDir    = ' + baseDir + '\n\n')
         submitFile.write('executable = ' + executable+ '\n')

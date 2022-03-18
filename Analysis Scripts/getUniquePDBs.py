@@ -4,20 +4,13 @@
 # @Last modified by:   Gilbert Loiseau
 # @Last modified time: 2021-12-09
 
-
-
 #This file will take a csv of pdbs and read every other row of them,
 #then get the sequence entropy
 
 from datetime import date
-from scipy import stats
-from matplotlib import gridspec
 import os
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import re
-import seaborn as sns
 from designFunctions import *
 
 today = date.today()

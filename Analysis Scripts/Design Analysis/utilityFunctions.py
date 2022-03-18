@@ -4,8 +4,6 @@
 # @Last modified by:   Gilbert Loiseau
 # @Last modified time: 2022-01-07
 
-
-
 """
 Created on 11/11/21 18:37:30 2021
 
@@ -14,17 +12,12 @@ Description:
 
 To add to your own python file, download this file to the same directory of your file.
 Add the below to the top of the your file:
-  -from utility.py import *
+  -from utilityFunctions.py import *
 
 You will then be able to use the commands from this file on your own.
 """
 
 # Packages
-from datetime import date
-from scipy import stats
-from matplotlib import gridspec
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 #This function iterates through a row of data and identifies whether or not the value in the column is a string

@@ -1,46 +1,45 @@
 # @Author: Gilbert Loiseau
-# @Date:   2021-12-25
-# @Filename: optimizationAnalysis.py
+# @Date:   2021-12-21
+# @Filename: optimizedBackboneAnalysis2.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2021-12-25
+# @Last modified time: 2022-01-07
 
 from datetime import date
-from scipy import stats
-from matplotlib import gridspec
 import os
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import re
-import seaborn as sns
-import logomaker as lm
-import random as rand
+import pandas as pd
 from utility import *
-from designFunctions import *
+from analyzerFunctions import *
 from optimizeBackboneFunctions import *
+import gc
 
 #TODO: make above into package
 """
-This code takes sequences randomly from my optimizedBackbones and mutants to setup a CHIP to order
+This code takes sequences randomly from my optimized backbone and mutant data
+and selects from a desired subset of sequences to setup a CHIP to order. By
+changing the redundant variable to True or False, you will make a library with
+redundant or no redundant sequences.
 """
 # Variables
-currDir_path = os.path.dirname(os.path.realpath(__file__))
-outputDir = currDir_path + '/Analysis'
-outputFile = outputDir + '/optimizedBackboneAnalysis.xlsx'
-plotOutputDir = outputDir+"/Plots/CHIP_Plots"
-inputFile = outputDir+"/compiledOptimizedBackboneData.csv"
-numSequences = 5
-totalSegments = 20
+redundant = True
+outputDir = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\"
+outputFile = outputDir + 'optimizedBackboneAnalysis.xlsx'
+
+plotOutputDir = outputDir+"CHIP_Plots\\"
+inputFile = "C:\\Users\\gjowl\\Downloads\\allBackboneOptimization.csv"
+numSequences = 8
+totalSegments = 12
 sequencesPerBin = 80
 sequencesPerSegment = 500
 numRandom = 60
-#TODO: switch this to the dataset on our server
+seed = 1
+
 # variables for original kde geometry plot from membranePDBs
 dfPath = "C:\\Users\\gjowl\\Downloads\\2020_09_23_kdeData.csv"
 dfKde = pd.read_csv(dfPath)
 
 # Main
-# If output directory does not exist, cre
+# If output directory does not exist, create it
 if not os.path.isdir(plotOutputDir):
     print('Creating output directory: ' + plotOutputDir + '.')
     os.mkdir(plotOutputDir)
@@ -62,12 +61,11 @@ writeDataframeToSpreadsheet(df, writer, 'All')
 dfDesign = df[df["StartSequence"] == df["Sequence"]]
 writeDataframeToSpreadsheet(dfDesign, writer, 'Design Sequences')
 
-
 # Get list of lists of bins
-binList = getBins(df, 'Total', -50, 0, 5)
+binList = getBins(df, 'Total', -40, 0, 5)
 
 #TODO: write this so that it outputs a dataframe that gets output to the summary file for the last sequence (and maybe each segment)
-sequenceNumbersPerBin = numberSequenceInBin(df, binList, -50)
+sequenceNumbersPerBin = numberSequenceInBin(df, binList, -40)
 for bin, num in zip(binList, sequenceNumbersPerBin):
     print(bin, ": ", num)
 bestDf = df[df['Total'] < -50]
@@ -84,7 +82,7 @@ dfMutant = dfMutant.drop_duplicates(subset="Sequence", keep=False)
 
 # only keeps mutants that have the desired amount of stable and clashing sequences from backbone optimization
 # (ex. if stable = 6, mutants with less than 6 stable sequences (total energy < 0) will be removed)
-dfMutants = checkForClashAndStable(dfMutant,7,3)
+dfMutants = checkForClashAndStable(dfMutant,5,3)
 
 # Get random mutant sequences to fill segments and output Kde and energy histograms for each segment
 dfSegments = pd.DataFrame()
@@ -92,12 +90,23 @@ binList1 = [-55, -50, -45, -40, -35, -30, -25, -20, -15, -10, -5, 0]
 
 # For the number of desired segments, generate segments and add to CHIP dataframe
 for segNumber in range(1,totalSegments+1):
-    dfRandomSequences = generateSegment(dfMutants, binList, 5, 6, 3)
-    dfRandomSequences['SegmentNumber'] = segNumber
-    dfSegments = dfSegments.append(dfRandomSequences)
-    name = "Segment" + str(num)
-    plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
-    plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)
+    if dfSegments.empty is True:
+        dfRandomSequences = generateSegment(dfMutants, binList, numSequences, 5, 3, seed+segNumber)
+        dfRandomSequences['SegmentNumber'] = segNumber
+        dfSegments = dfSegments.append(dfRandomSequences)
+        name = "Segment" + str(num)
+    else:
+        removePrevSeqList = list(set(dfMutants['runNumber'])-set(dfSegments['runNumber']))
+        tmpDf = dfMutants[dfMutants['runNumber'].isin(removePrevSeqList)]
+        sequenceNumbersPerBin = numberSequenceInBin(tmpDf, binList, -40)
+        #for bin, num in zip(binList, sequenceNumbersPerBin):
+        #    print(bin, ": ", num)
+        dfRandomSequences = generateSegment(tmpDf, binList, numSequences, 5, 3, seed+segNumber)
+        dfRandomSequences['SegmentNumber'] = segNumber
+        dfSegments = dfSegments.append(dfRandomSequences)
+        name = "Segment" + str(segNumber)
+        #plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
+        plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)
 
 # Add original design sequences to segments and output the number of sequences in each bin for entire CHIP
 dfCHIP = getDesignSequencesForSegment(dfDesign, dfSegments)
@@ -108,10 +117,15 @@ for bin, num in zip(binList, sequenceNumbersPerBin):
 writeDataframeToSpreadsheet(dfCHIP, writer, 'Segments')
 
 # Plot histogram for just the design data
-filenames = 'Design Energies After Backbone Optimization'
+title = ''
+if redundant is True:
+    title = 'Design Energies After Backbone Optimization Redundant'
+else:
+    title = 'Design Energies After Backbone Optimization NonRedundant'
+
 listDf = dfDesign
 binList = [-55, -50, -45, -40, -35, -30, -25, -20, -15, -10, -5, 0]
-plotHistogramForDataframe(df, "Total", binList1, filename, plotOutputDir)
+plotHistogramForDataframe(df, "Total", binList1, title, plotOutputDir)
 
 #TODO: Make below into a function that outputs the numbers for certain regions of geometric space
 dfMutAngle = dfCHIP[dfCHIP['Total'] < 0]
@@ -128,12 +142,17 @@ dfMutAngle = dfMutAngle[dfMutAngle['xShift'] > 7.5]
 writeDataframeToSpreadsheet(dfMutAngle, writer, 'rightNonGASRegion')
 print(len(dfMutAngle['Sequence'].unique()))
 
-dfStable = dfCHIP[dfCHIP[xColumnName] < 0]
+dfStable = dfCHIP[dfCHIP['Total'] < 0]
 dfMutClash = dfCHIP[dfCHIP['Total'] > 0]
 dfMutClash = dfCHIP[dfCHIP['Total'] < 100000]
+
 # plots scatterplot for a dataframe
-plotScatterplotForDataframe(dfStable, 'SegmentNumber', 'Total', "Stable Energies Spread Per segment", 'StablePerSegment')
-plotScatterplotForDataframe(dfMutClash, 'SegmentNumber', 'Total', "Clash Energies Spread Per segment", 'ClashPerSegment')
+if redundant is True:
+    plotScatterplotForDataframe(dfStable, 'SegmentNumber', 'Total', "Stable Energies Spread Per segment redundant", 'StablePerSegmentR', plotOutputDir)
+    plotScatterplotForDataframe(dfMutClash, 'SegmentNumber', 'Total', "Clash Energies Spread Per segment redundant", 'ClashPerSegmentR', plotOutputDir)
+else:
+    plotScatterplotForDataframe(dfStable, 'SegmentNumber', 'Total', "Stable Energies Spread Per segment nonredundant", 'StablePerSegmentNR', plotOutputDir)
+    plotScatterplotForDataframe(dfMutClash, 'SegmentNumber', 'Total', "Clash Energies Spread Per segment nonredundant", 'ClashPerSegmentNR', plotOutputDir)
 
 writeDataframeToSpreadsheet(dfStable, writer, 'StableMutants')
 writeDataframeToSpreadsheet(dfMutClash, writer, 'ClashingMutants')

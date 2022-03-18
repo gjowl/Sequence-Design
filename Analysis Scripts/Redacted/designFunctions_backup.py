@@ -15,7 +15,7 @@ import pandas as pd
 import re
 import seaborn as sns
 import logomaker as lm
-from utility import *
+from utilityFunctions import *
 
 ##############################################
 #                 FUNCTIONS

@@ -1,9 +1,7 @@
-# @Author: Gilbert Loiseau
-# @Date:   2021-12-25
-# @Filename: analyzeDesignData.py
-# @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2021-12-25
-
+"""
+Created on Friday November 12 2021
+@author: Gilbert Loiseau
+"""
 """
 This file is used to analyze the data from my sequence designs. It will read in a compiled energy file
 and analyze the designs, outputting a summary file for the design run. The hard coded parameters here
@@ -11,7 +9,6 @@ are used for my design run that was used to order my first CHIP. It outputs a su
 chosen by the given parameters for backboneOptimization and mutations. That data is analyzed by
 optimizedBackboneAnalysis.py and the sequences are converted to DNA format for the CHIP using prepareCHIP.py.
 """
-
 from datetime import date
 from scipy import stats
 from matplotlib import gridspec
@@ -21,28 +18,34 @@ import numpy as np
 import pandas as pd
 import re
 import seaborn as sns
-from designFunctions import *
+from analyzerFunctions import *
 
-#TODO: make the above designFunctions file into a package
 ##############################################
 #               OUTPUT SETUP
 ##############################################
 # Variables
 today = date.today()
 today = today.strftime("%Y_%m_%d")
-currDir_path = os.path.dirname(os.path.realpath(__file__))
-#inputFile = "C:\\Users\\gjowl\\Downloads\\3096seqs.csv"
-outputDir = currDir_path + '/Analysis'
-inputFile = outputDir +"/compiledDesignDataFiles.csv"
-outFile = outputDir + '/analyzedDesignData.xlsx'
+outputDir = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\" + today + "\\"
+inputDir = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\"
+inputFile = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\Design_files\\2021_11_10_rawDesignData.csv"
+#inputFile = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\"+today+"\\"+today+"_rawDesignData.csv"#version for when I get everything working so it all runs at once
+outFile = outputDir + 'analyzedDesignData.xlsx'
 writer = pd.ExcelWriter(outFile)
 energyLimit = -5
 densityLimit = 0.7
-listAA = ["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"]
+inputFile = "C:\\Users\\gjowl\\Downloads\\3096seqs.csv"
 
 #Main
-# make a directory to output plots
-plotOutputDir = outputDir+"/Plots"
+# if the outputDirectory doesn't exist, make it
+if not os.path.isdir(outputDir):
+    print('Creating output directory: ' + outputDir + '.')
+    os.mkdir(outputDir)
+else:
+    print('Output Directory: ' + outputDir + ' exists.')
+
+# make another directory to output plots
+plotOutputDir = outputDir+"Plots\\"
 if not os.path.isdir(plotOutputDir):
     print('Creating output directory: ' + plotOutputDir + '.')
     os.mkdir(plotOutputDir)
@@ -52,6 +55,9 @@ else:
 # Imports the input csv file into a dataframe
 df = pd.read_csv(inputFile, sep=",")
 dfAll = df
+
+# make this a setup dataframe function: sets up the interface and interfaceSeq columns for analysis
+listAA = ["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"]
 
 # Gets rid of the original design sequences before the montecarlo walk through sequence space
 #   I chose to rid of these sequences because although my design code with the baseline does get a good starting sequence,
@@ -63,7 +69,6 @@ dfAll = df
 df = df[df["DesignNumber"] > 0]
 getAADistribution(df, listAA, outputDir, "AADistribution_All")
 
-#TODO: where is this original membrane protein datafile? I should just access that path from my local computer in lab
 dfPath = "C:\\Users\\gjowl\\Downloads\\2020_09_23_kdeData.csv"
 dfKde = pd.read_csv(dfPath)
 

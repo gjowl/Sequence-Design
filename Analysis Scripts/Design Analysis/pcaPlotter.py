@@ -4,6 +4,9 @@
 # @Last modified by:   Gilbert Loiseau
 # @Last modified time: 2022/03/17
 
+"""
+This script makes a pca plot for my geometric data.
+"""
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np

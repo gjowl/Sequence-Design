@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 import re
 import random as rand
-from utility import *
+from utilityFunctions import *
 import dnachisel
 from dnachisel.biotools import reverse_translate
 
@@ -78,12 +78,12 @@ def getCHIPFile(df, dfFwdP, dfRevP, gpaSeq, g83ISeq, cut1, cut2, randomDNALength
     outputDf = pd.DataFrame.from_dict(dictOutput)
     return outputDf
 
-# Variables
-currDir_path = os.path.dirname(os.path.realpath(__file__))
-outputDir = currDir_path + '/Analysis'
-inputFile = outputDir + '/optimizedBackboneAnalysis.xlsx'
-primerFile = outputDir+"/Primers.csv"
-outputFile = outputDir + '/CHIP.xlsx'
+# Local Variables
+outputDir = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\"
+inputFile = outputDir + 'optimizedBackboneAnalysis.xlsx'
+inputFile = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\2022_1_5_CHIP\\CHIP1_Segments.xlsx"
+primerFile = "C:\\Users\\gjowl\\Downloads\\Primers.csv"
+outputFile = outputDir + 'CHIP.xlsx'
 writer = pd.ExcelWriter(outputFile)
 cutSite1 = 'gctagc'
 cutSite2 = 'gatc'
@@ -97,15 +97,13 @@ rand.seed(seed)
 # Read in CHIP primer file
 dfPrimer = pd.read_csv(primerFile, sep=',')
 
-# Separate Primers and primer names
-#go through list of primers
+# Separate Primers and primer names and add to corresponding dataframes
 dfForwardPrimer = dfPrimer.iloc[0::2]
 dfReversePrimer = dfPrimer.iloc[1::2]
 dfForwardPrimer = dfForwardPrimer.reset_index()
 dfReversePrimer = dfReversePrimer.reset_index()
 dfForwardPrimer.pop('index')
 dfReversePrimer.pop('index')
-
 
 # read excel spreadsheet with the randomly chosen CHIP sequences from optimizedBackboneAnalysis
 dfAllSequences = pd.read_excel(inputFile, sheet_name='Segments')

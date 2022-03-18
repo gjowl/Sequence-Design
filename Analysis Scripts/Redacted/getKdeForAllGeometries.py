@@ -2,7 +2,7 @@
 @author: gjowl
 """
 """
-This file creates a kde file for pca analysis
+This file creates a 6 dimensional kde plot
 """
 from datetime import date
 from scipy import stats

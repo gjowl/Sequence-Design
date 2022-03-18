@@ -11,23 +11,27 @@ It then compiles all of them into a file for analysis by compiledDesignData.csv
 
 import os
 import pandas as pd
+import helper
 
 #Functions
 def writeDataframeToNewSpreadsheet(df, outFile):
     df.to_csv(outFile, sep=',')
-    print(outFile)
+
+programName = "compileDesignData"
 
 # Main
 if __name__ == '__main__':
-    currDir_path = os.path.dirname(os.path.realpath(__file__))
+    config = helper.read_config()
 
-    outputDir = currDir_path + '/Analysis'
-    outFile = outputDir + '/compiledDesignData.csv'
+    outputDir = config[programName]["outputDir"]
+    dataDir = config[programName]["dataDir"]
+    outFile = outputDir + config[programName]["outFile"]
 
     # Dataframe to save the energy files into
     df = pd.DataFrame()
+    #TODO: I think this works...but it's currently pulling in all of the optimization files too. try to fix that
     # This searches for all files within a given folder from the current directory
-    for root, dirs, files in os.walk(currDir_path):
+    for root, dirs, files in os.walk(dataDir):
         for name in files:
             if name.endswith(("energyFile", ".csv")):
                 filename = root + "/" + name
@@ -36,4 +40,5 @@ if __name__ == '__main__':
                 tmpDf.reset_index(drop=True, inplace=True)
                 df = df.append(tmpDf)
 
+    # Output dataframe of all the energyFiles
     writeDataframeToNewSpreadsheet(df, outFile)

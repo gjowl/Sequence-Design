@@ -2,11 +2,13 @@
 """
 Created on Fri Mar  5 15:44:57 2021
 
+One of the first scripts I wrote to generate a kde plot for my data
+
 @author: gjowl
 """
 
 from scipy import stats
-from matplotlib import gridspec 
+from matplotlib import gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -76,41 +78,3 @@ value_space = np.linspace(values.min(), values.max())
 plt.hist(values, density=True)
 plt.plot(value_space, evaluated)
 evaluated.sum()
-
-#kde = stats.gaussian_kde(values)
-#density = kde(values)
-
-#fig, ax = plt.subplots(subplot_kw=dict(projection='3d'))
-#x, y = values
-#ax.scatter(x, y, c=density)
-#plt.show()
-
-#x=np.array([1, 2, 3, 4, 5]) 
-  
-# making subplots 
-#fig, ax = plt.subplots(2, 2) 
-  
-# set data with subplots and plot 
-#ax[0, 0].plot(x, x) 
-#ax[0, 1].plot(x, x*2) 
-#ax[1, 0].plot(x, x*x) 
-#ax[1, 1].plot(x, x*x*x) 
-  
-# set the spacing between subplots 
-#plt.show()
-
-#Contour plot (imshow causes it to squeeze the image)
-#fig = plt.figure()
-#ax = fig.gca()
-#ax.set_xlim(xmin, xmax)
-#ax.set_ylim(ymin, ymax)
-# Contourf plot
-#cfset = ax.contourf(X, Y, Z, cmap='Blues')
-## Or kernel density estimate plot instead of the contourf plot
-#ax.imshow(np.rot90(Z), cmap='Blues', extent=[xmin, xmax, ymin, ymax])
-# Contour plot
-#cset = ax.contour(X, Y, Z, colors='k')
-# Label plot
-#ax.clabel(cset, inline=1, fontsize=10)
-#ax.set_xlabel('Distance')
-#ax.set_ylabel('Angle')
