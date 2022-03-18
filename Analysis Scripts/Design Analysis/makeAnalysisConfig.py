@@ -2,6 +2,8 @@
 This script creates a config file for the runDesignAndMakeCHIP.py and all of the scripts that are
 run by it. It divides the configuration settings by the script name, allowing for easy access of
 the correct portion of the config file by each of the programs.
+
+taken from: https://www.codeproject.com/Articles/5319621/Configuration-Files-in-Python?msclkid=cd9787d6a70111ec82d314428d9b55e4
 """
 
 import configparser
