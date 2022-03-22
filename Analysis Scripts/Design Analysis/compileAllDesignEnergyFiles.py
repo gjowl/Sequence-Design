@@ -2,7 +2,7 @@
 # @Date:   2021-12-25
 # @Filename: compileAllDesignEnergyFiles.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2021-12-25
+# @Last modified time: 2022/03/21
 
 """
 This searches for all of the energyFile.csv contained anywhere within the starting directory.
@@ -17,7 +17,7 @@ import helper
 def writeDataframeToNewSpreadsheet(df, outFile):
     df.to_csv(outFile, sep=',')
 
-programName = "compileDesignData"
+programName, programExt = os.path.splitext(programPath)
 
 # Main
 if __name__ == '__main__':
