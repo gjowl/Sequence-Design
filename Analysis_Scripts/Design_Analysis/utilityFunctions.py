@@ -18,6 +18,7 @@ You will then be able to use the commands from this file on your own.
 """
 
 # Packages
+import os
 import pandas as pd
 
 #This function iterates through a row of data and identifies whether or not the value in the column is a string
@@ -59,3 +60,28 @@ def getRunTime(startTime):
     totalTime = endTime-startTime
     print(totalTime)
     return totalTime
+
+#class noConfigException():
+#    def __init__(self):
+#        self.message = "No config file found! Make sure there is a <fileName>.config file found in the program directory"
+#    def print_error(self):
+#        print(self.message)
+def getConfigFile():
+    configFile = ''
+    # Access the configuration file for this program (should only be one in the directory)
+    programPath = os.path.realpath(__file__)
+    programDir, programFile = os.path.split(programPath)
+    programName, programExt = os.path.splitext(programFile)
+    fileList = os.listdir(programDir)
+    for file in fileList:
+        fileName, fileExt = os.path.splitext(file)
+        if fileExt == '.config':
+            configFile = programDir + '/' + file
+    if configFile == '':
+        print("No config given! Break")
+    return configFile
+#try:
+#    configFile = getConfigFile()
+#except noConfigException as error:
+#    print("Bad input : {configFile}")
+#    print("{error.message}")

@@ -6,7 +6,7 @@ Created on Wed Jun  2 14:05:09 2021
 """
 
 from scipy import stats
-from matplotlib import gridspec 
+from matplotlib import gridspec
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd

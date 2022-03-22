@@ -15,7 +15,4 @@ import configparser
 def read_config(configFile):
     config = configparser.ConfigParser()
     config.read(configFile)
-    for key in config:
-        print(key)
-    print(1)
     return config

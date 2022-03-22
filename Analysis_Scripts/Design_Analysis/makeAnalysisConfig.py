@@ -11,33 +11,40 @@ import configparser
 # create config file object
 config_file = configparser.ConfigParser()
 
-
+#is it possible to automate this in case I do switch the name of the program?
+programName = 'analyzeAndRepackDesigns'
 projectDir = '/data02/gloiseau/Sequence_Design_Project/Design_Data'
 dataDir = projectDir + '/12_06_2021_CHIP1_Dataset'
 outputDir = projectDir + '/AnalyzedData'
-compileDesignDataFile = '/compiledDesignData.csv'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis Scripts/Design Analysis'
+compiledDesignDataFile = '/compiledDesignData.csv'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/Design_Analysis'
+compileDataScript = codeDir + "/compileAllDesignEnergyFiles.py"
+analyzeDataScript = codeDir + "/analyzeDesignData.py"
+requirementsFile = codeDir + "/requirements.txt"
 
 # main code section
 config_file["main"]={
     "outputDir":outputDir,
     "codeDir":codeDir,
+    "compileDataScript":compileDataScript,
+    "analyzeDataScript":analyzeDataScript,
+    "requirementsFile":requirementsFile
 }
 
 # compileDesignData section
-config_file["compileDesignData"]={
+config_file["compileAllDesignEnergyFiles"]={
     "outputDir":outputDir,
     "dataDir":dataDir,
-    "outFile":compileDesignDataFile
+    "outFile":compiledDesignDataFile
 }
 
 # analyzeDesignData section
-config_file["analyzerConfig"]={
+config_file["analyzeDesignData"]={
     "outputDir":outputDir,
     "energyLimit":-5,
     "densityLimit":0.7,
     "listAA":["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"],
-    "dataFile":outputDir + compileDesignDataFile,
+    "dataFile":outputDir + compiledDesignDataFile,
     "outFile":"/analyzedDesignData.xlsx",
     "kdeFile":"C:\\Users\\gjowl\\Downloads\\2020_09_23_kdeData.csv"#TODO: download this and change path
 }
@@ -46,15 +53,15 @@ config_file["analyzerConfig"]={
 # BUT I can print out a file that can be used to submit all of those jobs, submit, and then make another version of this for geomRepack analysis?
 
 # SAVE CONFIG FILE
-with open(r"analysis.config", 'w') as configfileObj:
+with open(programName+".config", 'w+') as configfileObj:
     config_file.write(configfileObj)
     configfileObj.flush()
     configfileObj.close()
 
-print("Config file 'analysis.config' created")
+print("Config file "+programName+".config created")
 
 # PRINT FILE CONTENT
-read_file = open("analysis.config", "r")
+read_file = open(programName+".config", "r")
 content = read_file.read()
 print("Content of the config file are:\n")
 print(content)

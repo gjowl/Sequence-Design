@@ -10,6 +10,7 @@ It then compiles all of them into a file for analysis by compiledDesignData.csv
 """
 
 import os
+import sys
 import pandas as pd
 import helper
 
@@ -17,11 +18,14 @@ import helper
 def writeDataframeToNewSpreadsheet(df, outFile):
     df.to_csv(outFile, sep=',')
 
-programName, programExt = os.path.splitext(programPath)
+programPath = os.path.realpath(__file__)
+programDir, programFile = os.path.split(programPath)
+programName, programExt = os.path.splitext(programFile)
 
 # Main
 if __name__ == '__main__':
-    config = helper.read_config()
+    configFile = sys.argv[1]
+    config = helper.read_config(configFile)
 
     outputDir = config[programName]["outputDir"]
     dataDir = config[programName]["dataDir"]
@@ -38,7 +42,7 @@ if __name__ == '__main__':
                 tmpDf = pd.read_csv(filename, sep="[:\t]", engine='python')
                 #In my original outputs, I used grep -r "Sequence Info:" to compile my data. I rid of those with the below
                 tmpDf.reset_index(drop=True, inplace=True)
-                df = df.append(tmpDf)
+                df = pd.concat([df, tmpDf])
 
     # Output dataframe of all the energyFiles
     writeDataframeToNewSpreadsheet(df, outFile)
