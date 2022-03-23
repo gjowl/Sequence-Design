@@ -2,7 +2,7 @@
 # @Date:   2021-12-25
 # @Filename: compileAllDesignEnergyFiles.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2022/03/21
+# @Last modified time: 2022/03/22
 
 """
 This searches for all of the energyFile.csv contained anywhere within the starting directory.
@@ -13,10 +13,9 @@ import os
 import sys
 import pandas as pd
 import helper
+from utilityFunctions import *
 
 #Functions
-def writeDataframeToNewSpreadsheet(df, outFile):
-    df.to_csv(outFile, sep=',')
 
 programPath = os.path.realpath(__file__)
 programDir, programFile = os.path.split(programPath)

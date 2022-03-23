@@ -91,6 +91,3 @@ def makeOutputDir(outputDir)
         os.mkdir(outputDir)
     else:
         print('Output Directory: ' + outputDir + ' exists.')
-
-def writeDataframeToNewSpreadsheet(df, outFile):
-    df.to_csv(outFile, sep=',')

@@ -2,7 +2,7 @@
 # @Date:   2021-12-25
 # @Filename: analyzeDesignData.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2021-12-25
+# @Last modified time: 2022/03/22
 
 """
 This file is used to analyze the data from my sequence designs. It will read in a compiled energy file
@@ -16,6 +16,7 @@ from datetime import date
 from scipy import stats
 from matplotlib import gridspec
 import os
+import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -27,7 +28,8 @@ import helper
 ##############################################
 #               OUTPUT SETUP
 ##############################################
-config = helper.read_config()
+configFile = sys.argv[1]
+config = helper.read_config(configFile)
 programName = "analyzeDesignData"
 # Variables
 today = date.today()
@@ -41,6 +43,7 @@ listAA = config[programName]["listAA"]
 kdeFile = config[programName]["kdeFile"]
 writer = pd.ExcelWriter(outFile)
 
+#TODO: add in all the config options for this shit geez it's a lot ...
 #Main
 # make a directory to output plots
 plotOutputDir = outputDir+"/Plots"

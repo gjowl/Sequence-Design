@@ -2,7 +2,7 @@
 # @Date:   2021-12-24
 # @Filename: compileOptimizationDataFiles.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2021-12-25
+# @Last modified time: 2022/03/22
 
 """
 This searches for all of the optimizationEnergyFile.csv contained anywhere within the starting directory.
@@ -17,12 +17,15 @@ def writeDataframeToNewSpreadsheet(df, outFile):
     df.to_csv(outFile, sep=',')
     print(outFile)
 
+programName = "compileDesignData"
+
 # Main
 if __name__ == '__main__':
-    currDir_path = os.path.dirname(os.path.realpath(__file__))
+    config = helper.read_config()
 
-    outputDir = currDir_path + '/Analysis'
-    outFile = outputDir + '/compiledOptimizedBackboneData.csv'
+    outputDir = config[programName]["outputDir"]
+    dataDir = config[programName]["dataDir"]
+    outFile = outputDir + '/compiledDesignData.csv'
 
     # Dataframe to save the energy files into
     df = pd.DataFrame()
