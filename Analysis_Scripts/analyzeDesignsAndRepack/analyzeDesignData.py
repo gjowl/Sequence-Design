@@ -25,33 +25,37 @@ import seaborn as sns
 from analyzerFunctions import *
 import helper
 
+today = date.today()
+today = today.strftime("%Y_%m_%d")
 ##############################################
 #               OUTPUT SETUP
 ##############################################
-configFile = sys.argv[1]
-config = helper.read_config(configFile)
-programName = "analyzeDesignData"
-# Variables
-today = date.today()
-today = today.strftime("%Y_%m_%d")
-outputDir = config[programName]["outputDir"]
-inputFile = config[programName]["dataFile"]
-outFile = outputDir + config[programName]["outFile"]
-energyLimit = config[programName]["energyLimit"]
-densityLimit = config[programName]["densityLimit"]
-listAA = config[programName]["listAA"]
-kdeFile = config[programName]["kdeFile"]
+# Use the utilityFunctions function to get the name of this program
+programName = getProgramName(sys.argv[0])
+
+# Read in configuration file:
+globalConfig = helper.read_config(configFile)
+config = globalConfig[programName]
+
+# Config file options:
+outputDir               = config["outputDir"]
+plotOutputDir           = config["plotOutputDir"]
+inputFile               = config["dataFile"]
+outFile                 = config["outFile"]
+kdeFile                 = config["kdeFile"]
+listAA                  = config["listAA"]
+energyLimit             = config["energyLimit"]
+densityLimit            = config["densityLimit"]
+crossingAngleLimit      = config["crossingAngleLimit"]
+sequenceProbabilityFile = config["sequenceProbabilityFile"]
+#sequenceProbabilityFile = inputDir + 'SequenceProbabilityFile.csv'
+
+# Setup the output writer for converting dataframes into a spreadsheet
 writer = pd.ExcelWriter(outFile)
 
 #TODO: add in all the config options for this shit geez it's a lot ...
-#Main
 # make a directory to output plots
-plotOutputDir = outputDir+"/Plots"
-if not os.path.isdir(plotOutputDir):
-    print('Creating output directory: ' + plotOutputDir + '.')
-    os.mkdir(plotOutputDir)
-else:
-    print('Output Directory: ' + plotOutputDir + ' exists.')
+makeOutputDir(plotOutputDir)
 
 # Imports the input csv file into a dataframe
 df = pd.read_csv(inputFile, sep=",")
@@ -67,73 +71,41 @@ dfAll = df
 df = df[df["DesignNumber"] > 0]
 getAADistribution(df, listAA, outputDir, "AADistribution_All")
 
-#TODO: where is this original membrane protein datafile? I should just access that path from my local computer in lab
 dfKde = pd.read_csv(kdeFile)
 
 #########################################################################
 #                  SETUP DATAFRAME FOR ANALYSIS
 #########################################################################
-#removeInterfaceEnds(df)
 convertInterfaceToX(df)
 addBinNumberColumn(df, -30, 5, 6)
 writeDataframeToSpreadsheet(df, writer, "All Data")
 
 #########################################################################
-#                   GET DUPLICATE SEQUENCE DATA
-#########################################################################
-# Get dataframe with only 1 copy of duplicated sequences
-df_dup = dfAll[dfAll.duplicated(['Sequence'], keep=False)]
-duplicateSeqTotal = getNumberOfSequences(df_dup)
-print("Duplicates: " + str(duplicateSeqTotal))
-writeDataframeToSpreadsheet(df_dup, writer, "Duplicate Sequences")
-
-# Get dataframe of duplicates that have energy less than given energy limit
-df_dupEnerLimit = df_dup[df_dup["Total"] < energyLimit]
-dupEnerLimitSeqTotal = getNumberOfSequences(df_dupEnerLimit)
-print("Energy < " + str(energyLimit) + ": " + str(dupEnerLimitSeqTotal))
-
-# Get dataframe
-df_dupDensityLimit = df_dupEnerLimit[df_dupEnerLimit['angleDistDensity'] < densityLimit]
-dupDensityLimitSeqTotal = getNumberOfSequences(df_dupDensityLimit)
-print("Density Group < 8: " + str(dupDensityLimitSeqTotal))
-
-#########################################################################
 #     TRIM THE SEQUENCES WITH HIGH ENERGY SCORES AND WITH DUPLICATES
 #########################################################################
+#TODO: should I just make this a loop? Like have the order of these, run through them, and then it's just a couple lines instead?
 # Get dataframe with designs less than the given energy limit
-dfEnerLimit = df[df["Total"] < energyLimit]
-enerLimitSeqTotal = getNumberOfSequences(dfEnerLimit)
-geoms = getNumberOfGeometries(dfEnerLimit)
-print("Energy < " + str(energyLimit) + ": " + str(enerLimitSeqTotal) + "; " + str(geoms))
+dfEnerLimit = getTrimmedDataframe(df,"Total",energyLimit,True)
 writeDataframeToSpreadsheet(dfEnerLimit, writer, "Total Energy < " + str(energyLimit))
 #plotDifferenceKde(dfKde, df, "xShift", "crossingAngle", "test", "allTest", outputDir)
 
 # Get dataframe with designs that have the same or less hydrogen bonding in the dimer than the monomer
-dfHbondLimit = dfEnerLimit[dfEnerLimit["HBONDDiff"] > 0]
-hbondLimitSeqTotal = getNumberOfSequences(dfHbondLimit)
-geoms = getNumberOfGeometries(dfHbondLimit)
-print("HbondDifference > 0: " + str(hbondLimitSeqTotal) + "; " + str(geoms))
+dfHbondLimit = getTrimmedDataframe(dfEnerLimit,"HBONDDiff",0,False)
 writeDataframeToSpreadsheet(dfHbondLimit, writer, "HbondDifference > 0")
 
 # Get dataframe with designs that have density scores within the density limit (high density areas in blue on the kde plot)
-dfDensityLimit = dfHbondLimit[dfHbondLimit['angleDistDensity'] < densityLimit]
-densityLimitSeqTotal = getNumberOfSequences(dfDensityLimit)
-geoms = getNumberOfGeometries(dfDensityLimit)
-print("Density Group < 7: " + str(densityLimitSeqTotal) + "; " + str(geoms))
-writeDataframeToSpreadsheet(dfDensityLimit, writer, "Density Group Limit < 7")
+dfDensityLimit = getTrimmedDataframe(dfHbondLimit,"angleDistDensity",densityLimit,True)
+writeDataframeToSpreadsheet(dfDensityLimit, writer, "Density Group Limit < " + str(densityLimit))
 
 # Get dataframe with designs that have a crossingAngle of higher than -70
 # -70 chosen arbitrarily to rid of sequences that likely would not be stable due to membrane entropy
-dfAngleLimit = dfDensityLimit[dfDensityLimit['crossingAngle'] > -70]
-angleLimitTotal = getNumberOfSequences(dfAngleLimit)
-print("Angle > -70: " + str(angleLimitTotal))
-writeDataframeToSpreadsheet(dfAngleLimit, writer, "Angle Limit > -70")
+dfAngleLimit = getTrimmedDataframe(dfDensityLimit,"crossingAngle",crossingAngleLimit,False)
+writeDataframeToSpreadsheet(dfAngleLimit, writer, "Angle Limit > " + str(crossingAngleLimit))
 
 ##################################################################################
 #     CALCULATE MEMBRANE PROTEIN SEQUENCE VS INTERFACE SEQUENCE PROBABILITY
 ##################################################################################
 # Create Sequence Probability dictionary from input file
-sequenceProbabilityFile = inputDir + 'SequenceProbabilityFile.csv'
 dfSeqProb = pd.read_csv(sequenceProbabilityFile, sep=",")
 
 ##############################################
@@ -173,7 +145,7 @@ plotHistogramsForDfList(listDf, binList, colorList, dfNames, filenames, "Total",
 #plotHistogramsForDfList(listDf, colorList, dfNames, filenames, "Total", plotOutputDir)
 
 submitFile = inputDir+'submitFile.condor'
-batchName = 'sequenceDesign'
+batchName = 'designBackboneOptimization'
 dirToSave = '/data02/gloiseau/Sequence_Design_Project/vdwSequenceDesign/$(batch_name)'
 executable = '/exports/home/mslib/trunk_AS/bin/geomRepack'
 

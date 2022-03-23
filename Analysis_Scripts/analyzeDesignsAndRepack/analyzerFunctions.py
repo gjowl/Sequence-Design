@@ -868,3 +868,15 @@ def writeConfigurationFile(df, fileName, batchName, baseDir, executable):
             submitFile.write(configLine)
             submitFile.write(queue)
         print("Config written: ", fileName)
+
+
+def getTrimmedDataframe(df, columnName, columnLimit, lessThan):
+    newDf = pd.Dataframe()
+    if lessThan is True:
+        newDf = df[df[columnName] < columnLimit]
+    else:
+        newDf = df[df[columnName] > columnLimit]
+    seqTotal = getNumberOfSequences(newDf)
+    geomTotal = getNumberOfGeometries(dfEnerLimit)
+    print(columnName + " < " + str(columnLimit) + "/n#Sequences: " + str(seqTotal) + "/nGeometries: " + geomTotal)
+    return newDf

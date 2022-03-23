@@ -66,10 +66,10 @@ def getRunTime(startTime):
 #        self.message = "No config file found! Make sure there is a <fileName>.config file found in the program directory"
 #    def print_error(self):
 #        print(self.message)
-def getConfigFile():
+def getConfigFile(file):
     configFile = ''
     # Access the configuration file for this program (should only be one in the directory)
-    programPath = os.path.realpath(__file__)
+    programPath = os.path.realpath(file)
     programDir, programFile = os.path.split(programPath)
     programName, programExt = os.path.splitext(programFile)
     fileList = os.listdir(programDir)
@@ -78,19 +78,42 @@ def getConfigFile():
         if fileExt == '.config':
             configFile = programDir + '/' + file
     if configFile == '':
-        print("No config given! Break")
+        sys.exit("No config file present in script directory!")
     return configFile
 #try:
 #    configFile = getConfigFile()
 #except noConfigException as error:
 #    print("Bad input : {configFile}")
 #    print("{error.message}")
-def makeOutputDir(outputDir)
+def makeOutputDir(outputDir):
+    # check if the path to the directory exists
     if not os.path.isdir(outputDir):
         print('Creating output directory: ' + outputDir + '.')
-        os.mkdir(outputDir)
+        # the below makes directories for the entire path
+        os.makedirs(outputDir)
     else:
         print('Output Directory: ' + outputDir + ' exists.')
 
 def writeDataframeToNewSpreadsheet(df, outFile):
     df.to_csv(outFile, sep=',')
+
+def compileDataFiles(fileName, dirName, outFile):
+    # Dataframe to save the energy files into
+    df = pd.DataFrame()
+    for root, dirs, files in os.walk(dirName):
+        for name in files:
+            if fileName == name:
+                #if name.endswith(("energyFile", ".csv")):
+                filename = root + "/" + name
+                tmpDf = pd.read_csv(filename, sep="[:\t]", engine='python')
+                #In my original outputs, I used grep -r "Sequence Info:" to compile my data. I rid of those with the below
+                tmpDf.reset_index(drop=True, inplace=True)
+                df = pd.concat([df, tmpDf])
+    # Output dataframe of all the energyFiles
+    writeDataframeToNewSpreadsheet(df, outFile)
+
+def getProgramName(file):
+    programPath = os.path.realpath(file)
+    programDir, programFile = os.path.split(programPath)
+    programName, programExt = os.path.splitext(programFile)
+    return programName
