@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 # @Author: Gilbert Loiseau
 # @Date:   2021-12-25
-# @Filename: analyzeDesignData.py
-# @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2022/03/22
+# @Last Modified by:   Gilbert Loiseau
+# @Last Modified time: 2022-04-22 15:38:28
 
 """
 This file is used to analyze the data from my sequence designs. It will read in a compiled energy file
@@ -24,14 +24,17 @@ import re
 import seaborn as sns
 from analyzerFunctions import *
 import helper
+from utilityFunctions import *
 
 today = date.today()
 today = today.strftime("%Y_%m_%d")
+
 ##############################################
 #               OUTPUT SETUP
 ##############################################
 # Use the utilityFunctions function to get the name of this program
 programName = getProgramName(sys.argv[0])
+configFile = sys.argv[1]
 
 # Read in configuration file:
 globalConfig = helper.read_config(configFile)
@@ -48,7 +51,6 @@ energyLimit             = config["energyLimit"]
 densityLimit            = config["densityLimit"]
 crossingAngleLimit      = config["crossingAngleLimit"]
 sequenceProbabilityFile = config["sequenceProbabilityFile"]
-#sequenceProbabilityFile = inputDir + 'SequenceProbabilityFile.csv'
 
 # Setup the output writer for converting dataframes into a spreadsheet
 writer = pd.ExcelWriter(outFile)
@@ -144,7 +146,7 @@ plotHistogramsForDfList(listDf, binList, colorList, dfNames, filenames, "Total",
 #plotHistogramsForDfList(listDf, colorList, dfNames, filenames, "VDWDiff", plotOutputDir)
 #plotHistogramsForDfList(listDf, colorList, dfNames, filenames, "Total", plotOutputDir)
 
-submitFile = inputDir+'submitFile.condor'
+submitFile = outputDir+'submitFile.condor'
 batchName = 'designBackboneOptimization'
 dirToSave = '/data02/gloiseau/Sequence_Design_Project/vdwSequenceDesign/$(batch_name)'
 executable = '/exports/home/mslib/trunk_AS/bin/geomRepack'

@@ -1,27 +1,6 @@
-"""
-Created on Mon Sep 13 18:37:30 2021
-
-@author: gjowl
-"""
-"""
-This piece of code is for writing a csv file that can be used to purchase a CHIP, similar to Samantha's CHIP4.
-  - Reads in the CHIP primer file to choose primers for segments (24 pairs of primers, so up to 24 segments can be made)
-  - Extract a list of amino acid sequences from a DataFrame made by optimizedBackboneAnalysis and converts it to
-    nucleic acid sequences with proper cutsites and primers
-  - Writes the output file for CHIP to be submitted to a vendor (TwistBiosciences or Agilent)
-
-TODO:
-    - Write in a way to output the proper energies for each sequence
-"""
-from datetime import date
-from scipy import stats
-import os
-import matplotlib.pyplot as plt
 import pandas as pd
-import re
 import random as rand
 from utilityFunctions import *
-import dnachisel
 from dnachisel.biotools import reverse_translate
 
 #Functions
@@ -75,44 +54,3 @@ def getCHIPFile(df, dfFwdP, dfRevP, gpaSeq, g83ISeq, cut1, cut2, randomDNALength
             i+=1
     outputDf = pd.DataFrame.from_dict(dictOutput)
     return outputDf
-
-# Variables
-currDir_path = os.path.dirname(os.path.realpath(__file__))
-outputDir = currDir_path + '/Analysis'
-inputFile = outputDir + '/optimizedBackboneAnalysis.xlsx'
-primerFile = outputDir+"/Primers.csv"
-outputFile = outputDir + '/CHIP.xlsx'
-writer = pd.ExcelWriter(outputFile)
-cutSite1 = 'gctagc'
-cutSite2 = 'gatc'
-gpa = 'LIIFGVMAGVIG'#final T comes from one of the base pairs in annealed cutsite, so hardcoded the codon for T
-g83I = 'LIIFGVMAIVIG'
-randomDNALength = 21 #matches the number from Samantha's CHIP4
-seed = 1
-rand.seed(seed)
-
-# Main
-# Read in CHIP primer file
-dfPrimer = pd.read_csv(primerFile, sep=',')
-
-# Separate Primers and primer names
-#go through list of primers
-dfForwardPrimer = dfPrimer.iloc[0::2]
-dfReversePrimer = dfPrimer.iloc[1::2]
-dfForwardPrimer = dfForwardPrimer.reset_index()
-dfReversePrimer = dfReversePrimer.reset_index()
-dfForwardPrimer.pop('index')
-dfReversePrimer.pop('index')
-
-# read excel spreadsheet with the randomly chosen CHIP sequences from optimizedBackboneAnalysis
-dfAllSequences = pd.read_excel(inputFile, sheet_name='Segments')
-
-# nucleic acid sequences for gpa and g83I
-gpaSeq = reverse_translate(gpa)
-g83ISeq = reverse_translate(g83I)
-
-# convert AA sequences to DNA sequences and
-dfCHIP = getCHIPFile(dfAllSequences, dfForwardPrimer, dfReversePrimer, gpaSeq, g83ISeq, cutSite1, cutSite2, randomDNALength)
-writeDataframeToSpreadsheet(dfCHIP, writer, 'CHIP')
-
-writer.close()

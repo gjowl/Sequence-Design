@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Gilbert Loiseau
+# @Date:   2021-12-25
+# @Last Modified by:   Gilbert Loiseau
+# @Last Modified time: 2022-04-22 15:41:11
 """
 This script can be used to update the config file with specific options, rather than having to change them
 in generateConfig.py and regenerate the configuration file.

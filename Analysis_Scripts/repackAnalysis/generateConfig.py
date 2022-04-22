@@ -2,8 +2,7 @@
 # @Date:   2022/03/22
 # @Filename: generateConfig.py
 # @Last modified by:   Gilbert Loiseau
-# @Last modified time: 2022/03/22
-
+# @Last modified time: 2022-04-22 15:45:16
 
 """
 This script creates a config file for the runDesignAndMakeCHIP.py and all of the scripts that are
@@ -19,17 +18,28 @@ import configparser
 config_file = configparser.ConfigParser()
 
 #is it possible to automate this in case I do switch the name of the program?
-programName = 'analyzeAndRepackDesigns'
+programName = 'analyzeRepacksAndMakeCHIP'
 projectDir = '/data02/gloiseau/Sequence_Design_Project/Design_Data'
 dataDir = projectDir + '/12_06_2021_CHIP1_Dataset'
 outputDir = projectDir + '/AnalyzedData'
-compiledDesignDataFile = '/compiledOptimizationData.csv'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/Repack_Analysis'
-#TODO: could I instead put all of the below in a file to run and make into this config?
+plotDir = outputDir + '/Plots'
+compiledOptimizationFile = '/compiledOptimizationData.csv'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/repackAnalysis'
 compileDataScript = codeDir + "/compileOptimizationDataFiles.py"
-analyzeDataScript = codeDir + "/optimizationAnalysis.py"
+analyzeDataScript = codeDir + "/optimizedBackboneAnalysis.py"
 prepareCHIPScript = codeDir + "/prepareCHIP.py"
 requirementsFile = codeDir + "/requirements.txt"
+optimizedBackboneFile = outputDir + '/optimizedBackboneAnalysis.xlsx'
+primerFile = outputDir + "/Primers.csv"
+chipFile = outputDir + "/CHIP.xlsx"
+
+pickRedundantSequences = True
+numSequences = 5
+totalSegments = 20
+sequencesPerBin = 80
+sequencesPerSegment = 500
+numRandom = 60
+seed = 1
 
 #TODO: fix all of these so that they are correct options
 # main code section
@@ -39,31 +49,43 @@ config_file["main"]={
     "compileDataScript":compileDataScript,
     "analyzeDataScript":analyzeDataScript,
     "prepareCHIPScript":prepareCHIPScript,
-    "requirementsFile":requirementsFile
+    "requirementsFile":requirementsFile,
+    "outFile":compiledOptimizationFile
 }
 
 # compileOptimizationDataFiles section
 config_file["compileOptimizationDataFiles"]={
     "outputDir":outputDir,
     "dataDir":dataDir,
-    "outFile":compiledDesignDataFile
+    "outFile":compiledOptimizationFile
 }
 
 # optimizationAnalysis section
-config_file["optimizationAnalysis"]={
+config_file["optimizedBackboneAnalysis"]={
     "outputDir":outputDir,
+    "plotDir":plotDir,
     "energyLimit":-5,
     "densityLimit":0.7,
     "listAA":["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"],
-    "dataFile":outputDir + compiledDesignDataFile,
-    "outFile":"/analyzedDesignData.xlsx",
-    "kdeFile":"C:\\Users\\gjowl\\Downloads\\2020_09_23_kdeData.csv"#TODO: download this and change path
+    "dataFile":outputDir + compiledOptimizationFile,
+    "outFile":optimizedBackboneFile,
+    "kdeFile":"C:\\Users\\gjowl\\Downloads\\2020_09_23_kdeData.csv",
+    "numSequences":numSequences,
+    "totalSegments":totalSegments,
+    "sequencePerBin":sequencesPerBin,
+    "sequencesPerSegment":sequencesPerSegment,
+    "numRandom":numRandom,
+    "redundant":pickRedundantSequences,
+    "seed":seed
 }
 
 # prepareCHIP section
 config_file["prepareCHIP"]={
     "outputDir":outputDir,
-
+    "inputFile":optimizedBackboneFile,
+    "primerFile":primerFile,
+    "outputFile":chipFile,
+    "seed":seed
 }
 #TODO: I haven't yet decided if I want to run the geomRepack right after from this file. I feel like that would take awhile, so I may split it for now
 # BUT I can print out a file that can be used to submit all of those jobs, submit, and then make another version of this for geomRepack analysis?

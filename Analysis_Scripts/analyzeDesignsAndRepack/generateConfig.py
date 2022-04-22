@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Gilbert Loiseau
+# @Date:   1969-12-31 18:00:00
+# @Last Modified by:   Gilbert Loiseau
+# @Last Modified time: 2022-04-22 15:40:07
 """
 This script creates a config file for the runDesignAndMakeCHIP.py and all of the scripts that are
 run by it. It divides the configuration settings by the script name, allowing for easy access of
@@ -36,6 +41,7 @@ config_file["main"]={
     "energyFileName":energyFileName,
     "outFile":compiledDesignDataFile,
     "submitDir":submitDir
+    "dataDir":dataDir
 }
 
 outFile = outputDir+"/analyzedDesignData.xlsx"

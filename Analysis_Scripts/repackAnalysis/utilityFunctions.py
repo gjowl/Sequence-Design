@@ -91,3 +91,9 @@ def makeOutputDir(outputDir)
         os.mkdir(outputDir)
     else:
         print('Output Directory: ' + outputDir + ' exists.')
+
+def getProgramName(file):
+    programPath = os.path.realpath(file)
+    programDir, programFile = os.path.split(programPath)
+    programName, programExt = os.path.splitext(programFile)
+    return programName

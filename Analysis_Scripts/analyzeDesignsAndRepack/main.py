@@ -34,6 +34,7 @@ outFile              = config["outFile"]
 requirementsFile     = config["requirementsFile"]
 analyzeDataScript    = config["analyzeDataScript"]
 generateSubmitScript = config["generateSubmitScript"]
+dataDir              = config["dataDir"]
 
 #TODO: add in error checking?
 if __name__ == '__main__':
