@@ -109,6 +109,16 @@ def compileDataFiles(fileName, dirName, outFile):
                 #In my original outputs, I used grep -r "Sequence Info:" to compile my data. I rid of those with the below
                 tmpDf.reset_index(drop=True, inplace=True)
                 df = pd.concat([df, tmpDf])
+    #I screwed up column names in my output (Sequence Info is the Total Energy column) so I'm fixing that here
+    #I also apparently added in a second Baseline column name, getting rid of that here too
+    colNames = df.columns.values.tolist()
+    print(colNames)
+    colNames.insert(0,"Sequence Info")
+    print(colNames)
+    colNames.remove('Baseline.1')
+    df.columns = colNames
+    #df.rename(columns=colNames, inplace=True)
+    print(colNames)
     # Output dataframe of all the energyFiles
     writeDataframeToNewSpreadsheet(df, outFile)
 

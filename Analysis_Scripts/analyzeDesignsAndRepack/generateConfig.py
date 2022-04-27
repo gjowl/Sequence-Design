@@ -23,7 +23,7 @@ datasetToAnalyze = '/12_06_2021_CHIP1_Dataset'
 dataDir = projectDir + datasetToAnalyze
 outputDir = projectDir + '/AnalyzedData' + datasetToAnalyze
 compiledDesignDataFile = dataDir + '/compiledDesignData.csv'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/Design_Analysis'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/analyzeDesignsAndRepack'
 analyzeDataScript = codeDir + "/analyzeDesignData.py"
 generateSubmitScript = codeDir + "/generateSubmitFile.py"
 requirementsFile = codeDir + "/requirements.txt"
@@ -40,12 +40,14 @@ config_file["main"]={
     "requirementsFile":requirementsFile,
     "energyFileName":energyFileName,
     "outFile":compiledDesignDataFile,
-    "submitDir":submitDir
+    "submitDir":submitDir,
     "dataDir":dataDir
 }
 
 outFile = outputDir+"/analyzedDesignData.xlsx"
-kdeFile = "C:\\Users\\gjowl\\Downloads\\2020_09_23_kdeData.csv"
+kdeFile = projectDir + '/2020_09_23_kdeData.csv'
+variableFile = projectDir + '/repackConfigList.csv'
+sequenceProbabilityFile = projectDir + '/sequenceProbabilityFile.csv'
 # analyzeDesignData section
 config_file["analyzeDesignData"]={
     "outputDir":outputDir,
@@ -53,28 +55,31 @@ config_file["analyzeDesignData"]={
     "energyLimit":-5,
     "densityLimit":0.7,
     "crossingAngleLimit":-70,
-    "listAA":["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"],
-    "dataFile":outputDir + compiledDesignDataFile,
+    "listAA":"A,F,G,I,L,S,T,V,W,Y",
+    "dataFile":compiledDesignDataFile,
     "outFile":outFile,
-    "kdeFile":kdeFile
+    "kdeFile":kdeFile,
+    "variableFile":variableFile,
+    "sequenceProbabilityFile":sequenceProbabilityFile
 }
 
 submitFile = "backboneOptimization.condor"
 header = "#Submit file for optimizing backbones and making mutants on designed sequences"
 batchName = "backboneOptimization"
+baseDir = "/data02/gloiseau/Sequence_Design_Project/vdwSequenceDesign/$(batch_name)"
 executable = "/exports/home/gloiseau/mslib/trunk_AS/bin/geomRepack"
 output = batchName+"/out/$().out"
 log = batchName+"/out/$().log"
 error = batchName+"/out/$().err"
 arguments = "--config $(configFile)"
-variables = "configFile"
-variableFile = "..."
+variables = "sequence,configFile"
 
 # generateSubmitFile section
 config_file["generateSubmitFile"]={
-    "fileName":submitFile,
+    "fileName":projectDir+submitFile,
     "header":header,
-    "batch_name":batchName,
+    "batchName":batchName,
+    "baseDir":baseDir,
     "executable":executable,
     "output":output,
     "log":log,

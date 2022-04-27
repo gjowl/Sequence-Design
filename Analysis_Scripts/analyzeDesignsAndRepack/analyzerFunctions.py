@@ -20,11 +20,9 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import re
 import seaborn as sns
 import logomaker as lm
-from utility import *
-import logging
+from utilityFunctions import *
 
 ##############################################
 #                 FUNCTIONS
@@ -37,12 +35,12 @@ import logging
 #            if seq[i] != -:
 #                find
 
-def compareDesignAndPDBSequences(sequences):
-    #TODO: write in code to read in the sequences from my pdb dataset and compare to the sequences here
-    #1. read in teh sequences from my dataset
-    for seq in sequences:
-        findSeq(seqToCompare)
-    #2. setup a finder that will recognize any sequence similar (-can be anything but all the matching parts have to be the same)
+#def compareDesignAndPDBSequences(sequences):
+#    #TODO: write in code to read in the sequences from my pdb dataset and compare to the sequences here
+#    #1. read in teh sequences from my dataset
+#    for seq in sequences:
+#        findSeq(seqToCompare)
+#    #2. setup a finder that will recognize any sequence similar (-can be anything but all the matching parts have to be the same)
 
 def plotKde(df, xAxis, yAxis):
     #Variable set up depending on data that I'm running
@@ -844,6 +842,7 @@ def getAADistribution(df, listAA, outputDir, name):
     seqList = df["InterfaceSeq"]
     for AA in listAA:
         getAACount(seqList, AA, dictAA)
+    print(dictAA)
     outputDf = pd.DataFrame.from_dict(dictAA)
     outputDf["Total"] = outputDf.sum(axis=1)
     totalAAs = outputDf.iloc[0]["Total"]
@@ -853,35 +852,23 @@ def getAADistribution(df, listAA, outputDir, name):
     writer.save()
     writer.close()
 
-def writeConfigurationFile(df, fileName, batchName, baseDir, executable):
-    designPDBList = df["Design Directory"]
-    queue = 'queue\n'
-    with open(fileName) as submitFile:
-        submitFile.write('batch_name = ' + batchName + '\n')
-        submitFile.write('baseDir    = ' + baseDir + '\n\n')
-        submitFile.write('executable = ' + executable+ '\n')
-        submitFile.write('output     = $(baseDir)/out/$(Process).out\n')
-        submitFile.write('log        = $(baseDir)/log/$(Process).log\n')
-        submitFile.write('error      = $(baseDir)/err/$(Process).err\n\n')
-        submitFile.write('stream_output = TRUE\n')
-        submitFile.write('stream_error  = TRUE\n\n')
-        submitFile.write('#Runs\n')
+def writeConfigurationFile(df, fileName):
+    designPDBList = df["PDBPath"]
+    with open(fileName, "w+") as variableFile:
         for i in designPDBList:
             designDir = i[:-25]
-            repackConfig = designDir+"repack.config"
-            configLine = 'arguments = "--config ' + repackConfig + ' --runNumber $(Process)"\n'
-            submitFile.write(configLine)
-            submitFile.write(queue)
-        print("Config written: ", fileName)
+            repackConfig = designDir+"repack.config\n"
+            variableFile.write(repackConfig)
+        print("Variable File written: ", fileName)
 
 
 def getTrimmedDataframe(df, columnName, columnLimit, lessThan):
-    newDf = pd.Dataframe()
+    newDf = pd.DataFrame()
     if lessThan is True:
         newDf = df[df[columnName] < columnLimit]
     else:
         newDf = df[df[columnName] > columnLimit]
     seqTotal = getNumberOfSequences(newDf)
-    geomTotal = getNumberOfGeometries(dfEnerLimit)
-    print(columnName + " < " + str(columnLimit) + "/n#Sequences: " + str(seqTotal) + "/nGeometries: " + geomTotal)
+    geomTotal = getNumberOfGeometries(newDf)
+    print(columnName + " < " + str(columnLimit) + "\n#Sequences: " + str(seqTotal) + "\n#Geometries: " + str(geomTotal))
     return newDf

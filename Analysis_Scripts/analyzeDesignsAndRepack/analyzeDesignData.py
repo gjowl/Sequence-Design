@@ -20,7 +20,6 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import re
 import seaborn as sns
 from analyzerFunctions import *
 import helper
@@ -46,11 +45,15 @@ plotOutputDir           = config["plotOutputDir"]
 inputFile               = config["dataFile"]
 outFile                 = config["outFile"]
 kdeFile                 = config["kdeFile"]
-listAA                  = config["listAA"]
-energyLimit             = config["energyLimit"]
-densityLimit            = config["densityLimit"]
-crossingAngleLimit      = config["crossingAngleLimit"]
+energyLimit             = float(config["energyLimit"])
+densityLimit            = float(config["densityLimit"])
+crossingAngleLimit      = float(config["crossingAngleLimit"])
 sequenceProbabilityFile = config["sequenceProbabilityFile"]
+variableFile            = config["variableFile"]
+listAA                  = config["listAA"]
+
+#Split the list string into a list of values
+listAA = listAA.split(',')
 
 # Setup the output writer for converting dataframes into a spreadsheet
 writer = pd.ExcelWriter(outFile)
@@ -61,6 +64,7 @@ makeOutputDir(plotOutputDir)
 
 # Imports the input csv file into a dataframe
 df = pd.read_csv(inputFile, sep=",")
+print(df)
 dfAll = df
 
 # Gets rid of the original design sequences before the montecarlo walk through sequence space
@@ -70,7 +74,7 @@ dfAll = df
 #   of one AA, such as Thr (ex. LLLTTTTTATTLTTTLLLL), the baseline favors these interactions enough to choose it as the most
 #   stable combination after self consistent mean field. The distributions after including my sequence entropy term are better,
 #   but I wanted to have these sequences just in case I ever wanted to look back at them to try to improve my algorithm
-df = df[df["DesignNumber"] > 0]
+df = df[df["SequenceNumber"] > 0]
 getAADistribution(df, listAA, outputDir, "AADistribution_All")
 
 dfKde = pd.read_csv(kdeFile)
@@ -81,6 +85,13 @@ dfKde = pd.read_csv(kdeFile)
 convertInterfaceToX(df)
 addBinNumberColumn(df, -30, 5, 6)
 writeDataframeToSpreadsheet(df, writer, "All Data")
+
+#########################################################################
+#                  SETUP DATAFRAME FOR ANALYSIS
+#########################################################################
+df_dup = dfAll[dfAll.duplicated(['Sequence'], keep=False)]
+df_dupEnerLimit = df_dup[df_dup['Total'] < energyLimit]
+df_dupDensityLimit = df_dupEnerLimit[df_dupEnerLimit['Total'] < densityLimit]
 
 #########################################################################
 #     TRIM THE SEQUENCES WITH HIGH ENERGY SCORES AND WITH DUPLICATES
@@ -146,14 +157,9 @@ plotHistogramsForDfList(listDf, binList, colorList, dfNames, filenames, "Total",
 #plotHistogramsForDfList(listDf, colorList, dfNames, filenames, "VDWDiff", plotOutputDir)
 #plotHistogramsForDfList(listDf, colorList, dfNames, filenames, "Total", plotOutputDir)
 
-submitFile = outputDir+'submitFile.condor'
-batchName = 'designBackboneOptimization'
-dirToSave = '/data02/gloiseau/Sequence_Design_Project/vdwSequenceDesign/$(batch_name)'
-executable = '/exports/home/mslib/trunk_AS/bin/geomRepack'
-
 energySortedDf = df_noDup.sort_values(by='Total', ascending=True)
 print(energySortedDf)
-writeConfigurationFile(energySortedDf, submitFile, batchName, dirToSave, executable)
+writeConfigurationFile(energySortedDf, variableFile)
 
 writer.save()
 writer.close()
