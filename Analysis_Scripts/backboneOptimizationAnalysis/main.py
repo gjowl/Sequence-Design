@@ -25,12 +25,10 @@ config = globalConfig[programName]
 # Config file options:
 outputDir            = config["outputDir"]
 analysisCodeDir      = config["codeDir"]
-energyFileName       = config["energyFileName"]
 outFile              = config["outFile"]
 requirementsFile     = config["requirementsFile"]
 compileDataScript    = config["compileDataScript"]
 analyzeDataScript    = config["analyzeDataScript"]
-generateSubmitScript = config["generateSubmitScript"]
 prepareCHIPScript    = config["prepareCHIPScript"]
 
 if __name__ == '__main__':
@@ -40,7 +38,7 @@ if __name__ == '__main__':
     #if you decide to add more packages to these programs, execute the below and it will update the requirements file:
     #   -pip freeze > requirements.txt
     #tips for requirements files https://pip.pypa.io/en/latest/reference/requirements-file-format/#requirements-file-format
-    execInstallRequirements = "pip install -r " + requirementsFile
+    execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     os.system(execInstallRequirements)
 
     # Compiles backbone optimization energy files from all design directories

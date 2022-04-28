@@ -16,11 +16,11 @@ import pandas as pd
 import re
 import random as rand
 import gc
+import seaborn as sns
 from datetime import date
 from scipy import stats
 from utilityFunctions import *
-from analyzerFunctions import *
-
+pd.options.mode.chained_assignment = None  # default='warn'
 
 # gets the first bin using lowest value in dataframe and minimum bin value given
 def getFirstBin(df, binMin, colName):
@@ -76,9 +76,48 @@ def getDesignSequencesForSegment(df, dfSegments):
         for segNumber in dfRunNumber['SegmentNumber'].unique():
             designSeq = df[df['runNumber'] == runNumber]
             designSeq['SegmentNumber'] = segNumber
-            dfOutput = dfOutput.append(designSeq)
+            dfOutput = pd.concat([dfOutput,designSeq])
     return dfOutput
 
+# Plots the original kde density with the new points from given data
+def plotOverlay(Z, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData, yData, outputDir):
+    # Plotting code below
+    fig, ax = plt.subplots()
+    plt.grid(False)
+    plt.xlabel(xAxis + " (Å)")
+    plt.ylabel(yAxis + " (°)")
+    plt.title(title)
+    ax.use_sticky_edges = False
+    q = ax.imshow(np.rot90(Z), cmap=plt.cm.Blues,
+        extent=[xmin, xmax, ymin, ymax], aspect="auto")
+
+    # Plots the datapoints onto the graph
+    ax.plot(xData, yData, markersize=1.33, color = "Red")
+    ax.set_xlim([xmin, xmax])
+    ax.set_ylim([ymin, ymax])
+    ax.set_xticks([6,7,8,9,10,11,12])
+    axes = plt.gca()
+
+    #save and show plot figure
+    today = date.today()
+    today = today.strftime("%Y_%m_%d")
+    #plt.colorbar(q)
+    plt.savefig(outputDir+filename+".png", bbox_inches='tight', dpi=150)
+    plt.close()
+
+def plotContour(df, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData, yData, outputDir):
+    figSNS, axSNS = plt.subplots()
+    sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False, ax=axSNS)
+    # Plots the datapoints onto the graph
+    axSNS.set_xlim([xmin, xmax])
+    axSNS.set_ylim([ymin, ymax])
+    plt.xlabel(xAxis + " (Å)")
+    plt.ylabel(yAxis + " (°)")
+    plt.title(title)
+    axSNS.plot(xData, yData, markersize=1.33, color = "Red")
+    #plt.savefig(outputDir+xAxis+"_v_"+yAxis+"_contour.png", bbox_inches='tight', dpi=150)
+    plt.savefig(outputDir+filename+"_contour.png", bbox_inches='tight', dpi=150)
+    plt.close()
 
 # Plot angle vs distance density plot for dataframe values
 def plotKdeOverlay(dfKde, df, xAxis, yAxis, outputDir, num):
@@ -122,7 +161,7 @@ def checkForClashAndStable(df, numStable, numClash):
         clash = len(dfClash)
         stable = len(dfStable)
         if clash >= numClash and stable >= numStable:
-            dfOutput = dfOutput.append(dfRunNumber)
+            dfOutput = pd.concat([dfOutput,dfRunNumber])
     return dfOutput
 
 # counts the number of sequences within bins in a given dataframe; outputs a list of lists
@@ -167,14 +206,14 @@ def generateSegment(df, binList, numSequences, numStable, numClash, seed):
                 for runNumber in uniqueSequences:
                     tmpDf = df[df['runNumber'] == runNumber]
                     randomSequences = randomlyChooseSequences(tmpDf, numStable, numClash, seed)
-                    dfOutput = dfOutput.append(randomSequences)
+                    dfOutput = pd.concat([dfOutput,randomSequences])
             else:
                 np.random.seed(seed)
                 randomRunNumbers = np.random.choice(uniqueSequences, size=numSequences, replace=False)
                 for runNumber in randomRunNumbers:
                     tmpDf = df[df['runNumber'] == runNumber]
                     randomSequences = randomlyChooseSequences(tmpDf, numStable, numClash, seed)
-                    dfOutput = dfOutput.append(randomSequences)
+                    dfOutput = pd.concat([dfOutput,randomSequences])
         else:
             previousRunNumbers = dfOutput['runNumber'].unique()
             runNumberToChoose = np.setdiff1d(uniqueSequences, previousRunNumbers)
@@ -183,7 +222,7 @@ def generateSegment(df, binList, numSequences, numStable, numClash, seed):
             for runNumber in randomRunNumbers:
                 tmpDf = df[df['runNumber'] == runNumber]
                 randomSequences = randomlyChooseSequences(tmpDf, numStable, numClash, seed)
-                dfOutput = dfOutput.append(randomSequences)
+                dfOutput = pd.concat([dfOutput,randomSequences])
     return dfOutput
 
 ## Below functions are redacted, but I thought they were interesting to keep
@@ -208,7 +247,7 @@ def assignSequencesToSegments(df, numSegments, maxNumberPerSegment):
             segmentNumber = rand.randint(1,numSegments)
             segmentNumber = checkIfMoreThanMaxAllowed(dfRunNumber, dfOutput, numSegments, segmentNumber, maxNumberPerSegment)
             dfRunNumber['SegmentNumber'] = segmentNumber
-            dfOutput = dfOutput.append(dfRunNumber)
+            dfOutput = pd.concat([dfOutput,dfRunNumber])
     except RecursionError as re:
         print("Segments for CHIP are filled!")
     return dfOutput
@@ -219,7 +258,7 @@ def makeRedundantLibrary(dfMutants, binList, numSequences, seed, segNumber):
     if dfSegments.empty is True:
         dfRandomSequences = generateSegment(dfMutants, binList, numSequences, 5, 3, seed+segNumber)
         dfRandomSequences['SegmentNumber'] = segNumber
-        dfSegments = dfSegments.append(dfRandomSequences)
+        dfSegments = pd.concat([dfSegments,dfRandomSequences])
         name = "Segment" + str(num)
     else:
         removePrevSeqList = list(set(dfMutants['runNumber'])-set(dfSegments['runNumber']))
@@ -229,7 +268,7 @@ def makeRedundantLibrary(dfMutants, binList, numSequences, seed, segNumber):
         #    print(bin, ": ", num)
         dfRandomSequences = generateSegment(tmpDf, binList, numSequences, 5, 3, seed+segNumber)
         dfRandomSequences['SegmentNumber'] = segNumber
-        dfSegments = dfSegments.append(dfRandomSequences)
+        dfSegments = pd.concat([dfSegments,dfRandomSequences])
         name = "Segment" + str(segNumber)
         #plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
         plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)
@@ -240,7 +279,7 @@ def makeNonRedundantLibrary(dfMutants, binList, numSequences, seed, segNumber):
     dfSegments = pd.DataFrame()
     dfRandomSequences = generateSegment(dfMutants, binList, numSequences, 5, 3, seed+segNumber)
     dfRandomSequences['SegmentNumber'] = segNumber
-    dfSegments = dfSegments.append(dfRandomSequences)
+    dfSegments = pd.concat([dfSegments,dfRandomSequences])
     name = "Segment" + str(segNumber)
     #plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
     #plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)

@@ -45,6 +45,6 @@ for root, dirs, files in os.walk(dataDir):
                 #In my original outputs, I used grep -r "Backbone Optimization:" to compile my data. I rid of those with the below
                 tmpDf = pd.read_csv(filename, sep="[:\t]", engine='python')
                 tmpDf.reset_index(drop=True, inplace=True)
-                df = df.append(tmpDf)
+                df = pd.concat([df,tmpDf])
 
 writeDataframeToNewSpreadsheet(df, outFile)

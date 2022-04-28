@@ -43,8 +43,10 @@ if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
     #if you decide to add more packages to these programs, execute the below and it will update the requirements file:
     #   -pip freeze > requirements.txt
-    #tips for requirements files https://pip.pypa.io/en/latest/reference/requirements-file-format/#requirements-file-format
-    execInstallRequirements = "pip install -r " + requirementsFile
+    #tips for requirements files:
+    #  https://pip.pypa.io/en/latest/reference/requirements-file-format/#requirements-file-format
+    #  gets rid of requirement output: https://github.com/pypa/pip/issues/5900?msclkid=474dd7c0c72911ec8bf671f1ae3975f0
+    execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     os.system(execInstallRequirements)
 
     # Compiles design energy files from all design directories
@@ -53,11 +55,10 @@ if __name__ == '__main__':
     # Analyzes designs and outputs a submit file filled with sequences for backboneOptimization
     execAnalyzeData = "python3 " + analyzeDataScript + " " + configFile
     os.system(execAnalyzeData)
-    print("Designs analyzed")#TODO: output the number of "successful designs"?
 
     execMakeSubmit = "python3 " + generateSubmitScript + " " + configFile
     os.system(execMakeSubmit)
-
+    
     #execRunRepack = "condor_submit " + mslDir + "/" + ...
     #TODO: do I also add in a way to run the next step here? I'll need to assume that these files are all found in the same directory
     #os.system("condor_submit backboneOptimization.condor")

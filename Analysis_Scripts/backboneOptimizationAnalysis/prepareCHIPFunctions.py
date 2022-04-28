@@ -37,9 +37,9 @@ def getCHIPFile(df, dfFwdP, dfRevP, gpaSeq, g83ISeq, cut1, cut2, randomDNALength
             dictOutput['Segment Number'].append(segmentNum)
             dictOutput['TM Sequence'].append(sequence[0:18])
         while gpaSeq.find(fwd) is True or gpaSeq.find(rvs) is True:
-            gpaSeq = reverse_translate(gpa)
+            gpaSeq = reverse_translate(gpaSeq)
         while g83ISeq.find(fwd) is True or g83ISeq.find(rvs) is True:
-            g83ISeq = reverse_translate(g83I)
+            g83ISeq = reverse_translate(g83ISeq)
         gpaDNASeq = fwd + cut1 + gpaSeq + 'AC' + cut2 + rvs + randomDNAEnd
         g83IDNASeq = fwd + cut1 + g83ISeq + 'AC'+ cut2 + rvs + randomDNAEnd
         i=0
@@ -49,8 +49,8 @@ def getCHIPFile(df, dfFwdP, dfRevP, gpaSeq, g83ISeq, cut1, cut2, randomDNALength
             dictOutput['DNA Sequence'].append(g83IDNASeq)
             dictOutput['Segment Number'].append(segmentNum)
             dictOutput['Segment Number'].append(segmentNum)
-            dictOutput['TM Sequence'].append(gpa)
-            dictOutput['TM Sequence'].append(g83I)
+            dictOutput['TM Sequence'].append(gpaSeq)
+            dictOutput['TM Sequence'].append(g83ISeq)
             i+=1
     outputDf = pd.DataFrame.from_dict(dictOutput)
     return outputDf

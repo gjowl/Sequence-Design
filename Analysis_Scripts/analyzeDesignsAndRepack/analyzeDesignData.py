@@ -158,8 +158,8 @@ plotHistogramsForDfList(listDf, binList, colorList, dfNames, filenames, "Total",
 #plotHistogramsForDfList(listDf, colorList, dfNames, filenames, "Total", plotOutputDir)
 
 energySortedDf = df_noDup.sort_values(by='Total', ascending=True)
-print(energySortedDf)
 writeConfigurationFile(energySortedDf, variableFile)
+print("Total Sequences for backboneOptimization: " + str(noDuplicateSeqTotal))
 
 writer.save()
 writer.close()

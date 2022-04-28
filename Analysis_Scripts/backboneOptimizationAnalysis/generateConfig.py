@@ -19,23 +19,24 @@ config_file = configparser.ConfigParser()
 
 #is it possible to automate this in case I do switch the name of the program?
 programName = 'analyzeRepacksAndMakeCHIP'
-projectDir = '/data02/gloiseau/Sequence_Design_Project/Design_Data'
-dataDir = projectDir + '/12_06_2021_CHIP1_Dataset'
-outputDir = projectDir + '/AnalyzedData'
-plotDir = outputDir + '/Plots'
-compiledOptimizationFile = '/compiledOptimizationData.csv'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/repackAnalysis'
-compileDataScript = codeDir + "/compileOptimizationDataFiles.py"
-analyzeDataScript = codeDir + "/optimizedBackboneAnalysis.py"
-prepareCHIPScript = codeDir + "/prepareCHIP.py"
-requirementsFile = codeDir + "/requirements.txt"
-optimizedBackboneFile = outputDir + '/optimizedBackboneAnalysis.xlsx'
-primerFile = outputDir + "/Primers.csv"
-chipFile = outputDir + "/CHIP.xlsx"
+projectDir = '/data02/gloiseau/Sequence_Design_Project/Design_Data/'
+datasetToAnalyze = '12_06_2021_CHIP1_Dataset/'
+dataDir = projectDir + datasetToAnalyze
+outputDir = projectDir + 'AnalyzedData/' + datasetToAnalyze
+plotDir = outputDir + 'Plots/BackboneOptimizationPlots/'
+compiledOptimizationFile = outputDir + 'compiledOptimizationData.csv'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/backboneOptimizationAnalysis/'
+compileDataScript = codeDir + "compileOptimizationDataFiles.py"
+analyzeDataScript = codeDir + "backboneOptimizationAnalysis.py"
+prepareCHIPScript = codeDir + "prepareCHIP.py"
+requirementsFile = codeDir + "requirements.txt"
+optimizedBackboneFile = outputDir + 'backboneOptimizationAnalysis.xlsx'
+primerFile = projectDir + "Primers.csv"
+chipFile = outputDir + "CHIP.xlsx"
 
 pickRedundantSequences = True
-numSequences = 5
-totalSegments = 20
+numSequences = 8
+totalSegments = 12
 sequencesPerBin = 80
 sequencesPerSegment = 500
 numRandom = 60
@@ -60,19 +61,21 @@ config_file["compileOptimizationDataFiles"]={
     "outFile":compiledOptimizationFile
 }
 
-# optimizationAnalysis section
-config_file["optimizedBackboneAnalysis"]={
+kdeFile = projectDir + '2020_09_23_kdeData.csv'
+
+# backboneOptimizationAnalysis section
+config_file["backboneOptimizationAnalysis"]={
     "outputDir":outputDir,
     "plotDir":plotDir,
     "energyLimit":-5,
     "densityLimit":0.7,
-    "listAA":["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"],
-    "dataFile":outputDir + compiledOptimizationFile,
+    "listAA":"A,F,G,I,L,S,T,V,W,Y",
+    "dataFile":compiledOptimizationFile,
     "outFile":optimizedBackboneFile,
-    "kdeFile":"C:\\Users\\gjowl\\Downloads\\2020_09_23_kdeData.csv",
+    "kdeFile":kdeFile,
     "numSequences":numSequences,
     "totalSegments":totalSegments,
-    "sequencePerBin":sequencesPerBin,
+    "sequencesPerBin":sequencesPerBin,
     "sequencesPerSegment":sequencesPerSegment,
     "numRandom":numRandom,
     "redundant":pickRedundantSequences,

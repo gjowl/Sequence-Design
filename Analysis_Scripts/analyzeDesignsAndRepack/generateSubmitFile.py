@@ -44,5 +44,7 @@ with open(fileName, "w+") as o:
     o.write("error         = " + condorErrDir + "\n")
     o.write("stream_output = TRUE" + "\n")
     o.write("stream_error  = TRUE" + "\n")
-    o.write("Arguments = " + arguments)
+    o.write("Arguments = " + arguments + "\n")
     o.write("queue " + variables + " from " +  variableFile)
+
+print("Submit script saved in: " + fileName)

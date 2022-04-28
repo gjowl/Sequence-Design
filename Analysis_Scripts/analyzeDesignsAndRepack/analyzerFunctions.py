@@ -157,7 +157,7 @@ def plotOverlay(Z, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData,
         extent=[xmin, xmax, ymin, ymax], aspect="auto")
 
     # Plots the datapoints onto the graph
-    ax.plot(xData, yData, 'k.', markersize=1.33, color = "Red")
+    ax.plot(xData, yData, markersize=1.33, color = "Red")
     ax.set_xlim([xmin, xmax])
     ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
@@ -172,14 +172,14 @@ def plotOverlay(Z, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData,
 
 def plotContour(df, title, filename, xAxis, yAxis, xmax, xmin, ymax, ymin, xData, yData, outputDir):
     figSNS, axSNS = plt.subplots()
-    sns.kdeplot(df[xAxis], df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, shade_lowest=False, ax=axSNS)
+    sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False, ax=axSNS)
     # Plots the datapoints onto the graph
     axSNS.set_xlim([xmin, xmax])
     axSNS.set_ylim([ymin, ymax])
     plt.xlabel(xAxis + " (Å)")
     plt.ylabel(yAxis + " (°)")
     plt.title(title)
-    axSNS.plot(xData, yData, 'k.', markersize=1.33, color = "Red")
+    axSNS.plot(xData, yData, markersize=1.33, color = "Red")
     #plt.savefig(outputDir+xAxis+"_v_"+yAxis+"_contour.png", bbox_inches='tight', dpi=150)
     plt.savefig(outputDir+filename+"_contour.png", bbox_inches='tight', dpi=150)
     plt.close()
@@ -856,9 +856,9 @@ def writeConfigurationFile(df, fileName):
     designPDBList = df["PDBPath"]
     with open(fileName, "w+") as variableFile:
         for i in designPDBList:
-            designDir = i[:-25]
-            repackConfig = designDir+"repack.config\n"
-            variableFile.write(repackConfig)
+            designDir = i[:-26]#TODO: make this better; it currently just gets up to the 26th character to get the dir
+            repackConfig = designDir+"/repack.config\n"
+            variableFile.write(designDir + "," + repackConfig)
         print("Variable File written: ", fileName)
 
 

@@ -18,18 +18,18 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'analyzeDesignsAndRepack'
-projectDir = '/data02/gloiseau/Sequence_Design_Project/Design_Data'
-datasetToAnalyze = '/12_06_2021_CHIP1_Dataset'
+projectDir = '/data02/gloiseau/Sequence_Design_Project/Design_Data/'
+datasetToAnalyze = '12_06_2021_CHIP1_Dataset/'
 dataDir = projectDir + datasetToAnalyze
-outputDir = projectDir + '/AnalyzedData' + datasetToAnalyze
-compiledDesignDataFile = dataDir + '/compiledDesignData.csv'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/analyzeDesignsAndRepack'
-analyzeDataScript = codeDir + "/analyzeDesignData.py"
-generateSubmitScript = codeDir + "/generateSubmitFile.py"
-requirementsFile = codeDir + "/requirements.txt"
+outputDir = projectDir + 'AnalyzedData/' + datasetToAnalyze
+compiledDesignDataFile = dataDir + 'compiledDesignData.csv'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/Analysis_Scripts/analyzeDesignsAndRepack/'
+analyzeDataScript = codeDir + "analyzeDesignData.py"
+generateSubmitScript = codeDir + "generateSubmitFile.py"
+requirementsFile = codeDir + "requirements.txt"
 energyFileName = "energyFile.csv"
-mslDir = "/exports/home/gloiseau/mslib/trunk_AS"
-submitDir = mslDir + "/condor"
+mslDir = "/exports/home/gloiseau/mslib/trunk_AS/"
+submitDir = mslDir + "condor"
 
 # main code section
 config_file["main"]={
@@ -44,14 +44,14 @@ config_file["main"]={
     "dataDir":dataDir
 }
 
-outFile = outputDir+"/analyzedDesignData.xlsx"
-kdeFile = projectDir + '/2020_09_23_kdeData.csv'
-variableFile = projectDir + '/repackConfigList.csv'
-sequenceProbabilityFile = projectDir + '/sequenceProbabilityFile.csv'
+outFile = outputDir+"analyzedDesignData.xlsx"
+kdeFile = projectDir + '2020_09_23_kdeData.csv'
+variableFile = projectDir + 'repackConfigList.csv'
+sequenceProbabilityFile = projectDir + 'sequenceProbabilityFile.csv'
 # analyzeDesignData section
 config_file["analyzeDesignData"]={
     "outputDir":outputDir,
-    "plotOutputDir":outputDir+"/Plots/Design_Plots",
+    "plotOutputDir":outputDir+"Plots/Design_Plots/",
     "energyLimit":-5,
     "densityLimit":0.7,
     "crossingAngleLimit":-70,
@@ -68,11 +68,11 @@ header = "#Submit file for optimizing backbones and making mutants on designed s
 batchName = "backboneOptimization"
 baseDir = "/data02/gloiseau/Sequence_Design_Project/vdwSequenceDesign/$(batch_name)"
 executable = "/exports/home/gloiseau/mslib/trunk_AS/bin/geomRepack"
-output = batchName+"/out/$().out"
-log = batchName+"/out/$().log"
-error = batchName+"/out/$().err"
-arguments = "--config $(configFile)"
-variables = "sequence,configFile"
+output = "$(seqDir)/$(batchName).out"
+log = "$(seqDir)/$(batchName).log"
+error = "$(seqDir)/$(batchName).err"
+arguments = "'--config $(configFile)'"
+variables = "seqDir,configFile"
 
 # generateSubmitFile section
 config_file["generateSubmitFile"]={
