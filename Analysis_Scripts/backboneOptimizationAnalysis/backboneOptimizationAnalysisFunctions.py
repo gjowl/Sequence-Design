@@ -284,3 +284,32 @@ def makeNonRedundantLibrary(dfMutants, binList, numSequences, seed, segNumber):
     #plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
     #plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)
     return dfSegments
+
+# get segments 
+def getSegments(df, dfKde, plotOutputDir, redundant, binList, numSequences, totalSegments, seed):
+    dfSegments = pd.DataFrame()
+    for segNumber in range(1,totalSegments+1):
+        if redundant is True:
+            dfRandomSequences = generateSegment(df, binList, numSequences, 6, 3, seed+segNumber)
+            dfRandomSequences['SegmentNumber'] = segNumber
+            dfSegments = pd.concat([dfSegments,dfRandomSequences])
+            name = "Segment" + str(segNumber)
+        else:
+            if dfSegments.empty is True:
+                dfRandomSequences = generateSegment(df, binList, numSequences, 6, 3, seed+segNumber)
+                dfRandomSequences['SegmentNumber'] = segNumber
+                dfSegments = pd.concat([dfSegments,dfRandomSequences])
+                name = "Segment" + str(segNumber)
+            else:
+                removePrevSeqList = list(set(df['runNumber'])-set(dfSegments['runNumber']))
+                tmpDf = df[df['runNumber'].isin(removePrevSeqList)]
+                sequenceNumbersPerBin = numberSequenceInBin(tmpDf, binList, -40)
+                #for bin, num in zip(binList, sequenceNumbersPerBin):
+                #    print(bin, ": ", num)
+                dfRandomSequences = generateSegment(tmpDf, binList, numSequences, 6, 3, seed+segNumber)
+                dfRandomSequences['SegmentNumber'] = segNumber
+                dfSegments = pd.concat([dfSegments,dfRandomSequences])
+                name = "Segment" + str(segNumber)
+                #plotHistogramForDataframe(dfRandomSequences, "Total", binList1, name, plotOutputDir)
+                plotKdeOverlay(dfKde, dfRandomSequences, 'Distance', 'Angle', plotOutputDir, segNumber)
+    return dfSegments

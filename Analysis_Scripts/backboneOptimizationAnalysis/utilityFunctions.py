@@ -49,6 +49,16 @@ def getColumnAverages(df, columnNames, dict):
 def writeDataframeToSpreadsheet(df, writer, sheetName):
     df.to_excel(writer, sheet_name=sheetName)
 
+def writeDataListToSpreadsheet(dataList, outputFile):
+    # initialize writer for output file
+    writer = pd.ExcelWriter(outputFile)
+    #loop through list of df and write into spreadsheet
+    for data in dataList:
+        df = data.getDf()
+        name = data.getName()
+        writeDataframeToSpreadsheet(df, writer, name)
+    writer.close()
+
 def writeDataframeToNewSpreadsheet(df, outFile, sheetName):
     writer = pd.ExcelWriter(outFile)
     df.to_excel(writer, sheet_name=sheetName)
