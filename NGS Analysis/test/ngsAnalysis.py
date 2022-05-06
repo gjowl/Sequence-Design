@@ -1,24 +1,22 @@
 import sys
 from functions import *
 
-
-
-
+# Command line arguments
 refFile = sys.argv[1]
 ngsFile = sys.argv[2]
 direction = sys.argv[3]
+
+# Control protein sequences
 gpa = 'LIIFGVMAGVIG'
 g83I = 'LIIFGVMAIVIG'
 
-#Set the forward and reverse primers for forward NGS sequence
+#Set the forward and reverse primers DNA sequences for forward NGS sequence
 fPrimer = "GGCTCCAAACTTGGGGAATCG"
 rPrimer = "CCTGATCAACCCAAGCCAATCC"
-offset = 21
 primers = [fPrimer, rPrimer]
-#Flip the primer string if analyzing the reverse NGS sequence
+#Reverse the primer string if analyzing the reverse NGS sequence
 if direction == "R":
     primers = reverseStrings(primers)
-    offset = 22
 
 # read in sequence reference file into dictionary (i.e. dict[seqName]=sequenceInfo)
 dictRef = readReferenceFile(refFile)
@@ -26,51 +24,33 @@ dictRef = readReferenceFile(refFile)
 # load in NGS file and get DNA sequence and qcodes
 dnaSeqs, qCodes = readNGSFile(ngsFile)
 
-#
-#  
-#TODO: set a cutoff for the number of sequences we will analyze (?)
-#TODO: open the sequence file (fastq)
-#   - set variables for looping
-#   - loop through every line
-poorSeq = 0
-noStart = 0
-noEnd = 0
+# Output the sequence dictionary and information about good and bad sequences
+proteinSeqs, poorSeq, noStart, noEnd = getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction)
+totalSeqs = len(dnaSeqs)
+goodSeq = totalSeqs-poorSeq-noStart-noEnd #TODO: just get the number of keys in proteinSeqs?
+goodPercent = goodSeq/totalSeqs
+#TODO: my noStart is off by like 40 for some reason? I'm getting rid of extra good sequences
+print("TotalSeqs PoorSeqs NoStart NoEnd GoodSeqs Percent")
+print(totalSeqs, poorSeq, noStart, noEnd, goodSeq, goodPercent)
 
-#TODO: a lot to figure out below
-for seq, q in zip(dnaSeqs, qCodes):
-    # look up what this p calculation is doing and what split // is in perl
-    for ...
-        
-    q = 0
-    p = 0
-    eIncorrect = 0
-    tm = ''
-    if eIncorrect > 1:
-        poorSeq = poorSeq +1
-        next #TODO: does next also work for python?
+cutoff = 10
+#basically correct, but the percentage is calculated wrong? I'll need to determine why that is the case later
+for seq, numSeq in proteinSeqs.items():
+    if numSeq > cutoff:
+        percent = numSeq/totalSeqs
+        print(seq, numSeq, percent)
+        if seq in dictRef:
+            print(dictRef[seq])
+        elif seq == gpa:
+            print("0\tP02724\tGLPA_HUMAN\t75\tWT\tN/A\n")
+        elif seq == g83I:
+            print("0\tP02724\tGLPA_HUMAN\t75\tG83I\t83\n")
+        else:
+            print("unknown")
+        exit()
 
-    # TODO: confirm that this is what perl is doing
-    j = find(fPrimer, seq)
-    k = find(rPrimer, seq)
-    # TODO: what does crop good sequence in between primers mean?
-    if (j == -1):
-        noStart = noStart+1
-        next
-    j = j + offset
-    if (k != -1):
-        #TODO: how to get this TM using python? substr in perl?
-        tm = ''
-    else:
-        noEnd = noEnd+1
-        next
 
-    # convert DNA to protein
-    protein = reverse_translate(tm)
 
-    # TODO: finish the rest of this for loop
-
-    ...
-#TODO: convert DNA to protein
-#TODO: print out the total, good, bad, etc. sequences
 #TODO: sort sequences (?)
+#TODO: set a cutoff for the number of sequences we will analyze (?)
 #TODO: output file similar to her output
