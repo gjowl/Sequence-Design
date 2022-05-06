@@ -193,6 +193,8 @@ for (my $i = 0; $i < $numLines; $i++){
 			$eIncorrect += $P;
 		}
 		$groupValue = 0;
+		print "$lines[$i]\n";
+		print "$eIncorrect\n";
 		if ($eIncorrect > 1){
 			$poorSeq++;
 			next;
@@ -203,6 +205,8 @@ for (my $i = 0; $i < $numLines; $i++){
 	}
 	my $j = index $sequence, $fPrimer; 
 	my $k = index $sequence, $rPrimer;
+	
+	
 	#Crop good sequences to inbetween the primers
 	if ($j == -1){
 		$noStart++;
@@ -215,12 +219,19 @@ for (my $i = 0; $i < $numLines; $i++){
 		$noEnd++;
 		next;
 	}
+	
 
 #	print "$sequence\t$tm\t";
 #	print "$tm\t";
 
 	#Convert DNA to protein
 	my $protein = &Conversion($tm);
+	#print "$i\n";
+	#print "$j\n";
+	#print "$k\n";
+	#print "$sequence\n";
+	#print "$tm\n";
+	print "$protein\n";
 
 	if (substr($protein, 0, 2) ne "AS"){
 		$noStart++;
@@ -238,7 +249,6 @@ for (my $i = 0; $i < $numLines; $i++){
 	} else {
 		$proteinSeqs{$protein} = 1;
 	}
-	#print "$protein\n";
 }
 
 #Print out fails
@@ -246,7 +256,7 @@ my $goodSeqs = $numSeqs - $poorSeq - $noStart - $noEnd;
 my $goodPercent = $goodSeqs / $numSeqs;
 print "TotalSeqs PoorSeqs NoStart NoEnd GoodSeqs Percent\n";
 print "$numSeqs\t$poorSeq\t$noStart\t$noEnd\t$goodSeqs\t$goodPercent\n";
-
+exit 1;
 #Sort amino acid sequences
 for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
 	if ($proteinSeqs{$aa} > $cutOff){ #remove seqs less than cutoff
