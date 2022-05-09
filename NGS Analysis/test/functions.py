@@ -1,5 +1,13 @@
 import re
+import os
 from dnachisel.biotools import translate, reverse_complement
+
+# get filename separate from type and directory
+def getFilename(file):
+    programPath = os.path.realpath(file)
+    programDir, programFile = os.path.split(programPath)
+    filename, programExt = os.path.splitext(programFile)
+    return filename
 
 # load in NGS file
 def readNGSFile(ngsFile):
@@ -39,7 +47,7 @@ def readReferenceFile(refFile):
         seqInfo = ''
         i = 0 
         while i < 6:
-            seqInfo += lineSplit[i] #TODO: split
+            seqInfo += lineSplit[i]+"\t"
             i += 1
         seqName = lineSplit[6]
         dictSequence[seqName] = seqInfo 
@@ -101,6 +109,7 @@ def getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction):
     poorSeq = 0
     noStart = 0
     noEnd = 0
+    x=0
     # loop through sequences and qcodes to add to dictionary
     for seq, qCode in zip(dnaSeqs, qCodes):
         eIncorrect = getQFactor(qCode)
@@ -127,6 +136,7 @@ def getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction):
         # check to see if AS at the start of sequence
         if protein.find("AS", 0, 2) == -1:
             noStart += 1
+            x+=1
             continue
         #check to see if L at end of sequence
         elif protein.endswith("L") == False:
@@ -139,4 +149,31 @@ def getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction):
             proteinSeqs[protein] += 1
         else:
             proteinSeqs[protein] = 1
+    print(x)
+    exit()
     return proteinSeqs, poorSeq, noStart, noEnd
+
+# write output file for good sequences with number of each and the percent of the population
+# basically correct, but the percentage is calculated wrong? I'll need to determine why that is the case later
+def writeOutputFile(proteinSeqs, totalSeqs, sequenceOutput, cutoff, refFile, outputFile):
+    # read in sequence reference file into dictionary (i.e. dict[seqName]=sequenceInfo)
+    dictRef = readReferenceFile(refFile)
+    # control sequences
+    gpa = 'LIIFGVMAGVIG'
+    g83I = 'LIIFGVMAIVIG'
+    # open and write output files
+    with open(outputFile, 'w') as f:
+        f.write("Number of Sequences: "+str(totalSeqs)+"\tCutoff: "+str(cutoff)+"\n")
+        f.write(sequenceOutput)
+        for seq, numSeq in proteinSeqs.items():
+            if numSeq > cutoff:
+                percent = numSeq/totalSeqs
+                f.write(seq+"\t"+str(numSeq)+"\t"+str(percent)+"\t")
+                if seq in dictRef:
+                    f.write(dictRef[seq]+"\n")
+                elif seq == gpa:
+                    f.write("0\tP02724\tGLPA_HUMAN\t75\tWT\tN/A\n")
+                elif seq == g83I:
+                    f.write("0\tP02724\tGLPA_HUMAN\t75\tG83I\t83\n")
+                else:
+                    f.write("Unknown\n")
