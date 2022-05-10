@@ -1,6 +1,22 @@
 import re
 import os
+import sys
 from dnachisel.biotools import translate, reverse_complement
+
+def getConfigFile(file):
+    configFile = ''
+    # Access the configuration file for this program (should only be one in the directory)
+    programPath = os.path.realpath(file)
+    programDir, programFile = os.path.split(programPath)
+    programName, programExt = os.path.splitext(programFile)
+    fileList = os.listdir(programDir)
+    for file in fileList:
+        fileName, fileExt = os.path.splitext(file)
+        if fileExt == '.config':
+            configFile = programDir + '/' + file
+    if configFile == '':
+        sys.exit("No config file present in script directory!")
+    return configFile
 
 # get filename separate from type and directory
 def getFilename(file):
@@ -8,6 +24,15 @@ def getFilename(file):
     programDir, programFile = os.path.split(programPath)
     filename, programExt = os.path.splitext(programFile)
     return filename
+
+def makeOutputDir(outputDir):
+    # check if the path to the directory exists
+    if not os.path.isdir(outputDir):
+        print('Creating output directory: ' + outputDir + '.')
+        # the below makes directories for the entire path
+        os.makedirs(outputDir)
+    else:
+        print('Output Directory: ' + outputDir + ' exists.')
 
 # load in NGS file
 def readNGSFile(ngsFile):
@@ -61,7 +86,7 @@ def writeOutputFile(ngsFile, direction):
 def reverseStrings(strings):
     revStrings = []
     for string in strings:
-        revString.append(string[::-1])
+        revStrings.append(string[::-1])
     return revStrings
 
 # OUTPUT SEQUENCE DICTIONARY
@@ -109,7 +134,6 @@ def getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction):
     poorSeq = 0
     noStart = 0
     noEnd = 0
-    x=0
     # loop through sequences and qcodes to add to dictionary
     for seq, qCode in zip(dnaSeqs, qCodes):
         eIncorrect = getQFactor(qCode)
@@ -136,7 +160,6 @@ def getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction):
         # check to see if AS at the start of sequence
         if protein.find("AS", 0, 2) == -1:
             noStart += 1
-            x+=1
             continue
         #check to see if L at end of sequence
         elif protein.endswith("L") == False:
@@ -149,8 +172,6 @@ def getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction):
             proteinSeqs[protein] += 1
         else:
             proteinSeqs[protein] = 1
-    print(x)
-    exit()
     return proteinSeqs, poorSeq, noStart, noEnd
 
 # write output file for good sequences with number of each and the percent of the population

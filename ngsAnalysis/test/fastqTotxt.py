@@ -1,18 +1,31 @@
 import sys
+import helper
 from functions import *
 
 # Command line arguments
 #TODO: change this to config file options
-refFile = sys.argv[1]
-ngsFile = sys.argv[2]
-direction = sys.argv[3]
-outputName = getFilename(ngsFile)
-outputFile = outputName+"-test.txt"
+
 #maybe add another argument for M9 vs sorted (so that I can add column names to the output file? Should I make it a csv also?)
 
-# Control protein sequences
-gpa = 'LIIFGVMAGVIG'
-g83I = 'LIIFGVMAIVIG'
+# Use the utilityFunctions function to get the name of this program
+programName = getFilename(sys.argv[0])
+configFile  = sys.argv[1]
+ngsFile     = sys.argv[2]
+direction        = sys.argv[3]
+
+# Read in configuration file:
+globalConfig = helper.read_config(configFile)
+config = globalConfig[programName]
+
+# Config file options:
+outputDir        = config["outputDir"]
+refFile          = config['refFile']
+gpa              = config['gpa']
+g83I             = config['g83I']
+
+# Other variables
+outputName       = getFilename(ngsFile)
+outputFile       = outputDir + outputName+"-test.txt"
 
 #Set the forward and reverse primers DNA sequences for forward NGS sequence
 fPrimer = "GGCTCCAAACTTGGGGAATCG"

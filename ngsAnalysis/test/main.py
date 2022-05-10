@@ -5,21 +5,19 @@
 # @Last modified time: 2022/03/21
 
 """
-This file will run multiple python scripts for compiling and then analyzing design data.
-
-TODO: add more here: this runs on a linux machine with condor installed..., website for condor,...
+This file will run multiple python scripts for compiling ngs data and then analyzing.
 """
 
 import sys
 import os
 import helper
-from utilityFunctions import *
+from functions import *
 
 # Use the utilityFunction to get the configFile
 configFile = getConfigFile(__file__)
 
 # Use the utilityFunctions function to get the name of this program
-programName = getProgramName(sys.argv[0])
+programName = getFilename(sys.argv[0])
 
 # Read in configuration file:
 globalConfig = helper.read_config(configFile)
@@ -27,15 +25,11 @@ config = globalConfig[programName]
 
 # Config file options:
 outputDir            = config["outputDir"]
-analysisCodeDir      = config["codeDir"]
-energyFileName       = config["energyFileName"]
-outFile              = config["outFile"]
 requirementsFile     = config["requirementsFile"]
-analyzeDataScript    = config["analyzeDataScript"]
-generateSubmitScript = config["generateSubmitScript"]
 dataDir              = config["dataDir"]
+fastqTotxt           = config["fastqTotxt"]
+ngsAnalysis          = config["ngsAnalysis"]
 
-#TODO: add in error checking?
 if __name__ == '__main__':
     # make the output directory that these will all output to
     makeOutputDir(outputDir)
@@ -48,15 +42,28 @@ if __name__ == '__main__':
     execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     os.system(execInstallRequirements)
 
+    for filename in os.listdir(dataDir):
+        dataFile = os.path.join(dataDir, filename)
+        if os.path.isfile(dataFile):
+            print(dataFile)
+            dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
+            # gets the direction 
+            if dataFile.find("R1") != -1:
+                execRunFastqTotxt = 'python3 '+fastqTotxt+' '+configFile+' '+dataFile+' '+'F'
+                print(execRunFastqTotxt)
+                os.system(execRunFastqTotxt)
+            else:
+                continue
+                execRunFastqTotxt = 'python3 '+fastqTotxt+' '+configFile+' '+dataFile+' '+'R'
+                print(execRunFastqTotxt)
+                os.system(execRunFastqTotxt)
+            exit() 
+    
+
     # Compiles design energy files from all design directories
-    compileDataFiles(energyFileName, dataDir, outFile)
+    #compileDataFiles(energyFileName, dataDir, outFile)
 
     # Analyzes designs and outputs a submit file filled with sequences for backboneOptimization
-    execAnalyzeData = "python3 " + analyzeDataScript + " " + configFile
-    os.system(execAnalyzeData)
-
-    execMakeSubmit = "python3 " + generateSubmitScript + " " + configFile
-    os.system(execMakeSubmit)
     
     #execRunRepack = "condor_submit " + mslDir + "/" + ...
     #TODO: do I also add in a way to run the next step here? I'll need to assume that these files are all found in the same directory

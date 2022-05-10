@@ -1,9 +1,4 @@
 
-
-#TODO: 
-
-
-
 # reconstructed fluorescence variables
 """
 From input file
@@ -25,7 +20,16 @@ p = average fluorescence
 
 # CSV file format:
 # sequence bin1Count bin2Count bin3Count bin4Count bin5Count bin6Count totalCount fractionPop medianFluor
-
+# TODO: how do I get the replicates for each of these?
+# I think I got it:
+#   - run the fastqToTxt on all
+#   - compile those into a file that contains all bins and replicates
+#   - hmmm...I think I just need to try it: 
+#       - first get the sequence from a file and add to another file
+#       - then add all of the other counts from individual files
+#       - do it for all of the replicates
+#       - sum them and add a column
+#       - add fluor and fraction pop? Or just take from another file (loop through one then the other?)
 # bin list (is there a way to get this? get only columns named bin)
 #   - for loop through name
 #       - for loop for bin in binlist for each name
