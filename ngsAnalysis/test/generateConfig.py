@@ -5,7 +5,7 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-outputDir = '/exports/home/gloiseau/test/'
+outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/output/'
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
 codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
 fastqTotxt = codeDir + "fastqTotxt.py"
