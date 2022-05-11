@@ -11,6 +11,7 @@ This file will run multiple python scripts for compiling ngs data and then analy
 import sys
 import os
 import helper
+import pandas as pd
 from functions import *
 
 # Use the utilityFunction to get the configFile
@@ -59,12 +60,40 @@ if __name__ == '__main__':
     #            print(execRunFastqTotxt)
     #            os.system(execRunFastqTotxt)
 
-    #TODO: write something here that gets a list of all of the sequences
+    # gets a list of all of the sequences
+    allSeqs = []
     for filename in os.listdir(outputDir):
         dataFile = os.path.join(outputDir, filename)
+        # get the sequence column (first column) and skip the summary data rows
+        seqColumn = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=3, usecols=[0])
+        # convert that column to a list
+        seqs = seqColumn.iloc[:,0].tolist()
+        # add each value in the list to the allSeqs list
+        for seq in seqs:
+            allSeqs.append(seq) 
+    # rid of the duplicate sequences in the list
+    allSeqs = pd.unique(allSeqs).tolist()
+    
+    # go through all files
+    for filename in os.listdir(outputDir):
+        # get one data file
+        dataFile = os.path.join(outputDir, filename)
+        # make sure it's a data file
         if os.path.isfile(dataFile):
+            # convert to csv and keep the sequence, count, and percentage columns
+            dfData = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=3, index_col=0, usecols=[0,1,2])
+            # get the column name for this data from the file name (bin name, M9, LB, etc.)
             colName = filename[6:8]
-            #for seq in seqFile:
+            # loop through all of the found sequences
+            for seq in allSeqs:
+                # get data for the sequence in this file
+                try:
+                    print(dfData.loc[seq])
+                    exit()
+                except:
+                    print(seq, ": ", 0) 
+                # if not found, add 0
+
                 # search for seq in file
                 # get count (and other important info?) and add to dict
                 # add dict as column to csv
