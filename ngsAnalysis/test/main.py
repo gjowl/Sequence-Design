@@ -56,27 +56,6 @@ if __name__ == '__main__':
     outFile = testDir+"allCounts.csv"
     outputSequenceCountsCsv(listSeq, outputDir, outFile)
 
-                # if not found, add 0
-
-                # search for seq in file
-                # get count (and other important info?) and add to dict
-                # add dict as column to csv
-            # do for all seqs, then go to next file and repeat
-
-            # So here I have a file: now should I go through every sequence in it?
-            # OR
-            # Should I find the sequence data in all of the files and add to a new file?
-            # TODO: 
-            #   - get a list of sequences found in all of the files
-            #   - go through each file, find the sequence data, add a column for each file found in (C1, C2, M9, LB, etc.)
-            #   - make sure the outputs make sense; have that and then you should be good to do calculation stuff tomorrow
-
-
-    # Compiles design energy files from all design directories
-    #compileDataFiles(energyFileName, dataDir, outFile)
-
-    # Analyzes designs and outputs a submit file filled with sequences for backboneOptimization
-    
     #execRunRepack = "condor_submit " + mslDir + "/" + ...
     #TODO: do I also add in a way to run the next step here? I'll need to assume that these files are all found in the same directory
     #os.system("condor_submit backboneOptimization.condor")

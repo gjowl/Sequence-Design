@@ -247,15 +247,21 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
         # make sure it's a file
         if os.path.isfile(dataFile):
             # get the column name for this data from the file name (bin name, M9, LB, etc.)
-            colName = filename[6:8]
+            colName = filename[6:13]
             dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
+            #for key, value in dictSeq.items():
+            #    for k, v in value.items():
+            #        if v > 0:
+            #            print(key, k, v)
     df = pd.DataFrame.from_dict(dictSeq)
     df_t = df.T
     df_t.to_csv(outFile)
         
 def getCountsForFile(listSeq, dictSeq, colName, file):
-    # convert to csv and keep the sequence, count, and percentage columns; sequence is the index
-    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=3, index_col=0, usecols=[0,1,2])
+    # convert to csv and keep the sequence, count, and percentage columns
+    columns = ['Sequence', 'Count', 'Percentage']
+    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=3, usecols=[0,1,2])
+    dfData.columns = columns
     # loop through all of the sequences and find count in dataframe
     for seq in listSeq:
         if seq not in dictSeq:
@@ -263,7 +269,8 @@ def getCountsForFile(listSeq, dictSeq, colName, file):
         # get data for the sequence in this file; if not found in file, set count as 0
         try:
             # search for the sequence as an index and get the count
-            count = dfData.loc[:seq][1][0]
+            index = dfData.index[dfData['Sequence'] == seq].to_list()
+            count = dfData.loc[index[0], 'Count']
             dictSeq[seq][colName] = count
         except:
             # if not found, set number for bin as 0
