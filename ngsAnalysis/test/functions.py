@@ -81,9 +81,6 @@ def readReferenceFile(refFile):
     f.close
     return dictSequence
 
-def writeOutputFile(ngsFile, direction):
-    print(ngsFile + " " + direction)
-    
 def reverseStrings(strings):
     revStrings = []
     for string in strings:
@@ -239,23 +236,36 @@ def getSequenceList(dir):
     allSeqs = pd.unique(allSeqs).tolist()
     return allSeqs
 
+#Checking the file exists or not
+def check_file_empty(path_of_file):
+    #Checking if file exist and it is empty
+    return os.path.exists(path_of_file) 
+
 def outputSequenceCountsCsv(listSeq, dir, outFile):
     dictSeq = {}
-    for filename in os.listdir(dir):
-        # get one data file
-        dataFile = os.path.join(dir, filename)
-        # make sure it's a file
-        if os.path.isfile(dataFile):
-            # get the column name for this data from the file name (bin name, M9, LB, etc.)
-            colName = filename[6:13]
-            dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
-            #for key, value in dictSeq.items():
-            #    for k, v in value.items():
-            #        if v > 0:
-            #            print(key, k, v)
-    df = pd.DataFrame.from_dict(dictSeq)
-    df_t = df.T
-    df_t.to_csv(outFile)
+    # checking if file exist and it is empty
+    fileExists = check_file_empty(outFile)
+    print(fileExists)
+    if fileExists == False:
+        for filename in os.listdir(dir):
+            # get one data file
+            dataFile = os.path.join(dir, filename)
+            # make sure it's a file
+            if os.path.isfile(dataFile):
+                # get the column name for this data from the file name (bin name, M9, LB, etc.)
+                colName = filename[6:13]
+                dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
+                #for key, value in dictSeq.items():
+                #    for k, v in value.items():
+                #        if v > 0:
+                #            print(key, k, v)
+        df = pd.DataFrame.from_dict(dictSeq)
+        # transpose the dataframe so sequences are rows and bins and others are columns
+        df_t = df.T
+        df_t = df_t[sorted(df_t.columns)]
+        df_t.to_csv(outFile)
+    else:
+        print("File exists. To rerun, delete " + outFile)
         
 def getCountsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
@@ -276,3 +286,4 @@ def getCountsForFile(listSeq, dictSeq, colName, file):
             # if not found, set number for bin as 0
             dictSeq[seq][colName] = 0
     return dictSeq
+

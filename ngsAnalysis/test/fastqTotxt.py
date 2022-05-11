@@ -11,7 +11,7 @@ from functions import *
 programName = getFilename(sys.argv[0])
 configFile  = sys.argv[1]
 ngsFile     = sys.argv[2]
-direction        = sys.argv[3]
+direction   = sys.argv[3]
 
 # Read in configuration file:
 globalConfig = helper.read_config(configFile)

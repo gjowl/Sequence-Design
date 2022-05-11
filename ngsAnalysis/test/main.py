@@ -32,6 +32,7 @@ dataDir              = config["dataDir"]
 testDir              = config["testDir"]
 fastqTotxt           = config["fastqTotxt"]
 ngsAnalysis          = config["ngsAnalysis"]
+outFile              = config["outputFile"]
 
 if __name__ == '__main__':
     # make the output directory that these will all output to
@@ -53,9 +54,10 @@ if __name__ == '__main__':
 
     # make csv with sequence counts for all files
     # go through all files and save counts in dictionary
-    outFile = testDir+"allCounts.csv"
     outputSequenceCountsCsv(listSeq, outputDir, outFile)
+    
+    # execute ngsAnalysis script 
+    execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
+    print(execNgsAnalysis)
+    os.system(execNgsAnalysis)
 
-    #execRunRepack = "condor_submit " + mslDir + "/" + ...
-    #TODO: do I also add in a way to run the next step here? I'll need to assume that these files are all found in the same directory
-    #os.system("condor_submit backboneOptimization.condor")

@@ -14,7 +14,9 @@ Reconstructed fluorescence
 a = fluorescence in current bin
 p = average fluorescence 
 """
-
+import sys
+import helper
+from functions import *
 # TODO: make a script that compiles the files into 1
 # compile the files into one in below file format
 
@@ -36,6 +38,38 @@ p = average fluorescence
 #       - do the calculation of normFrac for each bin
 #       - add previous normFrac to current
 #   - calc relative fluor and output to a csv (plotting will be done in another script; maybe added on to this list of scripts)
+
+# Use the utilityFunctions function to get the name of this program
+programName = getFilename(sys.argv[0])
+configFile  = sys.argv[1]
+
+# Read in configuration file:
+globalConfig = helper.read_config(configFile)
+config = globalConfig[programName]
+
+# Config file options:
+countFile        = config["countFile"]
+
+# So now I have the csv file with all of the counts
+
+# read csv containing counts
+df = pd.read_csv(countFile)
+
+# filter out to only have the bins
+dfBins = df.filter(like='C')
+dfLB = df.filter(like='LB')
+dfM9 = df.filter(like='M9')
+
+# filter out to only have Rep1
+numReplicates = 3
+i=0
+while i <= numReplicates:
+    replicate = 'Rep'+str(i)
+    dfRep = dfBins.filter(like=replicate)
+    print(dfRep)
+    i+=1
+exit()
+
 
 def calculateReconstructedFluorescence():
     for seq in binNumber:# maybe from outputfile with the name?

@@ -9,6 +9,7 @@ codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
 #codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
 outputDir = codeDir + 'output/'
 testDir = codeDir
+outputFile = testDir+"allCounts.csv"
 
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
 
@@ -23,7 +24,8 @@ config_file["main"]={
     "requirementsFile":requirementsFile,
     "fastqTotxt":fastqTotxt,
     "ngsAnalysis":ngsAnalysis,
-    "testDir":testDir
+    "testDir":testDir,
+    "outputFile":outputFile,
 }
 
 # fastqToTxt config options
@@ -32,7 +34,7 @@ gpa = 'LIIFGVMAGVIG'
 g83I = 'LIIFGVMAIVIG'
 fPrimer = "GGCTCCAAACTTGGGGAATCG"
 rPrimer = "CCTGATCAACCCAAGCCAATCC"
-outputFile = ''
+
 
 # fastqToTxt config
 config_file["fastqTotxt"]={
@@ -41,21 +43,17 @@ config_file["fastqTotxt"]={
     "fPrimer":fPrimer,
     "rPrimer":rPrimer,
     "refFile":refFile,
-    "outputDir":outputDir
+    "outputDir":outputDir,
+    "outputFile":outputFile,
 }
 
-# compile datafile config options
-config_file["compileDataFiles"]={
-
-}
-
-# compile datafile config
 # ngsAnalysis config options
-
 compileDataDir = ''
+
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
     "dataDir":compileDataDir,
+    "countFile":outputFile,
 }
 
 # SAVE CONFIG FILE
