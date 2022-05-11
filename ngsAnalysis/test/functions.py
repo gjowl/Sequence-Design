@@ -200,6 +200,28 @@ def writeOutputFile(proteinSeqs, totalSeqs, sequenceOutput, cutoff, refFile, out
                 else:
                     f.write("Unknown\n")
 
+# converts ngs fastq files to more workable txt files
+def convertFastqToTxt(fastqTotxt, config, dataDir, outputDir):
+    if len(os.listdir(outputDir)) == 0:
+        for filename in os.listdir(dataDir):
+            dataFile = os.path.join(dataDir, filename)
+            if os.path.isfile(dataFile):
+                print(dataFile)
+                dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
+                # gets the direction 
+                if dataFile.find("R1") != -1:
+                    execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'F'
+                    print(execRunFastqTotxt)
+                    os.system(execRunFastqTotxt)
+                else:#TODO: get this working for reverse
+                    continue
+                    execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'R'
+                    print(execRunFastqTotxt)
+                    os.system(execRunFastqTotxt)
+        print("Files successfully converted")
+    else:
+        print("Files already converted. If you would like to reconvert files, delete " + outputDir)
+
 # FOR CREATING A CSV FILE OF SEQUENCE COUNTS PER BIN/M9/LB
 # gets a list of all of the unique sequences present in data within a directory
 def getSequenceList(dir):

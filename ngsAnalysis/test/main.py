@@ -8,6 +8,7 @@
 This file will run multiple python scripts for compiling ngs data and then analyzing.
 """
 
+from fileinput import filename
 import sys
 import os
 import helper
@@ -44,23 +45,9 @@ if __name__ == '__main__':
     execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     os.system(execInstallRequirements)
 
-    # runs through all files in the dataDir and converts fastq to txt
-    #for filename in os.listdir(dataDir):
-    #    dataFile = os.path.join(dataDir, filename)
-    #    if os.path.isfile(dataFile):
-    #        print(dataFile)
-    #        dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
-    #        # gets the direction 
-    #        if dataFile.find("R1") != -1:
-    #            execRunFastqTotxt = 'python3 '+fastqTotxt+' '+configFile+' '+dataFile+' '+'F'
-    #            print(execRunFastqTotxt)
-    #            os.system(execRunFastqTotxt)
-    #        else:#TODO: get this working for reverse
-    #            continue
-    #            execRunFastqTotxt = 'python3 '+fastqTotxt+' '+configFile+' '+dataFile+' '+'R'
-    #            print(execRunFastqTotxt)
-    #            os.system(execRunFastqTotxt)
-
+    # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
+    convertFastqToTxt(fastqTotxt, configFile, dataDir, outputDir)
+    
     # get list of sequences
     listSeq = getSequenceList(outputDir)
 
