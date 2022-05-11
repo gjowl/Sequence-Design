@@ -28,6 +28,7 @@ config = globalConfig[programName]
 outputDir            = config["outputDir"]
 requirementsFile     = config["requirementsFile"]
 dataDir              = config["dataDir"]
+testDir              = config["testDir"]
 fastqTotxt           = config["fastqTotxt"]
 ngsAnalysis          = config["ngsAnalysis"]
 
@@ -60,38 +61,14 @@ if __name__ == '__main__':
     #            print(execRunFastqTotxt)
     #            os.system(execRunFastqTotxt)
 
-    # gets a list of all of the sequences
-    allSeqs = []
-    for filename in os.listdir(outputDir):
-        dataFile = os.path.join(outputDir, filename)
-        # get the sequence column (first column) and skip the summary data rows
-        seqColumn = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=3, usecols=[0])
-        # convert that column to a list
-        seqs = seqColumn.iloc[:,0].tolist()
-        # add each value in the list to the allSeqs list
-        for seq in seqs:
-            allSeqs.append(seq) 
-    # rid of the duplicate sequences in the list
-    allSeqs = pd.unique(allSeqs).tolist()
-    
-    # go through all files
-    for filename in os.listdir(outputDir):
-        # get one data file
-        dataFile = os.path.join(outputDir, filename)
-        # make sure it's a data file
-        if os.path.isfile(dataFile):
-            # convert to csv and keep the sequence, count, and percentage columns
-            dfData = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=3, index_col=0, usecols=[0,1,2])
-            # get the column name for this data from the file name (bin name, M9, LB, etc.)
-            colName = filename[6:8]
-            # loop through all of the found sequences
-            for seq in allSeqs:
-                # get data for the sequence in this file
-                try:
-                    print(dfData.loc[seq])
-                    exit()
-                except:
-                    print(seq, ": ", 0) 
+    # get list of sequences
+    listSeq = getSequenceList(outputDir)
+
+    # make csv with sequence counts for all files
+    # go through all files and save counts in dictionary
+    outFile = testDir+"allCounts.csv"
+    outputSequenceCountsCsv(listSeq, outputDir, outFile)
+
                 # if not found, add 0
 
                 # search for seq in file
@@ -106,7 +83,6 @@ if __name__ == '__main__':
             #   - get a list of sequences found in all of the files
             #   - go through each file, find the sequence data, add a column for each file found in (C1, C2, M9, LB, etc.)
             #   - make sure the outputs make sense; have that and then you should be good to do calculation stuff tomorrow
-            #
 
 
     # Compiles design energy files from all design directories

@@ -5,9 +5,10 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
-codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
+#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
 outputDir = codeDir + 'output/'
+testDir = codeDir
 
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
 
@@ -22,6 +23,7 @@ config_file["main"]={
     "requirementsFile":requirementsFile,
     "fastqTotxt":fastqTotxt,
     "ngsAnalysis":ngsAnalysis,
+    "testDir":testDir
 }
 
 # fastqToTxt config options

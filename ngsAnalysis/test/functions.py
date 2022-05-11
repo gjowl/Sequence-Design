@@ -1,6 +1,7 @@
 import re
 import os
 import sys
+import pandas as pd
 from dnachisel.biotools import translate, reverse_complement
 
 def getConfigFile(file):
@@ -198,3 +199,51 @@ def writeOutputFile(proteinSeqs, totalSeqs, sequenceOutput, cutoff, refFile, out
                     f.write("0\tP02724\tGLPA_HUMAN\t75\tG83I\t83\n")
                 else:
                     f.write("Unknown\n")
+
+# FOR CREATING A CSV FILE OF SEQUENCE COUNTS PER BIN/M9/LB
+# gets a list of all of the unique sequences present in data within a directory
+def getSequenceList(dir):
+    allSeqs = []
+    for file in os.listdir(dir):
+        dataFile = os.path.join(dir, file)
+        # get the sequence column (first column) and skip the summary data rows
+        seqColumn = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=3, usecols=[0])
+        # convert that column to a list
+        seqs = seqColumn.iloc[:,0].tolist()
+        # add each value in the list to the allSeqs list
+        for seq in seqs:
+            allSeqs.append(seq) 
+    # rid of the duplicate sequences in the list
+    allSeqs = pd.unique(allSeqs).tolist()
+    return allSeqs
+
+def outputSequenceCountsCsv(listSeq, dir, outFile):
+    dictSeq = {}
+    for filename in os.listdir(dir):
+        # get one data file
+        dataFile = os.path.join(dir, filename)
+        # make sure it's a file
+        if os.path.isfile(dataFile):
+            # get the column name for this data from the file name (bin name, M9, LB, etc.)
+            colName = filename[6:8]
+            dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
+    df = pd.DataFrame.from_dict(dictSeq)
+    df_t = df.T
+    df_t.to_csv(outFile)
+        
+def getCountsForFile(listSeq, dictSeq, colName, file):
+    # convert to csv and keep the sequence, count, and percentage columns; sequence is the index
+    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=3, index_col=0, usecols=[0,1,2])
+    # loop through all of the sequences and find count in dataframe
+    for seq in listSeq:
+        if seq not in dictSeq:
+            dictSeq[seq] = {}
+        # get data for the sequence in this file; if not found in file, set count as 0
+        try:
+            # search for the sequence as an index and get the count
+            count = dfData.loc[:seq][1][0]
+            dictSeq[seq][colName] = count
+        except:
+            # if not found, set number for bin as 0
+            dictSeq[seq][colName] = 0
+    return dictSeq
