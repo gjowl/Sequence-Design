@@ -220,21 +220,6 @@ def convertFastqToTxt(fastqTotxt, config, dataDir, outputDir):
         print("Files already converted. If you would like to reconvert files, delete " + outputDir)
 
 # FOR CREATING A CSV FILE OF SEQUENCE COUNTS PER BIN/M9/LB
-# gets a list of all of the unique sequences present in data within a directory
-def getSequenceList(dir):
-    allSeqs = []
-    for file in os.listdir(dir):
-        dataFile = os.path.join(dir, file)
-        # get the sequence column (first column) and skip the summary data rows
-        seqColumn = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=3, usecols=[0])
-        # convert that column to a list
-        seqs = seqColumn.iloc[:,0].tolist()
-        # add each value in the list to the allSeqs list
-        for seq in seqs:
-            allSeqs.append(seq) 
-    # rid of the duplicate sequences in the list
-    allSeqs = pd.unique(allSeqs).tolist()
-    return allSeqs
 
 #Checking the file exists or not
 def check_file_empty(path_of_file):

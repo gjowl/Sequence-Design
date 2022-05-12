@@ -10,7 +10,7 @@ codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
 outputDir = codeDir + 'output/'
 testDir = codeDir
 outputFile = testDir+"allCounts.csv"
-flowFile = testDir+"CHIP2-Reflow-Medians.csv"
+flowFile = testDir+"flowFile.csv"
 
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
 
@@ -53,7 +53,7 @@ compileDataDir = ''
 
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
-    "dataDir":compileDataDir,
+    "outputDir":testDir,
     "countFile":outputFile,
     "flowFile":flowFile,
 }

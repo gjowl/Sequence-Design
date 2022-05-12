@@ -39,6 +39,77 @@ from functions import *
 #       - add previous normFrac to current
 #   - calc relative fluor and output to a csv (plotting will be done in another script; maybe added on to this list of scripts)
 
+# FUNCTIONS 
+def calcSeqProportionInBin(sequence, binName, dfRep, dfFlow):
+    # get sequence count in bin
+    seqCount = dfRep.loc[sequence][binName]
+    # get total counts of all sequences in bin
+    totalAllSeqCount = dfRep[binName].sum(axis=0)
+    # get percent population in bin
+    percent = dfFlow.loc['Percent'][binName]
+    # calculate the sequence proportion for a single bin
+    binValue = percent*seqCount/totalAllSeqCount
+    return binValue
+
+def calculateNumerators(seqs, binName, dfRep, dfFlow):
+    allNums = []
+    for seq in seqs:
+        num = calcSeqProportionInBin(seq, binName, dfRep, dfFlow)
+        allNums.append(num)
+    return allNums
+
+# loops through all sequences and all bins for that sequence and calculates the reconstructed fluorescence denominator
+def calculateDenominators(seqs, bins, dfRep, dfFlow):
+    allDenoms = []
+    for seq in seqs:
+        # denominator variable to hold for each sequence
+        denom = 0
+        for currBin in bins:
+            # get sequence count in bin
+            seqCount = dfRep.loc[seq][currBin]
+            # get total counts of all sequences in bin
+            totalAllSeqCount = dfRep[currBin].sum(axis=0)
+            # get percent population in bin
+            percent = dfFlow.loc['Percent'][currBin]
+            # calculate the denominator for a single bin
+            binValue = percent*seqCount/totalAllSeqCount
+            # add to previous bin denominator total until calculated for all bins
+            denom += binValue
+        # append the calculated denominator to the allDenominator list
+        allDenoms.append(denom)
+    return allDenoms
+
+def calculateNumeratorsAndDenominators(seqs, bins, dfRep, dfFlow):
+    df = pd.DataFrame()
+    # calculate the numerators
+    for currBin in bins:
+        binNumerators = calculateNumerators(seqs, currBin, dfRep, dfFlow)
+        colName = currBin+'-Numerator'
+        numColumns = len(df.columns)
+        df.insert(numColumns, colName, binNumerators)
+    # get the denominator for the equation 
+    allDenominators = calculateDenominators(seqs, bins, dfRep, dfFlow)
+    # I think I'm going to make this a new dataframe and print it out (with numerators, denominators, etc.)
+    # add denominator to dataframe as a column under title Denominator
+    df = df.assign(Denominator = allDenominators)
+    return df
+
+def calculateNormalizedSequenceContribution(bins, df):
+    dfOut = pd.DataFrame()
+    for colName, binName in zip(df.columns, bins):
+        if colName != 'Denominator':
+            dfOut[binName] = (df[colName]/df['Denominator'])
+    return dfOut
+
+def calculateReconstructedFluorescence(bins, dfNorm, dfFlow):
+    df = pd.DataFrame()
+    for binName in bins:
+        median = dfFlow.loc['Median'][binName]
+        df[binName] = (dfNorm[binName]*median)
+    sumRows = df.sum(axis=1)
+    df['Fluorescence'] = sumRows
+    return df
+# MAIN
 # Use the utilityFunctions function to get the name of this program
 programName = getFilename(sys.argv[0])
 configFile  = sys.argv[1]
@@ -50,6 +121,7 @@ config = globalConfig[programName]
 # Config file options:
 countFile       = config["countFile"]
 flowFile        = config["flowFile"]
+outputDir       = config["outputDir"]
 
 # read csv containing counts
 df = pd.read_csv(countFile)
@@ -64,31 +136,26 @@ dfM9 = df.filter(like='M9')
 
 # filter out to only have Rep1
 numReplicates = 3
-dfFlow = pd.read_csv(flowFile)
-
+dfFlow = pd.read_csv(flowFile, index_col=0)
 i=1
 while i <= numReplicates:
     replicate = 'Rep'+str(i)
     dfRep = dfBins.filter(like=replicate)
     # get all bin names
     bins = dfRep.columns
-    # get count of a single sequence in all bins
-    totalSeqCounts = dfRep.sum(axis=1)
-    # get total counts of all sequences in all columns/bins
-    allSequenceInAllBinCount = dfRep.values.sum()
-    for currBin in bins:
-        # get total counts of all sequences in column/bin
-        countSeqsInBin = dfRep[colName].sum(axis=0)
-        print(countSeqsInBin)
-        # get count of sequence
-        for seq, count, totalSeqCount in zip(seqs,dfRep[currBin],totalSeqCounts):
-            if count > 0:
-                print(colName, count, seq, totalSeqCount)
-                #this should give me all of the values I need from here
-                # now just need to add in values from the flowFile (median and fraction pop)
-                num = count/countSeqsInBin
-                # I think I need a function to get denom: loop through all bins and getthese values
-                denom = totalSeqCounts/allSequenceInAllBinCount
+    # add in sequence column to first column, then as index
+    dfRep.insert(0, 'Sequence', seqs)
+    dfRep = dfRep.set_index('Sequence')
+    # get a dataframe with numerators and denominators
+    dfNumAndDenom = calculateNumeratorsAndDenominators(seqs, bins, dfRep, dfFlow)
+    # output a dataframe of a values for each sequence for each bin
+    dfNorm = calculateNormalizedSequenceContribution(bins, dfNumAndDenom)
+    # calculate the final reconstructed fluorescence
+    dfFluor = calculateReconstructedFluorescence(bins, dfNorm, dfFlow)
+    dfFluor.insert(0,'Sequence',seqs)
+    # write to output file for each replicate
+    filename = outputDir+replicate+'.csv'
+    dfFluor.to_csv(filename)
     i+=1
 exit()
 

@@ -15,6 +15,23 @@ import helper
 import pandas as pd
 from functions import *
 
+#FUNCTIONS
+# gets a list of all of the unique sequences present in data within a directory
+def getSequenceList(dir):
+    allSeqs = []
+    for file in os.listdir(dir):
+        dataFile = os.path.join(dir, file)
+        # get the sequence column (first column) and skip the summary data rows
+        seqColumn = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=3, usecols=[0])
+        # convert that column to a list
+        seqs = seqColumn.iloc[:,0].tolist()
+        # add each value in the list to the allSeqs list
+        for seq in seqs:
+            allSeqs.append(seq) 
+    # rid of the duplicate sequences in the list
+    allSeqs = pd.unique(allSeqs).tolist()
+    return allSeqs
+
 # Use the utilityFunction to get the configFile
 configFile = getConfigFile(__file__)
 
