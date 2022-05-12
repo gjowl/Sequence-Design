@@ -5,11 +5,12 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
+#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
+codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
 outputDir = codeDir + 'output/'
 testDir = codeDir
 outputFile = testDir+"allCounts.csv"
+flowFile = testDir+"CHIP2-Reflow-Medians.csv"
 
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
 
@@ -54,6 +55,7 @@ compileDataDir = ''
 config_file["ngsAnalysis"]={
     "dataDir":compileDataDir,
     "countFile":outputFile,
+    "flowFile":flowFile,
 }
 
 # SAVE CONFIG FILE

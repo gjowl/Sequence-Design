@@ -48,25 +48,47 @@ globalConfig = helper.read_config(configFile)
 config = globalConfig[programName]
 
 # Config file options:
-countFile        = config["countFile"]
-
-# So now I have the csv file with all of the counts
+countFile       = config["countFile"]
+flowFile        = config["flowFile"]
 
 # read csv containing counts
 df = pd.read_csv(countFile)
 
 # filter out to only have the bins
+# get the first column (sequence column)
+seqs = df.iloc[:,0]
+# filter for bins, LB, and M9
 dfBins = df.filter(like='C')
 dfLB = df.filter(like='LB')
 dfM9 = df.filter(like='M9')
 
 # filter out to only have Rep1
 numReplicates = 3
-i=0
+dfFlow = pd.read_csv(flowFile)
+
+i=1
 while i <= numReplicates:
     replicate = 'Rep'+str(i)
     dfRep = dfBins.filter(like=replicate)
-    print(dfRep)
+    # get all bin names
+    bins = dfRep.columns
+    # get count of a single sequence in all bins
+    totalSeqCounts = dfRep.sum(axis=1)
+    # get total counts of all sequences in all columns/bins
+    allSequenceInAllBinCount = dfRep.values.sum()
+    for currBin in bins:
+        # get total counts of all sequences in column/bin
+        countSeqsInBin = dfRep[colName].sum(axis=0)
+        print(countSeqsInBin)
+        # get count of sequence
+        for seq, count, totalSeqCount in zip(seqs,dfRep[currBin],totalSeqCounts):
+            if count > 0:
+                print(colName, count, seq, totalSeqCount)
+                #this should give me all of the values I need from here
+                # now just need to add in values from the flowFile (median and fraction pop)
+                num = count/countSeqsInBin
+                # I think I need a function to get denom: loop through all bins and getthese values
+                denom = totalSeqCounts/allSequenceInAllBinCount
     i+=1
 exit()
 
