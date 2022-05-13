@@ -48,8 +48,8 @@ def outputGoodSequenceDataframe(dir):
         listId.extend(dfData.iloc[:,4].tolist())
     df = pd.DataFrame(list(zip(listSeq,listId)), columns=['Sequence','Id'] )
     return df
-    #dfOut.drop_duplicates(subset=[0], keep=False, inplace=True)
 
+# get the uniprot ids and add to a file
 def addInUniprotIds(df, outputDir, file):
     outputFile = outputDir+"allCounts_withIds.csv" 
     fileExists = check_file_empty(outputFile)
@@ -108,21 +108,12 @@ if __name__ == '__main__':
     seqIdDf = outputGoodSequenceDataframe(outputDir)
     # get the sequence column (first column) and skip the summary data rows
     seqColumn = seqIdDf.iloc[:,0].tolist()
-    ## add each value in the list to the allSeqs list
-    #for seq in seqColumn:
-    #    allSeqs.append(seq) 
-    #for id in idColumn:
-    #    allIds.append(id) 
-    ## rid of the duplicate sequences in the list
-    #allSeqs = pd.unique(allSeqs).tolist()
-    #allIds = pd.unique(allIds).tolist()
 
     # make csv with sequence counts for all files
     # go through all files and save counts in dictionary
     outputSequenceCountsCsv(seqColumn, outputDir, outFile)
     seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
     seqIdDf = seqIdDf.reset_index(drop=True)
-    #dfOut.drop_duplicates(subset=[0], keep=False, inplace=True)
     addInUniprotIds(seqIdDf, testDir, outFile)
 
     # execute ngsAnalysis script 
