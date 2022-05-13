@@ -16,6 +16,7 @@ p = average fluorescence
 """
 import sys
 import helper
+import statistics as stat
 from functions import *
 # TODO: make a script that compiles the files into 1
 # compile the files into one in below file format
@@ -109,6 +110,11 @@ def calculateReconstructedFluorescence(bins, dfNorm, dfFlow):
     sumRows = df.sum(axis=1)
     df['Fluorescence'] = sumRows
     return df
+
+def insertAtEndOfDf(df, colName, col):
+    numCol = len(df.columns)
+    df.insert(numCol, colName, col)
+    return df
 # MAIN
 # Use the utilityFunctions function to get the name of this program
 programName = getFilename(sys.argv[0])
@@ -139,6 +145,8 @@ dfM9 = df.filter(like='M9')
 numReplicates = 3
 dfFlow = pd.read_csv(flowFile, index_col=0)
 i=1
+dfAvg = pd.DataFrame()
+
 while i <= numReplicates:
     replicate = 'Rep'+str(i)
     dfRep = dfBins.filter(like=replicate)
@@ -159,7 +167,41 @@ while i <= numReplicates:
     # write to output file for each replicate
     filename = outputDir+replicate+'.csv'
     dfFluor.to_csv(filename)
+    # add to dataframe that will be used to analyze fluorescence
+    fluorCol = dfFluor['Fluorescence']
+    dfAvg.insert(i-1, replicate+'-Fluor', fluorCol)
     i+=1
+
+# get average, stDev, etc. from reconstructed fluorescence
+colNames = dfAvg.columns
+avgFluors = []
+stdDevFluors = []
+for index, row in dfAvg.iterrows():
+    fluorVals = []
+    repsWithSequence = 0
+    for col in colNames:
+        fluor = row[col]
+        if fluor != 0:
+            fluorVals.append(fluor)
+    if len(fluorVals) > 1:
+        avgFluor = stat.mean(fluorVals)
+        stdDevFluor = stat.stdev(fluorVals)
+        avgFluors.append(avgFluor)
+        stdDevFluors.append(stdDevFluor)
+    elif len(fluorVals) == 1:
+        avgFluors.append(fluorVals[0])
+        stdDevFluors.append(0)
+    else:
+        avgFluors.append(0)
+        stdDevFluors.append(0)
+dfAvg.insert(0, 'Sequence', seqs)
+dfAvg.insert(1, 'Ids', ids)
+
+
+dfAvg = insertAtEndOfDf(dfAvg, 'Average', avgFluors)
+dfAvg = insertAtEndOfDf(dfAvg, 'StdDev', stdDevFluors)
+filename = outputDir+'avgFluor.csv'
+dfAvg.to_csv(filename)
 exit()
 
 

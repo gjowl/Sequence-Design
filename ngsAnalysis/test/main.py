@@ -129,3 +129,4 @@ if __name__ == '__main__':
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
     os.system(execNgsAnalysis)
 
+    
