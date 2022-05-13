@@ -50,5 +50,14 @@ while i <= numReplicates:
     # write to output file for each replicate
     filename = outputDir+replicate+'.csv'
     dfFluor.to_csv(filename)
+    # add to dataframe that will be used to analyze fluorescence
+    fluorCol = dfFluor['Fluorescence']
+    dfAvg.insert(i-1, replicate+'-Fluor', fluorCol)
     i+=1
 
+# get average, stDev, etc. from reconstructed fluorescence
+dfAvg = outputReconstructedFluorescenceDf(dfAvg)
+# output dataframe to csv file 
+filename = outputDir+'avgFluor.csv' # TODO: make into a config option
+dfAvg.insert(0, 'Sequence', seqs)
+dfAvg.to_csv(filename)

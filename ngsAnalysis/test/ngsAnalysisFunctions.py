@@ -131,4 +131,3 @@ def outputReconstructedFluorescenceDf(df):
     df = insertAtEndOfDf(df, 'Average', avgFluors)
     df = insertAtEndOfDf(df, 'StdDev', stdDevFluors)
     return df
-    
