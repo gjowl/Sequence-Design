@@ -226,6 +226,7 @@ def check_file_empty(path_of_file):
     #Checking if file exist and it is empty
     return os.path.exists(path_of_file) 
 
+#def outputSequenceCountsCsv(df, dir, outFile):
 def outputSequenceCountsCsv(listSeq, dir, outFile):
     dictSeq = {}
     # checking if file exist and it is empty
@@ -241,17 +242,14 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
                 colName = filename[6:13]
                 dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
                 #for key, value in dictSeq.items():
-                #    for k, v in value.items():
-                #        if v > 0:
-                #            print(key, k, v)
-        df = pd.DataFrame.from_dict(dictSeq)
+        dft = pd.DataFrame.from_dict(dictSeq)
         # transpose the dataframe so sequences are rows and bins and others are columns
-        df_t = df.T
+        df_t = dft.T
         df_t = df_t[sorted(df_t.columns)]
         df_t.to_csv(outFile)
     else:
         print("File exists. To rerun, delete " + outFile)
-        
+
 def getCountsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
     columns = ['Sequence', 'Count', 'Percentage']

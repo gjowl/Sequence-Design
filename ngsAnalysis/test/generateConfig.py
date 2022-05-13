@@ -9,7 +9,7 @@ programName = 'ngsAnalysis'
 codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
 outputDir = codeDir + 'output/'
 testDir = codeDir
-outputFile = testDir+"allCounts.csv"
+outputFile = testDir+"allCounts_withIds.csv"
 flowFile = testDir+"flowFile.csv"
 
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
