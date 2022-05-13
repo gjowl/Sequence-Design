@@ -51,19 +51,22 @@ def outputGoodSequenceDataframe(dir):
     #dfOut.drop_duplicates(subset=[0], keep=False, inplace=True)
 
 def addInUniprotIds(df, outputDir, file):
-    fileExists = check_file_empty(file)
+    outputFile = outputDir+"allCounts_withIds.csv" 
+    fileExists = check_file_empty(outputFile)
     if fileExists == False:
-        outputDf = pd.DataFrame()
-        dfData = pd.read_csv(file)
+        dfOut = pd.DataFrame()
+        dfData = pd.read_csv(file, delimiter=',', index_col=0)
         idList = []
         # checking if file exist and it is empty
-        for seq in dfData.iloc[:,0]:
+        for seq, row in dfData.iterrows():
             index = df.index[df['Sequence'] == seq].to_list()[0]
             id = df.loc[index, 'Id']
             idList.append(id)
-        dfData.insert(1, "Ids", idList)
+        numCol = len(dfData.columns)
+        dfOut = dfData
+        dfOut.insert(0, "Ids", idList)
         outputFile = outputDir+"allCounts_withIds.csv" 
-        dfData.to_csv(outputFile)
+        dfOut.to_csv(outputFile)
     else:
         print("File with uniprot ids exists. To remake", file)
 
@@ -118,12 +121,11 @@ if __name__ == '__main__':
     # go through all files and save counts in dictionary
     outputSequenceCountsCsv(seqColumn, outputDir, outFile)
     seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
-    seqIdDf = seqIdDf.reset_index()
+    seqIdDf = seqIdDf.reset_index(drop=True)
     #dfOut.drop_duplicates(subset=[0], keep=False, inplace=True)
     addInUniprotIds(seqIdDf, testDir, outFile)
 
     # execute ngsAnalysis script 
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
-    print(execNgsAnalysis)
     os.system(execNgsAnalysis)
 

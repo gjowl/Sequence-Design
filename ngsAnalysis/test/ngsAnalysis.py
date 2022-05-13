@@ -130,6 +130,7 @@ df = pd.read_csv(countFile)
 # get the first column (sequence column)
 seqs = df.iloc[:,0]
 # filter for bins, LB, and M9
+ids = df.iloc[:,1]
 dfBins = df.filter(like='C')
 dfLB = df.filter(like='LB')
 dfM9 = df.filter(like='M9')
@@ -145,6 +146,7 @@ while i <= numReplicates:
     bins = dfRep.columns
     # add in sequence column to first column, then as index
     dfRep.insert(0, 'Sequence', seqs)
+    dfRep.insert(1, 'Ids', ids)
     dfRep = dfRep.set_index('Sequence')
     # get a dataframe with numerators and denominators
     dfNumAndDenom = calculateNumeratorsAndDenominators(seqs, bins, dfRep, dfFlow)
@@ -153,6 +155,7 @@ while i <= numReplicates:
     # calculate the final reconstructed fluorescence
     dfFluor = calculateReconstructedFluorescence(bins, dfNorm, dfFlow)
     dfFluor.insert(0,'Sequence',seqs)
+    dfFluor.insert(1,'Ids',ids)
     # write to output file for each replicate
     filename = outputDir+replicate+'.csv'
     dfFluor.to_csv(filename)
