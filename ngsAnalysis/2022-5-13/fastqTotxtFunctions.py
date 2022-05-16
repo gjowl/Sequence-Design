@@ -126,14 +126,13 @@ def readReferenceFile(refFile):
     #setup output dictionary
     dictSequence = {}
     #traverse through lines one by one
-    seqInfo = ''
     #TODO: if you want to add more sequence information, change below
     for index, row in df.iterrows():
+        seqInfo = ''
         seqInfo += str(row[0])+"\t"
         seqName = row[1]
-        dictSequence[seqName] = seqInfo 
-    #close file
-    f.close
+        dictSequence[seqName] = seqInfo
+        print(seqName, seqInfo)
     return dictSequence
 
 # write output file for good sequences with number of each and the percent of the population

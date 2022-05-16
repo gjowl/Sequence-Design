@@ -215,10 +215,16 @@ for (my $i = 0; $i < $numLines; $i++){
 	$j = $j + $offset;	
 	if ($k != -1){
 		$tm = substr($sequence, $j, ($k-$j));
+		print "$j\n";
+		print "$k\n";
+		print "$k-$j\n";
+		print "$sequence\n";
+		print "$tm\n";
 	} else {
 		$noEnd++;
 		next;
 	}
+	exit;
 	
 
 #	print "$sequence\t$tm\t";

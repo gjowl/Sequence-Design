@@ -3,8 +3,6 @@ import helper
 from functions import *
 from fastqTotxtFunctions import *
 # Command line arguments
-#TODO: change this to config file options
-
 #maybe add another argument for M9 vs sorted (so that I can add column names to the output file? Should I make it a csv also?)
 
 # Use the utilityFunctions function to get the name of this program
@@ -25,7 +23,7 @@ g83I             = config['g83I']
 
 # Other variables
 outputName       = getFilename(ngsFile)
-outputFile       = outputDir + outputName+"-test.txt"
+outputFile       = outputDir + outputName+".txt"
 
 #Set the forward and reverse primers DNA sequences for forward NGS sequence
 fPrimer = "GGCTCCAAACTTGGGGAATCG"
@@ -44,7 +42,6 @@ proteinSeqs, poorSeq, noStart, noEnd = getGoodSequences(dnaSeqs, qCodes, fPrimer
 totalSeqs = len(dnaSeqs)
 goodSeq = totalSeqs-poorSeq-noStart-noEnd #TODO: just get the number of keys in proteinSeqs?
 goodPercent = goodSeq/totalSeqs
-#TODO: my noStart is off by like 40 for some reason? I'm getting rid of extra good sequences
 sequenceOutput = "TotalSeqs PoorSeqs NoStart NoEnd GoodSeqs Percent\n"
 sequenceOutput = sequenceOutput+str(totalSeqs)+" "+str(poorSeq)+" "+str(noStart)+" "+str(noEnd)+" "+str(goodSeq)+" "+str(goodPercent)+"\n"
 
