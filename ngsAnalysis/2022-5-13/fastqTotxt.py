@@ -2,6 +2,10 @@ import sys
 import helper
 from functions import *
 from fastqTotxtFunctions import *
+# Command line arguments
+#TODO: change this to config file options
+
+#maybe add another argument for M9 vs sorted (so that I can add column names to the output file? Should I make it a csv also?)
 
 # Use the utilityFunctions function to get the name of this program
 programName = getFilename(sys.argv[0])
