@@ -21,11 +21,9 @@ p = average fluorescence
 # TODO: add in all of the math parts as descriptions below
 # sequence proportion:
 # 
-def calcSeqProportionInBin(sequence, binName, dfRep, dfFlow):
+def calcSeqProportionInBin(sequence, totalAllSeqCount, binName, dfRep, dfFlow):
     # get sequence count in bin
     seqCount = dfRep.loc[sequence][binName]
-    # get total counts of all sequences in bin
-    totalAllSeqCount = dfRep[binName].sum(axis=0)
     # get percent population in bin
     percent = dfFlow.loc['Percent'][binName]
     # calculate the sequence proportion for a single bin
@@ -34,29 +32,40 @@ def calcSeqProportionInBin(sequence, binName, dfRep, dfFlow):
 
 # loop through all sequences and calculate the sequence proportion (numerator):
 # 
-def calculateNumerators(seqs, binName, dfRep, dfFlow):
+def calculateNumerators(seqs, inputFile, binName, dfRep, dfFlow):
     allNums = []
+    # get total counts of all sequences in bin
+    #TODO: fix this so the header is the names 
+    dfCount = pd.read_csv(inputFile, delimiter='\t', header=None, skiprows=range(0,3), nrows=1)
+    goodSeqCount = dfCount.iloc[:,3]
+    totalAllSeqCount = dfCount.iloc[:,0]
     for seq in seqs:
-        num = calcSeqProportionInBin(seq, binName, dfRep, dfFlow)
+        num = calcSeqProportionInBin(seq, goodSeqCount, binName, dfRep, dfFlow)
         allNums.append(num)
     return allNums
 
 # loops through all sequences and all bins for that sequence and calculates the reconstructed fluorescence denominator
 # 
-def calculateDenominators(seqs, bins, dfRep, dfFlow):
+def calculateDenominators(seqs, inputDir, bins, dfRep, dfFlow):
     allDenoms = []
     for seq in seqs:
         # denominator variable to hold for each sequence
         denom = 0
         for currBin in bins:
+            #TODO: make into a function
+            # get total counts of all sequences in bin
+            inputFile = inputDir + currBin+'.txt'
+            dfCount = pd.read_csv(inputFile, delimiter='\t', header=None, skiprows=range(0,3), nrows=1)
+            goodSeqCount = dfCount.iloc[:,3]
+            totalAllSeqCount = dfCount.iloc[:,0]
             # get sequence count in bin
             seqCount = dfRep.loc[seq][currBin]
             # get total counts of all sequences in bin
-            totalAllSeqCount = dfRep[currBin].sum(axis=0)
+            #totalAllSeqCount = dfRep[currBin].sum(axis=0)
             # get percent population in bin
             percent = dfFlow.loc['Percent'][currBin]
             # calculate the denominator for a single bin
-            binValue = percent*seqCount/totalAllSeqCount
+            binValue = percent*seqCount/goodSeqCount
             # add to previous bin denominator total until calculated for all bins
             denom += binValue
         # append the calculated denominator to the allDenominator list
@@ -65,16 +74,17 @@ def calculateDenominators(seqs, bins, dfRep, dfFlow):
 
 # calculate the numerator and denominators for each bin
 # 
-def calculateNumeratorsAndDenominators(seqs, bins, dfRep, dfFlow):
+def calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow):
     df = pd.DataFrame()
     # calculate the numerators
     for currBin in bins:
-        binNumerators = calculateNumerators(seqs, currBin, dfRep, dfFlow)
+        inputFile = inputDir + currBin+'.txt'
+        binNumerators = calculateNumerators(seqs, inputFile, currBin, dfRep, dfFlow)
         colName = currBin+'-Numerator'
         numColumns = len(df.columns)
         df.insert(numColumns, colName, binNumerators)
     # get the denominator for the equation 
-    allDenominators = calculateDenominators(seqs, bins, dfRep, dfFlow)
+    allDenominators = calculateDenominators(seqs, inputDir, bins, dfRep, dfFlow)
     # I think I'm going to make this a new dataframe and print it out (with numerators, denominators, etc.)
     # add denominator to dataframe as a column under title Denominator
     df = df.assign(Denominator = allDenominators)

@@ -18,6 +18,7 @@ import sys
 from pip import main
 from stringFunctions import *
 
+#TODO: make it so you can run this multiple times with multiple changes
 if __name__ == '__main__':
     stringToRemove = sys.argv[1]
     stringToReplace = sys.argv[2]

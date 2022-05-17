@@ -5,11 +5,11 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
-codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
+#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
 outputDir = codeDir + 'output/'
 testDir = codeDir
-outputFile = testDir+"allCounts.csv"
+outputFile = testDir+"allCounts_withIds.csv"
 flowFile = testDir+"flowFile.csv"
 
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
@@ -51,8 +51,10 @@ config_file["fastqTotxt"]={
 # ngsAnalysis config options
 compileDataDir = ''
 
+inputDir = codeDir + 'output/'
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
+    "inputDir":inputDir,
     "outputDir":testDir,
     "countFile":outputFile,
     "flowFile":flowFile,

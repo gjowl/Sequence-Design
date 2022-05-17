@@ -160,7 +160,11 @@ def convertFastqToTxt(fastqTotxt, config, dataDir, outputDir):
                 dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
                 # gets the direction 
                 if dataFile.find("R1") != -1:
-                    execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'F'
+                    name = getFilename(dataFile)
+                    # TODO: work on naming these rather than switching everytime
+                    execRunFastqTotxt = 'perl seqNgsAnalysis-GJLedit.pl --refFile refSeqs.csv --seqFile '+dataFile+' --direction 1 > '+'output/'+name+'.csv'
+                    # The below is using my version of the code
+                    #execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'F'
                     print(execRunFastqTotxt)
                     os.system(execRunFastqTotxt)
                 else:#TODO: get this working for reverse
@@ -190,16 +194,8 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
             # make sure it's a file
             if os.path.isfile(dataFile):
                 # get the column name for this data from the file name (bin name, M9, LB, etc.)
-                if "C" in dataFile:
-                    colName = filename[0:7] # name and rep for bins
-                    dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
-                else:
-                    colName = filename[0:11] # name, hour, and rep for LB/M9 
-                    dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
-                    #for key, value in dictSeq.items():
-                    #    for k, v in value.items():
-                    #        if v > 0:
-                    #            print(key, k, v)
+                colName = getFilename(filename)
+                dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
         df = pd.DataFrame.from_dict(dictSeq)
         # transpose the dataframe so sequences are rows and bins and others are columns
         df_t = df.T

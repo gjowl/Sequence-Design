@@ -97,7 +97,7 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
             # make sure it's a file
             if os.path.isfile(dataFile):
                 # get the column name for this data from the file name (bin name, M9, LB, etc.)
-                colName = filename[6:13]
+                colName = getFilename(filename)
                 dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
                 #for key, value in dictSeq.items():
                 #    for k, v in value.items():

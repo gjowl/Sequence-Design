@@ -32,6 +32,59 @@ def getSequenceList(dir):
     allSeqs = pd.unique(allSeqs).tolist()
     return allSeqs
 
+# gets all sequences that aren't classified as unknown
+def outputGoodSequenceDataframe(dir):
+    listSeq = []
+    listId = []
+    for file in os.listdir(dir):
+        dataFile = os.path.join(dir, file)
+        # the below helps read csv files with differing numbers of columns: 
+        # https://stackoverflow.com/questions/27020216/import-csv-with-different-number-of-columns-per-row-using-pandas
+        # Delimiter
+        delim = '\t'
+        # The max column count a line in the file could have
+        largest_column_count = 0
+        # Loop the data lines
+        with open(dataFile, 'r') as temp_f:
+            # Read the lines
+            lines = temp_f.readlines()
+            for l in lines:
+                # Count the column count for the current line
+                column_count = len(l.split(delim)) + 1
+                # Set the new most column count
+                largest_column_count = column_count if largest_column_count < column_count else largest_column_count
+        colName = getFilename(file)
+        # Generate column names (will be 0, 1, 2, ..., largest_column_count - 1)
+        column_names = [i for i in range(0, largest_column_count)]
+        dfData = pd.read_csv(dataFile, delimiter=delim, header=None, skiprows=4, names=column_names)
+        dfData = dfData[dfData.iloc[:,3] != 'Unknown']
+        numColumns = len(dfData.columns)
+        dfData.insert(numColumns, "Replicate", colName)
+        listSeq.extend(dfData.iloc[:,0].tolist())
+        listId.extend(dfData.iloc[:,4].tolist())
+    df = pd.DataFrame(list(zip(listSeq,listId)), columns=['Sequence','Id'] )
+    return df
+
+# get the uniprot ids and add to a file
+def addInUniprotIds(df, outputDir, file):
+    outputFile = outputDir+"allCounts_withIds.csv" 
+    fileExists = check_file_empty(outputFile)
+    if fileExists == False:
+        dfOut = pd.DataFrame()
+        dfData = pd.read_csv(file, delimiter=',', index_col=0)
+        idList = []
+        # checking if file exist and it is empty
+        for seq, row in dfData.iterrows():
+            index = df.index[df['Sequence'] == seq].to_list()[0]
+            id = df.loc[index, 'Id']
+            idList.append(id)
+        numCol = len(dfData.columns)
+        dfOut = dfData
+        dfOut.insert(0, "Ids", idList)
+        outputFile = outputDir+"allCounts_withIds.csv" 
+        dfOut.to_csv(outputFile)
+    else:
+        print("File with uniprot ids exists. To remake", file)
 # Use the utilityFunction to get the configFile
 configFile = getConfigFile(__file__)
 
@@ -66,15 +119,18 @@ if __name__ == '__main__':
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
     convertFastqToTxt(fastqTotxt, configFile, dataDir, outputDir)
     
-    # get list of sequences
-    listSeq = getSequenceList(outputDir)
+    seqIdDf = outputGoodSequenceDataframe(outputDir)
+    # get the sequence column (first column) and skip the summary data rows
+    seqColumn = seqIdDf.iloc[:,0].tolist()
 
     # make csv with sequence counts for all files
     # go through all files and save counts in dictionary
-    outputSequenceCountsCsv(listSeq, outputDir, outFile)
+    outputSequenceCountsCsv(seqColumn, outputDir, outFile)
+    seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
+    seqIdDf = seqIdDf.reset_index(drop=True)
+    addInUniprotIds(seqIdDf, testDir, outFile)
     
     # execute ngsAnalysis script 
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
-    print(execNgsAnalysis)
     os.system(execNgsAnalysis)
 

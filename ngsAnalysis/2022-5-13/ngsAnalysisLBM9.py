@@ -46,8 +46,10 @@ while i <= numReplicates:
     # calculate the ratio of sequences between LB and M9 media at different hour marks
     for seq in seqs: 
         for LBCol, M9Col in zip(LBColNames, M9ColNames):
-            count = LBCol['Sequence'].at(seq)
-            print(count)
+            countLB = dfRepLB[seq][LBCol]
+            countM9 = dfRepM9[seq][M9Col]
+            print(countLB, countM9)
+    exit()
 
     # write to output file for each replicate
     filename = outputDir+'LB-M9-'+replicate+'.csv'
