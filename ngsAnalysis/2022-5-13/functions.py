@@ -191,10 +191,10 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
             if os.path.isfile(dataFile):
                 # get the column name for this data from the file name (bin name, M9, LB, etc.)
                 if "C" in dataFile:
-                    colName = filename[0:5] # doesn't get me replicates for, may change the name 
+                    colName = filename[0:5] # name and rep for bins
                     dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
                 else:
-                    colName = filename[0:9] # doesn't get me replicates for, may change the name 
+                    colName = filename[0:9] # name, hour, and rep for LB/M9 
                     dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
                     #for key, value in dictSeq.items():
                     #    for k, v in value.items():

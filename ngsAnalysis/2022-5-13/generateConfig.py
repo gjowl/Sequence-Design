@@ -5,14 +5,15 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
 outputDir = codeDir + 'output/'
 testDir = codeDir
 outputFile = testDir+"allCounts.csv"
 flowFile = testDir+"flowFile.csv"
 
-dataDir = '/data/NGS/'
+dataDir = '/mnt/d/2022-5-13/'
+#dataDir = '/data/NGS/'
 
 fastqTotxt = codeDir + "fastqTotxt.py"
 ngsAnalysis = codeDir + "ngsAnalysis.py"
