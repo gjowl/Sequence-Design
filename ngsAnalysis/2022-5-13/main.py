@@ -32,6 +32,44 @@ def getSequenceList(dir):
     allSeqs = pd.unique(allSeqs).tolist()
     return allSeqs
 
+# gets only sequences without unknown
+def outputGoodSequenceDataframe(dir):
+    listSeq = []
+    listId = []
+    for file in os.listdir(dir):
+        dataFile = os.path.join(dir, file)
+        # the below helps read csv files with differing numbers of columns: 
+        # https://stackoverflow.com/questions/27020216/import-csv-with-different-number-of-columns-per-row-using-pandas
+        # Delimiter
+        delim = '\t'
+        # The max column count a line in the file could have
+        largest_column_count = 0
+        # Loop the data lines
+        with open(dataFile, 'r') as temp_f:
+            # Read the lines
+            lines = temp_f.readlines()
+            for l in lines:
+                # Count the column count for the current line
+                column_count = len(l.split(delim)) + 1
+                # Set the new most column count
+                largest_column_count = column_count if largest_column_count < column_count else largest_column_count
+        colName = ''
+        # get the proper column names if a bin file or LB and M9
+        if "C" in dataFile:
+            colName = file[0:7] # name and rep for bins
+        else:
+            colName = file[0:11] # name, hour, and rep for LB/M9 
+        # Generate column names (will be 0, 1, 2, ..., largest_column_count - 1)
+        column_names = [i for i in range(0, largest_column_count)]
+        dfData = pd.read_csv(dataFile, delimiter=delim, header=None, skiprows=3, names=column_names)
+        dfData = dfData[dfData.iloc[:,3] != 'Unknown']
+        numColumns = len(dfData.columns)
+        dfData.insert(numColumns, "Replicate", colName)
+        listSeq.extend(dfData.iloc[:,0].tolist())
+        listId.extend(dfData.iloc[:,4].tolist())
+    df = pd.DataFrame(list(zip(listSeq,listId)), columns=['Sequence','Id'] )
+    return df
+
 # Use the utilityFunction to get the configFile
 configFile = getConfigFile(__file__)
 
@@ -65,13 +103,20 @@ if __name__ == '__main__':
 
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
     convertFastqToTxt(fastqTotxt, configFile, dataDir, outputDir)
-    
     # get list of sequences
-    listSeq = getSequenceList(outputDir)
+    seqIdDf = outputGoodSequenceDataframe(outputDir)
+    # get the sequence column (first column) and skip the summary data rows
+    seqColumn = seqIdDf.iloc[:,0].tolist()
 
     # make csv with sequence counts for all files
     # go through all files and save counts in dictionary
-    outputSequenceCountsCsv(listSeq, outputDir, outFile)
+    outputSequenceCountsCsv(seqColumn, outputDir, outFile)
+    ## get list of sequences
+    #listSeq = getSequenceList(outputDir)
+
+    ## make csv with sequence counts for all files
+    ## go through all files and save counts in dictionary
+    #outputSequenceCountsCsv(listSeq, outputDir, outFile)
     
     # execute ngsAnalysis script 
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
