@@ -28,8 +28,36 @@ dfBins = df.filter(like='C')
 dfLB = df.filter(like='LB')
 dfM9 = df.filter(like='M9')
 
-# filter out to only have Rep1
 numReplicates = 3
+# for LB and M9
+i=1
+while i <= numReplicates:
+    replicate = 'Rep'+str(i)
+    dfRepLB = dfLB.filter(like=replicate)
+    dfRepM9 = dfM9.filter(like=replicate)
+    # get all column names
+    LBColNames = dfRepLB.columns
+    M9ColNames = dfRepM9.columns
+    # add in sequence column to first column, then as index
+    dfRepLB.insert(0, 'Sequence', seqs)
+    dfRepM9.insert(0, 'Sequence', seqs)
+    dfRepLB = dfRepLB.set_index('Sequence')
+    dfRepM9 = dfRepM9.set_index('Sequence')
+    # calculate the ratio of sequences between LB and M9 media at different hour marks
+    for seq in seqs: 
+        for LBCol, M9Col in zip(LBColNames, M9ColNames):
+            countLB = dfRepLB[seq][LBCol]
+            countM9 = dfRepM9[seq][M9Col]
+            print(countLB, countM9)
+    exit()
+
+    # write to output file for each replicate
+    filename = outputDir+'LB-M9-'+replicate+'.csv'
+    i+=1
+
+
+# filter out to only have Rep1
+
 dfFlow = pd.read_csv(flowFile, index_col=0)
 i=1
 dfAvg = pd.DataFrame()
@@ -62,3 +90,4 @@ dfAvg = outputReconstructedFluorescenceDf(dfAvg)
 filename = outputDir+'avgFluor.csv' # TODO: make into a config option
 dfAvg.insert(0, 'Sequence', seqs)
 dfAvg.to_csv(filename)
+
