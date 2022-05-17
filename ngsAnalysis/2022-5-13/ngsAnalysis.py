@@ -32,6 +32,7 @@ dfM9 = df.filter(like='M9')
 numReplicates = 3
 dfFlow = pd.read_csv(flowFile, index_col=0)
 i=1
+dfAvg = pd.DataFrame()
 while i <= numReplicates:
     replicate = 'Rep'+str(i)
     dfRep = dfBins.filter(like=replicate)
