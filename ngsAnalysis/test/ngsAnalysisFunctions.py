@@ -37,7 +37,7 @@ def calculateNumerators(seqs, inputFile, binName, dfRep, dfFlow):
     # get total counts of all sequences in bin
     #TODO: fix this so the header is the names 
     dfCount = pd.read_csv(inputFile, delimiter='\t', header=None, skiprows=range(0,3), nrows=1)
-    goodSeqCount = dfCount.iloc[:,3]
+    goodSeqCount = dfCount.iloc[:,4]
     totalAllSeqCount = dfCount.iloc[:,0]
     for seq in seqs:
         num = calcSeqProportionInBin(seq, goodSeqCount, binName, dfRep, dfFlow)
@@ -56,7 +56,7 @@ def calculateDenominators(seqs, inputDir, bins, dfRep, dfFlow):
             # get total counts of all sequences in bin
             inputFile = inputDir + currBin+'.txt'
             dfCount = pd.read_csv(inputFile, delimiter='\t', header=None, skiprows=range(0,3), nrows=1)
-            goodSeqCount = dfCount.iloc[:,3]
+            goodSeqCount = dfCount.iloc[:,4]
             totalAllSeqCount = dfCount.iloc[:,0]
             # get sequence count in bin
             seqCount = dfRep.loc[seq][currBin]

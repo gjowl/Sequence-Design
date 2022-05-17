@@ -46,8 +46,6 @@ while i <= numReplicates:
     dfRep = dfRep.set_index('Sequence')
     # get a dataframe with numerators and denominators
     dfNumAndDenom = calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow)
-    print(dfNumAndDenom)
-    exit()
     #filename = outputDir+'num_denom_'+replicate+'.csv'
     #dfNumAndDenom.to_csv(filename)
     # output a dataframe of a values for each sequence for each bin
