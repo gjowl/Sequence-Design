@@ -89,7 +89,6 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
     dictSeq = {}
     # checking if file exist and it is empty
     fileExists = check_file_empty(outFile)
-    print(fileExists)
     if fileExists == False:
         for filename in os.listdir(dir):
             # get one data file
@@ -130,4 +129,48 @@ def getCountsForFile(listSeq, dictSeq, colName, file):
             # if not found, set number for bin as 0
             dictSeq[seq][colName] = 0
     return dictSeq
+
+# get percents for each of the files
+def getPercentsForFile(listSeq, dictSeq, colName, file):
+    # convert to csv and keep the sequence, count, and percentage columns
+    columns = ['Sequence', 'Count', 'Percentage']
+    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=3, usecols=[0,1,2])
+    dfData.columns = columns
+    # loop through all of the sequences and find count in dataframe
+    for seq in listSeq:
+        if seq not in dictSeq:
+            dictSeq[seq] = {}
+        # get data for the sequence in this file; if not found in file, set count as 0
+        try:
+            # search for the sequence as an index and get the count
+            index = dfData.index[dfData['Sequence'] == seq].to_list()
+            percent = dfData.loc[index[0], 'Percentage']
+            dictSeq[seq][colName] = percent
+        except:
+            # if not found, set number for bin as 0
+            dictSeq[seq][colName] = 0
+    return dictSeq
+
+# output percents as a csv
+def outputSequencePercentsCsv(listSeq, dir, outFile):
+    dictSeq = {}
+    # checking if file exist and it is empty
+    fileExists = check_file_empty(outFile)
+    if fileExists == False:
+        for filename in sorted(os.listdir(dir)):
+            # get one data file
+            dataFile = os.path.join(dir, filename)
+            # make sure it's a file
+            if os.path.isfile(dataFile):
+                # get the column name for this data from the file name (bin name, M9, LB, etc.)
+                colName = getFilename(filename)
+                dictSeq = getPercentsForFile(listSeq, dictSeq, colName, dataFile)
+        df = pd.DataFrame.from_dict(dictSeq)
+        # transpose the dataframe so sequences are rows and bins and others are columns
+        df_t = df.T
+        df_t = df_t[sorted(df_t.columns)]
+        df_t.to_csv(outFile)
+    else:
+        print("File exists. To rerun, delete " + outFile)
+        
 

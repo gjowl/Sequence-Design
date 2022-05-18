@@ -1,0 +1,11 @@
+This program is a test for analyzing next generation sequencing data post sort-seq. It will calculate and output
+reconstructed fluorescence values for a given set of fastq files. There are stop gaps throughout the code if you
+are interested in making changes, where it will not repeat (i.e. reconverting fastq to txt files).
+
+1. Convert NGS fastq files to txt using a previously developed perl script
+    - output into a directory using
+2. Add all of that data to a csv file for easier manipulation
+    - output as allCounts.csv. Can add other parts to this file, similar to how I wrote functions in main to add
+    ids
+3. Analyze data using the ngsAnalysis.py script, which will calculate and output the reconstructed fluorescence
+    - calculates according to the reconstructed fluorescence equation (TODO add an image or file here)

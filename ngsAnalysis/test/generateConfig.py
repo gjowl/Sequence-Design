@@ -5,18 +5,25 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
+
+# directories
 #codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
-codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
-outputDir = codeDir + 'output/'
-testDir = codeDir
-outputFile = testDir+"allCounts_withIds.csv"
-flowFile = testDir+"flowFile.csv"
-
 dataDir = '/data02/jchoi/NGS Submissions/200812/Raw Data/'
+codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
+outputDir = codeDir + 'data/'
+inputDir = codeDir + 'inputFiles/'
+analysisDir = codeDir + 'analyzedData/'
 
+# requirements file
+requirementsFile = inputDir + "requirements.txt"
+
+# output files
+countFile = inputDir+"allCounts.csv"
+percentFile = inputDir+"allPercents.csv"
+
+# program files
 fastqTotxt = codeDir + "fastqTotxt.py"
 ngsAnalysis = codeDir + "ngsAnalysis.py"
-requirementsFile = codeDir + "requirements.txt"
 
 # main code section
 config_file["main"]={
@@ -25,8 +32,8 @@ config_file["main"]={
     "requirementsFile":requirementsFile,
     "fastqTotxt":fastqTotxt,
     "ngsAnalysis":ngsAnalysis,
-    "testDir":testDir,
-    "outputFile":outputFile,
+    "percentFile":percentFile,
+    "countFile":countFile,
 }
 
 # fastqToTxt config options
@@ -35,8 +42,6 @@ gpa = 'LIIFGVMAGVIG'
 g83I = 'LIIFGVMAIVIG'
 fPrimer = "GGCTCCAAACTTGGGGAATCG"
 rPrimer = "CCTGATCAACCCAAGCCAATCC"
-
-
 # fastqToTxt config
 config_file["fastqTotxt"]={
     "gpa":gpa,
@@ -45,19 +50,16 @@ config_file["fastqTotxt"]={
     "rPrimer":rPrimer,
     "refFile":refFile,
     "outputDir":outputDir,
-    "outputFile":outputFile,
 }
 
 # ngsAnalysis config options
-compileDataDir = ''
-
-inputDir = codeDir + 'output/'
-analysisDir = codeDir + 'analyzedData/'
+flowFile = inputDir+"flowFile.csv"
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
-    "inputDir":inputDir,
+    "inputDir":outputDir,
     "outputDir":analysisDir,
-    "countFile":outputFile,
+    "countFile":countFile,
+    "percentFile":percentFile,
     "flowFile":flowFile,
 }
 

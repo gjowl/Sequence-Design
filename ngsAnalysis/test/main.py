@@ -66,12 +66,10 @@ def outputGoodSequenceDataframe(dir):
     return df
 
 # get the uniprot ids and add to a file
-def addInUniprotIds(df, outputDir, file):
-    outputFile = outputDir+"allCounts_withIds.csv" 
-    fileExists = check_file_empty(outputFile)
-    if fileExists == False:
-        dfOut = pd.DataFrame()
-        dfData = pd.read_csv(file, delimiter=',', index_col=0)
+def addInUniprotIds(df, file):
+    dfOut = pd.DataFrame()
+    dfData = pd.read_csv(file, delimiter=',', index_col=0)
+    if not 'Ids' in dfData.columns: 
         idList = []
         # checking if file exist and it is empty
         for seq, row in dfData.iterrows():
@@ -81,8 +79,7 @@ def addInUniprotIds(df, outputDir, file):
         numCol = len(dfData.columns)
         dfOut = dfData
         dfOut.insert(0, "Ids", idList)
-        outputFile = outputDir+"allCounts_withIds.csv" 
-        dfOut.to_csv(outputFile)
+        dfOut.to_csv(file)
     else:
         print("File with uniprot ids exists. To remake", file)
 # Use the utilityFunction to get the configFile
@@ -99,10 +96,10 @@ config = globalConfig[programName]
 outputDir            = config["outputDir"]
 requirementsFile     = config["requirementsFile"]
 dataDir              = config["dataDir"]
-testDir              = config["testDir"]
 fastqTotxt           = config["fastqTotxt"]
 ngsAnalysis          = config["ngsAnalysis"]
-outFile              = config["outputFile"]
+countFile            = config["countFile"]
+percentFile          = config["percentFile"]
 
 if __name__ == '__main__':
     # make the output directory that these will all output to
@@ -125,10 +122,12 @@ if __name__ == '__main__':
 
     # make csv with sequence counts for all files
     # go through all files and save counts in dictionary
-    outputSequenceCountsCsv(seqColumn, outputDir, outFile)
+    outputSequenceCountsCsv(seqColumn, outputDir, countFile)
+    outputSequencePercentsCsv(seqColumn, outputDir, percentFile)
     seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
     seqIdDf = seqIdDf.reset_index(drop=True)
-    addInUniprotIds(seqIdDf, testDir, outFile)
+    addInUniprotIds(seqIdDf, countFile)
+    addInUniprotIds(seqIdDf, percentFile)
     
     # execute ngsAnalysis script 
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
