@@ -35,7 +35,8 @@ dfM9 = df.filter(like='M9')
 numReplicates = 3
 dfFlow = pd.read_csv(flowFile, index_col=0)
 i=1
-dfAvg = pd.DataFrame()
+dfAvgGood = pd.DataFrame()
+dfAvgTotal = pd.DataFrame()
 while i <= numReplicates:
     replicate = 'Rep'+str(i)
     dfRep = dfBins.filter(like=replicate)
@@ -46,27 +47,37 @@ while i <= numReplicates:
     dfRep = dfRep.set_index('Sequence')
     # get a dataframe with numerators and denominators
     dfNumAndDenom = calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow)
-    #filename = outputDir+'num_denom_'+replicate+'.csv'
-    #dfNumAndDenom.to_csv(filename)
+    filename = outputDir+'num_denom_'+replicate+'.csv'
+    dfNumAndDenom.to_csv(filename)
     # output a dataframe of a values for each sequence for each bin
-    dfNorm = calculateNormalizedSequenceContribution(bins, dfNumAndDenom)
+    dfNormGood, dfNormTotal = calculateNormalizedSequenceContribution(bins, dfNumAndDenom)
     filename = outputDir+'norm'+replicate+'.csv'
-    dfNorm.to_csv(filename)
+    dfNormGood.to_csv(filename)
     # calculate the final reconstructed fluorescence
-    dfFluor = calculateReconstructedFluorescence(bins, dfNorm, dfFlow)
-    dfFluor.insert(0,'Sequence',seqs)
+    dfFluorGood, dfFluorTotal = calculateReconstructedFluorescence(bins, dfNormGood, dfNormTotal, dfFlow)
+    dfFluorGood.insert(0,'Sequence',seqs)
     # write to output file for each replicate
-    filename = outputDir+replicate+'.csv'
-    dfFluor.to_csv(filename)
+    filename = outputDir+replicate+'Good.csv'
+    dfFluorGood.to_csv(filename)
+    filename = outputDir+replicate+'Total.csv'
+    dfFluorTotal.to_csv(filename)
     # add to dataframe that will be used to analyze fluorescence
-    fluorCol = dfFluor['Fluorescence']
-    dfAvg.insert(i-1, replicate+'-Fluor', fluorCol)
+    fluorGoodCol = dfFluorGood['Fluorescence']
+    dfAvgGood.insert(i-1, replicate+'-Fluor', fluorGoodCol)
+    fluorTotalCol = dfFluorTotal['Fluorescence']
+    dfAvgTotal.insert(i-1, replicate+'-Fluor', fluorTotalCol)
     i+=1
 
 # get average, stDev, etc. from reconstructed fluorescence
-dfAvg = outputReconstructedFluorescenceDf(dfAvg)
+dfAvgGood = outputReconstructedFluorescenceDf(dfAvgGood)
+dfAvgTotal = outputReconstructedFluorescenceDf(dfAvgTotal)
+
 # output dataframe to csv file 
-filename = outputDir+'avgFluor.csv' # TODO: make into a config option
-dfAvg.insert(0, 'Sequence', seqs)
-dfAvg.insert(1, 'Ids', ids)
-dfAvg.to_csv(filename)
+filename = outputDir+'avgFluorGoodCounts.csv' # TODO: make into a config option
+dfAvgGood.insert(0, 'Sequence', seqs)
+dfAvgGood.insert(1, 'Ids', ids)
+dfAvgGood.to_csv(filename)
+filename = outputDir+'avgFluorTotalCounts.csv' # TODO: make into a config option
+dfAvgTotal.insert(0, 'Sequence', seqs)
+dfAvgTotal.insert(1, 'Ids', ids)
+dfAvgTotal.to_csv(filename)

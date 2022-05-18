@@ -5,8 +5,8 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
+#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/test/'
+codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/test/'
 outputDir = codeDir + 'output/'
 testDir = codeDir
 outputFile = testDir+"allCounts_withIds.csv"
