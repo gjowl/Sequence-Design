@@ -51,9 +51,11 @@ config_file["fastqTotxt"]={
 # ngsAnalysis config options
 compileDataDir = ''
 
+analysisDir = codeDir + 'analyzedData/'
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
-    "outputDir":testDir,
+    "inputDir":testDir,
+    "outputDir":analysisDir,
     "countFile":outputFile,
     "flowFile":flowFile,
 }

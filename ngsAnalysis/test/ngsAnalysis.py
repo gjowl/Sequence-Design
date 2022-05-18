@@ -18,6 +18,9 @@ flowFile        = config["flowFile"]
 outputDir       = config["outputDir"]
 inputDir        = config["inputDir"]
 
+# make the output directory that these will all output to
+makeOutputDir(outputDir)
+
 # read csv containing counts
 df = pd.read_csv(countFile)
 
@@ -46,11 +49,9 @@ while i <= numReplicates:
     dfRep.insert(0, 'Sequence', seqs)
     dfRep = dfRep.set_index('Sequence')
     # get a dataframe with numerators and denominators
-    dfNumAndDenom = calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow)
-    filename = outputDir+'num_denom_'+replicate+'.csv'
-    dfNumAndDenom.to_csv(filename)
+    dfGoodNumDenom, dfTotalNumDenom = calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow)
     # output a dataframe of a values for each sequence for each bin
-    dfNormGood, dfNormTotal = calculateNormalizedSequenceContribution(bins, dfNumAndDenom)
+    dfNormGood, dfNormTotal = calculateNormalizedSequenceContribution(bins, dfGoodNumDenom, dfTotalNumDenom)
     filename = outputDir+'norm'+replicate+'.csv'
     dfNormGood.to_csv(filename)
     # calculate the final reconstructed fluorescence
