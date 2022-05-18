@@ -111,13 +111,13 @@ def calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow):
 
 # calculate the normalized sequence contribution
 def calculateNormalizedSequenceContribution(bins, dfGood, dfTotal):
-    dfGood = pd.DataFrame()
-    dfTotal = pd.DataFrame()
+    dfNormGood = pd.DataFrame()
+    dfNormTotal = pd.DataFrame()
     for colName, binName in zip(dfGood.columns, bins):
         if 'Denominator' not in colName:
-            dfGood[binName] = (dfGood[colName]/dfGood['Denominator'])
-            dfTotal[binName] = (dfTotal[colName]/dfTotal['Denominator'])
-    return dfGood, dfTotal
+            dfNormGood[binName] = (dfGood[colName]/dfGood['Denominator'])
+            dfNormTotal[binName] = (dfTotal[colName]/dfTotal['Denominator'])
+    return dfNormGood, dfNormTotal
 
 # calculate the reconstructed fluorescence value:
 # p = average fluorescence
