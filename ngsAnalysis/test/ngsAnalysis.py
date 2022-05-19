@@ -32,8 +32,7 @@ seqs = df.iloc[:,0]
 ids = df.iloc[:,1]
 # filter for bins, LB, and M9
 dfBins = df.filter(like='C')
-dfLB = df.filter(like='LB')
-dfM9 = df.filter(like='M9')
+
 
 # filter out to only have Rep1
 numReplicates = 3
@@ -72,17 +71,32 @@ if fileExists == False:
 else:
     print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)
 
-#filename = outputDir+'LBPercents.csv' # TODO: make into a config option
-#fileExists = check_file_empty(filename)
-#if fileExists == False:
-#    df_good, df_total = getPercentChange(numReplicates, dfLB, seqs, inputDir, outputDir, usePercents=False)
-#    # output dataframe to csv file and add sequence and id lists
-#    df_good.insert(0, 'Sequence', seqs)
-#    df_good.insert(1, 'Ids', ids)
-#    df_good.to_csv(filename)
-#    filename = outputDir+'avgFluorTotalPercents.csv' # TODO: make into a config option
-#    df_total.insert(0, 'Sequence', seqs)
-#    df_total.insert(1, 'Ids', ids)
-#    df_total.to_csv(filename)
-#else:
-#    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)
+#TODO: since I'm using the total above, maybe I should also calculate total percents? 
+# filter main dataframe for LB
+hours = ['0','12','18','30']
+dfLB = dfPercent.filter(like='LB')
+filename = outputDir+'LBPercents.csv' # TODO: make into a config option
+fileExists = check_file_empty(filename)
+if fileExists == False:
+    df_LB = getPercentChange(numReplicates, hours, dfLB, seqs, inputDir, outputDir)
+    # output dataframe to csv file and add sequence and id lists
+    df_good.insert(0, 'Sequence', seqs)
+    df_good.insert(1, 'Ids', ids)
+    df_good.to_csv(filename)
+else:
+    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)
+
+hours = ['0']
+dfM9 = dfPercent.filter(like='M9')
+filename = outputDir+'M9Percents.csv' # TODO: make into a config option
+fileExists = check_file_empty(filename)
+if fileExists == False:
+    df_M9 = getPercentChange(numReplicates, hours, dfM9, seqs, inputDir, outputDir)
+    df_M9LBRatio = df_LB.div(df_M9.iloc[0])
+    print(df_M9LBRatio)
+    # output dataframe to csv file and add sequence and id lists
+    df_M9.insert(0, 'Sequence', seqs)
+    df_M9.insert(1, 'Ids', ids)
+    df_M9.to_csv(filename)
+else:
+    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)

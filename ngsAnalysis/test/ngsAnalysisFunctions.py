@@ -1,5 +1,6 @@
 import sys
 import helper
+import numpy as np
 import statistics as stat
 from functions import *
 
@@ -212,14 +213,13 @@ def getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, inputDir, output
         replicate = 'Rep'+str(i)
         # filter out anything that isn't the same replicate
         dfRep = dfBins.filter(like=replicate)
-        # get all bin names for this replicate
-        bins = dfRep.columns
+        # get all hour marks names for this replicate
+        colNames = dfRep.columns
         # add in sequence column to first column, then convert to index
         dfRep.insert(0, 'Sequence', seqs)
         dfRep = dfRep.set_index('Sequence')
-        
         # get a dataframe with numerators and denominators
-        dfGoodNumDenom, dfTotalNumDenom = calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow, usePercents)
+        dfGoodNumDenom, dfTotalNumDenom = calculateNumeratorsAndDenominators(seqs, inputDir, colNames, dfRep, dfFlow, usePercents)
         # output a dataframe of a values for each sequence for each bin
         dfNormGood, dfNormTotal = calculateNormalizedSequenceContribution(bins, dfGoodNumDenom, dfTotalNumDenom)
         filename = normalizationFile+replicate+'.csv'
@@ -242,3 +242,33 @@ def getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, inputDir, output
     dfAvgGood = outputReconstructedFluorescenceDf(dfAvgGood)
     dfAvgTotal = outputReconstructedFluorescenceDf(dfAvgTotal)
     return dfAvgGood, dfAvgTotal
+
+# get percent change for LB and M9 sequences
+def getPercentChange(numReplicates, listHours, dfBins, seqs, inputDir, outputDir):
+    # initialize dataframe for the calculations using the good and total seq counts
+    dfAvg = pd.DataFrame()
+    # loop until going through all replicates
+    i = 1
+    while i <= numReplicates:
+        for hour in listHours:
+            replicate = 'Rep'+str(i)
+            # filter out anything that isn't the same replicate
+            dfRep = dfBins.filter(like=replicate)
+            dfHour = dfRep.filter(like=hour)
+            # get all bin names for this replicate
+            dfHour.replace(0, np.nan, inplace=True)
+            # get a dataframe with numerators and denominators
+            mean = dfRep.mean(axis=1)
+            dfRep.assign(Average=mean)
+            colLength = len(dfAvg.columns)
+            dfAvg.insert(colLength, replicate, mean)
+            # add in sequence column to first column, then convert to index
+            dfHour.insert(0, 'Sequence', seqs)
+            dfHour = dfHour.set_index('Sequence')
+            filename = outputDir+hour+'_'+replicate+'.csv'
+            dfHour.to_csv(filename)
+    return dfAvg
+            #for seq in seqs:
+            #    for colName in colNames:
+            #        percent = dfRep.loc[seq][colName]
+            #        # TODO: add comparison here

@@ -14,80 +14,81 @@ config = globalConfig[programName]
 
 # Config file options:
 countFile       = config["countFile"]
+percentFile     = config["percentFile"]
 flowFile        = config["flowFile"]
 outputDir       = config["outputDir"]
+inputDir        = config["inputDir"]
+
+# make the output directory that these will all output to
+makeOutputDir(outputDir)
 
 # read csv containing counts
 df = pd.read_csv(countFile)
+dfPercent = pd.read_csv(percentFile)
 
 # filter out to only have the bins
 # get the first column (sequence column)
 seqs = df.iloc[:,0]
 # filter for bins, LB, and M9
 dfBins = df.filter(like='C')
-dfLB = df.filter(like='LB')
-dfM9 = df.filter(like='M9')
-
-numReplicates = 3
-# for LB and M9
-i=1
-while i <= numReplicates:
-    replicate = 'Rep'+str(i)
-    dfRepLB = dfLB.filter(like=replicate)
-    dfRepM9 = dfM9.filter(like=replicate)
-    # get all column names
-    LBColNames = dfRepLB.columns
-    M9ColNames = dfRepM9.columns
-    # add in sequence column to first column, then as index
-    dfRepLB.insert(0, 'Sequence', seqs)
-    dfRepM9.insert(0, 'Sequence', seqs)
-    dfRepLB = dfRepLB.set_index('Sequence')
-    dfRepM9 = dfRepM9.set_index('Sequence')
-    # calculate the ratio of sequences between LB and M9 media at different hour marks
-    for seq in seqs: 
-        for LBCol, M9Col in zip(LBColNames, M9ColNames):
-            countLB = dfRepLB[seq][LBCol]
-            countM9 = dfRepM9[seq][M9Col]
-            print(countLB, countM9)
-    exit()
-
-    # write to output file for each replicate
-    filename = outputDir+'LB-M9-'+replicate+'.csv'
-    i+=1
-
 
 # filter out to only have Rep1
-
+numReplicates = 3
 dfFlow = pd.read_csv(flowFile, index_col=0)
 i=1
-dfAvg = pd.DataFrame()
-while i <= numReplicates:
-    replicate = 'Rep'+str(i)
-    dfRep = dfBins.filter(like=replicate)
-    # get all bin names
-    bins = dfRep.columns
-    # add in sequence column to first column, then as index
-    dfRep.insert(0, 'Sequence', seqs)
-    dfRep = dfRep.set_index('Sequence')
-    # get a dataframe with numerators and denominators
-    dfNumAndDenom = calculateNumeratorsAndDenominators(seqs, bins, dfRep, dfFlow)
-    # output a dataframe of a values for each sequence for each bin
-    dfNorm = calculateNormalizedSequenceContribution(bins, dfNumAndDenom)
-    # calculate the final reconstructed fluorescence
-    dfFluor = calculateReconstructedFluorescence(bins, dfNorm, dfFlow)
-    dfFluor.insert(0,'Sequence',seqs)
-    # write to output file for each replicate
-    filename = outputDir+replicate+'.csv'
-    dfFluor.to_csv(filename)
-    # add to dataframe that will be used to analyze fluorescence
-    fluorCol = dfFluor['Fluorescence']
-    dfAvg.insert(i-1, replicate+'-Fluor', fluorCol)
-    i+=1
 
-# get average, stDev, etc. from reconstructed fluorescence
-dfAvg = outputReconstructedFluorescenceDf(dfAvg)
-# output dataframe to csv file 
-filename = outputDir+'avgFluor.csv' # TODO: make into a config option
-dfAvg.insert(0, 'Sequence', seqs)
-dfAvg.to_csv(filename)
+# if counts file exists, don't recreate
+filename = outputDir+'avgFluorGoodCounts.csv' # TODO: make into a config option
+fileExists = check_file_empty(filename)
+if fileExists == False:
+    df_good, df_total = getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, inputDir, outputDir, dfFlow, usePercents=False)
+    # output dataframe to csv file and add sequence id lists
+    df_good.insert(0, 'Sequence', seqs)
+    df_good.to_csv(filename)
+    filename = outputDir+'avgFluorTotalCounts.csv' # TODO: make into a config option
+    df_total.insert(0, 'Sequence', seqs)
+    df_total.to_csv(filename)
+else:
+    print('Counts reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', countFile)
 
+dfBins = dfPercent.filter(like='C')
+filename = outputDir+'avgFluorGoodPercents.csv' # TODO: make into a config option
+fileExists = check_file_empty(filename)
+if fileExists == False:
+    df_good, df_total = getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, inputDir, outputDir, dfFlow, usePercents=True)
+    # output dataframe to csv file and add sequence lists
+    df_good.insert(0, 'Sequence', seqs)
+    df_good.to_csv(filename)
+    filename = outputDir+'avgFluorTotalPercents.csv' # TODO: make into a config option
+    df_total.insert(0, 'Sequence', seqs)
+    df_total.to_csv(filename)
+else:
+    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)
+
+#TODO: since I'm using the total above, maybe I should also calculate total percents? 
+# filter main dataframe for LB
+hours = ['0','12','18','30']
+dfLB = dfPercent.filter(like='LB')
+filename = outputDir+'LBPercents.csv' # TODO: make into a config option
+fileExists = check_file_empty(filename)
+if fileExists == False:
+    df_LB = getPercentChange(numReplicates, hours, dfLB, seqs, inputDir, outputDir)
+    # output dataframe to csv file and add sequence lists
+    df_good.insert(0, 'Sequence', seqs)
+    df_good.to_csv(filename)
+else:
+    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)
+
+hours = ['0']
+dfM9 = dfPercent.filter(like='M9')
+filename = outputDir+'M9Percents.csv' # TODO: make into a config option
+fileExists = check_file_empty(filename)
+if fileExists == False:
+    df_M9 = getPercentChange(numReplicates, hours, dfM9, seqs, inputDir, outputDir)
+    df_M9LBRatio = df_LB.div(df_M9.iloc[0])
+    print(df_M9LBRatio)
+    # output dataframe to csv file and add sequence lists
+    df_M9.insert(0, 'Sequence', seqs)
+    df_M9.to_csv(filename)
+else:
+    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)

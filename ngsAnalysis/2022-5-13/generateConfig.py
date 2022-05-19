@@ -6,18 +6,23 @@ config_file = configparser.ConfigParser()
 # main code config options
 programName = 'ngsAnalysis'
 #codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+dataDir = '/mnt/d/2022-5-13/'
 codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
 outputDir = codeDir + 'data/'
-testDir = codeDir
-outputFile = testDir+"allCounts.csv"
-flowFile = testDir+"flowFile.csv"
+inputDir = codeDir + 'inputFiles/'
+analysisDir = codeDir + 'analyzedData/'
 
-dataDir = '/mnt/d/2022-5-13/'
-#dataDir = '/data/NGS/'
+# input files
+requirementsFile = inputDir + "requirements.txt"
+refFile = inputDir + "refSeqs.csv"
 
+# output files
+countFile = inputDir+"allCounts.csv"
+percentFile = inputDir+"allPercents.csv"
+
+# program files
 fastqTotxt = codeDir + "fastqTotxt.py"
 ngsAnalysis = codeDir + "ngsAnalysis.py"
-requirementsFile = codeDir + "requirements.txt"
 
 # main code section
 config_file["main"]={
@@ -26,17 +31,16 @@ config_file["main"]={
     "requirementsFile":requirementsFile,
     "fastqTotxt":fastqTotxt,
     "ngsAnalysis":ngsAnalysis,
-    "testDir":testDir,
-    "outputFile":outputFile,
+    "percentFile":percentFile,
+    "countFile":countFile,
+    "refFile":refFile,
 }
 
 # fastqToTxt config options
-refFile   = codeDir + "refSeqs.csv"
 gpa = 'LIIFGVMAGVIG'
 g83I = 'LIIFGVMAIVIG'
 fPrimer = "GGCTCCAAACTTGGGGAATCG"
 rPrimer = "CCTGATCAACCCAAGCCAATCC"
-
 # fastqToTxt config
 config_file["fastqTotxt"]={
     "gpa":gpa,
@@ -45,18 +49,16 @@ config_file["fastqTotxt"]={
     "rPrimer":rPrimer,
     "refFile":refFile,
     "outputDir":outputDir,
-    "outputFile":outputFile,
 }
 
 # ngsAnalysis config options
-compileDataDir = ''
-
-analysisDir = codeDir + 'analyzedData/'
+flowFile = inputDir+"flowFile.csv"
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
-    "inputDir":testDir,
+    "inputDir":outputDir,
     "outputDir":analysisDir,
-    "countFile":outputFile,
+    "countFile":countFile,
+    "percentFile":percentFile,
     "flowFile":flowFile,
 }
 

@@ -66,8 +66,7 @@ def outputGoodSequenceDataframe(dir):
         numColumns = len(dfData.columns)
         dfData.insert(numColumns, "Replicate", colName)
         listSeq.extend(dfData.iloc[:,0].tolist())
-        listId.extend(dfData.iloc[:,4].tolist())
-    df = pd.DataFrame(list(zip(listSeq,listId)), columns=['Sequence','Id'] )
+    df = pd.DataFrame(listSeq, columns=['Sequence'])
     return df
 
 # Use the utilityFunction to get the configFile
@@ -84,10 +83,11 @@ config = globalConfig[programName]
 outputDir            = config["outputDir"]
 requirementsFile     = config["requirementsFile"]
 dataDir              = config["dataDir"]
-testDir              = config["testDir"]
 fastqTotxt           = config["fastqTotxt"]
 ngsAnalysis          = config["ngsAnalysis"]
-outFile              = config["outputFile"]
+countFile            = config["countFile"]
+percentFile          = config["percentFile"]
+refFile              = config["refFile"]
 
 if __name__ == '__main__':
     # make the output directory that these will all output to
@@ -102,7 +102,7 @@ if __name__ == '__main__':
     os.system(execInstallRequirements)
 
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
-    convertFastqToTxt(fastqTotxt, configFile, dataDir, outputDir)
+    convertFastqToTxt(fastqTotxt, configFile, refFile, dataDir, outputDir)
     # get list of sequences
     seqIdDf = outputGoodSequenceDataframe(outputDir)
     # get the sequence column (first column) and skip the summary data rows
@@ -110,9 +110,8 @@ if __name__ == '__main__':
 
     # make csv with sequence counts for all files
     # go through all files and save counts in dictionary
-    outputSequenceCountsCsv(seqColumn, outputDir, outFile)
-    ## get list of sequences
-    #listSeq = getSequenceList(outputDir)
+    outputSequenceCountsCsv(seqColumn, outputDir, countFile)
+    outputSequencePercentsCsv(seqColumn, outputDir, percentFile)
 
     ## make csv with sequence counts for all files
     ## go through all files and save counts in dictionary

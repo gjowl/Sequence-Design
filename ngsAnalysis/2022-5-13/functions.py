@@ -151,7 +151,7 @@ def getGoodSequences(dnaSeqs, qCodes, fPrimer, rPrimer, direction):
     return proteinSeqs, poorSeq, noStart, noEnd
 
 # converts ngs fastq files to more workable txt files
-def convertFastqToTxt(fastqTotxt, config, dataDir, outputDir):
+def convertFastqToTxt(fastqTotxt, config, refFile, dataDir, outputDir):
     if len(os.listdir(outputDir)) == 0:
         for filename in sorted(os.listdir(dataDir)):
             dataFile = os.path.join(dataDir, filename)
@@ -161,12 +161,12 @@ def convertFastqToTxt(fastqTotxt, config, dataDir, outputDir):
                 # gets the direction 
                 if dataFile.find("R1") != -1:
                     name = getFilename(dataFile)
-                    if 'C1' in name:
+                    if 'C' in name:
                         name = name[0:7]
                     else:
                         name = name[0:11]
                     # TODO: work on naming these rather than switching everytime
-                    execRunFastqTotxt = 'perl seqNgsAnalysis-GJLedit.pl --refFile refSeqs.csv --seqFile '+dataFile+' --direction 1 > '+'output/'+name+'.txt'
+                    execRunFastqTotxt = 'perl seqNgsAnalysis-GJLedit.pl --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+outputDir+name+'.txt'
                     # The below is using my version of the code
                     #execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'F'
                     print(execRunFastqTotxt)
