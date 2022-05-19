@@ -23,6 +23,7 @@ makeOutputDir(outputDir)
 
 # read csv containing counts
 df = pd.read_csv(countFile)
+dfPercent = pd.read_csv(percentFile)
 
 # filter out to only have the bins
 # get the first column (sequence column)
@@ -55,6 +56,7 @@ if fileExists == False:
 else:
     print('Counts reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', countFile)
 
+dfBins = dfPercent.filter(like='C')
 filename = outputDir+'avgFluorGoodPercents.csv' # TODO: make into a config option
 fileExists = check_file_empty(filename)
 if fileExists == False:
@@ -70,17 +72,17 @@ if fileExists == False:
 else:
     print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)
 
-filename = outputDir+'LBPercents.csv' # TODO: make into a config option
-fileExists = check_file_empty(filename)
-if fileExists == False:
-    df_good, df_total = getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, inputDir, outputDir, dfFlow, usePercents=True)
-    # output dataframe to csv file and add sequence and id lists
-    df_good.insert(0, 'Sequence', seqs)
-    df_good.insert(1, 'Ids', ids)
-    df_good.to_csv(filename)
-    filename = outputDir+'avgFluorTotalPercents.csv' # TODO: make into a config option
-    df_total.insert(0, 'Sequence', seqs)
-    df_total.insert(1, 'Ids', ids)
-    df_total.to_csv(filename)
-else:
-    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)
+#filename = outputDir+'LBPercents.csv' # TODO: make into a config option
+#fileExists = check_file_empty(filename)
+#if fileExists == False:
+#    df_good, df_total = getPercentChange(numReplicates, dfLB, seqs, inputDir, outputDir, usePercents=False)
+#    # output dataframe to csv file and add sequence and id lists
+#    df_good.insert(0, 'Sequence', seqs)
+#    df_good.insert(1, 'Ids', ids)
+#    df_good.to_csv(filename)
+#    filename = outputDir+'avgFluorTotalPercents.csv' # TODO: make into a config option
+#    df_total.insert(0, 'Sequence', seqs)
+#    df_total.insert(1, 'Ids', ids)
+#    df_total.to_csv(filename)
+#else:
+#    print('Percent reconstruction files exist. If want to rerun fluorescence reconstruction, delete: ', filename)

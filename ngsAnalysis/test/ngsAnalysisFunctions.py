@@ -217,6 +217,7 @@ def getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, inputDir, output
         # add in sequence column to first column, then convert to index
         dfRep.insert(0, 'Sequence', seqs)
         dfRep = dfRep.set_index('Sequence')
+        
         # get a dataframe with numerators and denominators
         dfGoodNumDenom, dfTotalNumDenom = calculateNumeratorsAndDenominators(seqs, inputDir, bins, dfRep, dfFlow, usePercents)
         # output a dataframe of a values for each sequence for each bin
