@@ -273,7 +273,7 @@ for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
 	}
 }
 
-
+#TODO: this gives errors on line 292, 327, 330, and 332. Use of initialized value; fix those in the future?
 #Translate
 sub Conversion {
 	my $testSeq = $_[0];

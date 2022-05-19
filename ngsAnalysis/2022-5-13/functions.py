@@ -189,7 +189,7 @@ def check_file_empty(path_of_file):
 def getCountsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
     columns = ['Sequence', 'Count', 'Percentage']
-    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=3, usecols=[0,1,2])
+    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=4, usecols=[0,1,2])
     dfData.columns = columns
     # loop through all of the sequences and find count in dataframe
     for seq in listSeq:
@@ -231,7 +231,7 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
 def getPercentsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
     columns = ['Sequence', 'Count', 'Percentage']
-    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=3, usecols=[0,1,2])
+    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=4, usecols=[0,1,2])
     dfData.columns = columns
     # loop through all of the sequences and find count in dataframe
     for seq in listSeq:
@@ -241,7 +241,7 @@ def getPercentsForFile(listSeq, dictSeq, colName, file):
         try:
             # search for the sequence as an index and get the count
             index = dfData.index[dfData['Sequence'] == seq].to_list()
-            percent = dfData.loc[index[0], 'Percent']
+            percent = dfData.loc[index[0], 'Percentage']
             dictSeq[seq][colName] = percent
         except:
             # if not found, set number for bin as 0
@@ -261,7 +261,7 @@ def outputSequencePercentsCsv(listSeq, dir, outFile):
             if os.path.isfile(dataFile):
                 # get the column name for this data from the file name (bin name, M9, LB, etc.)
                 colName = getFilename(filename)
-                dictSeq = getCountsForFile(listSeq, dictSeq, colName, dataFile)
+                dictSeq = getPercentsForFile(listSeq, dictSeq, colName, dataFile)
         df = pd.DataFrame.from_dict(dictSeq)
         # transpose the dataframe so sequences are rows and bins and others are columns
         df_t = df.T

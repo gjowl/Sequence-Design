@@ -244,31 +244,36 @@ def getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, inputDir, output
     return dfAvgGood, dfAvgTotal
 
 # get percent change for LB and M9 sequences
-def getPercentChange(numReplicates, listHours, dfBins, seqs, inputDir, outputDir):
-    # initialize dataframe for the calculations using the good and total seq counts
+def getMeanPercent(numReplicates, listHours, df, inputDir, outputDir):
+    # loop through all hours collected during maltose test
+    # initialize dataframe to hold the averages for each replicate
     dfAvg = pd.DataFrame()
-    # loop until going through all replicates
-    i = 1
-    while i <= numReplicates:
-        for hour in listHours:
-            replicate = 'Rep'+str(i)
-            # filter out anything that isn't the same replicate
-            dfRep = dfBins.filter(like=replicate)
-            dfHour = dfRep.filter(like=hour)
-            # get all bin names for this replicate
-            dfHour.replace(0, np.nan, inplace=True)
-            # get a dataframe with numerators and denominators
-            mean = dfRep.mean(axis=1)
-            dfRep.assign(Average=mean)
-            colLength = len(dfAvg.columns)
-            dfAvg.insert(colLength, replicate, mean)
-            # add in sequence column to first column, then convert to index
-            dfHour.insert(0, 'Sequence', seqs)
-            dfHour = dfHour.set_index('Sequence')
-            filename = outputDir+hour+'_'+replicate+'.csv'
-            dfHour.to_csv(filename)
+    for hour in listHours:
+        # loop through all replicates for this 
+        dfHour = df.filter(like="-"+hour)
+        # set all 0 values to NaN
+        dfHour = dfHour.replace(0, np.nan)
+        # get a dataframe with numerators and denominators
+        mean = dfHour.mean(axis=1)
+        colLength = len(dfAvg.columns)
+        dfAvg.insert(colLength, hour, mean)
+    dfAvg = dfAvg.replace(np.nan, 0)
+    # add in sequence column to first column, then convert to index
     return dfAvg
             #for seq in seqs:
             #    for colName in colNames:
             #        percent = dfRep.loc[seq][colName]
             #        # TODO: add comparison here
+
+def calculatePercentDifference(dfLB, dfM9):
+    # initialize dataframe to hold the percent differences averages
+    dfDiff = pd.DataFrame()
+    # iterate through columns in LB dataframe
+    for col in dfLB.columns:
+        LB = dfLB[col]
+        M9 = dfM9.iloc[:,0]
+        subtract = M9.subtract(LB)
+        percentDiff = subtract.divide(LB)*100
+        numColumns = len(dfDiff.columns)
+        dfDiff.insert(numColumns, col, percentDiff)
+    return dfDiff
