@@ -32,6 +32,7 @@ def getCHIPFile(df, dfFwdP, dfRevP, gpaSeq, g83ISeq, cut1, cut2, randomDNALength
             DNASeq = reverse_translate(sequence[0:17])
             while DNASeq.find(fwd) is True or DNASeq.find(rvs) is True:
                 DNASeq = reverse_translate(sequence[0:17])
+                #TODO: why did I add this TT and AC? Should it have been ACA?
             seqForChip = fwd + cut1 + DNASeq + 'TT' + cut2 + rvs + randomDNAEnd
             dictOutput['DNA Sequence'].append(seqForChip)
             dictOutput['Segment Number'].append(segmentNum)

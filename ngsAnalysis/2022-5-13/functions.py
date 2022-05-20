@@ -166,11 +166,14 @@ def convertFastqToTxt(fastqTotxt, config, refFile, dataDir, outputDir):
                     else:
                         name = name[0:11]
                     # TODO: work on naming these rather than switching everytime
-                    execRunFastqTotxt = 'perl seqNgsAnalysis-GJLedit.pl --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+outputDir+name+'.txt'
+                    #execRunFastqTotxt = 'perl seqNgsAnalysis-GJLedit.pl --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+outputDir+name+'.txt'
+                    #execRunFastqTotxt = 'perl AllSeqNgsAnalysis_CHIP.pl --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+outputDir+name+'.txt'
+                    execRunFastqTotxt = 'perl AllSeqNgsAnalysis_CHIP.pl --refFile /mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/CheatRefSeqs.csv --seqFile '+dataFile+' --direction 1 > '+outputDir+name+'.txt'
                     # The below is using my version of the code
                     #execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'F'
                     print(execRunFastqTotxt)
                     os.system(execRunFastqTotxt)
+                    eis()
                 else:#TODO: get this working for reverse
                     continue
                     execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'R'

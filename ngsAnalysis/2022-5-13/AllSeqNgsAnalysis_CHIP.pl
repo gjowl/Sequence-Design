@@ -123,9 +123,8 @@ close(FILE);
 my %reference;
 foreach my $refSeq(@ref){
 	chomp $refSeq;
-	# the below splits lines and adds to a way of identifying information 
-	my @line = split ',', $refSeq;
-	my $ID = $line[0];
+	my @line = split /\t/, $refSeq;
+	my $ID = $line[0] . "\t" . $line[1] . "\t" . $line[2] . "\t" . $line[3] . "\t" . $line[4] . "\t" . $line[5];
 	$reference{$line[1]} = $ID;
 }
 
@@ -214,13 +213,28 @@ for (my $i = 0; $i < $numLines; $i++){
 	$j = $j + $offset;	
 	if ($k != -1){
 		$tm = substr($sequence, $j, ($k-$j));
+		#print "$j\n";
+		#print "$k\n";
+		#print "$k-$j\n";
+		#print "$sequence\n";
+		#print "$tm\n";
 	} else {
 		$noEnd++;
 		next;
 	}
+	
+
+#	print "$sequence\t$tm\t";
+#	print "$tm\t";
 
 	#Convert DNA to protein
 	my $protein = &Conversion($tm);
+	#print "$i\n";
+	#print "$j\n";
+	#print "$k\n";
+	#print "$sequence\n";
+	#print "$tm\n";
+	#print "$protein\n";
 
 	if (substr($protein, 0, 2) ne "AS"){
 		$noStart++;
@@ -229,6 +243,7 @@ for (my $i = 0; $i < $numLines; $i++){
 		$noEnd++;
 		next;
 	} else {
+		#print "$tm\t";
 		$protein = substr($protein, 2);
 		$protein = substr($protein, 0, -1);
 	}
@@ -242,7 +257,7 @@ for (my $i = 0; $i < $numLines; $i++){
 #Print out fails
 my $goodSeqs = $numSeqs - $poorSeq - $noStart - $noEnd;
 my $goodPercent = $goodSeqs / $numSeqs;
-print "TotalSeqs\tPoorSeqs\tNoStart\tNoEnd\tGoodSeqs\tPercent\n";
+print "TotalSeqs PoorSeqs NoStart NoEnd GoodSeqs Percent\n";
 print "$numSeqs\t$poorSeq\t$noStart\t$noEnd\t$goodSeqs\t$goodPercent\n";
 #Sort amino acid sequences
 for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
@@ -253,9 +268,9 @@ for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
 		#Find reference label
 		if (exists $reference{$aa}){
 			print "$reference{$aa}\n";
-		} elsif ($aa eq "LIIFGMAGVIGT"){
+		} elsif ($aa eq "LIIFGVMAGVIGT"){
 			print "0\tP02724\tGLPA_HUMAN\t75\tWT\tN/A\n";
-		} elsif ($aa eq "LIIFGMAIVIGT"){
+		} elsif ($aa eq "LIIFGVMAIVIGT"){
 			print "0\tP02724\tGLPA_HUMAN\t75\tG83I\t83\n";
 		} else {
 			print "Unknown\n";
@@ -263,8 +278,7 @@ for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
 	}
 }
 
-#TODO: this gives errors on line 292, 327, 330, and 332. Use of initialized value; fix those in the future?
-#For some reason my gpa is a letter shorter than Josh's from CHIP4? And my other sequences may be short too, but seem to be working? Was that by design? Check the chip code
+
 #Translate
 sub Conversion {
 	my $testSeq = $_[0];
@@ -302,6 +316,7 @@ sub Translate{
 	my $startPos = $_[1];
 	my $orf = 0;
 	my $i = $startPos;
+	print "DNA: $dnaSeq\n";
 	#move down the string by 3s (codons)
 	for ($i = $startPos; $i < $sequenceLength ; $i = $i+3) {
 		my $begin = "M";
@@ -314,6 +329,7 @@ sub Translate{
 			last;
 		}
 		my $acid = $geneticCode{$codon};
+		print "$acid";
 		#while the acid isn't stop, run the translations
 		if ($acid eq $begin && $orf == 0){
 			$orf = 1;
@@ -329,6 +345,7 @@ sub Translate{
 			$aminoAcids = $aminoAcids . $stop;
 		} 
 	}
+	print "\n\n";
 	return $aminoAcids;
 };
 

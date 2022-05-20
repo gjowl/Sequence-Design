@@ -5,10 +5,10 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-dataDir = '/data/NGS/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-#dataDir = '/mnt/d/2022-5-13/'
+#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+#dataDir = '/data/NGS/'
+codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+dataDir = '/mnt/d/2022-5-13/'
 outputDir = codeDir + 'data/'
 inputDir = codeDir + 'inputFiles/'
 analysisDir = codeDir + 'analyzedData/'
@@ -54,6 +54,10 @@ config_file["fastqTotxt"]={
 
 # ngsAnalysis config options
 flowFile = inputDir+"flowFile.csv"
+energyFile = inputDir+"chipEnergyFile.csv"
+countDir = analysisDir+"reconstruction_by_count/"
+percentDir = analysisDir+"reconstruction_by_percent/"
+maltoseTestDir = analysisDir+"maltoseTest/"
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
     "inputDir":outputDir,
@@ -61,6 +65,10 @@ config_file["ngsAnalysis"]={
     "countFile":countFile,
     "percentFile":percentFile,
     "flowFile":flowFile,
+    "energyFile":energyFile,
+    "countDir":countDir,
+    "percentDir":percentDir,
+    "maltoseTestDir":maltoseTestDir,
 }
 
 # SAVE CONFIG FILE
