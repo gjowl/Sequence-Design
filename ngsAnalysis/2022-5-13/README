@@ -1,0 +1,20 @@
+
+To run, copy into the command line from your directory of choice:
+python3 main.py
+
+Filenames must be in the below format:
+For your bin files (C1=Bin1; Rep1=Replicate1). You can change these if you'd like,
+but you'll have to switch up the code. As of 5/22/2022, it's currently hardcoded to
+take and make files and columns for the outputs using the filename in this format. 
+The LB and M9 files MUST be named with the hour number and H in order for the code
+to recognize the hours and analyze it. For the analysis, these can be changed in the
+config file (technically not yet, but they will be! Otherwise, just hardcoded in the
+ngsAnalysis.py file)
+-   C1-Rep1-...fastq
+-   LB-0H-Rep1-...fastq
+
+Below is the list of necessary files that must go into your directory:
+
+Below is the list of files that must go into the input directory:
+
+Below is the list of files and directories that this code will create and output for a run:

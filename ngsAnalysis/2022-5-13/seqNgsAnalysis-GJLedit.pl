@@ -253,9 +253,9 @@ for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
 		#Find reference label
 		if (exists $reference{$aa}){
 			print "$reference{$aa}\n";
-		} elsif ($aa eq "LIIFGMAGVIGT"){
+		} elsif ($aa eq "LIIFGVMAGVIGT"){
 			print "0\tP02724\tGLPA_HUMAN\t75\tWT\tN/A\n";
-		} elsif ($aa eq "LIIFGMAIVIGT"){
+		} elsif ($aa eq "LIIFGVMAIVIGT"){
 			print "0\tP02724\tGLPA_HUMAN\t75\tG83I\t83\n";
 		} else {
 			print "Unknown\n";
