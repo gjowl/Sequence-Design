@@ -3,41 +3,6 @@ import helper
 from functions import *
 from ngsAnalysisFunctions import *
 
-
-# main function for fluorescence reconstruction
-def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, numReplicates, usePercentOptionList):
-    # loop through the lists of reconstruction dfs, dirs, and percent options (these should all be the same length)
-    for df, outputDir, usePercent in zip(dfToReconstruct, reconstructionDirList, usePercentOptionList):
-        # if the dir is empty, continue
-        if len(os.listdir(outputDir)) < 20:
-            dfBins = df.filter(like='C')
-            # reconstruct the fluorescence for both good and total sequence numbers
-            df_good, df_total = getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, segments, inputDir, outputDir, dfFlow, usePercent)
-            outputAnalysisDfToCsv(df_good, seqs, segments, outputDir, 'avgFluorGoodSeqs.csv') 
-            outputAnalysisDfToCsv(df_total, seqs, segments, outputDir, 'avgFlourTotalSeqs.csv') 
-        else:
-            print(outputDir, "files already made. If want to remake, make sure the directory is empty")
-
-# main function for getting the percent difference between LB and M9 for maltose test
-def getPercentDifference(list_df, list_of_hours, numReplicates, seqs, segments, inputDir, outputDir):
-    df_percentDiff = pd.DataFrame()
-    if len(os.listdir(outputDir)) == 0:
-        # list to hold the output df: the first output is for LB and the second is for M9
-        # after the loop, it uses both to calculate the percent difference 
-        outputDfs = []
-        for df, hourList in zip(list_df, list_of_hours):
-            outputDf = getMeanPercent(numReplicates, hourList, df, inputDir, outputDir)
-            outputDfs.append(outputDf)
-        df_percentDiff = calculatePercentDifference(outputDfs[0], outputDfs[1])
-        outputDfs.append(df_percentDiff)
-        nameList = ['LBPercents.csv', 'M9Percents.csv', 'percentDifference.csv']
-        for df, name in zip(outputDfs, nameList):
-            outputAnalysisDfToCsv(df, seqs, segments, outputDir, name)
-    else:
-        print('Percent difference file exists, loading it into dataframe...')
-        df_percentDiff = pd.read_csv(outputDir+'percentDifference.csv')
-        print('dataframe loaded; If want to remake fluorescence difference file, delete all files in: ', outputDir)
-    return df_percentDiff
 # MAIN
 # Use the utilityFunctions function to get the name of this program
 programName = getFilename(sys.argv[0])
@@ -58,6 +23,11 @@ maltoseTestDir  = config["maltoseTestDir"]
 countDir      = config["countDir"]
 percentDir     = config["percentDir"]
 
+# control sequences
+gpa = 'LIIFGVMAGVIGT'
+g83i = 'LIIFGVMAIVIGT'
+
+
 # make the output directories that these will all output to
 dirList = [outputDir, maltoseTestDir, countDir, percentDir]
 for dir in dirList:
@@ -65,12 +35,14 @@ for dir in dirList:
 
 # read csv containing counts
 df = pd.read_csv(countFile)
+
 # read csv containing percents
 dfPercent = pd.read_csv(percentFile)
+
 # get the first column (sequence column)
 seqs = df.iloc[:,0]
 segments = df.iloc[:,1]
-# filter for bins, LB, and M9
+
 # filter out to only have the bins
 dfBins = df.filter(like='C')
 
@@ -83,7 +55,11 @@ reconstructionDirList = [countDir, percentDir]
 dfToReconstruct = [df, dfPercent]
 usePercentOptionList = [False, True]
 # reconstruct the fluorescence profile for the dataframe using both counts and percents (they give slightly different values)
-reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, numReplicates, usePercentOptionList)
+# This outputs the dataframes into a list by method of calculating fluorescence: goodSeqs, totalSeqs, goodPercent, totalPercent
+df_reconstructedFluorList = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, numReplicates, usePercentOptionList)
+
+for df in df_reconstructedFluorList:
+    df = df[['Sequence','Average', 'StdDev']]
 
 # hardcoded hour lists for LB and M9
 LBhours = ['0H','12H','18H','30H']
@@ -111,13 +87,71 @@ df_belowCutoff.to_csv(belowCutoffFile)
 df_energyFile = pd.read_csv(energyFile)
 print(df_energyFile)
 
-cutoffSeqs = df_cutoff['Sequence']
-print(cutoffSeqs)
-df_cutoffEnergies = df_energyFile[df_energyFile['Sequence'] == cutoffSeqs]
-print(df_cutoffEnergies)
-exit()
+# I just realized: I may be losing sequences; some of the reading in the beginning that labels things unknown may be labeling it unknown if it just doesn't end in an L...
+# Can I just remove that? Why is that there? actually nevermind, I think I'm okay, false alarm. It hsould only remove for DNA seqs, not for TM. and I fixed it so that it would 
+# recognize my sequences buy removing an L? 
+# Add LILI (end doesn't get read by NGS, but is present in the datafile of sequences that we're getting energies from
+cutoffSeqs = df_cutoff['Sequence']+'LILI'
+df_cutoffEnergyData = df_energyFile[df_energyFile['Sequence'].isin(cutoffSeqs)]
+
+df_cutoffEnergyData = df_cutoffEnergyData.sort_values(by='Sequence')
+df_cutoffEnergyData.reset_index(drop=True, inplace=True)
+finalSeqs = df_cutoffEnergyData['Sequence']
+
+df_finalOutputs = []
+colsToAdd = ['Average', 'StdDev']
+
+df = df_reconstructedFluorList[1] # this uses total seq count
+# do this for one sequence, make into a function, then for loop through it for the rest and figure out names later
+df_out = df_cutoffEnergyData.copy()
+# add in the LILI add the end of all sequences that doesn't get read by NGS but is found in the energy file of sequences
+df['Sequence'] = df['Sequence']+'LILI'
+df = df[df['Sequence'].isin(finalSeqs)]
+df = df.sort_values(by='Sequence')
+df.reset_index(drop=True, inplace=True)
+for colName in df.columns:
+    if colName in colsToAdd:
+        df_out[colName] = pd.Series(df[colName])
+# get g83i sequence
+g83iFluor = df[df['Sequence' == g83i]]
+print(g83iFluor)
+
+# cutoff by g83i fluorescence
+df_g83iCutoff = df_out[df_out['Average'] > g83iFluor]
+print(df_g83iCutoff)
+df_g83iCutoff.to_csv(outputDir+'seqsHigherThanG83i.csv')
+print('DONE!')
+
+#for df in df_reconstructedFluorList:
+#    df_out = df_cutoffEnergyData.copy()
+#    # add in the LILI add the end of all sequences that doesn't get read by NGS but is found in the energy file of sequences
+#    df['Sequence'] = df['Sequence']+'LILI'
+#    df = df[df['Sequence'].isin(finalSeqs)]
+#    df = df.sort_values(by='Sequence')
+#    df.reset_index(drop=True, inplace=True)
+#    for colName in df.columns:
+#        if colName in colsToAdd:
+#            df_out[colName] = pd.Series(df[colName])
+#    df_finalOutputs.append(df_out)
+
+#output_names = ['1.csv', '2.csv', '3.csv', '4.csv']
+#for df, name in zip(df_finalOutputs, output_names):
+#    print(df)
+#    df.to_csv(outputDir+name)
+
+# take all of the above, find G83I value, and rid of those as a G83I cutoff
+# output 
+
+
+#for seq in finalSeqs:
+#    fluorAvgFinal = []
+#    fluorStdDevFinal = []
+#    for df in df_reconstructedFluorList:
+#        fluorAvgFinal.append(df[df['Sequence' == seq]]['Average'])
+#        fluorStdDevFinal.append(df[df['Sequence' == seq]]['StdDev'])
+#    df_out = df_cutoffEnergyData.assign(fluorAvgFinal)
+# next go through the sequences and add in columns of data for each sequence, and percent diff
+
+#df_final = df_cutoffEnerggyData.assign(Fluorescence = col_fluor)
 # need to read in the fluorescence file that I want to use
 #df_cutoffEnergies.assign(Fluorescence = )
-
-
-# for Samson: send him all of the things with the segment name; maybe send him the sequence list
