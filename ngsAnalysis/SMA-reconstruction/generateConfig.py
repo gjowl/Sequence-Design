@@ -1,5 +1,5 @@
 """
-Example code for generating a configuration file for ngsAnalysis
+Will generate a configuration file for ngsAnalysis
 """
 import configparser
 

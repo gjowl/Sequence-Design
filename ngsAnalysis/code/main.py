@@ -48,8 +48,10 @@ if __name__ == '__main__':
 
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
     convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir)
+    
     # get list of sequences and add to dataframe
     seqIdDf = outputGoodSequenceDataframe(outputDir)
+
     # get the sequence column (first column) and skip the summary data rows
     seqColumn = seqIdDf.iloc[:,0].tolist()
 
