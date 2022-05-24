@@ -22,7 +22,7 @@ countFile = inputDir+"allCounts.csv"
 percentFile = inputDir+"allPercents.csv"
 
 # program files
-fastqTotxt = codeDir + "fastqTotxt.py"
+fastqTotxt = codeDir + "fastqTotxt.pl"
 ngsAnalysis = codeDir + "ngsAnalysis.py"
 
 # main code section
