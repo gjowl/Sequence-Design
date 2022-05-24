@@ -40,9 +40,14 @@ def makeOutputDir(outputDir):
 # converts ngs fastq files to more workable txt files
 def convertFastqToTxt(fastqTotxt, config, namesFile, refFile, dataDir, outputDir):
     if len(os.listdir(outputDir)) == 0:
-        names = pd.read_csv(namesFile)
+        # read in the file with names for output files
+        df_names = pd.read_csv(namesFile, header=None)
+        # convert it to a list
+        list_names = df_names.iloc[:,0]
+        # initialize lists for the datafiles for ngs sequences read in fwd and rvs
         fwdDatafiles = []
         rvsDatafiles = []
+        # loop through the files in the data directory (holds the ngs files)
         for filename in sorted(os.listdir(dataDir)):
             dataFile = os.path.join(dataDir, filename)
             # confirms that file is a fastq
@@ -50,18 +55,18 @@ def convertFastqToTxt(fastqTotxt, config, namesFile, refFile, dataDir, outputDir
                 dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
                 # gets the direction 
                 if dataFile.find("R1") != -1:
+                    # add datafile to the fwd list
                     fwdDatafiles.append(dataFile)
                 else:
-                    # I don't currently run the reverse for any of the analysis, but the option is here if desired
+                    # add datafile to the fwd list
                     rvsDatafiles.append(dataFile)
-        for dataFile, name in zip(fwdDatafiles, names):
-            print(len(fwdDatafiles), len(names))
+        # loop through the files and names and execute the fastq to txt file conversion for each file
+        for dataFile, name in zip(fwdDatafiles, list_names):
             outputFile = outputDir+name+'.txt'
             execRunFastqTotxt = 'perl '+fastqTotxt+' --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+ outputFile 
             print(execRunFastqTotxt)
-            #os.system(execRunFastqTotxt)
-            print("Files successfully converted")
-        exit()
+            os.system(execRunFastqTotxt)
+        print("Files successfully converted")
     else:
         print("Files already converted. If you would like to reconvert files, delete " + outputDir)
 
