@@ -1,5 +1,4 @@
 import sys
-import helper
 import numpy as np
 import statistics as stat
 from functions import *
@@ -26,8 +25,6 @@ def outputAnalysisDfToCsv(df, seqs, segments, outputDir, name):
     df.insert(1, 'Segments', segments)
     filename = outputDir+name
     df.to_csv(filename)
-
-
 
 #FLUORESCENCE RECONSTRUCTION
 # main function for fluorescence reconstruction

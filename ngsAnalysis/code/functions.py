@@ -3,6 +3,14 @@ import os
 import sys
 import pandas as pd
 from dnachisel.biotools import translate, reverse_complement
+import configparser
+
+# Method to read config file settings
+# Helper file for reading the config file of interest for running the program
+def read_config(configFile):
+    config = configparser.ConfigParser()
+    config.read(configFile)
+    return config
 
 # get the configuration file for the current
 def getConfigFile(configDir):
@@ -35,45 +43,13 @@ def makeOutputDir(outputDir):
     else:
         print('Output Directory: ' + outputDir + ' exists.')
 
-# converts ngs fastq files to more workable txt files
-def convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir):
-    if len(os.listdir(outputDir)) == 0:
-        # read in the file with names for output files
-        df_names = pd.read_csv(namesFile, header=None)
-        # convert it to a list
-        list_names = df_names.iloc[:,0]
-        # initialize lists for the datafiles for ngs sequences read in fwd and rvs
-        fwdDatafiles = []
-        rvsDatafiles = []
-        # loop through the files in the data directory (holds the ngs files)
-        for filename in sorted(os.listdir(dataDir)):
-            dataFile = os.path.join(dataDir, filename)
-            # confirms that file is a fastq
-            if os.path.isfile(dataFile) and 'fastq' in dataFile:
-                dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
-                # gets the direction 
-                if dataFile.find("R1") != -1:
-                    # add datafile to the fwd list
-                    fwdDatafiles.append(dataFile)
-                else:
-                    # add datafile to the fwd list
-                    rvsDatafiles.append(dataFile)
-        # loop through the files and names and execute the fastq to txt file conversion for each file
-        for dataFile, name in zip(fwdDatafiles, list_names):
-            outputFile = outputDir+name+'.txt'
-            execRunFastqTotxt = 'perl '+fastqTotxt+' --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+ outputFile 
-            print(execRunFastqTotxt)
-            os.system(execRunFastqTotxt)
-        print("Files successfully converted")
-    else:
-        print("Files already converted. If you would like to reconvert files, delete " + outputDir)
-
 # FOR CREATING A CSV FILE OF SEQUENCE COUNTS PER BIN/M9/LB
 #Checking the file exists or not
 def check_file_empty(path_of_file):
     #Checking if file exist and it is empty
     return os.path.exists(path_of_file) 
 
+# main functions     
 # get counts for each of the files
 def getCountsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
@@ -159,4 +135,108 @@ def outputSequencePercentsCsv(listSeq, dir, outFile):
         df_t.to_csv(outFile)
     else:
         print("File exists. To rerun, delete " + outFile)
-        
+
+# gets a list of all of the unique sequences present in data within a directory
+def getSequenceList(dir):
+    allSeqs = []
+    for file in os.listdir(dir):
+        dataFile = os.path.join(dir, file)
+        # get the sequence column (first column) and skip the summary data rows
+        # TODO: fix this hardcoded 4
+        seqColumn = pd.read_csv(dataFile, delimiter='\t', header=None, skiprows=4, usecols=[0])
+        # convert that column to a list
+        seqs = seqColumn.iloc[:,0].tolist()
+        # add each value in the list to the allSeqs list
+        for seq in seqs:
+            allSeqs.append(seq) 
+    # rid of the duplicate sequences in the list
+    allSeqs = pd.unique(allSeqs).tolist()
+    return allSeqs
+
+# gets only sequences without unknown
+def outputGoodSequenceDataframe(dir):
+    listSeq = []
+    listSegment = []
+    for file in os.listdir(dir):
+        dataFile = os.path.join(dir, file)
+        # the below helps read csv files with differing numbers of columns: 
+        # https://stackoverflow.com/questions/27020216/import-csv-with-different-number-of-columns-per-row-using-pandas
+        # Delimiter
+        delim = '\t'
+        # The max column count a line in the file could have
+        largest_column_count = 0
+        # Loop the data lines
+        with open(dataFile, 'r') as temp_f:
+            # Read the lines
+            lines = temp_f.readlines()
+            for l in lines:
+                # Count the column count for the current line
+                column_count = len(l.split(delim)) + 1
+                # Set the new most column count
+                largest_column_count = column_count if largest_column_count < column_count else largest_column_count
+        colName = ''
+        # get the proper column names if a bin file or LB and M9
+        if "C" in dataFile:
+            colName = file[0:7] # name and rep for bins
+        else:
+            colName = file[0:11] # name, hour, and rep for LB/M9 
+        # Generate column names (will be 0, 1, 2, ..., largest_column_count - 1)
+        column_names = [i for i in range(0, largest_column_count)]
+        dfData = pd.read_csv(dataFile, delimiter=delim, header=None, skiprows=4, names=column_names)
+        dfData = dfData[dfData.iloc[:,3] != 'Unknown']
+        numColumns = len(dfData.columns)
+        dfData.insert(numColumns, "Replicate", colName)
+        listSeq.extend(dfData.iloc[:,0].tolist())
+        listSegment.extend(dfData.iloc[:,3].tolist())
+    df = pd.DataFrame(zip(listSeq, listSegment), columns=['Sequence','Segment'])
+    return df
+
+# get the uniprot ids and add to a file
+def appendColumnFromInputFile(df, colName, file):
+    dfOut = pd.DataFrame()
+    dfData = pd.read_csv(file, delimiter=',', index_col=0)
+    if not colName in dfData.columns: 
+        col = []
+        # checking if file exist and it is empty
+        for seq, row in dfData.iterrows():
+            index = df.index[df['Sequence'] == seq].to_list()[0]
+            value_from_col = df.loc[index, colName]
+            col.append(value_from_col)
+        dfOut = dfData
+        dfOut.insert(0, colName, col)
+        dfOut.to_csv(file)
+    else:
+        print("File with uniprot ids exists. To remake", file)
+
+# converts ngs fastq files to more workable txt files
+def convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir):
+    if len(os.listdir(outputDir)) == 0:
+        # read in the file with names for output files
+        df_names = pd.read_csv(namesFile, header=None)
+        # convert it to a list
+        list_names = df_names.iloc[:,0]
+        # initialize lists for the datafiles for ngs sequences read in fwd and rvs
+        fwdDatafiles = []
+        rvsDatafiles = []
+        # loop through the files in the data directory (holds the ngs files)
+        for filename in sorted(os.listdir(dataDir)):
+            dataFile = os.path.join(dataDir, filename)
+            # confirms that file is a fastq
+            if os.path.isfile(dataFile) and 'fastq' in dataFile:
+                dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
+                # gets the direction 
+                if dataFile.find("R1") != -1:
+                    # add datafile to the fwd list
+                    fwdDatafiles.append(dataFile)
+                else:
+                    # add datafile to the fwd list
+                    rvsDatafiles.append(dataFile)
+        # loop through the files and names and execute the fastq to txt file conversion for each file
+        for dataFile, name in zip(fwdDatafiles, list_names):
+            outputFile = outputDir+name+'.txt'
+            execRunFastqTotxt = 'perl '+fastqTotxt+' --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+ outputFile 
+            print(execRunFastqTotxt)
+            os.system(execRunFastqTotxt)
+        print("Files successfully converted")
+    else:
+        print("Files already converted. If you would like to reconvert files, delete " + outputDir)

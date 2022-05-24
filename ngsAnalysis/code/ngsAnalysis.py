@@ -1,5 +1,4 @@
 import sys
-import helper
 from functions import *
 from ngsAnalysisFunctions import *
 
@@ -9,7 +8,7 @@ programName = getFilename(sys.argv[0])
 configFile  = sys.argv[1]
 
 # Read in configuration file:
-globalConfig = helper.read_config(configFile)
+globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
 # Config file options:
