@@ -48,17 +48,21 @@ if __name__ == '__main__':
 
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
     convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir)
-    # get list of sequences
+    # get list of sequences and add to dataframe
     seqIdDf = outputGoodSequenceDataframe(outputDir)
     # get the sequence column (first column) and skip the summary data rows
     seqColumn = seqIdDf.iloc[:,0].tolist()
 
-    # make csv with sequence counts for all files
-    # go through all files and save counts in dictionary
+    # compile counts and percents from data files
+    # go through all files and save into csv file
     outputSequenceCountsCsv(seqColumn, outputDir, countFile)
     outputSequencePercentsCsv(seqColumn, outputDir, percentFile)
+
+    # drop duplicates and reset the index
     seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
     seqIdDf = seqIdDf.reset_index(drop=True)
+
+    # add the segment number to the counts and percents files to separate sequences by segment number
     appendColumnFromInputFile(seqIdDf, 'Segment', countFile)
     appendColumnFromInputFile(seqIdDf, 'Segment', percentFile)
 
