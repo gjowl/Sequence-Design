@@ -25,7 +25,7 @@ percentDir     = config["percentDir"]
 
 # control sequences
 gpa = 'LIIFGVMAGVIGT'
-g83i = 'LIIFGVMAIVIGT'
+g83i = 'LIIFGVMAIVIGL'
 
 
 # make the output directories that these will all output to
@@ -101,25 +101,31 @@ finalSeqs = df_cutoffEnergyData['Sequence']
 df_finalOutputs = []
 colsToAdd = ['Average', 'StdDev']
 
-df = df_reconstructedFluorList[1] # this uses total seq count
+df = df_reconstructedFluorList[3] # this uses total seq count
+# may have to change this: I think I should just use whatever the single g83i and gpa are from the flow (get those tomorrow or tonight and redo any analyses with those or just add them in)
+g83iFluor = df.loc[df['Sequence'] == g83i, 'Average'].item()
+# get g83i sequence
 # do this for one sequence, make into a function, then for loop through it for the rest and figure out names later
 df_out = df_cutoffEnergyData.copy()
 # add in the LILI add the end of all sequences that doesn't get read by NGS but is found in the energy file of sequences
 df['Sequence'] = df['Sequence']+'LILI'
+
 df = df[df['Sequence'].isin(finalSeqs)]
 df = df.sort_values(by='Sequence')
 df.reset_index(drop=True, inplace=True)
 for colName in df.columns:
     if colName in colsToAdd:
         df_out[colName] = pd.Series(df[colName])
-# get g83i sequence
-g83iFluor = df[df['Sequence' == g83i]]
-print(g83iFluor)
 
 # cutoff by g83i fluorescence
 df_g83iCutoff = df_out[df_out['Average'] > g83iFluor]
 print(df_g83iCutoff)
 df_g83iCutoff.to_csv(outputDir+'seqsHigherThanG83i.csv')
+
+# get just the designed sequences
+df_designs = df_g83iCutoff[df_g83iCutoff['Sequence'] == df_g83iCutoff['StartSequence']]
+print(df_designs)
+df_designs.to_csv(outputDir+'designs.csv')
 print('DONE!')
 
 #for df in df_reconstructedFluorList:
