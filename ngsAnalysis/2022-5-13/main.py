@@ -107,6 +107,7 @@ ngsAnalysis          = config["ngsAnalysis"]
 countFile            = config["countFile"]
 percentFile          = config["percentFile"]
 refFile              = config["refFile"]
+namesFile              = config["namesFile"]
 
 if __name__ == '__main__':
     # make the output directory that these will all output to
@@ -121,7 +122,7 @@ if __name__ == '__main__':
     os.system(execInstallRequirements)
 
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
-    convertFastqToTxt(fastqTotxt, configFile, refFile, dataDir, outputDir)
+    convertFastqToTxt(fastqTotxt, configFile, namesFile, refFile, dataDir, outputDir)
     # get list of sequences
     seqIdDf = outputGoodSequenceDataframe(outputDir)
     # get the sequence column (first column) and skip the summary data rows

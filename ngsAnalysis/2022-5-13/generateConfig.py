@@ -5,10 +5,10 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-#dataDir = '/data/NGS/'
-codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-dataDir = '/mnt/d/2022-5-13/'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+dataDir = '/data/NGS/'
+#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+#dataDir = '/mnt/d/2022-5-13/'
 outputDir = codeDir + 'data/'
 inputDir = codeDir + 'inputFiles/'
 analysisDir = codeDir + 'analyzedData/'
@@ -16,6 +16,7 @@ analysisDir = codeDir + 'analyzedData/'
 # input files
 requirementsFile = inputDir + "requirements.txt"
 refFile = inputDir + "refSeqs.csv"
+namesFile = inputDir + "dataFilenames.csv"
 
 # output files
 countFile = inputDir+"allCounts.csv"
@@ -35,6 +36,7 @@ config_file["main"]={
     "percentFile":percentFile,
     "countFile":countFile,
     "refFile":refFile,
+    "namesFile":namesFile,
 }
 
 # fastqToTxt config options

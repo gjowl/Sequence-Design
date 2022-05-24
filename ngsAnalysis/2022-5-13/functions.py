@@ -4,6 +4,7 @@ import sys
 import pandas as pd
 from dnachisel.biotools import translate, reverse_complement
 
+# get the configuration file for the current
 def getConfigFile(file):
     configFile = ''
     # Access the configuration file for this program (should only be one in the directory)
@@ -26,6 +27,7 @@ def getFilename(file):
     filename, programExt = os.path.splitext(programFile)
     return filename
 
+# make an output directory if it doesn't exist
 def makeOutputDir(outputDir):
     # check if the path to the directory exists
     if not os.path.isdir(outputDir):
@@ -36,8 +38,11 @@ def makeOutputDir(outputDir):
         print('Output Directory: ' + outputDir + ' exists.')
 
 # converts ngs fastq files to more workable txt files
-def convertFastqToTxt(fastqTotxt, config, refFile, dataDir, outputDir):
+def convertFastqToTxt(fastqTotxt, config, namesFile, refFile, dataDir, outputDir):
     if len(os.listdir(outputDir)) == 0:
+        names = pd.read_csv(namesFile)
+        fwdDatafiles = []
+        rvsDatafiles = []
         for filename in sorted(os.listdir(dataDir)):
             dataFile = os.path.join(dataDir, filename)
             # confirms that file is a fastq
@@ -45,22 +50,18 @@ def convertFastqToTxt(fastqTotxt, config, refFile, dataDir, outputDir):
                 dataFile = dataFile.replace(" ", "\ ") # replaces spaces so that directories with spaces can be located by linux command line
                 # gets the direction 
                 if dataFile.find("R1") != -1:
-                    name = getFilename(dataFile)
-                    if 'C' in name:
-                        name = name[0:7]
-                    else:
-                        name = name[0:11]
-                    execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'F'
-                    print(execRunFastqTotxt)
-                    os.system(execRunFastqTotxt)
-                    eis()
+                    fwdDatafiles.append(dataFile)
                 else:
                     # I don't currently run the reverse for any of the analysis, but the option is here if desired
-                    continue
-                    execRunFastqTotxt = 'python3 '+fastqTotxt+' '+config+' '+dataFile+' '+'R'
-                    print(execRunFastqTotxt)
-                    os.system(execRunFastqTotxt)
-        print("Files successfully converted")
+                    rvsDatafiles.append(dataFile)
+        for dataFile, name in zip(fwdDatafiles, names):
+            print(len(fwdDatafiles), len(names))
+            outputFile = outputDir+name+'.txt'
+            execRunFastqTotxt = 'perl '+fastqTotxt+' --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+ outputFile 
+            print(execRunFastqTotxt)
+            #os.system(execRunFastqTotxt)
+            print("Files successfully converted")
+        exit()
     else:
         print("Files already converted. If you would like to reconvert files, delete " + outputDir)
 
@@ -70,6 +71,7 @@ def check_file_empty(path_of_file):
     #Checking if file exist and it is empty
     return os.path.exists(path_of_file) 
 
+# get counts for each of the files
 def getCountsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
     columns = ['Sequence', 'Count', 'Percentage']
@@ -90,6 +92,7 @@ def getCountsForFile(listSeq, dictSeq, colName, file):
             dictSeq[seq][colName] = 0
     return dictSeq
 
+# output sequence counts as a csv
 def outputSequenceCountsCsv(listSeq, dir, outFile):
     dictSeq = {}
     # checking if file exist and it is empty
