@@ -27,7 +27,6 @@ percentDir     = config["percentDir"]
 gpa = 'LIIFGVMAGVIGT'
 g83i = 'LIIFGVMAIVIGL'
 
-
 # make the output directories that these will all output to
 dirList = [outputDir, maltoseTestDir, countDir, percentDir]
 for dir in dirList:

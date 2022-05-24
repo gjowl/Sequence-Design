@@ -89,10 +89,9 @@ def appendColumnFromInputFile(df, colName, file):
         print("File with uniprot ids exists. To remake", file)
 
 # Use the utilityFunction to get the configFile
-configFile = getConfigFile(__file__)
-
-# Use the utilityFunctions function to get the name of this program
-programName = getFilename(sys.argv[0])
+configFile = getConfigFile(sys.argv[1])
+# gets the name of this file to access 
+programName = getFilename(__file__)
 
 # Read in configuration file:
 globalConfig = helper.read_config(configFile)

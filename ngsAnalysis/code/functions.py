@@ -5,12 +5,10 @@ import pandas as pd
 from dnachisel.biotools import translate, reverse_complement
 
 # get the configuration file for the current
-def getConfigFile(file):
+def getConfigFile(configDir):
     configFile = ''
     # Access the configuration file for this program (should only be one in the directory)
-    programPath = os.path.realpath(file)
-    programDir, programFile = os.path.split(programPath)
-    programName, programExt = os.path.splitext(programFile)
+    programDir = os.path.realpath(configDir)
     fileList = os.listdir(programDir)
     for file in fileList:
         fileName, fileExt = os.path.splitext(file)

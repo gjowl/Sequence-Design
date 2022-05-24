@@ -13,6 +13,7 @@ dataDir = '/data/NGS/'
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'
+configFile = analysisDir+programName+".config" 
 
 # input files
 requirementsFile = inputDir + "requirements.txt"
@@ -29,6 +30,7 @@ ngsAnalysis = codeDir + "ngsAnalysis.py"
 
 # main code section
 config_file["main"]={
+    "programName":programName,
     "outputDir":outputDir,
     "dataDir":dataDir,
     "requirementsFile":requirementsFile,
@@ -62,7 +64,7 @@ config_file["ngsAnalysis"]={
 }
 
 # SAVE CONFIG FILE
-with open(programName+".config", 'w+') as configfileObj:
+with open(configFile, 'w+') as configfileObj:
     config_file.write(configfileObj)
     configfileObj.flush()
     configfileObj.close()
@@ -70,7 +72,7 @@ with open(programName+".config", 'w+') as configfileObj:
 print("Config file "+programName+".config created")
 
 # PRINT FILE CONTENT
-read_file = open(programName+".config", "r")
+read_file = open(configFile, "r")
 content = read_file.read()
 print("Content of the config file are:\n")
 print(content)
