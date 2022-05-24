@@ -1,6 +1,20 @@
 
-To run, copy into the command line from your directory of choice:
+To run, copy this directory (ngsAnalysis) into your directory of choice.
+
+To setup, please look at the generateConfig.py file. It contains all of the config
+options that will be necessary to run this script. Once you are satisfied, run the 
+below to generate the configuration file ngsAnalysis.config.
+
+WARNING: IF YOU CHANGE THE NAME OF THIS DIRECTORY, BE SURE TO CHANGE THE PATH IN THE 
+CONFIG. I've never tried running this after changing the entire directory name, so it
+may crash out.
+python3 generateConfig.py
+
+To then run using your config options:
 python3 main.py
+
+If the below doesn't work, consult the accompanying test sample in the test directory.
+There you can change options and you'll get a better feel for why it's working improperly.
 
 Filenames must be in the below format:
 For your bin files (C1=Bin1; Rep1=Replicate1). You can change these if you'd like,
@@ -14,7 +28,38 @@ ngsAnalysis.py file)
 -   LB-0H-Rep1-...fastq
 
 Below is the list of necessary files that must go into your directory:
+-functions.py: a list of functions necessary for running the main code of the script
+-generateConfig.py: the config generator for this program
+-main.py: the main script for this program
+-helper.py: contains the helper function for reading a config file
+-ngsAnalysis.py: script that will do the fluorescence reconstruction and output files
+-ngsAnalysisFunctions.py: a helper file that contains the functions used in ngsAnalysis.py 
+-fastqToTxt.pl: the file that will read through fastq files from the NGS data and compile it
+                more readable text files
 
 Below is the list of files that must go into the input directory:
+-refSeqs.csv: file that contains the reference sequences and any information you want to include
+              in the analysis
+-flowFile.csv: this file contains the information from your sort-seq flow: the medians and percent
+               population
 
 Below is the list of files and directories that this code will create and output for a run:
+-data: 
+-   This will output files by names that will be used for analyzing and organizing data from the runs. Make sure that your filenames are sortable
+    () TODO: make it so that this takes sorted files from the given directory and outputs the names based on the names from a given names file
+-inputFiles: 
+-   allCounts.csv: master csv that holds and organizes all of the counts for sequence, with columns as the bin name or LB/M9 hour and replicate
+-   allPercents.csv: master csv that holds and organizes all of the percents for sequence, with columns as the bin name or LB/M9 hour and replicate
+-analyzedData: self explanatory
+-   maltoseTest: files for maltose test
+-      LBPercents.csv: file containing the percents of a sequence found in the LB timepoint bins 
+-      M9Percents.csv: file containing the percents of a sequence found in the M9 timepoint bins #TODO: currently only uses one hardcoded timepoint
+-      percentDifference.csv: file containing the calculated percent difference per sequence per LB timepoint
+-   reconstruction_by_count: files for reconstructing fluorescence by seq counts
+-      avg files: fluorescence reconstruction average for the specified method of calculating fluorescence
+-      normRep files: this contains the normalization values per sequence per each replicate (column names are bins)
+-      rawFluor files: these contain the raw fluorescence per sequence per each replicate (column names are bins)
+-   reconstruction_by_percent: files for reconstructing fluorescence by seq percents
+-      avg files: fluorescence reconstruction average for the specified method of calculating fluorescence
+-      normRep files: this contains the normalization values per sequence per each replicate (column names are bins)
+-      rawFluor files: these contain the raw fluorescence per sequence per each replicate (column names are bins)

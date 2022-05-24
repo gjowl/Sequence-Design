@@ -5,7 +5,7 @@
 # @Last modified time: 2022/03/21
 
 """
-This file will run multiple python scripts for compiling ngs data and then analyzing.
+This file will run multiple python scripts for compiling ngs data and reconstructing the fluorescence profile.
 """
 
 from fileinput import filename
