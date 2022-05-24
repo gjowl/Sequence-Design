@@ -316,7 +316,6 @@ sub Translate{
 	my $startPos = $_[1];
 	my $orf = 0;
 	my $i = $startPos;
-	print "DNA: $dnaSeq\n";
 	#move down the string by 3s (codons)
 	for ($i = $startPos; $i < $sequenceLength ; $i = $i+3) {
 		my $begin = "M";
@@ -329,7 +328,6 @@ sub Translate{
 			last;
 		}
 		my $acid = $geneticCode{$codon};
-		print "$acid";
 		#while the acid isn't stop, run the translations
 		if ($acid eq $begin && $orf == 0){
 			$orf = 1;
@@ -345,7 +343,6 @@ sub Translate{
 			$aminoAcids = $aminoAcids . $stop;
 		} 
 	}
-	print "\n\n";
 	return $aminoAcids;
 };
 
