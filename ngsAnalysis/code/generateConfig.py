@@ -5,13 +5,14 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
 dataDir = '/data/NGS/'
 #codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
 #dataDir = '/mnt/d/2022-5-13/'
-outputDir = codeDir + 'data/'
-inputDir = codeDir + 'inputFiles/'
-analysisDir = codeDir + 'analyzedData/'
+outputDir = analysisDir + 'data/'
+inputDir = analysisDir + 'inputFiles/'
+analyzedDataDir = analysisDir + 'analyzedData/'
 
 # input files
 requirementsFile = inputDir + "requirements.txt"
@@ -39,31 +40,18 @@ config_file["main"]={
     "namesFile":namesFile,
 }
 
-# fastqToTxt config options
-gpa = 'LIIFGVMAGVIG'
-g83I = 'LIIFGVMAIVIG'
-fPrimer = "GGCTCCAAACTTGGGGAATCG"
-rPrimer = "CCTGATCAACCCAAGCCAATCC"
-# fastqToTxt config
-config_file["fastqTotxt"]={
-    "gpa":gpa,
-    "g83I":g83I,
-    "fPrimer":fPrimer,
-    "rPrimer":rPrimer,
-    "refFile":refFile,
-    "outputDir":outputDir,
-}
-
 # ngsAnalysis config options
 flowFile = inputDir+"flowFile.csv"
 energyFile = inputDir+"chipEnergyFile.csv"
-countDir = analysisDir+"reconstruction_by_count/"
-percentDir = analysisDir+"reconstruction_by_percent/"
-maltoseTestDir = analysisDir+"maltoseTest/"
+countDir = analyzedDataDir+"reconstruction_by_count/"
+percentDir = analyzedDataDir+"reconstruction_by_percent/"
+maltoseTestDir = analyzedDataDir+"maltoseTest/"
+gpa = 'LIIFGVMAGVIG'
+g83I = 'LIIFGVMAIVIG'
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
     "inputDir":outputDir,
-    "outputDir":analysisDir,
+    "outputDir":analyzedDataDir,
     "countFile":countFile,
     "percentFile":percentFile,
     "flowFile":flowFile,

@@ -38,7 +38,7 @@ def makeOutputDir(outputDir):
         print('Output Directory: ' + outputDir + ' exists.')
 
 # converts ngs fastq files to more workable txt files
-def convertFastqToTxt(fastqTotxt, config, namesFile, refFile, dataDir, outputDir):
+def convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir):
     if len(os.listdir(outputDir)) == 0:
         # read in the file with names for output files
         df_names = pd.read_csv(namesFile, header=None)
