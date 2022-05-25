@@ -333,10 +333,6 @@ def getMeanPercent(numReplicates, listHours, df, inputDir, outputDir):
     dfAvg = dfAvg.replace(np.nan, 0)
     # add in sequence column to first column, then convert to index
     return dfAvg
-            #for seq in seqs:
-            #    for colName in colNames:
-            #        percent = dfRep.loc[seq][colName]
-            #        # TODO: add comparison here
 
 def calculatePercentDifference(dfLB, dfM9):
     # initialize dataframe to hold the percent differences averages
