@@ -54,9 +54,6 @@ usePercentOptionList = [False, True]
 # This outputs the dataframes into a list by method of calculating fluorescence: goodSeqs, totalSeqs, goodPercent, totalPercent
 df_reconstructedFluorList = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList)
 
-for df in df_reconstructedFluorList:
-    df = df[['Sequence','Average', 'StdDev']]
-
 # hardcoded hour lists for LB and M9
 LBhours = ['0H','12H','18H','30H']
 M9hours = ['36H']
@@ -69,6 +66,19 @@ list_df = [dfLB, dfM9]
 df_percentDiff = getPercentDifference(list_df, list_of_hours, seqs, segments, inputDir, maltoseTestDir)
 
 # final step: separate out sequences that are above the cutoff into different dataframes
+# I think instead of just removing data, I'm just going to add in the percent difference to the avg files
+# so just need to add correct percent diff for every sequence present in the df
+df_fluorAndPercentDiffList = []
+for df in df_reconstructedFluorList:
+    percentDiffCol = []
+    for seq in df['Sequence']:
+        percentDiff = df_percentDiff[dfPercentDiff['Sequence'] == seq]
+        percentDiffCol.append(percentDiff)
+    df.assign(PercentDiff=percentDiffCol)
+    df_fluorAndPercentDiffList.append(df)
+print(df_fluorAndPercentDiffList)
+exit()
+
 # TODO: get a cutoff for the 18H neg  control with the lowest value
 df_cutoff = df_percentDiff[df_percentDiff['18H'] > -95]
 df_belowCutoff = df_percentDiff[df_percentDiff['18H'] < -95]
