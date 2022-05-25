@@ -122,6 +122,7 @@ my @ref = <FILE>;
 close(FILE);
 my %reference;
 foreach my $refSeq(@ref){
+	#TODO: this doesn't chomp off the last bit if no comma after sequence at line[1] (sequences become unrecognizable and output unknown)
 	chomp $refSeq;
 	# the below splits lines and adds to a way of identifying information 
 	my @line = split ',', $refSeq;
@@ -293,6 +294,7 @@ sub Conversion {
 	}
 	return $aminoAcids
 }
+
 sub Translate{
 	#translate the DNA
 	#move down the string

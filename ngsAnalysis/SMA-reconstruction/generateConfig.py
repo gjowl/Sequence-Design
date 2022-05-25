@@ -8,11 +8,12 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
-dataDir = '/data/NGS/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-#dataDir = '/mnt/d/2022-5-13/'
+#analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/SMA-reconstruction/'
+#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
+#dataDir = '/data/NGS/'
+analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/SMA-reconstruction/'
+codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
+dataDir = '/mnt/d/SMA-NGS/binFiles/'
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'
@@ -20,7 +21,7 @@ configFile = analysisDir+programName+".config"
 
 # input files
 requirementsFile = inputDir + "requirements.txt"
-refFile = inputDir + "refSeqs.csv"
+refFile = inputDir + "referenceSeqs.csv"
 namesFile = inputDir + "dataFilenames.csv"
 
 # output files

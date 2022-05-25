@@ -219,7 +219,8 @@ def convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir):
         fwdDatafiles = []
         rvsDatafiles = []
         # loop through the files in the data directory (holds the ngs files)
-        for filename in sorted(os.listdir(dataDir)):
+        sortedFiles = sorted(os.listdir(dataDir))
+        for filename in sortedFiles:
             dataFile = os.path.join(dataDir, filename)
             # confirms that file is a fastq
             if os.path.isfile(dataFile) and 'fastq' in dataFile:
