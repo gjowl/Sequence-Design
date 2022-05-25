@@ -28,7 +28,7 @@ def outputAnalysisDfToCsv(df, seqs, segments, outputDir, name):
 
 #FLUORESCENCE RECONSTRUCTION
 # main function for fluorescence reconstruction
-def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, numReplicates, usePercentOptionList):
+def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList):
     # loop through the lists of reconstruction dfs, dirs, and percent options (these should all be the same length)
     # list of dfs
     list_df = []
@@ -37,7 +37,7 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
         if len(os.listdir(outputDir)) < 1:
             dfBins = df.filter(like='C')
             # reconstruct the fluorescence for both good and total sequence numbers
-            df_good, df_total = getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, segments, inputDir, outputDir, dfFlow, usePercent)
+            df_good, df_total = getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, dfFlow, usePercent)
             outputAnalysisDfToCsv(df_good, seqs, segments, outputDir, 'avgFluorGoodSeqs.csv') 
             outputAnalysisDfToCsv(df_total, seqs, segments, outputDir, 'avgFluorTotalSeqs.csv') 
             list_df.append(df_good)
@@ -52,9 +52,23 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
             print("Done loading fluorescence reconstruction files into dataframes!\n")
     return list_df
 
+# gets the number of replicates
+def getNumberReplicates(df):
+    numReplicates = 0
+    for colName in df.columns:
+        # get everything after the -Rep
+        sepName = colName.rpartition('-Rep')
+        bin = sepName[0]
+        rep = int(sepName[2])
+        if rep > numReplicates:
+            numReplicates = rep
+        else:
+            continue
+    return numReplicates
+
 # use below functions to calculate the reconstructed fluorescence for
 # each sequence and add it to dataframes
-def getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, segments, inputDir, outputDir, dfFlow, usePercents=False):
+def getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, dfFlow, usePercents=False):
     # initialize dataframe for the calculations using the good and total seq counts
     dfAvgGood = pd.DataFrame()
     dfAvgTotal = pd.DataFrame()
@@ -63,6 +77,7 @@ def getReconstructedFluorescenceDf(numReplicates, dfBins, seqs, segments, inputD
     # Hardcoded output file names:
     normalizationFile = 'norm'
     rawFluorFile = 'rawFluor'
+    numReplicates = getNumberReplicates(dfBins)
     while i <= numReplicates:
         # TODO: get this working initialize df to hold all dfs for output
         list_df = []
@@ -276,10 +291,13 @@ def getReconstructedFluorescenceStats(df):
     df = insertAtEndOfDf(df, 'Average', avgFluors)
     df = insertAtEndOfDf(df, 'StdDev', stdDevFluors)
     return df
+
 # CALCULATE PERCENT DIFFERENCE
 # main function for getting the percent difference between LB and M9 for maltose test
-def getPercentDifference(list_df, list_of_hours, numReplicates, seqs, segments, inputDir, outputDir):
+def getPercentDifference(list_df, list_of_hours, seqs, segments, inputDir, outputDir):
     df_percentDiff = pd.DataFrame()
+    #TODO: this only gets number for one df; they should be the same, but it may need to be moved
+    numReplicates = getNumberReplicates(list_df[0])
     if len(os.listdir(outputDir)) == 0:
         # list to hold the output df: the first output is for LB and the second is for M9
         # after the loop, it uses both to calculate the percent difference 

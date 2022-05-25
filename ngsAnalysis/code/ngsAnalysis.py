@@ -44,8 +44,6 @@ segments = df.iloc[:,1]
 # filter out to only have the bins
 dfBins = df.filter(like='C')
 
-# hard coded defined number of replicates
-numReplicates = 3
 # get a dataframe for the file containing medians and percent population from flow csv
 dfFlow = pd.read_csv(flowFile, index_col=0)
 
@@ -54,7 +52,7 @@ dfToReconstruct = [df, dfPercent]
 usePercentOptionList = [False, True]
 # reconstruct the fluorescence profile for the dataframe using both counts and percents (they give slightly different values)
 # This outputs the dataframes into a list by method of calculating fluorescence: goodSeqs, totalSeqs, goodPercent, totalPercent
-df_reconstructedFluorList = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, numReplicates, usePercentOptionList)
+df_reconstructedFluorList = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList)
 
 for df in df_reconstructedFluorList:
     df = df[['Sequence','Average', 'StdDev']]
@@ -68,7 +66,7 @@ list_of_hours = [LBhours, M9hours]
 dfLB = dfPercent.filter(like='LB')
 dfM9 = dfPercent.filter(like='M9')
 list_df = [dfLB, dfM9]
-df_percentDiff = getPercentDifference(list_df, list_of_hours, numReplicates, seqs, segments, inputDir, maltoseTestDir)
+df_percentDiff = getPercentDifference(list_df, list_of_hours, seqs, segments, inputDir, maltoseTestDir)
 
 # final step: separate out sequences that are above the cutoff into different dataframes
 # TODO: get a cutoff for the 18H neg  control with the lowest value

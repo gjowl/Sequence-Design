@@ -8,12 +8,12 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-#analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/SMA-reconstruction/'
-#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
-#dataDir = '/data/NGS/'
-analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/SMA-reconstruction/'
-codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
-dataDir = '/mnt/d/SMA-NGS/binFiles/'
+analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/SMA-reconstruction/'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
+dataDir = '/data/NGS/'
+#analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/SMA-reconstruction/'
+#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
+#dataDir = '/mnt/d/SMA-NGS/binFiles/'
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'
