@@ -70,7 +70,24 @@ df_designs = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFl
 designDatafile = outputDir+'designData.csv'
 df_designs.to_csv(designDatafile)
 
-exit()
+# get only clashing sequences
+df_clash = df_energyAndFluor[df_energyAndFluor['Total'] > 0]
+
+# TODO: write a bit of code that will take the sequence and write out fasta and colabfold files for them
+# write colabfold csv file
+colabfoldFile = outputDir+'colabfold_clashing.csv'
+df_colab = pd.DataFrame()
+seqColumn = df_clash['Sequence']
+fastaColumn = df_clash['Sequence']+'.fasta'
+df_colab = insertAtEndOfDf(df_colab, 'fasta', fastaColumn)
+df_colab = insertAtEndOfDf(df_colab, 'Sequence', seqColumn)
+df_colab = df_colab.set_index('fasta')
+df_colab.to_csv(colabfoldFile, header=False)
+
+# write fasta files for all sequences
+fastaDir = ''
+for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
+    
 
 # may have to change this: I think I should just use whatever the single g83i and gpa are from the flow (get those tomorrow or tonight and redo any analyses with those or just add them in)
 g83iFluor = df.loc[df['Sequence'] == g83i, 'Average'].item()
