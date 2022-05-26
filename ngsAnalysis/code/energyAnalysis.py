@@ -49,12 +49,15 @@ df_fluorFiltered.reset_index(drop=True, inplace=True)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # add the fluorescence, stdDev, and percent difference to the energy dataframe
 colsToAdd = ['Average', 'StdDev', 'PercentDiff']
 for colName in df_fluor.columns:
     if colName in colsToAdd:
         df_energyAndFluor[colName] = pd.Series(df_fluorFiltered[colName])
 =======
+=======
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
@@ -75,6 +78,9 @@ for colName in df_fluor.columns:
         df_energyAndFluor = insertAtEndOfDf(df_energyAndFluor, colName, list_values)
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
+=======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
@@ -88,8 +94,11 @@ df_energyAndFluor.to_csv(allDatafile)
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 exit()
 =======
+=======
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
@@ -123,6 +132,9 @@ for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
     f.close()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
+=======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
