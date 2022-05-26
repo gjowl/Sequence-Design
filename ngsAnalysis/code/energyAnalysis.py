@@ -46,17 +46,64 @@ df_fluorFiltered = df_fluor[df_fluor['Sequence'].isin(finalSeqs)]
 df_fluorFiltered = df_fluorFiltered.sort_values(by='Sequence')
 df_fluorFiltered.reset_index(drop=True, inplace=True)
 
+<<<<<<< HEAD
 # add the fluorescence, stdDev, and percent difference to the energy dataframe
 colsToAdd = ['Average', 'StdDev', 'PercentDiff']
 for colName in df_fluor.columns:
     if colName in colsToAdd:
         df_energyAndFluor[colName] = pd.Series(df_fluorFiltered[colName])
+=======
+# I found an issue with this: my energy file sometimes has duplicate sequences:
+# mutants to some sequences end up being the same as a starting sequence
+# So instead of just adding columns, I'll need to add info for each sequence
+# add the fluorescence, stdDev, and percent difference to the energy dataframe
+colInfo = []
+colsToAdd = ['Average', 'StdDev', 'PercentDiff']
+for colName in df_fluor.columns:
+    if colName in colsToAdd:
+        list_values = [] 
+        for seq in df_energyAndFluor['Sequence']:
+            # get the sequence info for the given column
+            value = df_fluorFiltered.loc[df_fluorFiltered['Sequence'] == seq, colName].item()
+            list_values.append(value)
+        df_energyAndFluor = insertAtEndOfDf(df_energyAndFluor, colName, list_values)
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 
 # output the dataframe
 allDatafile = outputDir+'allData.csv'
 df_energyAndFluor.to_csv(allDatafile)
 
+<<<<<<< HEAD
 exit()
+=======
+# get just design sequences
+df_designs = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFluor['StartSequence'])]
+designDatafile = outputDir+'designData.csv'
+df_designs.to_csv(designDatafile)
+
+# get only clashing sequences
+df_clash = df_energyAndFluor[df_energyAndFluor['Total'] > 0]
+
+# TODO: write a bit of code that will take the sequence and write out fasta and colabfold files for them
+# write colabfold csv file
+colabfoldFile = outputDir+'colabfold_clashing.csv'
+df_colab = pd.DataFrame()
+seqColumn = df_clash['Sequence']
+fastaColumn = df_clash['Sequence']+'.fasta'
+df_colab = insertAtEndOfDf(df_colab, 'fasta', fastaColumn)
+df_colab = insertAtEndOfDf(df_colab, 'Sequence', seqColumn)
+df_colab = df_colab.set_index('fasta')
+df_colab.to_csv(colabfoldFile, header=False)
+
+# write fasta files for all sequences
+fastaDir = ''
+for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
+    filename = fastaDir+fasta
+    with open(filename, 'w') as f:
+        f.write('>>',seq,'\n')
+        f.write(seq,':',seq)
+    f.close()
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 
 # may have to change this: I think I should just use whatever the single g83i and gpa are from the flow (get those tomorrow or tonight and redo any analyses with those or just add them in)
 g83iFluor = df.loc[df['Sequence'] == g83i, 'Average'].item()

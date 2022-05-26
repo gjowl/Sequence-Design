@@ -241,3 +241,9 @@ def convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir):
         print("Files successfully converted")
     else:
         print("Files already converted. If you would like to reconvert files, delete " + outputDir)
+
+# insert column at the end of the dataframe
+def insertAtEndOfDf(df, colName, col):
+    numCol = len(df.columns)
+    df.insert(numCol, colName, col)
+    return df
