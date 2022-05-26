@@ -48,12 +48,15 @@ df_fluorFiltered.reset_index(drop=True, inplace=True)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # add the fluorescence, stdDev, and percent difference to the energy dataframe
 colsToAdd = ['Average', 'StdDev', 'PercentDiff']
 for colName in df_fluor.columns:
     if colName in colsToAdd:
         df_energyAndFluor[colName] = pd.Series(df_fluorFiltered[colName])
 =======
+=======
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 # I found an issue with this: my energy file sometimes has duplicate sequences:
@@ -71,6 +74,9 @@ for colName in df_fluor.columns:
             list_values.append(value)
         df_energyAndFluor = insertAtEndOfDf(df_energyAndFluor, colName, list_values)
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
+=======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
@@ -81,8 +87,11 @@ df_energyAndFluor.to_csv(allDatafile)
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 exit()
 =======
+=======
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 # get just design sequences
@@ -113,6 +122,9 @@ for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
         f.write(seq,':',seq)
     f.close()
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
+=======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 =======
 >>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
