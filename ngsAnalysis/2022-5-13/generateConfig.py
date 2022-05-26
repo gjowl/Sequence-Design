@@ -31,6 +31,10 @@ percentFile = inputDir+"allPercents.csv"
 # program files
 fastqTotxt = codeDir + "fastqTotxt.pl"
 ngsAnalysis = codeDir + "ngsAnalysis.py"
+energyAnalysis = codeDir + "energyAnalysis.py"
+
+# booleans
+analyzeEnergies = True
 
 # main code section
 config_file["main"]={
@@ -40,6 +44,8 @@ config_file["main"]={
     "requirementsFile":requirementsFile,
     "fastqTotxt":fastqTotxt,
     "ngsAnalysis":ngsAnalysis,
+    "energyAnalysis":energyAnalysis,
+    "analyzeEnergies":analyzeEnergies,
     "percentFile":percentFile,
     "countFile":countFile,
     "refFile":refFile,
@@ -48,7 +54,7 @@ config_file["main"]={
 
 # ngsAnalysis config options
 flowFile = inputDir+"flowFile.csv"
-energyFile = inputDir+"chipEnergyFile.csv"
+reconstructionFile = analyzedDataDir+"reconstructionFile.csv"
 countDir = analyzedDataDir+"reconstruction_by_count/"
 percentDir = analyzedDataDir+"reconstruction_by_percent/"
 maltoseTestDir = analyzedDataDir+"maltoseTest/"
@@ -61,10 +67,22 @@ config_file["ngsAnalysis"]={
     "countFile":countFile,
     "percentFile":percentFile,
     "flowFile":flowFile,
-    "energyFile":energyFile,
+    "reconstructionFile":reconstructionFile,
     "countDir":countDir,
     "percentDir":percentDir,
     "maltoseTestDir":maltoseTestDir,
+}
+
+# energyAnalysis config options
+energyFile = inputDir+"chipEnergyFile.csv"
+# for now, decided to only continue forward with this data 
+# (seems closest to SMA and JC reconstruction)
+energyDir = analyzedDataDir+'energyAnalysis/'
+# ngsAnalysis config
+config_file["energyAnalysis"]={
+    "outputDir":energyDir,
+    "energyFile":energyFile,
+    "reconstructionFile":reconstructionFile,
 }
 
 # SAVE CONFIG FILE

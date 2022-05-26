@@ -29,11 +29,15 @@ requirementsFile     = config["requirementsFile"]
 dataDir              = config["dataDir"]
 fastqTotxt           = config["fastqTotxt"]
 ngsAnalysis          = config["ngsAnalysis"]
+energyAnalysis          = config["energyAnalysis"]
 countFile            = config["countFile"]
 percentFile          = config["percentFile"]
 refFile              = config["refFile"]
 namesFile              = config["namesFile"]
 
+# booleans
+analyzeEnergies          = config["analyzeEnergies"]
+analyzeEnergies = bool(analyzeEnergies)
 if __name__ == '__main__':
     # make the output directory that these will all output to
     makeOutputDir(outputDir)
@@ -72,3 +76,11 @@ if __name__ == '__main__':
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
     print(execNgsAnalysis)
     os.system(execNgsAnalysis)
+
+    # only execute energy analysis script if boolean to do so is true
+    print(analyzeEnergies)
+    if analyzeEnergies == True:
+        # execute ngsAnalysis script 
+        execEnergyAnalysis = 'python3 '+energyAnalysis+' '+configFile
+        print(execEnergyAnalysis)
+        os.system(execEnergyAnalysis)
