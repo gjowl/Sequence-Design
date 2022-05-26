@@ -259,12 +259,6 @@ def calculateReconstructedFluorescence(bins, dfNormGood, dfNormTotal, dfFlow):
     dfTotal['Fluorescence'] = sumRowsTotal
     return dfGood, dfTotal
 
-# insert column at the end of the dataframe
-def insertAtEndOfDf(df, colName, col):
-    numCol = len(df.columns)
-    df.insert(numCol, colName, col)
-    return df
-
 # get average, stDev, etc. from reconstructed fluorescence
 def getReconstructedFluorescenceStats(df):
     colNames = df.columns

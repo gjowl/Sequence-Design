@@ -46,15 +46,29 @@ df_fluorFiltered = df_fluor[df_fluor['Sequence'].isin(finalSeqs)]
 df_fluorFiltered = df_fluorFiltered.sort_values(by='Sequence')
 df_fluorFiltered.reset_index(drop=True, inplace=True)
 
+# I found an issue with this: my energy file sometimes has duplicate sequences:
+# mutants to some sequences end up being the same as a starting sequence
+# So instead of just adding columns, I'll need to add info for each sequence
 # add the fluorescence, stdDev, and percent difference to the energy dataframe
+colInfo = []
 colsToAdd = ['Average', 'StdDev', 'PercentDiff']
 for colName in df_fluor.columns:
     if colName in colsToAdd:
-        df_energyAndFluor[colName] = pd.Series(df_fluorFiltered[colName])
+        list_values = [] 
+        for seq in df_energyAndFluor['Sequence']:
+            # get the sequence info for the given column
+            value = df_fluorFiltered.loc[df_fluorFiltered['Sequence'] == seq, colName].item()
+            list_values.append(value)
+        df_energyAndFluor = insertAtEndOfDf(df_energyAndFluor, colName, list_values)
 
 # output the dataframe
 allDatafile = outputDir+'allData.csv'
 df_energyAndFluor.to_csv(allDatafile)
+
+# get just design sequences
+df_designs = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFluor['StartSequence'])]
+designDatafile = outputDir+'designData.csv'
+df_designs.to_csv(designDatafile)
 
 exit()
 
