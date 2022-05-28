@@ -46,25 +46,6 @@ df_fluorFiltered = df_fluor[df_fluor['Sequence'].isin(finalSeqs)]
 df_fluorFiltered = df_fluorFiltered.sort_values(by='Sequence')
 df_fluorFiltered.reset_index(drop=True, inplace=True)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-# add the fluorescence, stdDev, and percent difference to the energy dataframe
-colsToAdd = ['Average', 'StdDev', 'PercentDiff']
-for colName in df_fluor.columns:
-    if colName in colsToAdd:
-        df_energyAndFluor[colName] = pd.Series(df_fluorFiltered[colName])
-=======
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 # I found an issue with this: my energy file sometimes has duplicate sequences:
 # mutants to some sequences end up being the same as a starting sequence
 # So instead of just adding columns, I'll need to add info for each sequence
@@ -79,39 +60,11 @@ for colName in df_fluor.columns:
             value = df_fluorFiltered.loc[df_fluorFiltered['Sequence'] == seq, colName].item()
             list_values.append(value)
         df_energyAndFluor = insertAtEndOfDf(df_energyAndFluor, colName, list_values)
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 
 # output the dataframe
 allDatafile = outputDir+'allData.csv'
 df_energyAndFluor.to_csv(allDatafile)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-exit()
-=======
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 # get just design sequences
 df_designs = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFluor['StartSequence'])]
 designDatafile = outputDir+'designData.csv'
@@ -128,31 +81,20 @@ seqColumn = df_clash['Sequence']
 fastaColumn = df_clash['Sequence']+'.fasta'
 df_colab = insertAtEndOfDf(df_colab, 'fasta', fastaColumn)
 df_colab = insertAtEndOfDf(df_colab, 'Sequence', seqColumn)
-df_colab = df_colab.set_index('fasta')
-df_colab.to_csv(colabfoldFile, header=False)
 
 # write fasta files for all sequences
-fastaDir = ''
+fastaDir = '/mnt/d/fasta/'
 for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
     filename = fastaDir+fasta
     with open(filename, 'w') as f:
-        f.write('>>',seq,'\n')
-        f.write(seq,':',seq)
+        f.write('>'+seq+'\n')
+        f.write(seq+':'+seq)
     f.close()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
-=======
->>>>>>> 11fbedde02bddf7575e23180bf209fa5b903af76
 
+df_colab = df_colab.set_index('fasta')
+df_colab.to_csv(colabfoldFile, header=False)
+
+exit()
 # may have to change this: I think I should just use whatever the single g83i and gpa are from the flow (get those tomorrow or tonight and redo any analyses with those or just add them in)
 g83iFluor = df.loc[df['Sequence'] == g83i, 'Average'].item()
 # get g83i sequence
