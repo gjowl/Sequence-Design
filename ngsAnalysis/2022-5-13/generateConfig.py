@@ -9,11 +9,12 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
-dataDir = '/data/NGS/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-#dataDir = '/mnt/d/2022-5-13/'
+#analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
+#dataDir = '/data/NGS/'
+analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
+dataDir = '/mnt/d/2022-5-13/'
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'
