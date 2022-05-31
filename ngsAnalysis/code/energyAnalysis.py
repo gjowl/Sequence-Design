@@ -63,12 +63,12 @@ for colName in df_fluor.columns:
 
 # output the dataframe
 allDatafile = outputDir+'allData.csv'
-df_energyAndFluor.to_csv(allDatafile)
+df_energyAndFluor.to_csv(allDatafile, index=False)
 
 # get just design sequences
 df_designs = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFluor['StartSequence'])]
 designDatafile = outputDir+'designData.csv'
-df_designs.to_csv(designDatafile)
+df_designs.to_csv(designDatafile, index=False)
 
 # get only clashing sequences
 df_clash = df_energyAndFluor[df_energyAndFluor['Total'] > 0]
@@ -92,7 +92,7 @@ for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
     f.close()
 
 df_colab = df_colab.set_index('fasta')
-df_colab.to_csv(colabfoldFile, header=False)
+df_colab.to_csv(colabfoldFile, header=False, index=False)
 
 exit()
 # may have to change this: I think I should just use whatever the single g83i and gpa are from the flow (get those tomorrow or tonight and redo any analyses with those or just add them in)
