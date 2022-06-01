@@ -24,10 +24,10 @@ def outputRegressionLine(x, y):
     #obtain m (slope) and b(intercept) of linear regression line
     m, b = np.polyfit(x, y, 1)
     #add linear regression line to scatterplot 
-    line = plt.plot(x, m*x+b, label='y={:.2f}x+{:.2f}'.format(m, b))
+    line = plt.plot(x, m*x+b, label='y={:.2f}x+{:.2f}'.format(m, b), c='orange')
     return line
     
-def createScatterPlot(df, xAxis, yAxis, labelName, outFile, title):
+def createScatterPlotDiffLabels(df, xAxis, yAxis, labelName, outFile, title):
     # setup figure and axes
     fig, ax = plt.subplots()
     # set axis title
@@ -38,6 +38,7 @@ def createScatterPlot(df, xAxis, yAxis, labelName, outFile, title):
     # get values from dataframe
     x = df[xAxis]
     y = df[yAxis]
+
     # values need to be in list format for scatterplot
     xList = x.tolist()
     yList = y.tolist()
@@ -58,9 +59,35 @@ def createScatterPlot(df, xAxis, yAxis, labelName, outFile, title):
     #plt.gca().add_artist(l2)
     # save image to filename
     fig.savefig(outFile,format='png', dpi=1200)
-
-
-
+    
+def createScatterPlot(df, xAxis, yAxis, outFile, title):
+    # setup figure and axes
+    fig, ax = plt.subplots()
+    # set axis title
+    ax.set_title(title)
+    # set axes labels
+    ax.set_xlabel('Energy Score')
+    ax.set_ylabel('Fluorescence')
+    # get values from dataframe
+    x = df[xAxis]
+    y = df[yAxis]
+    # get the wild type value from the dataframe
+    df_wt = df[df['StartSequence'] == df['Sequence']] 
+    x_wt = df_wt[xAxis]
+    y_wt = df_wt[yAxis]
+    # values need to be in list format for scatterplot
+    xList = x.tolist()
+    yList = y.tolist()
+    # plot scatter plot for mutants
+    plt.scatter(x, y, s=50, linewidth=0.1)
+    plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
+    # TODO: fix so that there's a separate legend for regression
+    # outputs a regression line and equation 
+    l1 = outputRegressionLine(x, y)
+    l2 = plt.legend(fontsize=6, loc='center right')
+    #plt.gca().add_artist(l2)
+    # save image to filename
+    fig.savefig(outFile,format='png', dpi=1200)
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
@@ -92,15 +119,15 @@ for designDf in list_designDf:
     designDf = designDf[designDf['Total'] < 100]
     # sorts the designDf by Total energy score
     designDf = designDf.sort_values(by='Total')
+    designDf = designDf.reset_index(drop=True)
     xAxis = 'Total'
     yAxis = 'Average' # Fluorescence
-    runNumber = designDf['runNumber'][2]
+    runNumber = designDf['runNumber'][0]
     graphTitle = 'Design '+str(runNumber)
     graphFile = outputDir+graphTitle+'.png'
-    label = 'Sequence'
-    createScatterPlot(designDf,xAxis,yAxis,label,graphFile,graphTitle)
-    exit()
+    createScatterPlot(designDf,xAxis,yAxis,graphFile,graphTitle)
 
+exit()
 
 # TODO: add in a way to identify any sequences with the same positions for the interface
 # I think take the interface, identify which positions are not dash, add that number to a list
