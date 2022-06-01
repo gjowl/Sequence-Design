@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as cs
 import random
+import re
 
 """
 Run as:
@@ -92,6 +93,22 @@ def createScatterPlot(df, xAxis, yAxis, outFile, title):
     fig.savefig(outFile,format='png', dpi=1200)
     plt.close()
 
+def getScatterplotsForDfList(list_df, xAxis, yAxis):
+    # iterate through the list of dataframes
+    for df in list_df:
+        # removes anything with an energy score below 100
+        df = df[df[xAxis] < 100]
+        # sorts the df by Total energy score
+        df = df.sort_values(by=xAxis)
+        df = df.reset_index(drop=True)
+        # get the runNumber for the filename
+        runNumber = df['runNumber'][0]
+        graphTitle = 'Design '+str(runNumber)
+        graphFile = outputDir+graphTitle+'.png'
+        # create the scatter plot
+        createScatterPlot(df,xAxis,yAxis,graphFile,graphTitle)
+        exit()
+
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
 #outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
@@ -118,19 +135,11 @@ else:
         designDf = df[df['StartSequence'] == sequence]
         list_designDf.append(designDf)
 
-for designDf in list_designDf:
-    designDf = designDf[designDf['Total'] < 100]
-    # sorts the designDf by Total energy score
-    designDf = designDf.sort_values(by='Total')
-    designDf = designDf.reset_index(drop=True)
-    xAxis = 'Total'
-    yAxis = 'Average' # Fluorescence
-    runNumber = designDf['runNumber'][0]
-    graphTitle = 'Design '+str(runNumber)
-    graphFile = outputDir+graphTitle+'.png'
-    createScatterPlot(designDf,xAxis,yAxis,graphFile,graphTitle)
-    exit()
+#TODO: I should convert these in the final alldata dataframe to actual names (energy score and fluorescence)
+xAxis = 'Total'
+yAxis = 'Average' # Fluorescence
 
+#getScatterplotsForDfList(list_designDf, xAxis, yAxis)
 
 # TODO: add in a way to identify any sequences with the same positions for the interface
 # I think take the interface, identify which positions are not dash, add that number to a list
@@ -152,11 +161,30 @@ for interface in df['Interface']:
     else:
         list_interface.append(numInterface)
 
+
+pattern = '^A....G$'
+test_string = 'AGLLAG'
+result = re.match(pattern, test_string)
+if result:
+  print("Search successful.")
+else:
+  print("Search unsuccessful.")	
+
+pattern = '^a...s$'
+test_string = 'abyss'
+result = re.match(pattern, test_string)
+if result:
+  print("Search successful.")
+else:
+  print("Search unsuccessful.")	
+
+#TODO: use regex to search for something that matches 
 for interface in df['Interface']:
     for numInterface in list_interface:
         for index in numInterface:
             if interface[index] == '-':
-               continue 
+                print(index)
+            exit()
 
 # TODO: input data here for kde plotting; go through the xShifts and crossingAngles and such here for any
 # generated dataframes
