@@ -71,6 +71,7 @@ def createScatterPlot(df, xAxis, yAxis, outFile, title):
     # get values from dataframe
     x = df[xAxis]
     y = df[yAxis]
+    stdDev = df['StdDev']
     # get the wild type value from the dataframe
     df_wt = df[df['StartSequence'] == df['Sequence']] 
     x_wt = df_wt[xAxis]
@@ -79,6 +80,7 @@ def createScatterPlot(df, xAxis, yAxis, outFile, title):
     xList = x.tolist()
     yList = y.tolist()
     # plot scatter plot for mutants
+    plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
     plt.scatter(x, y, s=50, linewidth=0.1)
     plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
     # TODO: fix so that there's a separate legend for regression
@@ -88,6 +90,7 @@ def createScatterPlot(df, xAxis, yAxis, outFile, title):
     #plt.gca().add_artist(l2)
     # save image to filename
     fig.savefig(outFile,format='png', dpi=1200)
+    plt.close()
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
@@ -126,8 +129,8 @@ for designDf in list_designDf:
     graphTitle = 'Design '+str(runNumber)
     graphFile = outputDir+graphTitle+'.png'
     createScatterPlot(designDf,xAxis,yAxis,graphFile,graphTitle)
+    exit()
 
-exit()
 
 # TODO: add in a way to identify any sequences with the same positions for the interface
 # I think take the interface, identify which positions are not dash, add that number to a list
