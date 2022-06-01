@@ -20,40 +20,47 @@ I will use this to input datafiles generate by other pieces of code that can the
 analyzed.
 """
 
-def createScatterPlot(x, y, labels, color, outFile, title):
-    fig, ax = plt.subplots()
+def outputRegressionLine(x, y):
     #obtain m (slope) and b(intercept) of linear regression line
     m, b = np.polyfit(x, y, 1)
     #add linear regression line to scatterplot 
-    plt.plot(x, m*x+b, label='y={:.2f}x+{:.2f}'.format(m, b))
+    line = plt.plot(x, m*x+b, label='y={:.2f}x+{:.2f}'.format(m, b))
+    return line
     
+def createScatterPlot(df, xAxis, yAxis, labelName, outFile, title):
+    # setup figure and axes
+    fig, ax = plt.subplots()
     # set axis title
     ax.set_title(title)
-
     # set axes labels
     ax.set_xlabel('Energy Score')
     ax.set_ylabel('Fluorescence')
+    # get values from dataframe
+    x = df[xAxis]
+    y = df[yAxis]
+    # values need to be in list format for scatterplot
+    xList = x.tolist()
+    yList = y.tolist()
+    labels = df[labelName].tolist()
     # get a color map based on the length of the input
     colormap = cm.viridis
     colorlist = [cs.rgb2hex(colormap(i)) for i in np.linspace(0, 0.9, len(labels))]
+    # loop through the dataframe to output the scatterplot with points in different colors 
     for i,c in enumerate(colorlist):
-        x1=x[i]
-        y1=y[i]
+        x1=xList[i]
+        y1=yList[i]
         l=labels[i]
-        ax.scatter(x1, y1, label=l, s=50, linewidth=0.1, c=c)
-    
-    #for n in range(len(labels)):
-    #    plt.scatter(xAxis, yAxis, label=labels[n])
-    #l = plt.legend(labels, loc=len(labels)) 
-
-    
-    l1 = plt.legend(fontsize=9)
+        plt.scatter(x1, y1, label=l, s=50, linewidth=0.1, c=c)
+    # TODO: fix so that there's a separate legend for regression
+    # outputs a regression line and equation 
+    l1 = outputRegressionLine(x, y)
     l2 = plt.legend(fontsize=6, loc='center right')
-    #plt.gca().add_artist(l)
-    #plt.gca().add_artist(l1)
     #plt.gca().add_artist(l2)
     # save image to filename
     fig.savefig(outFile,format='png', dpi=1200)
+
+
+
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
@@ -85,16 +92,13 @@ for designDf in list_designDf:
     designDf = designDf[designDf['Total'] < 100]
     # sorts the designDf by Total energy score
     designDf = designDf.sort_values(by='Total')
-    xAxis = designDf['Total']
-    yAxis = designDf['Average'] # Fluorescence
+    xAxis = 'Total'
+    yAxis = 'Average' # Fluorescence
     runNumber = designDf['runNumber'][2]
     graphTitle = 'Design '+str(runNumber)
     graphFile = outputDir+graphTitle+'.png'
-    label = designDf['Sequence']
-    colors = []
-    for j in range(len(xAxis)):
-        colors.append("#"+''.join([random.choice('ABCDEF0123456789') for i in range(6)]))
-    createScatterPlot(xAxis,yAxis,label,colors,graphFile,graphTitle)
+    label = 'Sequence'
+    createScatterPlot(designDf,xAxis,yAxis,label,graphFile,graphTitle)
     exit()
 
 
