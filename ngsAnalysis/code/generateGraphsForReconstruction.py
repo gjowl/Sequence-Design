@@ -111,8 +111,8 @@ def getScatterplotsForDfList(list_df, xAxis, yAxis):
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
-#outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
-outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+#outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['Total']
 
 # make the output directory if it doesn't exist
@@ -152,15 +152,35 @@ list_interface = []
 for interface in df['Interface']:
     # identify positions of interface that aren't dash
     numInterface = []
+    nInterface = 'x'
+    i = 0
     for AA in interface:
         if AA != '-':
-            index = interface.index(AA)
+            index = interface.index(AA,i)
+            #print(interface, AA, index)
             numInterface.append(index)
-    if numInterface in list_interface:
-        continue
-    else:
-        list_interface.append(numInterface)
+            nInterface = nInterface+str(index)
+        i+=1
+    list_interface.append(nInterface) 
+df['numInterface'] = list_interface
+interfaceFile = outputDir+'interfaces.csv'
+df.to_csv(interfaceFile)
+exit()
 
+# TODO: how do I get rid of things that don't seem to correlate...? What is a good way to cutoff data?
+# Maybe looking at the counts per LB and M9 for some sequences?
+# TODO: look at percent GpA and energy score differences to choose sequences to look at docking and backbone repacks:
+# come up with some way to say that these numbers are too different?
+# some way to show correlation +/- a value or so? as in like move down 10%: what is the energy score and what's a 
+# reasonable acceptable range for that score
+
+
+for interface in df['Interface']:
+    for numInterface in list_interface:
+        print(numInterface)
+        for index in numInterface:
+            if interface[index] == '-':
+                print(index)
 
 pattern = '^A....G$'
 test_string = 'AGLLAG'
@@ -177,14 +197,6 @@ if result:
   print("Search successful.")
 else:
   print("Search unsuccessful.")	
-
-#TODO: use regex to search for something that matches 
-for interface in df['Interface']:
-    for numInterface in list_interface:
-        for index in numInterface:
-            if interface[index] == '-':
-                print(index)
-            exit()
 
 # TODO: input data here for kde plotting; go through the xShifts and crossingAngles and such here for any
 # generated dataframes
