@@ -43,7 +43,7 @@ separationLength = int(sys.argv[2])
 
 # variables
 currentDir = os.getcwd()
-outputFile = currentDir+'/matchingSequences.csv'
+outputFile = currentDir+'/matchingSequences3.csv'
 gxxxgLetters = ['G','A','S']
 col = 'Sequence'
 

@@ -53,7 +53,7 @@ def createScatterPlotDiffLabels(df, xAxis, yAxis, labelName, outFile, title):
     # save image to filename
     fig.savefig(outFile,format='png', dpi=1200)
     
-def createScatterPlot(df, xAxis, yAxis, outFile, title):
+def createScatterPlot(df, xAxis, yAxis, r2Cutoff, filename, title):
     # setup figure and axes
     fig, ax = plt.subplots()
     # get values from dataframe
@@ -61,7 +61,7 @@ def createScatterPlot(df, xAxis, yAxis, outFile, title):
     y = df[yAxis]
     # outputs a regression line and equation 
     line, r2 = outputRegressionLine(x, y)
-    if r2 > 0.5:
+    if r2 <= r2Cutoff:
         print(title, r2)
         # set axis title
         ax.set_title(title)
@@ -77,33 +77,34 @@ def createScatterPlot(df, xAxis, yAxis, outFile, title):
         xList = x.tolist()
         yList = y.tolist()
         # plot scatter plot for mutants
-        plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
+        #plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
         plt.scatter(x, y, s=50, linewidth=0.1)
         plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
         # TODO: fix so that there's a separate legend for regression
         l2 = plt.legend(fontsize=6, loc='upper right')
         #plt.gca().add_artist(l2)
         # save image to filename
-        fig.savefig(outFile,format='png', dpi=1200)
-    exit()
+        fig.savefig(filename+'.png',format='png', dpi=1200)
+        df.to_csv(filename+'.csv')
     plt.close()
 
-def getScatterplotsForDfList(list_df, nameCol, xAxis, yAxis, outputDir):
+def getScatterplotsForDfList(list_df, nameCol, xAxis, yAxis, r2Cutoff, outputDir):
     # iterate through the list of dataframes
     for df in list_df:
+        df.loc[df[xAxis] > 0, xAxis] = 0
         # sorts the df by Total energy score
         df = df.sort_values(by=xAxis)
         df = df.reset_index(drop=True)
-        # get the runNumber for the filename
-        runNumber = df[nameCol][0]
-        graphTitle = str(runNumber)
-        graphFile = outputDir+graphTitle+'.png'
+        # get the name value for the filename
+        name = df[nameCol][0]
+        graphTitle = str(name)
+        filename = outputDir+graphTitle
         # create the scatter plot
-        createScatterPlot(df,xAxis,yAxis,graphFile,graphTitle)
+        createScatterPlot(df,xAxis,yAxis,r2Cutoff,filename,graphTitle)
 
 def getListOfDfWithUniqueColumnVal(df, colName):
     list_df = []
-    for num in df['runNumber'].unique():
-        out_df = df[df['runNumber'] == num]
+    for num in df[colName].unique():
+        out_df = df[df[colName] == num]
         list_df.append(out_df)
     return list_df

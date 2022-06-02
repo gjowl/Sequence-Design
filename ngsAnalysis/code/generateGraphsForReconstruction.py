@@ -20,8 +20,11 @@ analyzed.
 #outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['Total']
+r2Cutoff = 0.5
 
 # make the output directory if it doesn't exist
+makeOutputDir(outputDir)
+outputDir = outputDir+str(r2Cutoff)+'cutoff/'
 makeOutputDir(outputDir)
 
 # read in input file from command line file options
@@ -30,21 +33,19 @@ df = pd.read_csv(inputFile)
 
 # TODO: do this in my actual analysis file
 gpaFluor = 109804.5
-#df['Percent GpA'] = df['Average']/gpaFluor*100
-#df['StdDev'] = df['StdDev']/gpaFluor*100
+df['Percent GpA'] = df['Average']/gpaFluor*100
+df['StdDev'] = df['StdDev']/gpaFluor*100
 
 # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
 list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
-
 #TODO: I should convert these in the final alldata dataframe to actual names (energy score and fluorescence)
 xAxis = 'Total'
-#yAxis = 'Percent GpA' # Fluorescence
-yAxis = 'Average' # Fluorescence
+yAxis = 'Percent GpA' # Fluorescence
 
-# replaces all values greater than 0 with 0
-df.loc[df[xAxis] > 100, xAxis] = 0
+# replaces all values greater than 0 with 0; this works in the function but not out here?
+#df.loc[df[xAxis] > 100, xAxis] = 0
 
-getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, outputDir)
+getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, r2Cutoff, outputDir)
 # TODO: add in a way to identify any sequences with the same positions for the interface
 # I think take the interface, identify which positions are not dash, add that number to a list
 # and if sequences match that list then add to dictionary? OR easier would be to go through all,
@@ -68,41 +69,28 @@ for interface in df['Interface']:
     list_interface.append(nInterface) 
 df['numInterface'] = list_interface
 list_interfaceDf = getListOfDfWithUniqueColumnVal(df, 'numInterface')
-getScatterplotsForDfList(list_interfaceDf, 'numInterface', xAxis, yAxis, outputDir)
+getScatterplotsForDfList(list_interfaceDf, 'numInterface', xAxis, yAxis, r2Cutoff, outputDir)
 interfaceFile = outputDir+'interfaces.csv'
 df.to_csv(interfaceFile)
 exit()
 
-# TODO: how do I get rid of things that don't seem to correlate...? What is a good way to cutoff data?
-# Maybe looking at the counts per LB and M9 for some sequences?
-# TODO: look at percent GpA and energy score differences to choose sequences to look at docking and backbone repacks:
-# come up with some way to say that these numbers are too different?
-# some way to show correlation +/- a value or so? as in like move down 10%: what is the energy score and what's a 
-# reasonable acceptable range for that score
-
-
-for interface in df['Interface']:
-    for numInterface in list_interface:
-        print(numInterface)
-        for index in numInterface:
-            if interface[index] == '-':
-                print(index)
-
-pattern = '^A....G$'
-test_string = 'AGLLAG'
-result = re.match(pattern, test_string)
-if result:
-  print("Search successful.")
-else:
-  print("Search unsuccessful.")	
-
-pattern = '^a...s$'
-test_string = 'abyss'
-result = re.match(pattern, test_string)
-if result:
-  print("Search successful.")
-else:
-  print("Search unsuccessful.")	
-
-# TODO: input data here for kde plotting; go through the xShifts and crossingAngles and such here for any
-# generated dataframes
+df.loc[df[xAxis] > 0, xAxis] = 0
+# sorts the df by Total energy score
+df = df.sort_values(by=xAxis)
+df = df.reset_index(drop=True)
+print(df)
+df_designs = df[df['StartSequence'] == df['Sequence']] 
+df_mutants = df[df['StartSequence'] != df['Sequence']] 
+df_designMaltose = df_designs[df_designs['PercentDiff'] > -100]
+print(df_designMaltose)
+#title = 'maltoseTestDesigns'
+#outFile = outputDir+'maltoseDesigns.png'
+#createScatterPlot(df_designMaltose, xAxis, yAxis, 0, outFile, title)
+#title = 'Designs'
+#outFile = outputDir+'designs.png'
+#csvFile = outputDir+'maltoseDesigns.csv'
+#df_designMaltose.to_csv(csvFile, index=False)
+#createScatterPlot(df_designs, xAxis, yAxis, 0, outFile, title)
+title = 'mutants'
+outFile = outputDir+'mutants.png'
+createScatterPlot(df_mutants, xAxis, yAxis, 0, outFile, title)
