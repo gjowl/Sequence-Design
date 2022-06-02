@@ -1,12 +1,6 @@
 import sys
 from functions import *
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
-import matplotlib.colors as cs
-import random
-import re
-
+from reconstructionGraphingFunctions import *
 """
 Run as:
     python3 generateGraphsForDataframe.py [inputFile]
@@ -21,98 +15,10 @@ I will use this to input datafiles generate by other pieces of code that can the
 analyzed.
 """
 
-def outputRegressionLine(x, y):
-    #obtain m (slope) and b(intercept) of linear regression line
-    m, b = np.polyfit(x, y, 1)
-    #add linear regression line to scatterplot 
-    line = plt.plot(x, m*x+b, label='y={:.2f}x+{:.2f}'.format(m, b), c='orange')
-    return line
-    
-def createScatterPlotDiffLabels(df, xAxis, yAxis, labelName, outFile, title):
-    # setup figure and axes
-    fig, ax = plt.subplots()
-    # set axis title
-    ax.set_title(title)
-    # set axes labels
-    ax.set_xlabel('Energy Score')
-    ax.set_ylabel('Fluorescence')
-    # get values from dataframe
-    x = df[xAxis]
-    y = df[yAxis]
-
-    # values need to be in list format for scatterplot
-    xList = x.tolist()
-    yList = y.tolist()
-    labels = df[labelName].tolist()
-    # get a color map based on the length of the input
-    colormap = cm.viridis
-    colorlist = [cs.rgb2hex(colormap(i)) for i in np.linspace(0, 0.9, len(labels))]
-    # loop through the dataframe to output the scatterplot with points in different colors 
-    for i,c in enumerate(colorlist):
-        x1=xList[i]
-        y1=yList[i]
-        l=labels[i]
-        plt.scatter(x1, y1, label=l, s=50, linewidth=0.1, c=c)
-    # TODO: fix so that there's a separate legend for regression
-    # outputs a regression line and equation 
-    l1 = outputRegressionLine(x, y)
-    l2 = plt.legend(fontsize=6, loc='center right')
-    #plt.gca().add_artist(l2)
-    # save image to filename
-    fig.savefig(outFile,format='png', dpi=1200)
-    
-def createScatterPlot(df, xAxis, yAxis, outFile, title):
-    # setup figure and axes
-    fig, ax = plt.subplots()
-    # set axis title
-    ax.set_title(title)
-    # set axes labels
-    ax.set_xlabel('Energy Score')
-    ax.set_ylabel('Fluorescence')
-    # get values from dataframe
-    x = df[xAxis]
-    y = df[yAxis]
-    stdDev = df['StdDev']
-    # get the wild type value from the dataframe
-    df_wt = df[df['StartSequence'] == df['Sequence']] 
-    x_wt = df_wt[xAxis]
-    y_wt = df_wt[yAxis]
-    # values need to be in list format for scatterplot
-    xList = x.tolist()
-    yList = y.tolist()
-    # plot scatter plot for mutants
-    plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
-    plt.scatter(x, y, s=50, linewidth=0.1)
-    plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
-    # TODO: fix so that there's a separate legend for regression
-    # outputs a regression line and equation 
-    l1 = outputRegressionLine(x, y)
-    l2 = plt.legend(fontsize=6, loc='center right')
-    #plt.gca().add_artist(l2)
-    # save image to filename
-    fig.savefig(outFile,format='png', dpi=1200)
-    plt.close()
-
-def getScatterplotsForDfList(list_df, xAxis, yAxis):
-    # iterate through the list of dataframes
-    for df in list_df:
-        # removes anything with an energy score below 100
-        df = df[df[xAxis] < 100]
-        # sorts the df by Total energy score
-        df = df.sort_values(by=xAxis)
-        df = df.reset_index(drop=True)
-        # get the runNumber for the filename
-        runNumber = df['runNumber'][0]
-        graphTitle = 'Design '+str(runNumber)
-        graphFile = outputDir+graphTitle+'.png'
-        # create the scatter plot
-        createScatterPlot(df,xAxis,yAxis,graphFile,graphTitle)
-        exit()
-
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
-outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
-#outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+#outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['Total']
 
 # make the output directory if it doesn't exist
@@ -122,25 +28,23 @@ makeOutputDir(outputDir)
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
 
+# TODO: do this in my actual analysis file
+gpaFluor = 109804.5
+#df['Percent GpA'] = df['Average']/gpaFluor*100
+#df['StdDev'] = df['StdDev']/gpaFluor*100
+
 # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
-list_designDf = []
-if 'runNumber' in df.columns:
-    for num in df['runNumber'].unique():
-        designDf = pd.DataFrame()
-        designDf = df[df['runNumber'] == num]
-        list_designDf.append(designDf)
-else:
-    for sequence in df['StartSequence']:
-        designDf = pd.DataFrame()
-        designDf = df[df['StartSequence'] == sequence]
-        list_designDf.append(designDf)
+list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
 
 #TODO: I should convert these in the final alldata dataframe to actual names (energy score and fluorescence)
 xAxis = 'Total'
+#yAxis = 'Percent GpA' # Fluorescence
 yAxis = 'Average' # Fluorescence
 
-#getScatterplotsForDfList(list_designDf, xAxis, yAxis)
+# replaces all values greater than 0 with 0
+df.loc[df[xAxis] > 100, xAxis] = 0
 
+getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, outputDir)
 # TODO: add in a way to identify any sequences with the same positions for the interface
 # I think take the interface, identify which positions are not dash, add that number to a list
 # and if sequences match that list then add to dictionary? OR easier would be to go through all,
@@ -163,6 +67,8 @@ for interface in df['Interface']:
         i+=1
     list_interface.append(nInterface) 
 df['numInterface'] = list_interface
+list_interfaceDf = getListOfDfWithUniqueColumnVal(df, 'numInterface')
+getScatterplotsForDfList(list_interfaceDf, 'numInterface', xAxis, yAxis, outputDir)
 interfaceFile = outputDir+'interfaces.csv'
 df.to_csv(interfaceFile)
 exit()
