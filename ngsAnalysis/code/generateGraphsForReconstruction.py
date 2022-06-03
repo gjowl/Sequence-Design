@@ -19,7 +19,7 @@ analyzed.
 # variables: if want to make this more multipurpose, add the below into a config file
 outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 #outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
-columnsToAnalyze = ['Total']
+columnsToAnalyze = ['EnergyScore']
 r2Cutoff = 0
 
 # make the output directory if it doesn't exist
@@ -30,7 +30,7 @@ makeOutputDir(outputDir)
 # read in input file from command line file options
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
-df2 = pd.read_csv('/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/matchingSequences3.csv')
+df2 = pd.read_csv('/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/gxxxgDesigns.csv')
 
 # get dataframe with only non matching sequences from other dataframe
 df_nonGxxxg = df[df['Sequence'].isin(df2['Sequence']) == False]
@@ -39,19 +39,19 @@ df = df_nonGxxxg.copy()
 
 # TODO: do this in my actual analysis file
 gpaFluor = 109804.5
-df['Percent GpA'] = df['Average']/gpaFluor*100
-df['StdDev'] = df['StdDev']/gpaFluor*100
 
 # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
 list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
 #TODO: I should convert these in the final alldata dataframe to actual names (energy score and fluorescence)
-xAxis = 'Total'
-yAxis = 'Percent GpA' # Fluorescence
+xAxis = 'EnergyScore'
+yAxis = 'PercentGpA' # Fluorescence
+stdDev = 'PercentGpAStdDev'
+# set sequence column as first column
 
 # replaces all values greater than 0 with 0; this works in the function but not out here?
 #df.loc[df[xAxis] > 100, xAxis] = 0
 
-getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, r2Cutoff, outputDir)
+getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, stdDev, r2Cutoff, outputDir)
 # TODO: add in a way to identify any sequences with the same positions for the interface
 # I think take the interface, identify which positions are not dash, add that number to a list
 # and if sequences match that list then add to dictionary? OR easier would be to go through all,

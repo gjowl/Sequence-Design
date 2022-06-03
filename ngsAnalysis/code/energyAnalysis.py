@@ -1,7 +1,12 @@
-
 import sys
 from functions import *
 
+def addColumnsToFrontOfDf(df, colNames):
+    df_output = df.copy()
+    for colName in colNames:
+        col = df_output.pop(colName)
+        df_output.insert(0, colName, col)
+    return df_output
 # MAIN
 # Use the utilityFunctions function to get the name of this program
 programName = getFilename(sys.argv[0])
@@ -20,6 +25,14 @@ reconstructionFile = config["reconstructionFile"]
 gpa = 'LIIFGVMAGVIGT'
 g83i = 'LIIFGVMAIVIGL'
 
+# variables
+fluorCol = 'Fluorescence'
+stdDevCol = 'FluorStdDev'
+percentGpaCol = 'PercentGpa'
+percentGpaStdDevCol = 'PercentGpaStdDev'
+maltoseCol = 'MaltosePercentDiff'
+colsToAdd = [fluorCol, stdDevCol, percentGpaCol, percentGpaStdDevCol, maltoseCol]
+
 # make the output directories that these will all output to
 dirList = [outputDir]
 for dir in dirList:
@@ -28,6 +41,7 @@ for dir in dirList:
 # read in the input files
 df_energyFile = pd.read_csv(energyFile)
 df_fluor = pd.read_csv(reconstructionFile)
+
 
 # initialize a new dataframe that will be used for analysis and output
 df_output = pd.DataFrame()
@@ -50,8 +64,6 @@ df_fluorFiltered.reset_index(drop=True, inplace=True)
 # mutants to some sequences end up being the same as a starting sequence
 # So instead of just adding columns, I'll need to add info for each sequence
 # add the fluorescence, stdDev, and percent difference to the energy dataframe
-colInfo = []
-colsToAdd = ['Average', 'StdDev', 'PercentDiff']
 for colName in df_fluor.columns:
     if colName in colsToAdd:
         list_values = [] 
@@ -61,9 +73,20 @@ for colName in df_fluor.columns:
             list_values.append(value)
         df_energyAndFluor = insertAtEndOfDf(df_energyAndFluor, colName, list_values)
 
+# reverse columns to add them to the front of the dataframe in proper order
+colsToAdd.reverse()
+df_output = addColumnsToFrontOfDf(df_energyAndFluor, colsToAdd)
+
+# rename energy column Total -> EnergyScore and add to front of dataframe
+energyScore = df_output.pop('Total')
+df_output.insert(0, 'EnergyScore', energyScore)
+# add sequence column to front of dataframe
+sequence = df_output.pop('Sequence')
+df_output.insert(0, 'Sequence', sequence)
+
 # output the dataframe
 allDatafile = outputDir+'allData.csv'
-df_energyAndFluor.to_csv(allDatafile, index=False)
+df_output.to_csv(allDatafile, index=False)
 
 # get just design sequences
 df_designs = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFluor['StartSequence'])]
@@ -72,32 +95,7 @@ df_designs.to_csv(designDatafile, index=False)
 
 # get only clashing sequences
 df_clash = df_energyAndFluor[df_energyAndFluor['Total'] > 0]
-
-# TODO: write a bit of code that will take the sequence and write out fasta and colabfold files for them
-# write colabfold csv file
-colabfoldFile = outputDir+'colabfold_clashing.csv'
-df_colab = pd.DataFrame()
-seqColumn = df_clash['Sequence']
-fastaColumn = df_clash['Sequence']+'.fasta'
-df_colab = insertAtEndOfDf(df_colab, 'fasta', fastaColumn)
-df_colab = insertAtEndOfDf(df_colab, 'Sequence', seqColumn)
-
-# write fasta files for all sequences
-fastaDir = '/mnt/d/fasta/'
-for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
-    filename = fastaDir+fasta
-    with open(filename, 'w') as f:
-        f.write('>'+seq+'\n')
-        f.write(seq+':'+seq)
-    f.close()
-
-df_colab = df_colab.set_index('fasta')
-df_colab.to_csv(colabfoldFile, header=False, index=False)
-
 exit()
-# may have to change this: I think I should just use whatever the single g83i and gpa are from the flow (get those tomorrow or tonight and redo any analyses with those or just add them in)
-g83iFluor = df.loc[df['Sequence'] == g83i, 'Average'].item()
-# get g83i sequence
 # do this for one sequence, make into a function, then for loop through it for the rest and figure out names later
 df_out = df_cutoffEnergyData.copy()
 # add in the LILI add the end of all sequences that doesn't get read by NGS but is found in the energy file of sequences
@@ -110,13 +108,29 @@ for colName in df.columns:
     if colName in colsToAdd:
         df_out[colName] = pd.Series(df[colName])
 
-# cutoff by g83i fluorescence
-df_g83iCutoff = df_out[df_out['Average'] > g83iFluor]
-print(df_g83iCutoff)
-df_g83iCutoff.to_csv(outputDir+'seqsHigherThanG83i.csv')
-
 # get just the designed sequences
-df_designs = df_g83iCutoff[df_g83iCutoff['Sequence'] == df_g83iCutoff['StartSequence']]
-print(df_designs)
+df_designs = df[df['Sequence'] == df['StartSequence']]
 df_designs.to_csv(outputDir+'designs.csv')
 print('DONE!')
+
+# uncomment and change below if planning to run alphafold on these designs
+# TODO: write a bit of code that will take the sequence and write out fasta and colabfold files for them
+# write colabfold csv file
+#colabfoldFile = outputDir+'colabfold_clashing.csv'
+#df_colab = pd.DataFrame()
+#seqColumn = df_clash['Sequence']
+#fastaColumn = df_clash['Sequence']+'.fasta'
+#df_colab = insertAtEndOfDf(df_colab, 'fasta', fastaColumn)
+#df_colab = insertAtEndOfDf(df_colab, 'Sequence', seqColumn)
+
+# write fasta files for all sequences
+#fastaDir = '/mnt/d/fasta/'
+#for seq, fasta in zip(df_colab['Sequence'], df_colab['fasta']):
+#    filename = fastaDir+fasta
+#    with open(filename, 'w') as f:
+#        f.write('>'+seq+'\n')
+#        f.write(seq+':'+seq)
+#    f.close()
+#
+#df_colab = df_colab.set_index('fasta')
+#df_colab.to_csv(colabfoldFile, header=False, index=False)
