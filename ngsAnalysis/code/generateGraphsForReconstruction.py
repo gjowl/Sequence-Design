@@ -17,10 +17,10 @@ analyzed.
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
-#outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
-outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+#outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['Total']
-r2Cutoff = 0.5
+r2Cutoff = 0
 
 # make the output directory if it doesn't exist
 makeOutputDir(outputDir)
@@ -30,6 +30,12 @@ makeOutputDir(outputDir)
 # read in input file from command line file options
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
+df2 = pd.read_csv('/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/matchingSequences3.csv')
+
+# get dataframe with only non matching sequences from other dataframe
+df_nonGxxxg = df[df['Sequence'].isin(df2['Sequence']) == False]
+df_nonGxxxg.to_csv(outputDir+'nonGxxxg.csv', index=False)
+df = df_nonGxxxg.copy()
 
 # TODO: do this in my actual analysis file
 gpaFluor = 109804.5

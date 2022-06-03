@@ -59,33 +59,37 @@ def createScatterPlot(df, xAxis, yAxis, r2Cutoff, filename, title):
     # get values from dataframe
     x = df[xAxis]
     y = df[yAxis]
-    # outputs a regression line and equation 
-    line, r2 = outputRegressionLine(x, y)
-    if r2 <= r2Cutoff:
-        print(title, r2)
-        # set axis title
-        ax.set_title(title)
-        # set axes labels
-        ax.set_xlabel('Energy Score')
-        ax.set_ylabel('Fluorescence')
-        stdDev = df['StdDev']
-        # get the wild type value from the dataframe
-        df_wt = df[df['StartSequence'] == df['Sequence']] 
-        x_wt = df_wt[xAxis]
-        y_wt = df_wt[yAxis]
-        # values need to be in list format for scatterplot
-        xList = x.tolist()
-        yList = y.tolist()
-        # plot scatter plot for mutants
-        #plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
-        plt.scatter(x, y, s=50, linewidth=0.1)
-        plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
-        # TODO: fix so that there's a separate legend for regression
-        l2 = plt.legend(fontsize=6, loc='upper right')
-        #plt.gca().add_artist(l2)
-        # save image to filename
-        fig.savefig(filename+'.png',format='png', dpi=1200)
-        df.to_csv(filename+'.csv')
+    if len(x) > 1:
+        print(df)
+        print(x)
+        print(y)
+        # outputs a regression line and equation 
+        line, r2 = outputRegressionLine(x, y)
+        if r2 >= r2Cutoff:
+            print(title, r2)
+            # set axis title
+            ax.set_title(title)
+            # set axes labels
+            ax.set_xlabel('Energy Score')
+            ax.set_ylabel('Fluorescence')
+            stdDev = df['StdDev']
+            # get the wild type value from the dataframe
+            df_wt = df[df['StartSequence'] == df['Sequence']] 
+            x_wt = df_wt[xAxis]
+            y_wt = df_wt[yAxis]
+            # values need to be in list format for scatterplot
+            xList = x.tolist()
+            yList = y.tolist()
+            # plot scatter plot for mutants
+            #plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
+            plt.scatter(x, y, s=50, linewidth=0.1)
+            plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
+            # TODO: fix so that there's a separate legend for regression
+            l2 = plt.legend(fontsize=6, loc='upper right')
+            #plt.gca().add_artist(l2)
+            # save image to filename
+            fig.savefig(filename+'.png',format='png', dpi=1200)
+            df.to_csv(filename+'.csv')
     plt.close()
 
 def getScatterplotsForDfList(list_df, nameCol, xAxis, yAxis, r2Cutoff, outputDir):
