@@ -43,16 +43,33 @@ separationLength = int(sys.argv[2])
 
 # variables
 currentDir = os.getcwd()
-outputFile = currentDir+'/matchingSequences3.csv'
+outputFile = currentDir+'/gxxxgDesigns.csv'
 gxxxgLetters = ['G','A','S']
 col = 'Sequence'
 
 # get just the matching sequences
 df_match = checkForPatternBySepLength(df, col, gxxxgLetters, separationLength)
 
-# set the matching column to the first column of the dataframe
-first_column = df_match.pop(col)
-df_match.insert(0, col, first_column)
-
 # output the matching sequence dataframe in csv format
 df_match.to_csv(outputFile, index=False)
+
+# output non matching sequences in csv format
+df_nonGxxxg = df[df['Sequence'].isin(df_match['Sequence']) == False]
+df_nonGxxxg.to_csv(currentDir+'/nonGxxxg.csv', index=False)
+
+# gets only the design sequences that have a GASright like pattern
+col = 'StartSequence'
+df_match = checkForPatternBySepLength(df, col, gxxxgLetters, separationLength)
+
+# get any sequences match the starting sequence
+df_startGxxxG = df[df['StartSequence'].isin(df_match['StartSequence']) == True]
+df_startGxxxG.to_csv(currentDir+'/startSeqGxxxg.csv', index=False)
+
+# get all sequences that don't have a GxxxG starting sequence
+df_noStartGxxxG = df[df['StartSequence'].isin(df_match['StartSequence']) == False]
+df_noStartGxxxG.to_csv(currentDir+'/noStartSeqGxxxg.csv', index=False)
+
+# TODO: get all sequences that have GxxxG but not started as GASright
+df_nonStartGxxxg = df[df['Sequence'].isin(df_match['Sequence']) == False]
+df_nonStartGxxxg.to_csv(currentDir+'/nonGxxxg.csv', index=False)
+
