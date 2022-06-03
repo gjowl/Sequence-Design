@@ -24,7 +24,7 @@ def outputAnalysisDfToCsv(df, seqs, segments, outputDir, name):
     df.insert(0, 'Sequence', seqs)
     df.insert(1, 'Segments', segments)
     filename = outputDir+name
-    df.to_csv(filename)
+    df.to_csv(filename, index=False)
 
 #FLUORESCENCE RECONSTRUCTION
 # main function for fluorescence reconstruction

@@ -9,12 +9,12 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-#analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
-#dataDir = '/data/NGS/'
-analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
-dataDir = '/mnt/d/2022-5-13/'
+analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
+dataDir = '/data/NGS/'
+#analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
+#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
+#dataDir = '/mnt/d/2022-5-13/'
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'
@@ -26,8 +26,8 @@ refFile = inputDir + "refSeqs.csv"
 namesFile = inputDir + "dataFilenames.csv"
 
 # output files
-countFile = inputDir+"allCounts.csv"
-percentFile = inputDir+"allPercents.csv"
+countFile = analysisDir+"allCounts.csv"
+percentFile = analysisDir+"allPercents.csv"
 
 # program files
 fastqTotxt = codeDir + "fastqTotxt.pl"
@@ -55,12 +55,16 @@ config_file["main"]={
 
 # ngsAnalysis config options
 flowFile = inputDir+"flowFile.csv"
-reconstructionFile = analyzedDataDir+"reconstructionFile.csv"
+reconstructionFile = analyzedDataDir+"reconstructionAllData.csv"
+reconstructionFile = analyzedDataDir+"reconstructionAllData.csv"
 countDir = analyzedDataDir+"reconstruction_by_count/"
 percentDir = analyzedDataDir+"reconstruction_by_percent/"
 maltoseTestDir = analyzedDataDir+"maltoseTest/"
+maltoseCutoff = -95 #simple cutoff that we've used in the past; also can use negative control values
 gpa = 'LIIFGVMAGVIG'
-g83I = 'LIIFGVMAIVIG'
+g83i = 'LIIFGVMAIVIG'
+gpaFluor = 109804.5
+g83iFluor = 39740
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
     "inputDir":outputDir,
@@ -71,7 +75,10 @@ config_file["ngsAnalysis"]={
     "reconstructionFile":reconstructionFile,
     "countDir":countDir,
     "percentDir":percentDir,
+    "gpaFluor":gpaFluor,
+    "g83iFluor":g83iFluor,
     "maltoseTestDir":maltoseTestDir,
+    "maltoseCutoff":maltoseCutoff,
 }
 
 # energyAnalysis config options
@@ -79,7 +86,7 @@ energyFile = inputDir+"chipEnergyFile.csv"
 # for now, decided to only continue forward with this data 
 # (seems closest to SMA and JC reconstruction)
 energyDir = analyzedDataDir+'energyAnalysis/'
-# ngsAnalysis config
+# energyAnalysis config
 config_file["energyAnalysis"]={
     "outputDir":energyDir,
     "energyFile":energyFile,
