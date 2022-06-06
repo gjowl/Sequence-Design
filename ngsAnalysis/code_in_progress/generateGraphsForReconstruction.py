@@ -14,11 +14,14 @@ be great to add in other types of graphs to graph that can just be input and cre
 I will use this to input datafiles generate by other pieces of code that can then be
 analyzed.
 """
+# TODO: fix this code so that it's easy to run for just one dataframe or for multiples and any other options (different things to analyze;
+# should I try to set up a class to run multiple types of graphing modes? linear, exponential, etc. Or different types of things to analyze?)
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
-#outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
-outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+outputDir = os.getcwd()
+outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+#outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['EnergyScore']
 r2Cutoff = 0
 
@@ -30,19 +33,21 @@ makeOutputDir(outputDir)
 # read in input file from command line file options
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
+df = df[df['StartSequence'] == df['Sequence']]
 #df = df[df['MaltosePercentDiff'] > -95]
 
 # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
-list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
-xAxis = 'VDWDiff'
+#list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
+xAxis = 'EnergyScore'
 yAxis = 'PercentGpa' # Fluorescence
 stdDev = 'PercentGpaStdDev'
 
-title = 'allData'
-outFile = outputDir+'allData.png'
+title = 'nonGxxxGData'
+outFile = outputDir+title
 createScatterPlot(df, xAxis, yAxis, stdDev, 0, outFile, title)
+exit()
 
-
+# TODO: add an option here to run or not run the below code
 getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, stdDev, r2Cutoff, outputDir)
 # TODO: add in a way to identify any sequences with the same positions for the interface
 # I think take the interface, identify which positions are not dash, add that number to a list
