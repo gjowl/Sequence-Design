@@ -86,7 +86,7 @@ def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
             #plt.gca().add_artist(l2)
             # save image to filename
             fig.savefig(filename+'.png',format='png', dpi=1200)
-            df.to_csv(filename+'.csv')
+            df.to_csv(filename+'.csv', index=False)
     plt.close()
 
 def getScatterplotsForDfList(list_df, nameCol, xAxis, yAxis, stdDev, r2Cutoff, outputDir):

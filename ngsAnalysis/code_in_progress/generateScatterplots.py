@@ -1,6 +1,7 @@
 import sys
 from functions import *
-from reconstructionGraphingFunctions import *
+import pandas as pd
+from generateScatterplotFunctions import *
 """
 Run as:
     python3 generateGraphsForDataframe.py [inputFile]
@@ -19,16 +20,16 @@ analyzed.
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
-outputDir = os.getcwd()
-outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
+outputDir = os.getcwd()+'/'
+#outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 #outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['EnergyScore']
 r2Cutoff = 0
 
 # make the output directory if it doesn't exist
 makeOutputDir(outputDir)
-outputDir = outputDir+'nonGxxxG_vdwDiff/'
-makeOutputDir(outputDir)
+#outputDir = outputDir+'nonGxxxG_vdwDiff/'
+#makeOutputDir(outputDir)
 
 # read in input file from command line file options
 inputFile = sys.argv[1]
@@ -42,7 +43,7 @@ xAxis = 'EnergyScore'
 yAxis = 'PercentGpa' # Fluorescence
 stdDev = 'PercentGpaStdDev'
 
-title = 'nonGxxxGData'
+title = 'nonGxxxG_DesignSequence'
 outFile = outputDir+title
 createScatterPlot(df, xAxis, yAxis, stdDev, 0, outFile, title)
 exit()
