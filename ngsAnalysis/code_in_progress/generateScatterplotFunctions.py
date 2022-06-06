@@ -78,7 +78,7 @@ def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
             xList = x.tolist()
             yList = y.tolist()
             # plot scatter plot for mutants
-            plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
+            #plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
             plt.scatter(x, y, s=50, linewidth=0.1)
             plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
             # TODO: fix so that there's a separate legend for regression

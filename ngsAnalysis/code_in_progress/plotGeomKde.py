@@ -51,12 +51,12 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
     cmap = plt.cm.Reds
-    cmap = cmap.reversed()
+    #cmap = cmap.reversed()
     # get min and max of the data
     min_val = np.min(fluor)
     max_val = np.max(fluor)
     # flip the data so that the min is at the top of the colorbar
-    norm = matplotlib.colors.Normalize(vmin=-50, vmax=max_val) # TODO: change this to the min and max of the data
+    norm = matplotlib.colors.Normalize(vmin=40, vmax=100) # TODO: change this to the min and max of the data
     print(norm(fluor))
     ax.scatter(xAxis, yAxis, c=cmap(norm(fluor)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
@@ -89,7 +89,7 @@ df_data = pd.read_csv(inputFile)
 # set xAxis and yAxis variables
 xAxis = 'xShift'
 yAxis = 'crossingAngle'
-data = 'EnergyScore'
+data = 'PercentGpa'
 
 df_data = df_data[df_data['StartSequence'] == df_data['Sequence']]
 #df_data = df_data[df_data['MaltosePercentDiff'] > -100]
@@ -102,5 +102,5 @@ fluor = df_data[data].values
 kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
 # TODO: run on just design sequences
 # plot the kde plot with an overlay of the input dataset   
-plotKdeOverlay(kdeZScores, x, y, fluor, "allData_energyScore", projectDir)
+plotKdeOverlay(kdeZScores, x, y, fluor, "allData_"+data, projectDir)
 # TODO: figure out what might be a good point to drop monomers from data
