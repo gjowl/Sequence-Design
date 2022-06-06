@@ -1,17 +1,21 @@
 """
 Example code for generating a configuration file for ngsAnalysis
 """
+import os
 import configparser
 
 # create config file object
 config_file = configparser.ConfigParser()
 
+# set up directory structure
+currDir = os.getcwd()
+parentDir = os.path.dirname(currDir)
+
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
+analysisDir = parentDir+'/2022-5-13/'
+codeDir = os.getcwd()+'/'
 dataDir = '/data/NGS/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
 #dataDir = '/mnt/d/2022-5-13/'
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
