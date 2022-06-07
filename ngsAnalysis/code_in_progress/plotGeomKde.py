@@ -51,7 +51,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
     cmap = plt.cm.Reds
-    cmap = cmap.reversed()
+    #cmap = cmap.reversed()
     # get min and max of the data
     min_val = np.min(fluor)
     max_val = np.max(fluor)
@@ -92,7 +92,7 @@ xAxis = 'xShift'
 yAxis = 'crossingAngle'
 data = 'EnergyScore'
 
-df_data = df_data[df_data['StartSequence'] == df_data['Sequence']]
+#df_data = df_data[df_data['StartSequence'] == df_data['Sequence']]
 #df_data = df_data[df_data['MaltosePercentDiff'] > -100]
 #df_data = df_data[df_data['PercentGpa'] > 60]
 # get the x and y axes data to be plotted from the dataframe
@@ -103,5 +103,5 @@ fluor = df_data[data].values
 kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
 # TODO: run on just design sequences
 # plot the kde plot with an overlay of the input dataset   
-plotKdeOverlay(kdeZScores, x, y, fluor, "allData_"+data, projectDir)
+plotKdeOverlay(kdeZScores, x, y, fluor, "homodimerSequences_"+data, projectDir)
 # TODO: figure out what might be a good point to drop monomers from data

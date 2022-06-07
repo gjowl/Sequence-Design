@@ -35,17 +35,17 @@ makeOutputDir(outputDir)
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
 df = df[df['StartSequence'] == df['Sequence']]
-df = df[df['PercentGpa'] > 50]
+df = df[df['PercentGpa'] > 40]
 #df = df[df['MaltosePercentDiff'] > -95]
 
 # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
 #list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
-xAxis = 'EnergyScore'
+xAxis = 'EnergyNoIMM1'
 yAxis = 'PercentGpa' # Fluorescence
 stdDev = 'PercentGpaStdDev'
 
 #title = 'allDesigns'
-title = 'gxxxgDesigns_higherThan50PercentGpa'
+title = 'nonGxxxGDesigns_noIMM1'
 outFile = outputDir+title
 createScatterPlot(df, xAxis, yAxis, stdDev, 0, outFile, title)
 exit()

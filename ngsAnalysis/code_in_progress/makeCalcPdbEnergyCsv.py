@@ -49,7 +49,8 @@ with open(optimizeFile, 'w') as f:
                 pdbEnd = value[pdbBeforeMutantDirIndex:]
                 replaceDir = '/Design_Data/12_06_2021_CHIP1_Dataset'
                 newDir = start+replaceDir
-                pdb = newDir+pdbMiddle+'mutants'+pdbEnd
+                #pdb = newDir+pdbMiddle+'mutants'+pdbEnd
+                pdb = newDir+pdbMiddle+'bestOptimizedBackbone.pdb'
                 line = line+','+pdb
             # needed to find a way to account for command line use of negative angle and rotation, coded that below
             else:
