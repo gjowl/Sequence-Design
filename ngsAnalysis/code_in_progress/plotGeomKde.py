@@ -57,7 +57,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
     max_val = np.max(fluor)
     # flip the data so that the min is at the top of the colorbar
     #norm = matplotlib.colors.Normalize(vmin=40, vmax=100) # TODO: change this to the min and max of the data
-    norm = matplotlib.colors.Normalize(vmin=-40, vmax=0) # TODO: change this to the min and max of the data
+    norm = matplotlib.colors.Normalize(vmin=-50, vmax=-5) # TODO: change this to the min and max of the data
     print(norm(fluor))
     ax.scatter(xAxis, yAxis, c=cmap(norm(fluor)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
@@ -103,5 +103,5 @@ fluor = df_data[data].values
 kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
 # TODO: run on just design sequences
 # plot the kde plot with an overlay of the input dataset   
-plotKdeOverlay(kdeZScores, x, y, fluor, "allData_"+data, projectDir)
+plotKdeOverlay(kdeZScores, x, y, fluor, "GxxxG_-40to-5_"+data, projectDir)
 # TODO: figure out what might be a good point to drop monomers from data
