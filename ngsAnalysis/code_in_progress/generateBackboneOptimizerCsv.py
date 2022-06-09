@@ -1,4 +1,6 @@
 import sys
+import pandas as pd
+import os
 from functions import *
 
 """
@@ -20,7 +22,7 @@ predict the dimerization strength of my mutant sequences.
 energyAndFluorFile = sys.argv[1]
 df_energyAndFluor = pd.read_csv(energyAndFluorFile)
 # get just the mutants sequences
-df_mutants = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFluor['StartSequence']) == False]
+#df_mutants = df_energyAndFluor[df_energyAndFluor['Sequence'].isin(df_energyAndFluor['StartSequence']) == False]
 # get the output directory (currently same directory as energy file)
 programPath = os.path.realpath(energyAndFluorFile)
 programDir, programFile = os.path.split(programPath)
@@ -30,7 +32,7 @@ optimizeFile = outputDir+'/allMutants.csv'
 colsToAdd = ['Sequence','xShift','crossingAngle','axialRotation','zShift','DesignDir']
 with open(optimizeFile, 'w') as f:
     # loop through all rows to get the desired information for the csv for each sequence 
-    for index, row in df_mutants.iterrows():
+    for index, row in df_energyAndFluor.iterrows():
         # initialize string to output
         line = ''
         # loop through all of the given columns hardcoded above
