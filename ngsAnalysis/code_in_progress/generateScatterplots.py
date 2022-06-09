@@ -28,21 +28,23 @@ r2Cutoff = 0
 
 # make the output directory if it doesn't exist
 makeOutputDir(outputDir)
-#outputDir = outputDir+'nonGxxxG_vdwDiff/'
-#makeOutputDir(outputDir)
+outputDir = outputDir+'nonGxxxG/'
+makeOutputDir(outputDir)
 
 # read in input file from command line file options
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
+# rid of anything with greater than 0 energy score
+df = df[df['EnergyScore'] < 0]
 #df = df[df['StartSequence'] == df['Sequence']]
-df = df[df['PercentGpa'] > 0]
-df = df[df['xShift'] < 7.5]
-df = df[df['crossingAngle'] > -60]
-df = df[df['crossingAngle'] < -20]
+#df = df[df['PercentGpa'] > 0]
+#df = df[df['xShift'] < 7.5]
+#df = df[df['crossingAngle'] > -60]
+#df = df[df['crossingAngle'] < -20]
 #df = df[df['MaltosePercentDiff'] > -95]
 
 # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
-#list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
+list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
 xAxis = 'EnergyScore'
 yAxis = 'PercentGpa' # Fluorescence
 stdDev = 'PercentGpaStdDev'
@@ -51,8 +53,7 @@ stdDev = 'PercentGpaStdDev'
 title = 'GxxxGwithMutants'
 outFile = outputDir+title
 df.loc[df[xAxis] > 0, xAxis] = 0
-createScatterPlot(df, xAxis, yAxis, stdDev, 0, outFile, title)
-exit()
+#createScatterPlot(df, xAxis, yAxis, stdDev, 0, outFile, title)
 
 # TODO: add an option here to run or not run the below code
 getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, stdDev, r2Cutoff, outputDir)
