@@ -16,7 +16,7 @@ to calculate the energy of pdbs.
 energyFile = sys.argv[1]
 df = pd.read_csv(energyFile)
 # get just the mutants sequences
-df_designs = df[df['Sequence'] == df['StartSequence']]
+#df_designs = df[df['Sequence'] == df['StartSequence']]
 
 # get the output directory (currently same directory as energy file)
 programPath = os.path.realpath(energyFile)
@@ -29,7 +29,7 @@ optimizeFile = outputDir+'/nonGxxxG_designs_calcEnergy.csv'
 colsToAdd = ['Sequence','DesignDir']
 with open(optimizeFile, 'w') as f:
     # loop through all rows to get the desired information for the csv for each sequence 
-    for index, row in df_designs.iterrows():
+    for index, row in df.iterrows():
         # initialize string to output
         line = ''
         # loop through all of the given columns hardcoded above
@@ -49,8 +49,9 @@ with open(optimizeFile, 'w') as f:
                 pdbEnd = value[pdbBeforeMutantDirIndex:]
                 replaceDir = '/Design_Data/12_06_2021_CHIP1_Dataset'
                 newDir = start+replaceDir
-                #pdb = newDir+pdbMiddle+'mutants'+pdbEnd
-                pdb = newDir+pdbMiddle+'bestOptimizedBackbone.pdb'
+                pdb = newDir+pdbMiddle+'mutants'+pdbEnd
+                # uncomment this for WT
+                #pdb = newDir+pdbMiddle+'bestOptimizedBackbone.pdb'
                 line = line+','+pdb
             # needed to find a way to account for command line use of negative angle and rotation, coded that below
             else:

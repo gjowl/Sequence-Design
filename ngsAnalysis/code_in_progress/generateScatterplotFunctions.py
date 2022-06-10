@@ -81,11 +81,12 @@ def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
             #plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
             plt.scatter(x, y, s=50, linewidth=0.1)
             plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
-
+            # set the y axis to be the same scale
+            ax.set_ylim(bottom=0, top=140)
             # add in count of sequences
             xmin = min(x)
             ymax = max(y)
-            plt.text(xmin-1, ymax+7, "# Sequences = " + str(len(x)), fontsize=10)
+            plt.text(xmin-1, 147, "# Sequences = " + str(len(x)), fontsize=10)
             # TODO: fix so that there's a separate legend for regression
             l2 = plt.legend(fontsize=6, loc='upper right')
             #plt.gca().add_artist(l2)
