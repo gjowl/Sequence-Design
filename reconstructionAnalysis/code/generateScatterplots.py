@@ -26,6 +26,7 @@ outputDir = os.getcwd()+'/'
 columnsToAnalyze = ['EnergyScore']
 r2Cutoff = 0
 
+# TODO: write code that will run this with multiple dataframes and output that data to different directories 
 # make the output directory if it doesn't exist
 makeOutputDir(outputDir)
 outputDir = outputDir+'GxxxG/'
@@ -43,62 +44,50 @@ df = pd.read_csv(inputFile)
 #df = df[df['crossingAngle'] < -20]
 #df = df[df['MaltosePercentDiff'] > -95]
 
-# get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
-#list_designDf = getListOfDfWithUniqueColumnVal(df, 'runNumber')
+# setup the list of columns to analyze
 xAxis = 'EnergyScore'
 yAxis = 'PercentGpa' # Fluorescence
 stdDev = 'PercentGpaStdDev'
-
-#title = 'allDesigns_noLine'
-title = 'test_3design_correlation'
-outFile = outputDir+title
-df.loc[df[xAxis] > 0, xAxis] = 0
-createScatterPlot(df, xAxis, yAxis, stdDev, 0, outFile, title)
-exit()
-# TODO: add an option here to run or not run the below code
-getScatterplotsForDfList(list_designDf, 'runNumber', xAxis, yAxis, stdDev, r2Cutoff, outputDir)
-# TODO: add in a way to identify any sequences with the same positions for the interface
-# I think take the interface, identify which positions are not dash, add that number to a list
-# and if sequences match that list then add to dictionary? OR easier would be to go through all,
-# get the sequences that match, output that dataframe, then continue from the first one that doesn't match
-# that combo in a list of combos (and then it's probably easier to output all of those as dataframes list 
-# rather than just converting dictionaries)
-list_sameInterfaceDf = []
-list_interface = []
-for interface in df['Interface']:
-    # identify positions of interface that aren't dash
-    numInterface = []
-    nInterface = 'x'
-    i = 0
-    for AA in interface:
-        if AA != '-':
-            index = interface.index(AA,i)
-            #print(interface, AA, index)
-            numInterface.append(index)
-            nInterface = nInterface+str(index)
-        i+=1
-    list_interface.append(nInterface) 
+# find sequences with the same interface
+list_interface = getNumInterface(df)
+# add in the interface number to the dataframe
 df['numInterface'] = list_interface
-list_interfaceDf = getListOfDfWithUniqueColumnVal(df, 'numInterface')
-getScatterplotsForDfList(list_interfaceDf, 'numInterface', xAxis, yAxis, stdDev, r2Cutoff, outputDir)
+# output the file with the interface column
 interfaceFile = outputDir+'interfaces.csv'
 df.to_csv(interfaceFile)
+# define interface output directory
+interfaceDir = outputDir+'interfaces/'
+# get the sequences that pass maltose test
+df_maltose = df[df['MaltosePercentDiff'] > -100]
+# analyze a list of dataframes for all individual sequences and interfaces
+list_df = [df, df_maltose]
+titles = ['allSequences', 'maltoseSequences']
+colList = ['runNumber', 'numInterface']
+for data, title in zip(list_df, titles):
+    outDir = outputDir+title+'/'
+    for colName in colList:
+        # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
+        listDf = getListOfDfWithUniqueColumnVal(data, colName)
+        # TODO: add an option here to run or not run the below code
+        dir = outDir+colName+'/'
+        makeOutputDir(dir)
+        # output scatterplots for df list
+        getScatterplotsForDfList(listDf, colName, xAxis, yAxis, stdDev, r2Cutoff, dir)
 
-df.loc[df[xAxis] > 0, xAxis] = 0
 # sorts the df by Total energy score
 df = df.sort_values(by=xAxis)
 df = df.reset_index(drop=True)
+# get the design sequences
 df_designs = df[df['StartSequence'] == df['Sequence']] 
+# get the mutant sequences
 df_mutants = df[df['StartSequence'] != df['Sequence']] 
-df_designMaltose = df_designs[df_designs['MaltosePercentDiff'] > -100]
-title = 'maltoseTestDesigns'
-outFile = outputDir+'maltoseDesigns.png'
-createScatterPlot(df_designMaltose, xAxis, yAxis, stdDev, 0, outFile, title)
-#title = 'Designs'
-#outFile = outputDir+'designs.png'
-#csvFile = outputDir+'maltoseDesigns.csv'
-#df_designMaltose.to_csv(csvFile, index=False)
-#createScatterPlot(df_designs, xAxis, yAxis, 0, outFile, title)
-#title = 'mutants'
-#outFile = outputDir+'mutants.png'
-#createScatterPlot(df_mutants, xAxis, yAxis, 0, outFile, title)
+# get the sequences that pass maltose test
+df_maltose = df[df['MaltosePercentDiff'] > -100]
+
+# output a scatterplot of all sequences
+titles = ['allSequences', 'designSequences', 'maltoseSequences']
+dfs = [df, df_designs, df_maltose]
+for title, data in zip(titles, dfs):
+    outFile = outputDir+title
+    df.loc[df[xAxis] > 0, xAxis] = 0
+    createScatterPlot(data, xAxis, yAxis, stdDev, 0, outFile, title)
