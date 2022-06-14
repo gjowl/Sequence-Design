@@ -65,7 +65,10 @@ def createScatterPlotDiffLabels(df, xAxis, yAxis, labelName, outFile, title):
 def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
     # setup figure and axes
     fig, ax = plt.subplots()
-    # get values from dataframe
+    # make a copy of the original dataframe
+    df_allSeqs = df.copy()
+    # rid of any sequence with an energy score of greater than 0
+    df = df[df[xAxis] < 0]
     x = df[xAxis]
     y = df[yAxis]
     if len(x) > 1:
@@ -102,7 +105,7 @@ def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
             l2 = plt.legend(fontsize=6, loc='upper right')
             # save image to filename
             fig.savefig(filename+'.png',format='png', dpi=1200)
-            df.to_csv(filename+'.csv', index=False)
+            df_allSeqs.to_csv(filename+'.csv', index=False)
     plt.close()
 
 def getScatterplotsForDfList(list_df, nameCol, xAxis, yAxis, stdDev, r2Cutoff, outputDir):
