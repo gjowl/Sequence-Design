@@ -29,36 +29,36 @@ r2Cutoff = 0
 # TODO: write code that will run this with multiple dataframes and output that data to different directories 
 # make the output directory if it doesn't exist
 makeOutputDir(outputDir)
-outputDir = outputDir+'GxxxG/'
+outputDir = outputDir+'reconstructionData/'
 makeOutputDir(outputDir)
 
 # read in input file from command line file options
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
 # rid of anything with greater than 0 energy score
-#df = df[df['EnergyScore'] < 0]
-#df = df[df['StartSequence'] == df['Sequence']]
-#df = df[df['PercentGpa'] > 0]
-#df = df[df['xShift'] < 7.5]
-#df = df[df['crossingAngle'] > -60]
-#df = df[df['crossingAngle'] < -20]
-#df = df[df['MaltosePercentDiff'] > -95]
+df = df[df['EnergyScore'] < 0]
 
 # setup the list of columns to analyze
 xAxis = 'EnergyScore'
 yAxis = 'PercentGpa' # Fluorescence
 stdDev = 'PercentGpaStdDev'
+
 # find sequences with the same interface
 list_interface = getNumInterface(df)
+
 # add in the interface number to the dataframe
 df['numInterface'] = list_interface
+
 # output the file with the interface column
 interfaceFile = outputDir+'interfaces.csv'
 df.to_csv(interfaceFile)
+
 # define interface output directory
 interfaceDir = outputDir+'interfaces/'
+
 # get the sequences that pass maltose test
 df_maltose = df[df['MaltosePercentDiff'] > -100]
+
 # analyze a list of dataframes for all individual sequences and interfaces
 list_df = [df, df_maltose]
 titles = ['allSequences', 'maltoseSequences']
@@ -77,12 +77,11 @@ for data, title in zip(list_df, titles):
 # sorts the df by Total energy score
 df = df.sort_values(by=xAxis)
 df = df.reset_index(drop=True)
-# get the design sequences
+
+# get the design, mutant, and maltose sequences
 df_designs = df[df['StartSequence'] == df['Sequence']] 
-# get the mutant sequences
 df_mutants = df[df['StartSequence'] != df['Sequence']] 
-# get the sequences that pass maltose test
-df_maltose = df[df['MaltosePercentDiff'] > -100]
+df_maltose = df[df['MaltosePercentDiff'] > -95]
 
 # output a scatterplot of all sequences
 titles = ['allSequences', 'designSequences', 'maltoseSequences']
