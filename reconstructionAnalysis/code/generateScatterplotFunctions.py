@@ -4,9 +4,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as cs
+from scipy.stats import spearmanr
 import random
 import re
 from sklearn.metrics import r2_score
+
+def getSpearmanCorrelation(df, xAxis, yAxis):
+    # get the values from the dataframe
+    x = df[xAxis]
+    y = df[yAxis]
+    # calculate the spearman correlation
+    rho, p = spearmanr(x, y)
+    return rho, p
 
 def outputRegressionLine(x, y):
     # fit a line to a 1 degree polynomial
@@ -56,7 +65,10 @@ def createScatterPlotDiffLabels(df, xAxis, yAxis, labelName, outFile, title):
 def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
     # setup figure and axes
     fig, ax = plt.subplots()
-    # get values from dataframe
+    # make a copy of the original dataframe
+    df_allSeqs = df.copy()
+    # rid of any sequence with an energy score of greater than 0
+    df = df[df[xAxis] < 0]
     x = df[xAxis]
     y = df[yAxis]
     if len(x) > 1:
@@ -64,6 +76,8 @@ def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
         line, r2 = outputRegressionLine(x, y)
         if r2 >= r2Cutoff:
             print(title, r2)
+            # get spearman correlation
+            rho, p = getSpearmanCorrelation(df, xAxis, yAxis)
             # set axis title
             ax.set_title(title)
             # set axes labels
@@ -72,27 +86,26 @@ def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
             stdDev = df[stdDev]
             # get the wild type value from the dataframe
             df_wt = df[df['StartSequence'] == df['Sequence']] 
-            x_wt = df_wt[xAxis]
-            y_wt = df_wt[yAxis]
+            x_wt, y_wt = df_wt[xAxis], df_wt[yAxis]
             # values need to be in list format for scatterplot
-            xList = x.tolist()
-            yList = y.tolist()
+            xList, yList = x.tolist(), y.tolist()
             # plot scatter plot for mutants
-            #plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
+            plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
             plt.scatter(x, y, s=50, linewidth=0.1)
             plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
             # set the y axis to be the same scale
             ax.set_ylim(bottom=0, top=140)
             # add in count of sequences
-            xmin = min(x)
-            ymax = max(y)
+            xmin, ymin, xmax, ymax = min(x), min(y), max(x), max(y)
+            # output numbers onto the graph
             plt.text(xmin-1, 147, "# Sequences = " + str(len(x)), fontsize=10)
+            plt.text(xmax-1, 147, "Spearman = %.3f" % rho, fontsize=7)
+            plt.text(xmax-1, 143, "p = %.3f" % p, fontsize=7)
             # TODO: fix so that there's a separate legend for regression
             l2 = plt.legend(fontsize=6, loc='upper right')
-            #plt.gca().add_artist(l2)
             # save image to filename
             fig.savefig(filename+'.png',format='png', dpi=1200)
-            df.to_csv(filename+'.csv', index=False)
+            df_allSeqs.to_csv(filename+'.csv', index=False)
     plt.close()
 
 def getScatterplotsForDfList(list_df, nameCol, xAxis, yAxis, stdDev, r2Cutoff, outputDir):
@@ -115,3 +128,20 @@ def getListOfDfWithUniqueColumnVal(df, colName):
         out_df = df[df[colName] == num]
         list_df.append(out_df)
     return list_df
+
+def getNumInterface(df):
+    list_interface = []
+    for interface in df['Interface']:
+        # identify positions of interface that aren't dash
+        numInterface = []
+        nInterface = 'x'
+        i = 0
+        for AA in interface:
+            if AA != '-':
+                index = interface.index(AA,i)
+                #print(interface, AA, index)
+                numInterface.append(index)
+                nInterface = nInterface+str(index)
+            i+=1
+        list_interface.append(nInterface) 
+    return list_interface
