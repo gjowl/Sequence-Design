@@ -26,15 +26,14 @@ outputDir = os.getcwd()+'/'
 columnsToAnalyze = ['EnergyScore']
 r2Cutoff = 0
 
-# TODO: write code that will run this with multiple dataframes and output that data to different directories 
-# make the output directory if it doesn't exist
-makeOutputDir(outputDir)
-outputDir = outputDir+'reconstructionData/'
-makeOutputDir(outputDir)
-
 # read in input file from command line file options
 inputFile = sys.argv[1]
 df = pd.read_csv(inputFile)
+filename = getFilename(inputFile)
+
+# make the output directory for the scatterplots based on the input filename
+outputDir = outputDir+filename+'/'
+makeOutputDir(outputDir)
 # rid of anything with greater than 0 energy score
 df = df[df['EnergyScore'] < 0]
 
