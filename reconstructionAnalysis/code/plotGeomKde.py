@@ -84,24 +84,25 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
 projectDir = os.getcwd()+'/'
 kdeFile = projectDir + '2020_09_23_kdeData.csv'
 inputFile = sys.argv[1]
+
 # copy and paste some code for writing the kde data to a file
 df_kde = pd.read_csv(kdeFile)
 df_data = pd.read_csv(inputFile)
+
 # set xAxis and yAxis variables
 xAxis = 'xShift'
 yAxis = 'crossingAngle'
 data = 'EnergyScore'
 
 df_data = df_data[df_data['StartSequence'] == df_data['Sequence']]
-#df_data = df_data[df_data['MaltosePercentDiff'] > -100]
-#df_data = df_data[df_data['PercentGpa'] > 60]
+
 # get the x and y axes data to be plotted from the dataframe
 x = df_data.loc[:, xAxis]
 y = df_data.loc[:, yAxis]
 fluor = df_data[data].values
+
 # get the kde plot for the geometry data
 kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
-# TODO: run on just design sequences
+
 # plot the kde plot with an overlay of the input dataset   
 plotKdeOverlay(kdeZScores, x, y, fluor, "GxxxG_-40to-5_"+data, projectDir)
-# TODO: figure out what might be a good point to drop monomers from data

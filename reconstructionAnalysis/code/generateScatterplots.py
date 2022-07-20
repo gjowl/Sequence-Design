@@ -2,6 +2,7 @@ import sys
 from functions import *
 import pandas as pd
 from generateScatterplotFunctions import *
+
 """
 Run as:
     python3 generateGraphsForDataframe.py [inputFile]
@@ -15,14 +16,10 @@ be great to add in other types of graphs to graph that can just be input and cre
 I will use this to input datafiles generate by other pieces of code that can then be
 analyzed.
 """
-# TODO: fix this code so that it's easy to run for just one dataframe or for multiples and any other options (different things to analyze;
-# should I try to set up a class to run multiple types of graphing modes? linear, exponential, etc. Or different types of things to analyze?)
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
 outputDir = os.getcwd()+'/'
-#outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
-#outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['EnergyScore']
 r2Cutoff = 0
 
@@ -34,6 +31,7 @@ filename = getFilename(inputFile)
 # make the output directory for the scatterplots based on the input filename
 outputDir = outputDir+filename+'/'
 makeOutputDir(outputDir)
+
 # rid of anything with greater than 0 energy score
 df = df[df['EnergyScore'] < 0]
 
