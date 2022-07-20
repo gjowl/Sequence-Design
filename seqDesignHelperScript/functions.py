@@ -1,4 +1,5 @@
 import random
+import os
 # loop to generate geometries from arguments
 def generateGeometries(args, rows):
     # variables
@@ -32,10 +33,20 @@ def generateGeometries(args, rows):
 # write the csv
 def writeCsv(rows, args):
     # open the csv file
-    filename = args.filename + '.csv'
+    filename = args.outputDir + '/' + args.filename + '.csv'
     with open(filename, 'w') as f:
         # write the header
         f.write('runNumber,xShift,crossingAngle,negAngle,axialRotation,zShift\n')
         # write the rows
         for row in rows:
             f.write(','.join(str(x) for x in row) + '\n')
+
+# make an output directory if it doesn't exist
+def makeOutputDir(outputDir):
+    # check if the path to the directory exists
+    if not os.path.isdir(outputDir):
+        print('Creating output directory: ' + outputDir + '.')
+        # the below makes directories for the entire path
+        os.makedirs(outputDir)
+    else:
+        print('Output Directory: ' + outputDir + ' exists.')

@@ -1,5 +1,5 @@
 import sys
-import pandas as pd
+import os
 import random
 import argparse
 from functions import *
@@ -12,10 +12,12 @@ for the spread of each geometry and the number of geometries to generate. The ou
 be a csv file with the following columns:
 xShift,crossingAngle,negAngle,axialRotation,zShift
 """
+# get the current directory
 
 # parse the command line arguments
 parser = argparse.ArgumentParser(description='Generate a csv file for a condor design run.')
 parser.add_argument('-n', '--numGeoms', type=int, default=10, help='The number of geometries to generate.')
+parser.add_argument('-outputDir', '--outputDir', type=str, default=os.getcwd(), help='The output directory.')
 parser.add_argument('-xShift', '--xShift', type=float, default=6.3, help='The starting xShift of the geometry.')
 parser.add_argument('-xSpread', '--xSpread', type=float, default=1, help='Added to the start xShift of the geometry.')
 parser.add_argument('-crossingAngle', '--crossingAngle', type=float, default=-40, help='The starting crossing angle of the geometry.')
@@ -33,6 +35,4 @@ csvRows = []
 generateGeometries(args, csvRows)
 
 # TODO: if I wanted to, I could also get the density for each here and add it to the row
-for row in csvRows:
-    print(row)
 writeCsv(csvRows, args)
