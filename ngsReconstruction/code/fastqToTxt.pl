@@ -226,7 +226,7 @@ for (my $i = 0; $i < $numLines; $i++){
 	if (substr($protein, 0, 2) ne "AS"){
 		$noStart++;
 		next;
-	} elsif (substr($protein, -1) ne "L"){
+	} elsif (substr($protein, -1) ne "I"){ # changed on 2022-8-9 to account for GpA and G83I problems
 		$noEnd++;
 		next;
 	} else {
@@ -254,9 +254,9 @@ for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
 		#Find reference label
 		if (exists $reference{$aa}){
 			print "$reference{$aa}\n";
-		} elsif ($aa eq "LIIFGMAGVIGT"){
+		} elsif ($aa eq "LIIFGVMAGVIGT"){ # added a V on 2022-8-9 to account for GpA and G83I problems
 			print "0\tP02724\tGLPA_HUMAN\t75\tWT\tN/A\n";
-		} elsif ($aa eq "LIIFGMAIVIGT"){
+		} elsif ($aa eq "LIIFGVMAIVIGT"){
 			print "0\tP02724\tGLPA_HUMAN\t75\tG83I\t83\n";
 		} else {
 			print "Unknown\n";
