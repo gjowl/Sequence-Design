@@ -2,6 +2,7 @@ import sys
 from functions import *
 import pandas as pd
 from generateScatterplotFunctions import *
+
 """
 Run as:
     python3 generateGraphsForDataframe.py [inputFile]
@@ -15,14 +16,10 @@ be great to add in other types of graphs to graph that can just be input and cre
 I will use this to input datafiles generate by other pieces of code that can then be
 analyzed.
 """
-# TODO: fix this code so that it's easy to run for just one dataframe or for multiples and any other options (different things to analyze;
-# should I try to set up a class to run multiple types of graphing modes? linear, exponential, etc. Or different types of things to analyze?)
 
 #MAIN
 # variables: if want to make this more multipurpose, add the below into a config file
 outputDir = os.getcwd()+'/'
-#outputDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
-#outputDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/graphs/'
 columnsToAnalyze = ['EnergyScore']
 r2Cutoff = 0
 
@@ -34,30 +31,31 @@ filename = getFilename(inputFile)
 # make the output directory for the scatterplots based on the input filename
 outputDir = outputDir+filename+'/'
 makeOutputDir(outputDir)
+
 # rid of anything with greater than 0 energy score
-#df = df[df['EnergyScore'] < 0]
-#df = df[df['StartSequence'] == df['Sequence']]
-#df = df[df['PercentGpa'] > 0]
-#df = df[df['xShift'] < 7.5]
-#df = df[df['crossingAngle'] > -60]
-#df = df[df['crossingAngle'] < -20]
-#df = df[df['MaltosePercentDiff'] > -95]
+df = df[df['EnergyScore'] < 0]
 
 # setup the list of columns to analyze
 xAxis = 'EnergyScore'
 yAxis = 'PercentGpa' # Fluorescence
 stdDev = 'PercentGpaStdDev'
+
 # find sequences with the same interface
 list_interface = getNumInterface(df)
+
 # add in the interface number to the dataframe
 df['numInterface'] = list_interface
+
 # output the file with the interface column
 interfaceFile = outputDir+'interfaces.csv'
 df.to_csv(interfaceFile)
+
 # define interface output directory
 interfaceDir = outputDir+'interfaces/'
+
 # get the sequences that pass maltose test
 df_maltose = df[df['MaltosePercentDiff'] > -100]
+
 # analyze a list of dataframes for all individual sequences and interfaces
 list_df = [df, df_maltose]
 titles = ['allSequences', 'maltoseSequences']
@@ -76,12 +74,11 @@ for data, title in zip(list_df, titles):
 # sorts the df by Total energy score
 df = df.sort_values(by=xAxis)
 df = df.reset_index(drop=True)
-# get the design sequences
+
+# get the design, mutant, and maltose sequences
 df_designs = df[df['StartSequence'] == df['Sequence']] 
-# get the mutant sequences
 df_mutants = df[df['StartSequence'] != df['Sequence']] 
-# get the sequences that pass maltose test
-df_maltose = df[df['MaltosePercentDiff'] > -100]
+df_maltose = df[df['MaltosePercentDiff'] > -95]
 
 # output a scatterplot of all sequences
 titles = ['allSequences', 'designSequences', 'maltoseSequences']
