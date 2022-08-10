@@ -9,8 +9,8 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsAnalysis/code/'
+analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/CHIP1/'
+codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/code/'
 dataDir = '/data/NGS/'
 #analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
 #codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
@@ -30,7 +30,7 @@ countFile = analysisDir+"allCounts.csv"
 percentFile = analysisDir+"allPercents.csv"
 
 # program files
-fastqTotxt = codeDir + "fastqTotxt.pl"
+fastqTotxt = codeDir + "fastqToTxt.pl"
 ngsAnalysis = codeDir + "ngsAnalysis.py"
 energyAnalysis = codeDir + "energyAnalysis.py"
 
