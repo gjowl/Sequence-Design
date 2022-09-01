@@ -44,7 +44,8 @@ separationLength = int(sys.argv[2])
 # variables
 currentDir = os.getcwd()
 outputFile = currentDir+'/gxxxgDesigns.csv'
-gxxxgLetters = ['G','A','S']
+#gxxxgLetters = ['G','A','S']
+gxxxgLetters = ['G']
 col = 'Sequence'
 
 # get just the matching sequences

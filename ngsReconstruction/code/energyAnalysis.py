@@ -23,7 +23,7 @@ reconstructionFile = config["reconstructionFile"]
 
 # control sequences
 gpa = 'LIIFGVMAGVIGT'
-g83i = 'LIIFGVMAIVIGL'
+g83i = 'LIIFGVMAIVIGT'
 
 # variables
 fluorCol = 'Fluorescence'
@@ -42,13 +42,12 @@ for dir in dirList:
 df_energyFile = pd.read_csv(energyFile)
 df_fluor = pd.read_csv(reconstructionFile)
 
-
 # initialize a new dataframe that will be used for analysis and output
 df_output = pd.DataFrame()
 
 # find the sequences from the energy file that are present in the reconstruction file
 #   - first get a sequence list: sequences in energyFile have added LILI, so add here
-seqs = df_fluor['Sequence']+'LILI'
+seqs = df_fluor['Sequence']+'ILI' # 2022-8-10: added in L during the fastqToTxt.pl step, so only add ILI here
 df_fluor['Sequence'] = seqs
 df_energyAndFluor = df_energyFile[df_energyFile['Sequence'].isin(seqs)]
 df_energyAndFluor = df_energyAndFluor.sort_values(by='Sequence')
