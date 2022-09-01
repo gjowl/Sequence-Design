@@ -21,13 +21,12 @@ maltoseTestDir  = config["maltoseTestDir"]
 countDir        = config["countDir"]
 percentDir      = config["percentDir"]
 reconstructionFile        = config["reconstructionFile"]
-gpaFluorescence        = float(config["gpaFluor"])
-g83IFluorescence        = float(config["g83iFluor"])
+
 maltoseCutoff       = float(config["maltoseCutoff"])
 
 # control sequences
 gpa = 'LIIFGVMAGVIGT'
-g83i = 'LIIFGVMAIVIGL'
+g83i = 'LIIFGVMAIVIGT'
 
 # make the output directories that these will all output to
 dirList = [outputDir, maltoseTestDir, countDir, percentDir]
@@ -90,6 +89,13 @@ fluor_column = df_fluorAndPercent.pop('StdDev')
 df_fluorAndPercent.insert(3, 'FluorStdDev', fluor_column)
 
 # ADD IN PERCENT GPA ADN STANDARD DEVIATION
+# extract the gpa and g83i fluorescence from the df_fluorAndPercent dataframe
+gpaFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == gpa, 'Fluorescence'].values[0]
+g83IFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == g83i, 'Fluorescence'].values[0]
+print(gpaFluorescence)
+print(g83IFluorescence)
+#gpaFluorescence = float(config["gpaFluor"])
+#g83IFluorescence = float(config["g83iFluor"])
 # calculate percent GpA of fluorescence
 percentGpaCol = df_fluorAndPercent['Fluorescence']/gpaFluorescence*100
 percentGpaStdDevCol = df_fluorAndPercent['FluorStdDev']/gpaFluorescence*100

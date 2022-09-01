@@ -9,12 +9,12 @@ config_file = configparser.ConfigParser()
 
 # set up directory structure
 currDir = os.getcwd()
-parentDir = os.path.dirname(currDir)
+#parentDir = os.path.dirname(currDir)
 
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = parentDir+'/2022-5-13/'
-codeDir = os.getcwd()+'/'
+analysisDir = currDir+'/CHIP1/'
+codeDir = os.getcwd()+'/code/'
 dataDir = '/data/NGS/'
 #dataDir = '/mnt/d/2022-5-13/'
 outputDir = analysisDir + 'data/'

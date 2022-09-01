@@ -214,7 +214,7 @@ for (my $i = 0; $i < $numLines; $i++){
 	}
 	$j = $j + $offset;	
 	if ($k != -1){
-		$tm = substr($sequence, $j, ($k-$j));
+		$tm = substr($sequence, $j, ($k-$j + 3)); # changed on 2022-8-9...same as Josh's code, but not sure what it does?
 	} else {
 		$noEnd++;
 		next;
