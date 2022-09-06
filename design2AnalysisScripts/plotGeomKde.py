@@ -11,31 +11,25 @@ edited version of plotGeomKde.py to plot the kde for the 2020_09_23_kdeData.csv 
 an overlay of an input dataframe. The plotGeomKde function is the driver function and the others are helper functions
 
 """
-def plotGeomKde(df_kde, df_data):
+def plotGeomKde(df_kde, df_data, dataColumn):
     # read in kde file from command line, or default to 2020_09_23_kdeData.csv
     projectDir = os.getcwd()+'/'
-    #kdeFile = projectDir + '2020_09_23_kdeData.csv'
-    #inputFile = sys.argv[1]
-
-    # copy and paste some code for writing the kde data to a file
-    #df_kde = pd.read_csv(kdeFile)
-    #df_data = pd.read_csv(inputFile)
+    df_data = df_data.drop_duplicates('crossingAngle',keep='first')
 
     # set xAxis and yAxis variables
     xAxis = 'xShift'
     yAxis = 'crossingAngle'
-    data = 'Total'
 
     # get the x and y axes data to be plotted from the dataframe
     x = df_data.loc[:, xAxis]
     y = df_data.loc[:, yAxis]
-    energies = df_data[data].values
+    energies = df_data[dataColumn].values
 
     # get the kde plot for the geometry data
     kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
 
     # plot the kde plot with an overlay of the input dataset   
-    plotKdeOverlay(kdeZScores, x, y, energies, "_"+data, projectDir)
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, projectDir)
 
 def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     # hardcoded variable set up for plot limits
@@ -56,7 +50,7 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     Z = np.reshape(kernel(positions).T, X.shape)
     return Z
 
-def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, filename, outputDir):
     # Plotting code below
     fig, ax = plt.subplots()
     # plotting labels and variables 
@@ -80,13 +74,12 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
     cmap = plt.cm.Reds
     cmap = cmap.reversed()
     # get min and max of the data
-    min_val = np.min(fluor)
-    max_val = np.max(fluor)
+    min_val = np.min(data)
+    max_val = np.max(data)
     # flip the data so that the min is at the top of the colorbar
     #norm = matplotlib.colors.Normalize(vmin=40, vmax=100) # TODO: change this to the min and max of the data
     norm = matplotlib.colors.Normalize(vmin=-50, vmax=-5) # TODO: change this to the min and max of the data
-    print(norm(fluor))
-    ax.scatter(xAxis, yAxis, c=cmap(norm(fluor)), s=30, alpha=0.5)
+    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
     sm.set_array([])  # only needed for matplotlib < 3.1
@@ -107,3 +100,6 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
     plt.savefig(outputDir+filename+".png", bbox_inches='tight', dpi=150)
     plt.close()
 
+#TODO:
+# is it possible to get the kde density for a single point?
+# if so, do that for each geometric parameter
