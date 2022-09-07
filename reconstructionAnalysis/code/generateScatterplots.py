@@ -60,16 +60,16 @@ df_maltose = df[df['MaltosePercentDiff'] > -100]
 list_df = [df, df_maltose]
 titles = ['allSequences', 'maltoseSequences']
 colList = ['runNumber', 'numInterface']
-for data, title in zip(list_df, titles):
-    outDir = outputDir+title+'/'
-    for colName in colList:
-        # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
-        listDf = getListOfDfWithUniqueColumnVal(data, colName)
-        # TODO: add an option here to run or not run the below code
-        dir = outDir+colName+'/'
-        makeOutputDir(dir)
-        # output scatterplots for df list
-        getScatterplotsForDfList(listDf, colName, xAxis, yAxis, stdDev, r2Cutoff, dir)
+#for data, title in zip(list_df, titles):
+#    outDir = outputDir+title+'/'
+#    for colName in colList:
+#        # get a list of dataframes of all sequences that are from the same design group (runNumber or StartSequence)
+#        listDf = getListOfDfWithUniqueColumnVal(data, colName)
+#        # TODO: add an option here to run or not run the below code
+#        dir = outDir+colName+'/'
+#        makeOutputDir(dir)
+#        # output scatterplots for df list
+#        getScatterplotsForDfList(listDf, colName, xAxis, yAxis, stdDev, r2Cutoff, dir)
 
 # sorts the df by Total energy score
 df = df.sort_values(by=xAxis)

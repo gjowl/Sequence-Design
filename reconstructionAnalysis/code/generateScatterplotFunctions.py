@@ -90,7 +90,7 @@ def createScatterPlot(df, xAxis, yAxis, stdDev, r2Cutoff, filename, title):
             # values need to be in list format for scatterplot
             xList, yList = x.tolist(), y.tolist()
             # plot scatter plot for mutants
-            plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
+            #plt.errorbar(x, y, stdDev, linestyle='None', marker='', capsize=4, c='black')
             plt.scatter(x, y, s=50, linewidth=0.1)
             plt.scatter(x_wt, y_wt, s=50, linewidth=0.1, c='r')
             # set the y axis to be the same scale
