@@ -42,7 +42,7 @@ if df_data['VDWDiff'].sum() == 0:
 # only keep sequences where Total Energy is less than 0
 df_total = df_data[df_data['Total'] < -5]
 
-#df_total = df_total[df_total['PercentGpa'] < 50]
+df_total = df_total[df_total['PercentGpa'] > 50]
 df_total = df_total.sort_values(by='VDWDiff')
 # only keep sequences where VDWDiff is greater than 0
 df_vdwDiff = df_total[df_total['VDWDiff'] < 0]
@@ -71,7 +71,7 @@ for df,filename in zip(df_list, filename_list):
 #plotGeomKde(df_kde, df_total, 'PercentGpa')
 
 # output updated df_data to csv
-df_data.to_csv(os.getcwd()+"/test.csv", index=False)
+#df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 
 # TODO: only overlay unique geometries
 # TODO: compare the geometries to the sequences I got before; to the sequences that worked plot
