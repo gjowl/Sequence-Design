@@ -63,7 +63,12 @@ def plotEnergyDiffStackedBarGraph(df, filename):
     plt.ylabel('Energy')
     plt.title('Energy Plot')
     plt.xticks(x, df['Sequence'])
+<<<<<<< HEAD
     plt.yticks(np.arange(-70, 0, 10))
+=======
+    plt.ylim(-80,-30)
+    plt.yticks(np.arange(-80, -30, 10))
+>>>>>>> 79960644233ca4e4fae65934702dc00ff55bf9de
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
     #plt.show()
     # save plot
