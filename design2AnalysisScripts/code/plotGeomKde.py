@@ -72,13 +72,13 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, filename, outputDir):
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
     cmap = plt.cm.Reds
-    cmap = cmap.reversed()
+    #cmap = cmap.reversed()
     # get min and max of the data
     min_val = np.min(data)
     max_val = np.max(data)
     # flip the data so that the min is at the top of the colorbar
-    #norm = matplotlib.colors.Normalize(vmin=40, vmax=100) # TODO: change this to the min and max of the data
-    norm = matplotlib.colors.Normalize(vmin=-50, vmax=-5) # TODO: change this to the min and max of the data
+    norm = matplotlib.colors.Normalize(vmin=50, vmax=100) # TODO: change this to the min and max of the data
+    #norm = matplotlib.colors.Normalize(vmin=-50, vmax=-5) # TODO: change this to the min and max of the data
     ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar

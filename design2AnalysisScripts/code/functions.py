@@ -42,7 +42,7 @@ def getEnergyDiff(df_designs, df_energy, energy):
 #
 ## output the design file
 #df_designs.to_csv(outputDir+'designs_with_energyDiff.csv')
-def plotEnergyDiffStackedBarGraph(df):
+def plotEnergyDiffStackedBarGraph(df, filename):
     # data columns to plot
     n = len(df)
     x = np.arange(n)
@@ -59,7 +59,7 @@ def plotEnergyDiffStackedBarGraph(df):
     p2 = plt.bar(x, HBONDDiff, width, color='r', bottom=VDWDiff)
     #p3 = plt.bar(x, IMM1DimerMonomerDiff, width, color='g', bottom=HBONDDimerMonomerDiff)
     # change the dpi to make the image smaller
-    fig.set_dpi(20000)
+    fig.set_dpi(2000)
     plt.ylabel('Energy')
     plt.title('Energy Plot')
     plt.xticks(x, df['Sequence'])
@@ -67,4 +67,4 @@ def plotEnergyDiffStackedBarGraph(df):
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
     #plt.show()
     # save plot
-    fig.savefig(os.getcwd()+'/energyPlot.png')
+    fig.savefig(os.getcwd()+'/energyPlot_'+filename+'.png')
