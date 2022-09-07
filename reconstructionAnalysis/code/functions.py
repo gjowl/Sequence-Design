@@ -1,6 +1,7 @@
 import os
 import sys
 import configparser
+import pandas as pd
 
 # Method to read config file settings
 # Helper file for reading the config file of interest for running the program
