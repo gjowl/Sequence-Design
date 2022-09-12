@@ -18,6 +18,10 @@ dfDup = df[df.duplicated(subset=['Sequence'], keep=False)]
 
 # get a dataframe with sequences that are unique
 dfUnique = df.drop_duplicates(subset=['Sequence'], keep='first')
+# sort by total
+dfUnique = dfUnique.sort_values(by=['Total'])
+print(dfUnique)
+exit()
 
 # separate the df into regions of interest
 dfRight = df[df['crossingAngle'] < 0]
@@ -30,3 +34,5 @@ avgEnergyGxxxg = dfgxxxg['Energy'].mean()
 avgEnergyLeft = dfLeft['Energy'].mean()
  
 # what plots should I use? scatter plot for each?
+
+# ideas for analysis
