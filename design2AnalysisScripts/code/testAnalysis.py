@@ -42,7 +42,7 @@ if df_data['VDWDiff'].sum() == 0:
 # only keep sequences where Total Energy is less than 0
 df_total = df_data[df_data['Total'] < -5]
 
-df_total = df_total[df_total['PercentGpa'] > 50]
+df_total = df_total[df_total['PercentGpa'] < 50]
 df_total = df_total.sort_values(by='VDWDiff')
 # only keep sequences where VDWDiff is greater than 0
 df_vdwDiff = df_total[df_total['VDWDiff'] < 0]

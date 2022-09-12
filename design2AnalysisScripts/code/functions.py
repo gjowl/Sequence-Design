@@ -66,6 +66,8 @@ def plotEnergyDiffStackedBarGraph(df, filename):
     plt.ylim(-80,-30)
     plt.yticks(np.arange(-80, -30, 10))
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
+    # save the number of designs on the plot
+    plt.text(0.5, -25, 'Number of Designs: '+str(n))
     #plt.show()
     # save plot
     fig.savefig(os.getcwd()+'/energyPlot_'+filename+'.png')
