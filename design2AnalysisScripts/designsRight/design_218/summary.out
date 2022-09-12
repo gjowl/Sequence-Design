@@ -1,0 +1,101 @@
+09_10_2022
+
+PolyLeu Backbone:   LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000110010011011000000
+Rotamers Levels:    023002301300200221131
+Identify Interface finished. Time: Sat Sep 10 09:24:10 2022
+Elapsed time of program: 4.43347s/0.0738912min
+
+Self Consistent Mean Field started. Time: Sat Sep 10 09:24:20 2022
+Elapsed time of program: 14.3841s/0.239735min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLYWLLGLLTTLTTLLLILI
+Best Sequence:      LLLYWLLGLLTTLTTLLLILI
+Interface Sequence: L--YW--GL-TT-TT--LI-I
+Interface:          000110010011011000000
+Total Energy:       442.818
+VDW:                397.335
+HBOND:              -75.4869
+
+End SelfPairManager Optimization: 2494s
+Self Consistent Mean Field finished. Time: Sat Sep 10 10:06:30 2022
+Elapsed time of program: 2543.96s/42.3994min
+
+Sequence search replicate 0 started. Time: Sat Sep 10 10:06:34 2022
+Elapsed time of program: 2548.06s/42.4676min
+
+Self and Pair of all amino acids calculation 0 started. Time: Sat Sep 10 10:06:50 2022
+Elapsed time of program: 2564.25s/42.7375min
+
+Time to calculate energies: 3135s
+Self and Pair of all amino acids calculation 0 finished. Time: Sat Sep 10 10:59:03 2022
+Elapsed time of program: 5697.43s/94.9571min
+
+Best Sequence #0: LLLFVLLGLLTFLVTLLLILI; Energy: 99.645
+Best Sequence #1: LLLFVLLGLLTYLVTLLLILI; Energy: 96.8497
+Best Sequence #2: LLLFVLLGLLWFLVTLLLILI; Energy: 97.8966
+Best Sequence #3: LLLFVLLGLLWWLTTLLLILI; Energy: 75.544
+Best Sequence #4: LLLFVLLGLLWWLVTLLLILI; Energy: 81.7297
+Best Sequence #5: LLLFVLLGLLWYLVTLLLILI; Energy: 95.0531
+Best Sequence #6: LLLFVLLGLLWYLYTLLLILI; Energy: 100.319
+Best Sequence #7: LLLFVLLGLLYTLTTLLLILI; Energy: 96.9473
+Best Sequence #8: LLLFVLLGLLYWLTTLLLILI; Energy: 89.4222
+Best Sequence #9: LLLFWLLGLLTFLVTLLLILI; Energy: 93.2254
+Best Sequence #10: LLLFWLLGLLTYLTTLLLILI; Energy: 83.1421
+Best Sequence #11: LLLFWLLGLLTYLVTLLLILI; Energy: 90.3302
+Best Sequence #12: LLLFWLLGLLWFLVTLLLILI; Energy: 90.6533
+Best Sequence #13: LLLFWLLGLLWYLTTLLLILI; Energy: 79.6115
+Best Sequence #14: LLLFWLLGLLWYLVTLLLILI; Energy: 87.7964
+Best Sequence #15: LLLFWLLGLLYTLTTLLLILI; Energy: 88.2846
+Best Sequence #16: LLLLVLLGLLTTLTTLLLILI; Energy: 71.1291
+Best Sequence #17: LLLLWLLGLLWFLTTLLLILI; Energy: 64.5319
+Best Sequence #18: LLLLWLLGLLWWLTTLLLILI; Energy: 47.6126
+Best Sequence #19: LLLLWLLGLLWYLTTLLLILI; Energy: 59.7127
+Best Sequence #20: LLLLWLLGLLWYLYTLLLILI; Energy: 72.4617
+Best Sequence #21: LLLYVLLGLLTTLTTLLLILI; Energy: 84.6416
+Best Sequence #22: LLLYVLLGLLTYLTTLLLILI; Energy: 84.4389
+Best Sequence #23: LLLYVLLGLLTYLYTLLLILI; Energy: 99.0773
+Best Sequence #24: LLLYVLLGLLWFLTTLLLILI; Energy: 85.439
+Best Sequence #25: LLLYVLLGLLWTLTTLLLILI; Energy: 79.1155
+Best Sequence #26: LLLYVLLGLLWYLYTLLLILI; Energy: 96.3636
+Best Sequence #27: LLLYVLLGLLYTLTTLLLILI; Energy: 90.8908
+Best Sequence #28: LLLYVLLGLLYWLTTLLLILI; Energy: 84.0702
+Best Sequence #29: LLLYWLLGLLTFLTTLLLILI; Energy: 81.3098
+Best Sequence #30: LLLYWLLGLLTYLTTLLLILI; Energy: 79.322
+Best Sequence #31: LLLYWLLGLLTYLVTLLLILI; Energy: 86.392
+Best Sequence #32: LLLYWLLGLLWFLTTLLLILI; Energy: 77.6947
+Best Sequence #33: LLLYWLLGLLWTLTTLLLILI; Energy: 71.3862
+Best Sequence #34: LLLYWLLGLLWWLTTLLLILI; Energy: 62.7234
+Best Sequence #35: LLLYWLLGLLWWLVTLLLILI; Energy: 69.0275
+Best Sequence #36: LLLYWLLGLLWYLTTLLLILI; Energy: 73.8669
+Best Sequence #37: LLLYWLLGLLWYLVTLLLILI; Energy: 82.0347
+Best Sequence #38: LLLYWLLGLLWYLYTLLLILI; Energy: 86.616
+Best Sequence #39: LLLYWLLGLLYTLTTLLLILI; Energy: 84.5334
+Best Sequence #40: LLLYWLLGLLYWLTTLLLILI; Energy: 75.8494
+Best Sequence #41: LLLYWLLGLLYWLVTLLLILI; Energy: 83.072
+End monte carlo sequence search #0: 179s
+Monte Carlo ended at Temp: 0.815777
+
+Sequence search replicate 0 finished. Time: Sat Sep 10 11:02:27 2022
+Elapsed time of program: 5900.53s/98.3422min
+
+Backbone repack replicate 0 started. Time: Sat Sep 10 11:02:27 2022
+Elapsed time of program: 5900.53s/98.3422min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        8.67597
+crossingAngle: 21
+axialRotation: 75.6518
+zShift:        3.22877
+
+***AFTER REPACK GEOMETRY***
+xShift:        8.69008
+crossingAngle: 20.4838
+axialRotation: 75.0277
+zShift:        3.4007
+
+Monte Carlo repack complete. Time: 4509 seconds
+
+Final energy is 24282.1 after repack, indicating clashes. Choose a different geometry

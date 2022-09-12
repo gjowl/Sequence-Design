@@ -1,0 +1,244 @@
+09_09_2022
+
+PolyLeu Backbone:   LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000100110011001100000
+Rotamers Levels:    130031002100210023322
+Identify Interface finished. Time: Fri Sep  9 21:48:35 2022
+Elapsed time of program: 3.2553s/0.054255min
+
+Self Consistent Mean Field started. Time: Fri Sep  9 21:48:43 2022
+Elapsed time of program: 10.5055s/0.175091min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLYLLGTLLGYLLVTLLILI
+Best Sequence:      LLLYLLGTLLGYLLVTLLILI
+Interface Sequence: L-LY-LGT-LGY-LVT-----
+Interface:          000100110011001100000
+Total Energy:       -36.0898
+VDW:                -68.8353
+HBOND:              -84.3017
+
+End SelfPairManager Optimization: 2259s
+Self Consistent Mean Field finished. Time: Fri Sep  9 22:26:37 2022
+Elapsed time of program: 2285.11s/38.0852min
+
+Sequence search replicate 0 started. Time: Fri Sep  9 22:26:40 2022
+Elapsed time of program: 2287.47s/38.1245min
+
+Self and Pair of all amino acids calculation 0 started. Time: Fri Sep  9 22:26:48 2022
+Elapsed time of program: 2295.69s/38.2615min
+
+Time to calculate energies: 2254s
+Self and Pair of all amino acids calculation 0 finished. Time: Fri Sep  9 23:04:21 2022
+Elapsed time of program: 4548.85s/75.8142min
+
+Best Sequence #0: LLLFLLGILLGFLLTTLLILI; Energy: -383.442
+Best Sequence #1: LLLFLLGILLGFLLWTLLILI; Energy: -385.182
+Best Sequence #2: LLLFLLGTLLGFLLTFLLILI; Energy: -368.285
+Best Sequence #3: LLLFLLGTLLGFLLTTLLILI; Energy: -386.119
+Best Sequence #4: LLLFLLGTLLGFLLTYLLILI; Energy: -372.235
+Best Sequence #5: LLLFLLGTLLGFLLWFLLILI; Energy: -368.79
+Best Sequence #6: LLLFLLGTLLGFLLWTLLILI; Energy: -385.291
+Best Sequence #7: LLLFLLGTLLGYLLTTLLILI; Energy: -389.967
+Best Sequence #8: LLLFLLGTLLGYLLVTLLILI; Energy: -386.824
+Best Sequence #9: LLLFLLGTLLGYLLWTLLILI; Energy: -389.388
+Best Sequence #10: LLLYLLGILLGFLLTTLLILI; Energy: -388.324
+Best Sequence #11: LLLYLLGILLGFLLWTLLILI; Energy: -389.015
+Best Sequence #12: LLLYLLGTLLGFLLTTLLILI; Energy: -391.151
+Best Sequence #13: LLLYLLGTLLGFLLWFLLILI; Energy: -373.929
+Best Sequence #14: LLLYLLGTLLGFLLWTLLILI; Energy: -390.36
+Best Sequence #15: LLLYLLGTLLGYLLTTLLILI; Energy: -394.852
+Best Sequence #16: LLLYLLGTLLGYLLVTLLILI; Energy: -391.11
+Best Sequence #17: LLLYLLGTLLGYLLWTLLILI; Energy: -394.979
+End monte carlo sequence search #0: 116s
+Monte Carlo ended at Temp: 0.815777
+
+Sequence search replicate 0 finished. Time: Fri Sep  9 23:06:35 2022
+Elapsed time of program: 4682.65s/78.0442min
+
+Backbone repack replicate 0 started. Time: Fri Sep  9 23:06:35 2022
+Elapsed time of program: 4682.65s/78.0442min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        6.7985
+crossingAngle: -50.171
+axialRotation: 6.15087
+zShift:        5.04005
+
+***AFTER REPACK GEOMETRY***
+xShift:        6.88664
+crossingAngle: -50.6843
+axialRotation: 5.82103
+zShift:        5.15359
+
+Monte Carlo repack complete. Time: 1806 seconds
+
+Backbone repack replicate 0 finished. Time: Fri Sep  9 23:36:45 2022
+Elapsed time of program: 6492.74s/108.212min
+
+Sequence search replicate 1 started. Time: Fri Sep  9 23:36:45 2022
+Elapsed time of program: 6492.74s/108.212min
+
+Self and Pair of all amino acids calculation 1 started. Time: Fri Sep  9 23:36:54 2022
+Elapsed time of program: 6501.68s/108.361min
+
+Time to calculate energies: 2272s
+Self and Pair of all amino acids calculation 1 finished. Time: Sat Sep 10 00:14:45 2022
+Elapsed time of program: 8772.87s/146.214min
+
+Best Sequence #0: LLLFLLGILLGYLLTTLLILI; Energy: -387.473
+Best Sequence #1: LLLFLLGILLGYLLVTLLILI; Energy: -384.696
+Best Sequence #2: LLLFLLGILLGYLLWTLLILI; Energy: -388.842
+Best Sequence #3: LLLFLLGTLLGFLLTTLLILI; Energy: -387.519
+Best Sequence #4: LLLFLLGTLLGFLLWTLLILI; Energy: -388.119
+Best Sequence #5: LLLFLLGTLLGYLLTTLLILI; Energy: -391.252
+Best Sequence #6: LLLFLLGTLLGYLLVTLLILI; Energy: -388.142
+Best Sequence #7: LLLFLLGTLLGYLLWTLLILI; Energy: -391.714
+Best Sequence #8: LLLYLLGILLGFLLTTLLILI; Energy: -389.779
+Best Sequence #9: LLLYLLGILLGTLLTTLLILI; Energy: -404.245
+Best Sequence #10: LLLYLLGILLGYLLTTLLILI; Energy: -392.539
+Best Sequence #11: LLLYLLGTLLGFLLTTLLILI; Energy: -392.59
+Best Sequence #12: LLLYLLGTLLGFLLTVLLILI; Energy: -385.297
+Best Sequence #13: LLLYLLGTLLGFLLWTLLILI; Energy: -393.19
+Best Sequence #14: LLLYLLGTLLGFLLWVLLILI; Energy: -384.553
+Best Sequence #15: LLLYLLGTLLGTLLTTLLILI; Energy: -404.616
+Best Sequence #16: LLLYLLGTLLGTLLWTLLILI; Energy: -405.067
+Best Sequence #17: LLLYLLGTLLGYLLTTLLILI; Energy: -396.325
+Best Sequence #18: LLLYLLGTLLGYLLVTLLILI; Energy: -393.464
+Best Sequence #19: LLLYLLGTLLGYLLWTLLILI; Energy: -396.785
+Best Sequence #20: LLLYLLGTLLGYLLWVLLILI; Energy: -388.942
+End monte carlo sequence search #1: 103s
+Monte Carlo ended at Temp: 0.815777
+
+Sequence search replicate 1 finished. Time: Sat Sep 10 00:16:55 2022
+Elapsed time of program: 8902.83s/148.381min
+
+Backbone repack replicate 1 started. Time: Sat Sep 10 00:16:55 2022
+Elapsed time of program: 8902.83s/148.381min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        6.88664
+crossingAngle: -50.6843
+axialRotation: 5.82103
+zShift:        5.15359
+
+***AFTER REPACK GEOMETRY***
+xShift:        6.95747
+crossingAngle: -50.854
+axialRotation: 6.83169
+zShift:        5.2938
+
+Monte Carlo repack complete. Time: 3349 seconds
+
+Backbone repack replicate 1 finished. Time: Sat Sep 10 01:12:48 2022
+Elapsed time of program: 12255.9s/204.265min
+
+Sequence search replicate 2 started. Time: Sat Sep 10 01:12:48 2022
+Elapsed time of program: 12255.9s/204.265min
+
+Self and Pair of all amino acids calculation 2 started. Time: Sat Sep 10 01:12:58 2022
+Elapsed time of program: 12265.9s/204.432min
+
+Time to calculate energies: 2255s
+Self and Pair of all amino acids calculation 2 finished. Time: Sat Sep 10 01:50:31 2022
+Elapsed time of program: 14519.1s/241.985min
+
+Best Sequence #0: LLLFLLGTLLGFLLTTLLILI; Energy: -388.23
+Best Sequence #1: LLLFLLGTLLGFLLVTLLILI; Energy: -387.243
+Best Sequence #2: LLLFLLGTLLGTLLWTLLILI; Energy: -401.607
+Best Sequence #3: LLLFLLGTLLGYLLTTLLILI; Energy: -392.267
+Best Sequence #4: LLLFLLGTLLGYLLVTLLILI; Energy: -390.905
+Best Sequence #5: LLLFLLGTLLGYLLWTLLILI; Energy: -392.521
+Best Sequence #6: LLLYLLGILLGFLLTFLLILI; Energy: -373.361
+Best Sequence #7: LLLYLLGILLGFLLTTLLILI; Energy: -390.275
+Best Sequence #8: LLLYLLGILLGFLLWTLLILI; Energy: -392.048
+Best Sequence #9: LLLYLLGILLGTLLTFLLILI; Energy: -387.66
+Best Sequence #10: LLLYLLGILLGTLLWFLLILI; Energy: -387.993
+Best Sequence #11: LLLYLLGTLLGFLLTTLLILI; Energy: -393.709
+Best Sequence #12: LLLYLLGTLLGFLLTVLLILI; Energy: -385.739
+Best Sequence #13: LLLYLLGTLLGFLLVTLLILI; Energy: -392.722
+Best Sequence #14: LLLYLLGTLLGFLLWTLLILI; Energy: -394.239
+Best Sequence #15: LLLYLLGTLLGTLLTTLLILI; Energy: -405.857
+Best Sequence #16: LLLYLLGTLLGTLLWFLLILI; Energy: -389.038
+Best Sequence #17: LLLYLLGTLLGTLLWTLLILI; Energy: -406.906
+Best Sequence #18: LLLYLLGTLLGYLLTTLLILI; Energy: -397.918
+Best Sequence #19: LLLYLLGTLLGYLLTVLLILI; Energy: -389.71
+Best Sequence #20: LLLYLLGTLLGYLLVTLLILI; Energy: -396.028
+Best Sequence #21: LLLYLLGTLLGYLLWTLLILI; Energy: -398.033
+Best Sequence #22: LLLYLLGVLLGTLLWFLLILI; Energy: -381.815
+End monte carlo sequence search #2: 102s
+Monte Carlo ended at Temp: 0.815777
+
+Sequence search replicate 2 finished. Time: Sat Sep 10 01:52:46 2022
+Elapsed time of program: 14653.9s/244.232min
+
+Backbone repack replicate 2 started. Time: Sat Sep 10 01:52:46 2022
+Elapsed time of program: 14653.9s/244.232min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        6.95747
+crossingAngle: -50.854
+axialRotation: 6.83169
+zShift:        5.2938
+
+***AFTER REPACK GEOMETRY***
+xShift:        6.95657
+crossingAngle: -50.6885
+axialRotation: 6.92697
+zShift:        5.24118
+
+Monte Carlo repack complete. Time: 2224 seconds
+
+Backbone repack replicate 2 finished. Time: Sat Sep 10 02:29:54 2022
+Elapsed time of program: 16881.5s/281.358min
+
+Monomer energy calculations  started. Time: Sat Sep 10 02:29:54 2022
+Elapsed time of program: 16881.5s/281.358min
+
+Calculating monomer energies...
+LLLFLLGTLLGTLLWTLLILI Dimer - Monomer = -401.607 - -368.908 = -32.6991
+LLLFLLGTLLGFLLVTLLILI Dimer - Monomer = -387.243 - -347.556 = -39.6868
+LLLFLLGTLLGFLLTTLLILI Dimer - Monomer = -388.23 - -355.108 = -33.1224
+LLLFLLGILLGFLLTTLLILI Dimer - Monomer = -383.442 - -348.869 = -34.5729
+LLLYLLGTLLGTLLTTLLILI Dimer - Monomer = -405.857 - -378.151 = -27.706
+LLLFLLGILLGFLLWTLLILI Dimer - Monomer = -385.182 - -344.436 = -40.7454
+LLLFLLGTLLGYLLVTLLILI Dimer - Monomer = -390.905 - -351.879 = -39.0267
+LLLYLLGILLGTLLTTLLILI Dimer - Monomer = -404.245 - -373.962 = -30.2829
+LLLYLLGILLGFLLTTLLILI Dimer - Monomer = -390.275 - -352.883 = -37.3927
+LLLYLLGTLLGFLLTVLLILI Dimer - Monomer = -385.739 - -351.763 = -33.9758
+LLLFLLGILLGYLLTTLLILI Dimer - Monomer = -387.473 - -351.63 = -35.8423
+LLLFLLGTLLGYLLTTLLILI Dimer - Monomer = -392.267 - -359.355 = -32.9118
+LLLFLLGTLLGFLLTFLLILI Dimer - Monomer = -368.285 - -337.034 = -31.2501
+LLLYLLGTLLGTLLWTLLILI Dimer - Monomer = -406.906 - -372.917 = -33.9888
+LLLFLLGTLLGFLLWTLLILI Dimer - Monomer = -388.119 - -348.377 = -39.7419
+LLLYLLGTLLGFLLVTLLILI Dimer - Monomer = -392.722 - -351.619 = -41.1022
+LLLFLLGILLGYLLVTLLILI Dimer - Monomer = -384.696 - -343.974 = -40.7217
+LLLYLLGTLLGFLLTTLLILI Dimer - Monomer = -393.709 - -359.126 = -34.5828
+LLLYLLGTLLGYLLTVLLILI Dimer - Monomer = -389.71 - -356.033 = -33.6766
+LLLYLLGVLLGTLLWFLLILI Dimer - Monomer = -381.815 - -346.795 = -35.0193
+LLLYLLGTLLGYLLVTLLILI Dimer - Monomer = -396.028 - -355.973 = -40.0553
+LLLYLLGILLGTLLTFLLILI Dimer - Monomer = -387.66 - -355.384 = -32.276
+LLLFLLGTLLGFLLTYLLILI Dimer - Monomer = -372.235 - -340.938 = -31.297
+LLLYLLGTLLGTLLWFLLILI Dimer - Monomer = -389.038 - -354.871 = -34.1674
+LLLYLLGTLLGFLLWVLLILI Dimer - Monomer = -384.553 - -341.9 = -42.653
+LLLFLLGTLLGFLLWFLLILI Dimer - Monomer = -368.79 - -330.178 = -38.6123
+LLLYLLGILLGFLLTFLLILI Dimer - Monomer = -373.361 - -334.473 = -38.8885
+LLLYLLGILLGTLLWFLLILI Dimer - Monomer = -387.993 - -350.754 = -37.239
+LLLYLLGTLLGYLLTTLLILI Dimer - Monomer = -397.918 - -363.413 = -34.5046
+LLLFLLGTLLGYLLWTLLILI Dimer - Monomer = -392.521 - -352.478 = -40.0433
+LLLYLLGTLLGFLLWTLLILI Dimer - Monomer = -394.239 - -352.709 = -41.5299
+LLLYLLGILLGYLLTTLLILI Dimer - Monomer = -392.539 - -355.627 = -36.9119
+LLLYLLGILLGFLLWTLLILI Dimer - Monomer = -392.048 - -348.348 = -43.6993
+LLLYLLGTLLGFLLWFLLILI Dimer - Monomer = -373.929 - -334.021 = -39.9085
+LLLYLLGTLLGYLLWTLLILI Dimer - Monomer = -398.033 - -356.157 = -41.8767
+LLLFLLGILLGYLLWTLLILI Dimer - Monomer = -388.842 - -346.633 = -42.2096
+LLLYLLGTLLGYLLWVLLILI Dimer - Monomer = -388.942 - -348.728 = -40.2139
+End monomer calculations: 989s
+
+Monomer energy calculations  finished. Time: Sat Sep 10 02:46:23 2022
+Elapsed time of program: 17870.9s/297.849min
+
+Total Time: 298 minutes

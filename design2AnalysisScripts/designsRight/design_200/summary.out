@@ -1,0 +1,94 @@
+09_10_2022
+
+PolyLeu Backbone:   LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000110010011011000000
+Rotamers Levels:    023002301300300321121
+Identify Interface finished. Time: Sat Sep 10 08:09:29 2022
+Elapsed time of program: 5.28293s/0.0880489min
+
+Self Consistent Mean Field started. Time: Sat Sep 10 08:09:43 2022
+Elapsed time of program: 19.255s/0.320916min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLYVLLTLLWYLTTLLLILI
+Best Sequence:      LLLYVLLTLLWYLTTLLLILI
+Interface Sequence: L--YV--TL-WY-TT--LI-I
+Interface:          000110010011011000000
+Total Energy:       -12.4739
+VDW:                -63.0131
+HBOND:              -74.9834
+
+End SelfPairManager Optimization: 2768s
+Self Consistent Mean Field finished. Time: Sat Sep 10 08:56:12 2022
+Elapsed time of program: 2808.2s/46.8033min
+
+Sequence search replicate 0 started. Time: Sat Sep 10 08:56:16 2022
+Elapsed time of program: 2811.65s/46.8609min
+
+Self and Pair of all amino acids calculation 0 started. Time: Sat Sep 10 08:56:25 2022
+Elapsed time of program: 2821.21s/47.0201min
+
+Time to calculate energies: 2360s
+Self and Pair of all amino acids calculation 0 finished. Time: Sat Sep 10 09:35:44 2022
+Elapsed time of program: 5180.36s/86.3393min
+
+Best Sequence #0: LLLFVLLGLLTFLTGLLLILI; Energy: -351.328
+Best Sequence #1: LLLFVLLGLLTFLVGLLLILI; Energy: -344.4
+Best Sequence #2: LLLFVLLGLLWFLTGLLLILI; Energy: -353.299
+Best Sequence #3: LLLFWLLGLLWFLTGLLLILI; Energy: -359.106
+Best Sequence #4: LLLFWLLGLLWYLTGLLLILI; Energy: -362.195
+Best Sequence #5: LLLFWLLGLLWYLVGLLLILI; Energy: -355.239
+Best Sequence #6: LLLFWLLGLLYTLVGLLLILI; Energy: -351.91
+Best Sequence #7: LLLFWLLGLLYYLVGLLLILI; Energy: -340.704
+Best Sequence #8: LLLWVLLGLLTFLTGLLLILI; Energy: -365.038
+Best Sequence #9: LLLWVLLGLLWFLTGLLLILI; Energy: -368.509
+Best Sequence #10: LLLWVLLGLLWYLTGLLLILI; Energy: -371.545
+Best Sequence #11: LLLWVLLGLLYTLTGLLLILI; Energy: -367.85
+Best Sequence #12: LLLWVLLTLLTFLTGLLLILI; Energy: -372.871
+Best Sequence #13: LLLWWLLGLLYTLTGLLLILI; Energy: -373.437
+Best Sequence #14: LLLYVLLGLLFTLTGLLLILI; Energy: -354.517
+Best Sequence #15: LLLYVLLGLLFWLTGLLLILI; Energy: -355.822
+Best Sequence #16: LLLYVLLGLLTFLTGLLLILI; Energy: -356.555
+Best Sequence #17: LLLYVLLGLLTFLVGLLLILI; Energy: -349.629
+Best Sequence #18: LLLYVLLGLLTWLTGLLLILI; Energy: -371.119
+Best Sequence #19: LLLYVLLGLLTYLTGLLLILI; Energy: -359.179
+Best Sequence #20: LLLYVLLGLLWFLTGLLLILI; Energy: -358.517
+Best Sequence #21: LLLYVLLGLLWWLTGLLLILI; Energy: -373.574
+Best Sequence #22: LLLYVLLGLLWYLTGLLLILI; Energy: -361.626
+Best Sequence #23: LLLYVLLGLLYTLTGLLLILI; Energy: -359.041
+Best Sequence #24: LLLYVLLTLLTFLTGLLLILI; Energy: -363.652
+Best Sequence #25: LLLYVLLTLLTYLTGLLLILI; Energy: -366.237
+Best Sequence #26: LLLYVLLTLLWFLTTLLLILI; Energy: -375.824
+Best Sequence #27: LLLYVLLTLLWYLTGLLLILI; Energy: -369.134
+Best Sequence #28: LLLYVLLTLLWYLTTLLLILI; Energy: -379.079
+Best Sequence #29: LLLYWLLGLLTFLTGLLLILI; Energy: -360.632
+Best Sequence #30: LLLYWLLGLLTFLVGLLLILI; Energy: -353.706
+Best Sequence #31: LLLYWLLGLLWFLTGLLLILI; Energy: -364.263
+Best Sequence #32: LLLYWLLGLLWYLTGLLLILI; Energy: -367.158
+Best Sequence #33: LLLYWLLGLLYTLTGLLLILI; Energy: -363.738
+Best Sequence #34: LLLYWLLGLLYTLVGLLLILI; Energy: -356.832
+End monte carlo sequence search #0: 134s
+Monte Carlo ended at Temp: 0.815777
+
+Sequence search replicate 0 finished. Time: Sat Sep 10 09:38:16 2022
+Elapsed time of program: 5331.65s/88.8608min
+
+Backbone repack replicate 0 started. Time: Sat Sep 10 09:38:16 2022
+Elapsed time of program: 5331.65s/88.8609min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        8.67597
+crossingAngle: 26.19
+axialRotation: 75.6518
+zShift:        3.22877
+
+***AFTER REPACK GEOMETRY***
+xShift:        8.61265
+crossingAngle: 26.2651
+axialRotation: 75.3361
+zShift:        3.38194
+
+Monte Carlo repack complete. Time: 4803 seconds
+
+Final energy is 130646 after repack, indicating clashes. Choose a different geometry
