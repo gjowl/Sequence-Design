@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from matplotlib.ticker import PercentFormatter
 
 def getEnergyDiff(df_designs, df_energy, energy):
     list_energyDiff = []
@@ -42,7 +43,7 @@ def getEnergyDiff(df_designs, df_energy, energy):
 #
 ## output the design file
 #df_designs.to_csv(outputDir+'designs_with_energyDiff.csv')
-def plotEnergyDiffStackedBarGraph(df, filename):
+def plotEnergyDiffStackedBarGraph(df, outputDir):
     # data columns to plot
     n = len(df)
     x = np.arange(n)
@@ -68,9 +69,39 @@ def plotEnergyDiffStackedBarGraph(df, filename):
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
     # save the number of designs on the plot
     plt.text(0.5, -25, 'Number of Designs: '+str(n))
-    # make output directory
-    outputDir = os.getcwd()+'/'+filename
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
     # save plot
     fig.savefig(outputDir+'/energyDiffPlot.png')
+
+# plot histogram of dataframe and column
+def plotHist(df, column, outputDir, title):
+    # Plotting code below
+    fig, ax = plt.subplots()
+    # get the minimum and maximum values of the column
+    ax.hist(df[column], weights=np.ones(len(df))/len(df), bins=[-55,-50,-45,-40,-35,-30,-25,-20,-15,-10,-5], color='b')
+    # set y axis to percent
+    plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
+    # set the y axis label
+    plt.ylabel('Frequency')
+    # set the x axis label
+    plt.xlabel('Energy Score')
+    # set the title
+    plt.title(title+' histogram')
+    # save the number of data points on the figure
+    plt.text(-60, -0.05, 'n = '+str(len(df)))
+    # check if Top in outputDir
+    if 'Top' in outputDir:
+        # set the y axis limits
+        plt.ylim(0,0.7)
+    else:
+        # set the y axis limits
+        plt.ylim(0,0.5)
+    # save the figure
+    plt.savefig(outputDir+"/histogram.png", bbox_inches='tight', dpi=150)
+    plt.close()
+
+def breakIntoDesignRegions(df):
+    # divide data into dataframes for each region
+    df_right = df[(df['crossingAngle'] < 0) & (df['xShift'] > 7.5)]
+    df_left = df[df['crossingAngle'] > 0]
+    df_gasright = df[(df['crossingAngle'] < 0) & (df['xShift'] < 7.5)]
+    return df_right, df_left, df_gasright

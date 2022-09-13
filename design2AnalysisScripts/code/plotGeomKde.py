@@ -11,7 +11,7 @@ edited version of plotGeomKde.py to plot the kde for the 2020_09_23_kdeData.csv 
 an overlay of an input dataframe. The plotGeomKde function is the driver function and the others are helper functions
 
 """
-def plotGeomKde(df_kde, df_data, dataColumn, filename):
+def plotGeomKde(df_kde, df_data, dataColumn, outputDir):
     # read in kde file from command line, or default to 2020_09_23_kdeData.csv
     df_data = df_data.drop_duplicates('crossingAngle',keep='first')
 
@@ -28,7 +28,7 @@ def plotGeomKde(df_kde, df_data, dataColumn, filename):
     kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
 
     # plot the kde plot with an overlay of the input dataset   
-    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, filename)
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir)
 
 def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     # hardcoded variable set up for plot limits
@@ -49,7 +49,7 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     Z = np.reshape(kernel(positions).T, X.shape)
     return Z
 
-def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, filename):
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
     # Plotting code below
     fig, ax = plt.subplots()
     # plotting labels and variables 
@@ -67,17 +67,15 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, filename):
     ax.use_sticky_edges = False
     q = ax.imshow(np.rot90(kdeZScores), cmap=plt.cm.Blues,
         extent=[xmin, xmax, ymin, ymax], aspect="auto")
-    
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
     cmap = plt.cm.Reds
-    #cmap = cmap.reversed()
+    cmap = cmap.reversed()
     # get min and max of the data
     min_val = np.min(data)
     max_val = np.max(data)
     # flip the data so that the min is at the top of the colorbar
-    norm = matplotlib.colors.Normalize(vmin=50, vmax=100) # TODO: change this to the min and max of the data
-    #norm = matplotlib.colors.Normalize(vmin=-50, vmax=-5) # TODO: change this to the min and max of the data
+    norm = matplotlib.colors.Normalize(vmin=-55, vmax=-5) # TODO: change this to the min and max of the data
     ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
@@ -85,20 +83,10 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, filename):
     fig.colorbar(sm)
     # add the number of datapoints to the plot
     plt.text(xmin-1, ymax+7, "# Geometries = " + str(len(xAxis)), fontsize=10)
-    #ax.scatter(xAxis, yAxis, c='r', s=5, marker='o', alpha=0.5)
-    # Plot data points onto the graph with fluorescence as color
-    #ax.scatter(xAxis, yAxis, c=fluor, s=5, marker='o', alpha=0.5)
-    # Plot the datapoints onto the graph
-    #ax.scatter(xAxis, yAxis, c='r', s=5, marker='o', alpha=0.5)
     ax.set_xlim([xmin, xmax])
     ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
-
-    # make output directory
-    outputDir = os.getcwd()+'/'+filename
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
     plt.savefig(outputDir+"/kdeOverlay.png", bbox_inches='tight', dpi=150)
     plt.close()
 
