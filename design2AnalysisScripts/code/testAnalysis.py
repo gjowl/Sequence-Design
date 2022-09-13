@@ -62,8 +62,8 @@ filename_list = ['All','Right', 'Left', 'GASright']
 
 # TODO: setup overlay for a list of dataframes (also get the overlays for axial and z)
 for df,filename in zip(df_list, filename_list):
-    #plotGeomKde(df_kde, df, 'Total')
-    #plotHist(df, 'Total',filename)
+    plotGeomKde(df_kde, df, 'Total')
+    plotHist(df, 'Total',filename)
     # the below works, but try to think of a better way to plot it to make it more visually appealing and easier to understand
     plotEnergyDiffStackedBarGraph(df,filename)
 

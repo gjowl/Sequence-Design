@@ -11,9 +11,8 @@ edited version of plotGeomKde.py to plot the kde for the 2020_09_23_kdeData.csv 
 an overlay of an input dataframe. The plotGeomKde function is the driver function and the others are helper functions
 
 """
-def plotGeomKde(df_kde, df_data, dataColumn):
+def plotGeomKde(df_kde, df_data, dataColumn, filename):
     # read in kde file from command line, or default to 2020_09_23_kdeData.csv
-    projectDir = os.getcwd()+'/'
     df_data = df_data.drop_duplicates('crossingAngle',keep='first')
 
     # set xAxis and yAxis variables
@@ -29,7 +28,7 @@ def plotGeomKde(df_kde, df_data, dataColumn):
     kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
 
     # plot the kde plot with an overlay of the input dataset   
-    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, projectDir)
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, filename)
 
 def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     # hardcoded variable set up for plot limits
@@ -50,14 +49,14 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     Z = np.reshape(kernel(positions).T, X.shape)
     return Z
 
-def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, filename, outputDir):
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, filename):
     # Plotting code below
     fig, ax = plt.subplots()
     # plotting labels and variables 
     plt.grid(False)
     plt.xlabel("Distance (Å)")
     plt.ylabel("Angle (°)")
-    plt.title(filename)
+    plt.title(dataColumn)
     # Setup for plotting output
     plt.rc('font', size=10)
     plt.rc('xtick', labelsize=10)
@@ -85,7 +84,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, filename, outputDir):
     sm.set_array([])  # only needed for matplotlib < 3.1
     fig.colorbar(sm)
     # add the number of datapoints to the plot
-    plt.text(xmin-1, ymax+7, "# Sequences = " + str(len(xAxis)), fontsize=10)
+    plt.text(xmin-1, ymax+7, "# Geometries = " + str(len(xAxis)), fontsize=10)
     #ax.scatter(xAxis, yAxis, c='r', s=5, marker='o', alpha=0.5)
     # Plot data points onto the graph with fluorescence as color
     #ax.scatter(xAxis, yAxis, c=fluor, s=5, marker='o', alpha=0.5)
@@ -96,8 +95,11 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, filename, outputDir):
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
 
-    #plt.colorbar(q)
-    plt.savefig(outputDir+filename+".png", bbox_inches='tight', dpi=150)
+    # make output directory
+    outputDir = os.getcwd()+'/'+filename
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
+    plt.savefig(outputDir+"/kdeOverlay.png", bbox_inches='tight', dpi=150)
     plt.close()
 
 #TODO:
