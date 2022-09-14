@@ -44,7 +44,11 @@ df_total = df_data[df_data['Total'] < -5]
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #df_total = df_total[df_total['PercentGpa'] < 50]
+=======
+df_total = df_total[df_total['PercentGpa'] > 50]
+>>>>>>> 79960644233ca4e4fae65934702dc00ff55bf9de
 =======
 df_total = df_total[df_total['PercentGpa'] > 50]
 >>>>>>> 79960644233ca4e4fae65934702dc00ff55bf9de
@@ -81,7 +85,11 @@ for df,filename in zip(df_list, filename_list):
 # output updated df_data to csv
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 df_data.to_csv(os.getcwd()+"/test.csv", index=False)
+=======
+#df_data.to_csv(os.getcwd()+"/test.csv", index=False)
+>>>>>>> 79960644233ca4e4fae65934702dc00ff55bf9de
 =======
 #df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 >>>>>>> 79960644233ca4e4fae65934702dc00ff55bf9de
