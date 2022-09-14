@@ -31,7 +31,10 @@ for dir in os.listdir(searchDir):
                 # read the csv file into a dataframe
                 header = pd.read_csv(filename,sep='\t',header=None, nrows=1,usecols=range(29)).dropna(axis=1)
                 df = pd.read_csv(filename, sep='\t', header=None, skiprows=2, usecols=range(29))
+<<<<<<< HEAD
                 print(header.iloc[0])
+=======
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
                 df.columns = header.iloc[0]
                 # combine the dataframes
                 outputDf = pd.concat([outputDf,df],axis=0)

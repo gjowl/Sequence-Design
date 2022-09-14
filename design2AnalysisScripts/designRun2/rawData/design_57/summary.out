@@ -1,0 +1,67 @@
+09_10_2022
+
+PolyLeu Backbone:   LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000100110011001100000
+Rotamers Levels:    133002001200230033122
+Identify Interface finished. Time: Sat Sep 10 00:40:39 2022
+Elapsed time of program: 5.58818s/0.0931363min
+
+Self Consistent Mean Field started. Time: Sat Sep 10 00:40:51 2022
+Elapsed time of program: 17.7372s/0.29562min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLGLLTGLLTGLLTYLLILI
+Best Sequence:      LLLGLLTGLLTGLLTYLLILI
+Interface Sequence: L--GL-TGL-TG--TY--I--
+Interface:          000100110011001100000
+Total Energy:       83590.2
+VDW:                83554.3
+HBOND:              -99.6544
+
+End SelfPairManager Optimization: 2828s
+Self Consistent Mean Field finished. Time: Sat Sep 10 01:28:27 2022
+Elapsed time of program: 2873.58s/47.893min
+
+Sequence search replicate 0 started. Time: Sat Sep 10 01:28:31 2022
+Elapsed time of program: 2877.34s/47.9557min
+
+Self and Pair of all amino acids calculation 0 started. Time: Sat Sep 10 01:28:44 2022
+Elapsed time of program: 2890.86s/48.181min
+
+Time to calculate energies: 2760s
+Self and Pair of all amino acids calculation 0 finished. Time: Sat Sep 10 02:14:43 2022
+Elapsed time of program: 5649.63s/94.1605min
+
+Best Sequence #0: LLLGLLSGLLTGLLTTLLILI; Energy: 83211
+Best Sequence #1: LLLGLLSGLLTGLLTYLLILI; Energy: 83223.4
+Best Sequence #2: LLLGLLTGLLSGLLTTLLILI; Energy: 83211.1
+Best Sequence #3: LLLGLLTGLLTGLLTTLLILI; Energy: 83213.4
+Best Sequence #4: LLLGLLTGLLTGLLTYLLILI; Energy: 83225.8
+Best Sequence #5: LLLGLLTGLLTGLLVTLLILI; Energy: 83221
+Best Sequence #6: LLLGLLTGLLTGLLVYLLILI; Energy: 83233.2
+Best Sequence #7: LLLGLLYGLLTGLLTTLLILI; Energy: 83231.3
+End monte carlo sequence search #0: 101s
+Monte Carlo ended at Temp: 0.815777
+
+Sequence search replicate 0 finished. Time: Sat Sep 10 02:16:48 2022
+Elapsed time of program: 5774.35s/96.2391min
+
+Backbone repack replicate 0 started. Time: Sat Sep 10 02:16:48 2022
+Elapsed time of program: 5774.35s/96.2391min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        6.43411
+crossingAngle: -43.4417
+axialRotation: 74.1466
+zShift:        4.35807
+
+***AFTER REPACK GEOMETRY***
+xShift:        6.45843
+crossingAngle: -43.4008
+axialRotation: 74.7565
+zShift:        4.24339
+
+Monte Carlo repack complete. Time: 722 seconds
+
+Final energy is 37135.6 after repack, indicating clashes. Choose a different geometry

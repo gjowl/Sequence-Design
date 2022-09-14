@@ -1,0 +1,95 @@
+09_10_2022
+
+PolyLeu Backbone:   LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000110010011011000000
+Rotamers Levels:    033002102200200330132
+Identify Interface finished. Time: Sat Sep 10 08:26:02 2022
+Elapsed time of program: 2.9313s/0.0488549min
+
+Self Consistent Mean Field started. Time: Sat Sep 10 08:26:10 2022
+Elapsed time of program: 10.3584s/0.172641min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLWVLLSLLTTLTTLLLILI
+Best Sequence:      LLLWVLLALLTTLTTLLLILI
+Interface Sequence: L--WV-LA--TT-TT--LI--
+Interface:          000110010011011000000
+Total Energy:       1030.82
+VDW:                972.129
+HBOND:              -81.1561
+
+End SelfPairManager Optimization: 2463s
+Self Consistent Mean Field finished. Time: Sat Sep 10 09:07:36 2022
+Elapsed time of program: 2496.74s/41.6123min
+
+Sequence search replicate 0 started. Time: Sat Sep 10 09:07:39 2022
+Elapsed time of program: 2499.75s/41.6625min
+
+Self and Pair of all amino acids calculation 0 started. Time: Sat Sep 10 09:07:56 2022
+Elapsed time of program: 2516.93s/41.9489min
+
+Time to calculate energies: 2870s
+Self and Pair of all amino acids calculation 0 finished. Time: Sat Sep 10 09:55:44 2022
+Elapsed time of program: 5385.06s/89.751min
+
+Best Sequence #0: LLLFILLGLLYFLTSLLLILI; Energy: 670.124
+Best Sequence #1: LLLFILLGLLYFLTTLLLILI; Energy: 678.658
+Best Sequence #2: LLLFILLGLLYLLTTLLLILI; Energy: 660.448
+Best Sequence #3: LLLFILLGLLYLLVTLLLILI; Energy: 667.618
+Best Sequence #4: LLLFILLGLLYWLTSLLLILI; Energy: 655.249
+Best Sequence #5: LLLFILLGLLYWLTTLLLILI; Energy: 662.844
+Best Sequence #6: LLLFVLLGLLFTLTSLLLILI; Energy: 672.969
+Best Sequence #7: LLLFVLLGLLFYLTSLLLILI; Energy: 676.995
+Best Sequence #8: LLLFVLLGLLYFLTSLLLILI; Energy: 674.003
+Best Sequence #9: LLLFVLLGLLYFLTTLLLILI; Energy: 682.531
+Best Sequence #10: LLLFVLLGLLYLLTSLLLILI; Energy: 656.267
+Best Sequence #11: LLLFVLLGLLYLLTTLLLILI; Energy: 664.328
+Best Sequence #12: LLLFVLLGLLYWLTSLLLILI; Energy: 659.129
+Best Sequence #13: LLLFVLLGLLYWLTTLLLILI; Energy: 666.724
+Best Sequence #14: LLLFVLLGLLYYLTSLLLILI; Energy: 671.644
+Best Sequence #15: LLLWILLALLTTLTSLLLILI; Energy: 641.036
+Best Sequence #16: LLLWILLGLLTTLTSLLLILI; Energy: 644.511
+Best Sequence #17: LLLWILLGLLYFLTSLLLILI; Energy: 652.295
+Best Sequence #18: LLLWILLGLLYFLTTLLLILI; Energy: 660.822
+Best Sequence #19: LLLWILLGLLYFLVSLLLILI; Energy: 659.321
+Best Sequence #20: LLLWILLGLLYFLVTLLLILI; Energy: 667.988
+Best Sequence #21: LLLWILLGLLYLLTTLLLILI; Energy: 642.617
+Best Sequence #22: LLLWILLGLLYLLVTLLLILI; Energy: 649.787
+Best Sequence #23: LLLWILLGLLYTLTSLLLILI; Energy: 645.622
+Best Sequence #24: LLLWVLLALLTTLTSLLLILI; Energy: 643.28
+Best Sequence #25: LLLWVLLALLTTLTTLLLILI; Energy: 651.588
+Best Sequence #26: LLLWVLLGLLFFLVSLLLILI; Energy: 669.836
+Best Sequence #27: LLLWVLLGLLFTLTSLLLILI; Energy: 656.538
+Best Sequence #28: LLLWVLLGLLYFLTSLLLILI; Energy: 656.829
+Best Sequence #29: LLLWVLLGLLYFLTTLLLILI; Energy: 665.364
+Best Sequence #30: LLLWVLLGLLYFLVSLLLILI; Energy: 663.855
+Best Sequence #31: LLLWVLLGLLYFLVTLLLILI; Energy: 672.522
+Best Sequence #32: LLLWVLLGLLYLLTSLLLILI; Energy: 639.087
+Best Sequence #33: LLLWVLLGLLYLLTTLLLILI; Energy: 647.151
+Best Sequence #34: LLLWVLLGLLYTLTSLLLILI; Energy: 650.156
+Best Sequence #35: LLLWVLLGLLYWLTTLLLILI; Energy: 649.56
+End monte carlo sequence search #0: 167s
+Monte Carlo ended at Temp: 0.815777
+
+Sequence search replicate 0 finished. Time: Sat Sep 10 09:58:55 2022
+Elapsed time of program: 5575.99s/92.9332min
+
+Backbone repack replicate 0 started. Time: Sat Sep 10 09:58:55 2022
+Elapsed time of program: 5575.99s/92.9332min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        8.67597
+crossingAngle: 26.19
+axialRotation: 50
+zShift:        3.22877
+
+***AFTER REPACK GEOMETRY***
+xShift:        8.65767
+crossingAngle: 25.9863
+axialRotation: 49.6044
+zShift:        3.40844
+
+Monte Carlo repack complete. Time: 3304 seconds
+
+Final energy is 313.536 after repack, indicating clashes. Choose a different geometry
