@@ -14,6 +14,7 @@ an overlay of an input dataframe. The plotGeomKde function is the driver functio
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def plotGeomKde(df_kde, df_data, dataColumn):
     # read in kde file from command line, or default to 2020_09_23_kdeData.csv
     projectDir = os.getcwd()+'/'
@@ -29,6 +30,10 @@ def plotGeomKde(df_kde, df_data, dataColumn, outputDir):
 def plotGeomKde(df_kde, df_data, dataColumn, outputDir):
     # read in kde file from command line, or default to 2020_09_23_kdeData.csv
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+def plotGeomKde(df_kde, df_data, dataColumn, outputDir):
+    # read in kde file from command line, or default to 2020_09_23_kdeData.csv
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     df_data = df_data.drop_duplicates('crossingAngle',keep='first')
 
     # set xAxis and yAxis variables
@@ -47,6 +52,7 @@ def plotGeomKde(df_kde, df_data, dataColumn, outputDir):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, projectDir)
 =======
     plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir)
@@ -57,6 +63,9 @@ def plotGeomKde(df_kde, df_data, dataColumn, outputDir):
 =======
     plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir)
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir)
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
 
 def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     # hardcoded variable set up for plot limits
@@ -80,6 +89,7 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, filename, outputDir):
 =======
 def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
@@ -90,12 +100,16 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 =======
 def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     # Plotting code below
     fig, ax = plt.subplots()
     # plotting labels and variables 
     plt.grid(False)
     plt.xlabel("Distance (Å)")
     plt.ylabel("Angle (°)")
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -109,6 +123,9 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 =======
     plt.title(dataColumn)
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+    plt.title(dataColumn)
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     # Setup for plotting output
     plt.rc('font', size=10)
     plt.rc('xtick', labelsize=10)
@@ -122,6 +139,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
@@ -132,21 +150,27 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
     cmap = plt.cm.Reds
     cmap = cmap.reversed()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     # get min and max of the data
     min_val = np.min(data)
     max_val = np.max(data)
     # flip the data so that the min is at the top of the colorbar
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -161,12 +185,16 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 =======
     norm = matplotlib.colors.Normalize(vmin=-55, vmax=-5) # TODO: change this to the min and max of the data
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+    norm = matplotlib.colors.Normalize(vmin=-55, vmax=-5) # TODO: change this to the min and max of the data
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
     sm.set_array([])  # only needed for matplotlib < 3.1
     fig.colorbar(sm)
     # add the number of datapoints to the plot
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -185,10 +213,14 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 =======
     plt.text(xmin-1, ymax+7, "# Geometries = " + str(len(xAxis)), fontsize=10)
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+    plt.text(xmin-1, ymax+7, "# Geometries = " + str(len(xAxis)), fontsize=10)
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     ax.set_xlim([xmin, xmax])
     ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -204,6 +236,9 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
 =======
     plt.savefig(outputDir+"/kdeOverlay.png", bbox_inches='tight', dpi=150)
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+    plt.savefig(outputDir+"/kdeOverlay.png", bbox_inches='tight', dpi=150)
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     plt.close()
 
 #TODO:

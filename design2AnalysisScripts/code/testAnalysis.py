@@ -48,6 +48,7 @@ df_total = df_data[df_data['Total'] < -5]
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #df_total = df_total[df_total['PercentGpa'] < 50]
 =======
 df_total = df_total[df_total['PercentGpa'] > 50]
@@ -67,6 +68,9 @@ df_total = df_total[df_total['PercentGpa'] < 50]
 =======
 df_total = df_total[df_total['PercentGpa'] < 50]
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+df_total = df_total[df_total['PercentGpa'] < 50]
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
 df_total = df_total.sort_values(by='VDWDiff')
 # only keep sequences where VDWDiff is greater than 0
 df_vdwDiff = df_total[df_total['VDWDiff'] < 0]
@@ -89,6 +93,7 @@ for df,filename in zip(df_list, filename_list):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     #plotGeomKde(df_kde, df, 'Total')
     #plotHist(df, 'Total',filename)
 =======
@@ -103,6 +108,10 @@ for df,filename in zip(df_list, filename_list):
     plotGeomKde(df_kde, df, 'Total')
     plotHist(df, 'Total',filename)
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+    plotGeomKde(df_kde, df, 'Total')
+    plotHist(df, 'Total',filename)
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     # the below works, but try to think of a better way to plot it to make it more visually appealing and easier to understand
     plotEnergyDiffStackedBarGraph(df,filename)
 
@@ -110,6 +119,7 @@ for df,filename in zip(df_list, filename_list):
 #plotGeomKde(df_kde, df_total, 'PercentGpa')
 
 # output updated df_data to csv
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -135,6 +145,9 @@ df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 =======
 #df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+#df_data.to_csv(os.getcwd()+"/test.csv", index=False)
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
 
 # TODO: only overlay unique geometries
 # TODO: compare the geometries to the sequences I got before; to the sequences that worked plot

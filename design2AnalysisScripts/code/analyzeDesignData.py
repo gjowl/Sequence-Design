@@ -51,7 +51,11 @@ df_dup = df_dup.sort_values(by=['Sequence', 'Total'])
 df_dup.to_csv(inputDir+"/duplicateSequences.csv", index=False)
 
 # get a dataframe with sequences that are unique
+<<<<<<< HEAD
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
+=======
+#df = df.drop_duplicates(subset=['Sequence'], keep='first')
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
 
 # sort by total energy
 df = df.sort_values(by=['Total'])

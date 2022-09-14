@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 from matplotlib.ticker import PercentFormatter
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
@@ -14,6 +15,9 @@ from matplotlib.ticker import PercentFormatter
 =======
 from matplotlib.ticker import PercentFormatter
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+from matplotlib.ticker import PercentFormatter
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
 
 def getEnergyDiff(df_designs, df_energy, energy):
     list_energyDiff = []
@@ -57,6 +61,7 @@ def getEnergyDiff(df_designs, df_energy, energy):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def plotEnergyDiffStackedBarGraph(df, filename):
 =======
 def plotEnergyDiffStackedBarGraph(df, outputDir):
@@ -67,6 +72,9 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
 =======
 def plotEnergyDiffStackedBarGraph(df, outputDir):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+def plotEnergyDiffStackedBarGraph(df, outputDir):
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     # data columns to plot
     n = len(df)
     x = np.arange(n)
@@ -87,6 +95,7 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
     plt.ylabel('Energy')
     plt.title('Energy Plot')
     plt.xticks(x, df['Sequence'])
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -115,6 +124,8 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
     plt.ylim(-90,-35)
     plt.yticks(np.arange(-90, -30, 10))
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
@@ -158,8 +169,11 @@ def breakIntoDesignRegions(df):
     return df_right, df_left, df_gasright
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b

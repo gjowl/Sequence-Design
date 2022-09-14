@@ -12,6 +12,7 @@ programName = 'ngsAnalysis'
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/CHIP1/'
 codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/code/'
 dataDir = '/data/NGS/'
@@ -23,6 +24,8 @@ dataDir = '/data/NGS/'
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
 #analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/CHIP1/'
 #codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/code/'
 #dataDir = '/data/NGS/'
@@ -31,11 +34,14 @@ codeDir = '/mnt/d/github/Sequence-Design/ngsReconstruction/code/'
 dataDir = '/mnt/d/2022-5-13/'
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
+>>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'
