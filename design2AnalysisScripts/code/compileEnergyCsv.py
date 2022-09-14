@@ -33,7 +33,10 @@ for dir in os.listdir(searchDir):
                 df = pd.read_csv(filename, sep='\t', header=None, skiprows=2, usecols=range(29))
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 print(header.iloc[0])
+=======
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
