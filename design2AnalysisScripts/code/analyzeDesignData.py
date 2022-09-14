@@ -25,11 +25,7 @@ if inputDir == '':
     inputDir = os.getcwd()
 
 # make output directory
-<<<<<<< HEAD
-analysisDir = inputDir+'/analyzedData'
-=======
 analysisDir = inputDir+'/analyzedData_PercentGpaLessThan50'
->>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
 # check if the analysis directory exists
 if not os.path.exists(analysisDir):
     os.makedirs(analysisDir)
@@ -55,25 +51,15 @@ df_dup = df_dup.sort_values(by=['Sequence', 'Total'])
 df_dup.to_csv(inputDir+"/duplicateSequences.csv", index=False)
 
 # get a dataframe with sequences that are unique
-<<<<<<< HEAD
-<<<<<<< HEAD
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
-=======
-#df = df.drop_duplicates(subset=['Sequence'], keep='first')
->>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
-=======
 #df = df.drop_duplicates(subset=['Sequence'], keep='first')# don't drop for original design data (compiledDesignData.csv)
->>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
 
 # sort by total energy
 df = df.sort_values(by=['Total'])
 
-<<<<<<< HEAD
-=======
 # only use data with PercentGpa > 50
-df = df[df['PercentGpa'] < 50]
+#df = df[df['PercentGpa'] < 50]
 
->>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
 # output dfUnique to a csv file
 #df_unique.to_csv(cwd+"uniqueSequences.csv", index=False)
 df_right, df_left, df_gasright = breakIntoDesignRegions(df)
