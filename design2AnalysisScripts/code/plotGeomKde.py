@@ -87,6 +87,8 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
     ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
+    # output the number of sequences in the dataset onto plot
+    #plt.text(xmin-1, ymax+10, "# N = " + str(len(xAxis)), fontsize=10)
     plt.savefig(outputDir+"/kdeOverlay.png", bbox_inches='tight', dpi=150)
     plt.close()
 

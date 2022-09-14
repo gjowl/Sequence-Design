@@ -56,19 +56,21 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
     IMM1Diff = df['IMM1Diff']*-1
     # setup the bar plots for each energy difference
     fig, ax = plt.subplots()
-    p1 = plt.bar(x, VDWDiff, width, color='b')
-    p2 = plt.bar(x, HBONDDiff, width, color='r', bottom=VDWDiff)
+    p1 = plt.bar(x, VDWDiff, width, color='cornflowerblue', edgecolor='black')
+    p2 = plt.bar(x, HBONDDiff, width, color='firebrick', bottom=VDWDiff, edgecolor='black')
     #p3 = plt.bar(x, IMM1DimerMonomerDiff, width, color='g', bottom=HBONDDimerMonomerDiff)
     # change the dpi to make the image smaller
     fig.set_dpi(2000)
     plt.ylabel('Energy')
     plt.title('Energy Plot')
-    plt.xticks(x, df['Sequence'])
+    #plt.xticks(x, df['Sequence'])
     plt.ylim(-90,-35)
     plt.yticks(np.arange(-90, -30, 10))
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
     # save the number of designs on the plot
-    plt.text(0.5, -25, 'Number of Designs: '+str(n))
+    #plt.text(0.5, -25, 'Number of Designs: '+str(n))
+    # output the number of sequences in the dataset onto plot top left corner
+    plt.text(0.2, -33, 'N = '+str(n))
     # save plot
     fig.savefig(outputDir+'/energyDiffPlot.png')
 
