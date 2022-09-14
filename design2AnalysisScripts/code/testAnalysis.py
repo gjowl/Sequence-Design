@@ -46,6 +46,7 @@ df_total = df_data[df_data['Total'] < -5]
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 #df_total = df_total[df_total['PercentGpa'] < 50]
 =======
 df_total = df_total[df_total['PercentGpa'] > 50]
@@ -56,6 +57,9 @@ df_total = df_total[df_total['PercentGpa'] > 50]
 =======
 df_total = df_total[df_total['PercentGpa'] > 50]
 >>>>>>> 79960644233ca4e4fae65934702dc00ff55bf9de
+=======
+df_total = df_total[df_total['PercentGpa'] < 50]
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 df_total = df_total[df_total['PercentGpa'] < 50]
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
@@ -79,8 +83,13 @@ filename_list = ['All','Right', 'Left', 'GASright']
 # TODO: setup overlay for a list of dataframes (also get the overlays for axial and z)
 for df,filename in zip(df_list, filename_list):
 <<<<<<< HEAD
+<<<<<<< HEAD
     #plotGeomKde(df_kde, df, 'Total')
     #plotHist(df, 'Total',filename)
+=======
+    plotGeomKde(df_kde, df, 'Total')
+    plotHist(df, 'Total',filename)
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
     plotGeomKde(df_kde, df, 'Total')
     plotHist(df, 'Total',filename)
@@ -96,6 +105,7 @@ for df,filename in zip(df_list, filename_list):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 =======
 #df_data.to_csv(os.getcwd()+"/test.csv", index=False)
@@ -106,6 +116,9 @@ df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 =======
 #df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 >>>>>>> 79960644233ca4e4fae65934702dc00ff55bf9de
+=======
+#df_data.to_csv(os.getcwd()+"/test.csv", index=False)
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 #df_data.to_csv(os.getcwd()+"/test.csv", index=False)
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff

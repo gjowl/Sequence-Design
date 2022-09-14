@@ -32,7 +32,10 @@ for dir in os.listdir(searchDir):
                 header = pd.read_csv(filename,sep='\t',header=None, nrows=1,usecols=range(29)).dropna(axis=1)
                 df = pd.read_csv(filename, sep='\t', header=None, skiprows=2, usecols=range(29))
 <<<<<<< HEAD
+<<<<<<< HEAD
                 print(header.iloc[0])
+=======
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
                 df.columns = header.iloc[0]

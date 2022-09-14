@@ -3,6 +3,10 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+from matplotlib.ticker import PercentFormatter
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 from matplotlib.ticker import PercentFormatter
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
@@ -47,7 +51,11 @@ def getEnergyDiff(df_designs, df_energy, energy):
 ## output the design file
 #df_designs.to_csv(outputDir+'designs_with_energyDiff.csv')
 <<<<<<< HEAD
+<<<<<<< HEAD
 def plotEnergyDiffStackedBarGraph(df, filename):
+=======
+def plotEnergyDiffStackedBarGraph(df, outputDir):
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 def plotEnergyDiffStackedBarGraph(df, outputDir):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
@@ -75,6 +83,7 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     plt.yticks(np.arange(-70, 0, 10))
 =======
     plt.ylim(-80,-30)
@@ -93,6 +102,8 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
     # save plot
     fig.savefig(os.getcwd()+'/energyPlot_'+filename+'.png')
 =======
+=======
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
     plt.ylim(-90,-35)
     plt.yticks(np.arange(-90, -30, 10))
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
@@ -134,4 +145,7 @@ def breakIntoDesignRegions(df):
     df_left = df[df['crossingAngle'] > 0]
     df_gasright = df[(df['crossingAngle'] < 0) & (df['xShift'] < 7.5)]
     return df_right, df_left, df_gasright
+<<<<<<< HEAD
+>>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
+=======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
