@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 from matplotlib.ticker import PercentFormatter
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
@@ -18,6 +19,9 @@ from matplotlib.ticker import PercentFormatter
 =======
 from matplotlib.ticker import PercentFormatter
 >>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
+=======
+from matplotlib.ticker import PercentFormatter
+>>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
 
 def getEnergyDiff(df_designs, df_energy, energy):
     list_energyDiff = []
@@ -62,6 +66,7 @@ def getEnergyDiff(df_designs, df_energy, energy):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 def plotEnergyDiffStackedBarGraph(df, filename):
 =======
 def plotEnergyDiffStackedBarGraph(df, outputDir):
@@ -75,6 +80,9 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
 =======
 def plotEnergyDiffStackedBarGraph(df, outputDir):
 >>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
+=======
+def plotEnergyDiffStackedBarGraph(df, outputDir):
+>>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
     # data columns to plot
     n = len(df)
     x = np.arange(n)
@@ -87,13 +95,19 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
     IMM1Diff = df['IMM1Diff']*-1
     # setup the bar plots for each energy difference
     fig, ax = plt.subplots()
+<<<<<<< HEAD
     p1 = plt.bar(x, VDWDiff, width, color='b')
     p2 = plt.bar(x, HBONDDiff, width, color='r', bottom=VDWDiff)
+=======
+    p1 = plt.bar(x, VDWDiff, width, color='cornflowerblue', edgecolor='black')
+    p2 = plt.bar(x, HBONDDiff, width, color='firebrick', bottom=VDWDiff, edgecolor='black')
+>>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
     #p3 = plt.bar(x, IMM1DimerMonomerDiff, width, color='g', bottom=HBONDDimerMonomerDiff)
     # change the dpi to make the image smaller
     fig.set_dpi(2000)
     plt.ylabel('Energy')
     plt.title('Energy Plot')
+<<<<<<< HEAD
     plt.xticks(x, df['Sequence'])
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -126,11 +140,20 @@ def plotEnergyDiffStackedBarGraph(df, outputDir):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
+=======
+    #plt.xticks(x, df['Sequence'])
+>>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
     plt.ylim(-90,-35)
     plt.yticks(np.arange(-90, -30, 10))
     plt.legend((p2[0], p1[0]), ('HBOND', 'VDW'))
     # save the number of designs on the plot
+<<<<<<< HEAD
     plt.text(0.5, -25, 'Number of Designs: '+str(n))
+=======
+    #plt.text(0.5, -25, 'Number of Designs: '+str(n))
+    # output the number of sequences in the dataset onto plot top left corner
+    plt.text(0.2, -33, 'N = '+str(n))
+>>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
     # save plot
     fig.savefig(outputDir+'/energyDiffPlot.png')
 
@@ -170,6 +193,7 @@ def breakIntoDesignRegions(df):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
@@ -177,3 +201,5 @@ def breakIntoDesignRegions(df):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
+=======
+>>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8

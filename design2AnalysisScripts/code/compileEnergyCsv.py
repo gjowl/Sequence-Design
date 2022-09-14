@@ -35,6 +35,7 @@ for dir in os.listdir(searchDir):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                 print(header.iloc[0])
 =======
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
@@ -44,6 +45,8 @@ for dir in os.listdir(searchDir):
 >>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
 =======
 >>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
+=======
+>>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
                 df.columns = header.iloc[0]
                 # combine the dataframes
                 outputDf = pd.concat([outputDf,df],axis=0)
