@@ -29,8 +29,10 @@ for dir in os.listdir(searchDir):
             if file == "energyFile.csv":
                 filename = currDir+file
                 # read the csv file into a dataframe
-                header = pd.read_csv(filename,sep='\t',header=None, nrows=1,usecols=range(29)).dropna(axis=1)
-                df = pd.read_csv(filename, sep='\t', header=None, skiprows=2, usecols=range(29))
+                #header = pd.read_csv(filename,sep='\t',header=None, nrows=1,usecols=range(29)).dropna(axis=1)
+                #df = pd.read_csv(filename, sep='\t', header=None, skiprows=2, usecols=range(29))
+                header = pd.read_csv(filename,sep='\t',header=None, nrows=1)
+                df = pd.read_csv(filename, sep='\t', header=None, skiprows=1)
                 df.columns = header.iloc[0]
                 # add the directory name to the dataframe
                 df['Directory'] = dir

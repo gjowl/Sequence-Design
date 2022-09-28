@@ -1,0 +1,80 @@
+09_25_2022
+
+Backbone:           LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000110011001100110000
+Rotamers Levels:    123001300120022003312
+Identify Interface finished. Time: Sun Sep 25 23:57:07 2022
+Elapsed time of program: 0.0635min
+
+Self Consistent Mean Field started. Time: Sun Sep 25 23:57:17 2022
+Elapsed time of program: 0.234min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLYGLLTGLLTGLLTTLILI
+Best Sequence:      LLLTGLLTGLLTGLLTTLILI
+Interface Sequence: L--TGL-TGL-TG--TT--L-
+Interface:          000110011001100110000
+Total Energy:       61
+VDW:                19.4
+HBOND:              -97
+
+End SelfPairManager Optimization: 3.83e+03s
+Self Consistent Mean Field finished. Time: Mon Sep 26 01:01:30 2022
+Elapsed time of program: 64.4min
+
+Sequence search replicate 0 started. Time: Mon Sep 26 01:01:32 2022
+Elapsed time of program: 64.5min
+
+Self and Pair of all amino acids calculation 0 started. Time: Mon Sep 26 01:01:48 2022
+Elapsed time of program: 64.7min
+
+Self and Pair of all amino acids calculation 0 finished. Time: Mon Sep 26 02:06:01 2022
+Elapsed time of program: 129min
+
+End monte carlo sequence search #0: 5.52min
+Monte Carlo ended at Temp: 0.653
+
+Sequence search replicate 0 finished. Time: Mon Sep 26 02:12:03 2022
+Elapsed time of program: 135min
+
+Compute Monomer Energy 0 started. Time: Mon Sep 26 02:12:03 2022
+Elapsed time of program: 135min
+
+LLLYGLLTGLLTGLLTTLILI Dimer - Monomer = -295 - -364 = 68.9
+Compute Monomer Energy 0 finished. Time: Mon Sep 26 02:14:29 2022
+Elapsed time of program: 137min
+
+Backbone repack replicate 0 started. Time: Mon Sep 26 02:14:29 2022
+Elapsed time of program: 137min
+
+Time to calculate energies for backbone repack: 0
+***GEOMETRY SHIFT***
+xShift;        Before: 7.03; After: 7.03
+crossingAngle; Before: -43; After: -41.9
+axialRotation; Before: -23.2; After: -23.1
+zShift;        Before: 4.47; After: 4.41
+
+Energy;        Before: 232; After: 62.3
+
+Completed all cycles. Accepted 100/118
+Backbone repack replicate 0 finished. Time: Mon Sep 26 02:37:22 2022
+Elapsed time of program: 160min
+
+Sequence search replicate 1 started. Time: Mon Sep 26 02:37:22 2022
+Elapsed time of program: 160min
+
+Self and Pair of all amino acids calculation 1 started. Time: Mon Sep 26 02:37:35 2022
+Elapsed time of program: 161min
+
+Self and Pair of all amino acids calculation 1 finished. Time: Mon Sep 26 03:31:51 2022
+Elapsed time of program: 215min
+
+End monte carlo sequence search #1: 4.52min
+Monte Carlo ended at Temp: 0.653
+
+Sequence search replicate 1 finished. Time: Mon Sep 26 03:36:48 2022
+Elapsed time of program: 220min
+
+Sequence	Interface	InterfaceSequence	Baseline	Dimer	Dimerw/Baseline	HBONDDimer	HBONDMonomer	IMM1Dimer	IMM1Monomer	Monomer	MonomerSasa	SequenceProbability	Total	VDWDimer	VDWMonomer	acceptCycleNumber	axialRotation	bestEnergyTotal	crossingAngle	currEnergyTotal	currEntropy	endAxialRotation	endCrossingAngle	endXShift	endZShift	energyComparison	entropyDiff	geometryNumber	prevEntropy	startEnergy	xShift	zShift	
+LLLYGLLTGLLTGLLTTLILI	123001300120022003312	L--YGL-TGL-TG--TT--L-	354.639	-295.378	59.2606	-97.0293	-100.054	-222.173	-271.992	-364.305	4518.7	3.03607e-07	62.3318	23.8244	7.74045	82	-23.18	60.746	-43.03	59.4738	0.213262	-23.1192	-41.9194	7.02508	4.40989	1.27218	0.494594	0	0.707856	68.9267	7.03	4.47	
+Total Time: 220 minutes

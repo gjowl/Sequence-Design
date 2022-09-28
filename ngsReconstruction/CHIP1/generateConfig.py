@@ -9,45 +9,12 @@ config_file = configparser.ConfigParser()
 
 # main code config options
 programName = 'ngsAnalysis'
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/CHIP1/'
 codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/code/'
 dataDir = '/data/NGS/'
-#analysisDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/2022-5-13/'
-#codeDir = '/mnt/c/Users/gjowl/github/Sequence-Design/ngsAnalysis/code/'
+#analysisDir = '/mnt/d/github/Sequence-Design/ngsReconstruction/CHIP1/'
+#codeDir = '/mnt/d/github/Sequence-Design/ngsReconstruction/code/'
 #dataDir = '/mnt/d/2022-5-13/'
-=======
-=======
->>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
-=======
->>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
-=======
->>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
-=======
->>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
-#analysisDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/CHIP1/'
-#codeDir = '/exports/home/gloiseau/github/Sequence-Design/ngsReconstruction/code/'
-#dataDir = '/data/NGS/'
-analysisDir = '/mnt/d/github/Sequence-Design/ngsReconstruction/CHIP1/'
-codeDir = '/mnt/d/github/Sequence-Design/ngsReconstruction/code/'
-dataDir = '/mnt/d/2022-5-13/'
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
-=======
->>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
-=======
->>>>>>> ad76af7087793a7c3c58fcc8c653ea5605f2b2ff
-=======
->>>>>>> 526550a3041fc0669e9d118b0c727dbcc999064b
-=======
->>>>>>> aff5e515ed04cfd4d742cd0dd2b778f297359cb8
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'

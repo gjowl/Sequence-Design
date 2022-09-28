@@ -1,0 +1,146 @@
+09_26_2022
+
+Backbone:           LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000110011001100110000
+Rotamers Levels:    133002300220031003102
+Identify Interface finished. Time: Mon Sep 26 05:12:49 2022
+Elapsed time of program: 0.0659min
+
+Self Consistent Mean Field started. Time: Mon Sep 26 05:13:01 2022
+Elapsed time of program: 0.268min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLYGLLSTLLGTLLGYLILI
+Best Sequence:      LLLYGLLSYLLGTLLGYLILI
+Interface Sequence: L--YG--SY--GT-LGY-IL-
+Interface:          000110011001100110000
+Total Energy:       2.6e+03
+VDW:                2.56e+03
+HBOND:              -75.4
+
+End SelfPairManager Optimization: 3.21e+03s
+Self Consistent Mean Field finished. Time: Mon Sep 26 06:06:54 2022
+Elapsed time of program: 54.1min
+
+Sequence search replicate 0 started. Time: Mon Sep 26 06:06:55 2022
+Elapsed time of program: 54.2min
+
+Self and Pair of all amino acids calculation 0 started. Time: Mon Sep 26 06:07:10 2022
+Elapsed time of program: 54.4min
+
+Self and Pair of all amino acids calculation 0 finished. Time: Mon Sep 26 06:58:20 2022
+Elapsed time of program: 106min
+
+End monte carlo sequence search #0: 3.27min
+Monte Carlo ended at Temp: 0.653
+
+Sequence search replicate 0 finished. Time: Mon Sep 26 07:01:58 2022
+Elapsed time of program: 109min
+
+Compute Monomer Energy 0 started. Time: Mon Sep 26 07:01:58 2022
+Elapsed time of program: 109min
+
+LLLYWLLGTLLGTLLGWLILI Dimer - Monomer = 2.24e+03 - -352 = 2.59e+03
+Compute Monomer Energy 0 finished. Time: Mon Sep 26 07:06:17 2022
+Elapsed time of program: 114min
+
+Backbone repack replicate 0 started. Time: Mon Sep 26 07:06:17 2022
+Elapsed time of program: 114min
+
+Time to calculate energies for backbone repack: 0
+***GEOMETRY SHIFT***
+xShift;        Before: 6.58; After: 6.54
+crossingAngle; Before: -35.4; After: -35.5
+axialRotation; Before: -72.8; After: -72.7
+zShift;        Before: 0.86; After: 1.11
+
+Energy;        Before: 6.99e+07; After: 1.03e+03
+
+Completed all cycles. Accepted 81/312
+Final energy is 1.03e+03 after repack, indicating clashes. Choose a different geometry
+Backbone repack replicate 0 finished. Time: Mon Sep 26 08:29:12 2022
+Elapsed time of program: 196min
+
+Sequence search replicate 1 started. Time: Mon Sep 26 08:29:12 2022
+Elapsed time of program: 196min
+
+Self and Pair of all amino acids calculation 1 started. Time: Mon Sep 26 08:29:22 2022
+Elapsed time of program: 197min
+
+Self and Pair of all amino acids calculation 1 finished. Time: Mon Sep 26 09:20:10 2022
+Elapsed time of program: 247min
+
+End monte carlo sequence search #1: 4.85min
+Monte Carlo ended at Temp: 0.653
+
+Sequence search replicate 1 finished. Time: Mon Sep 26 09:25:22 2022
+Elapsed time of program: 253min
+
+Compute Monomer Energy 1 started. Time: Mon Sep 26 09:25:22 2022
+Elapsed time of program: 253min
+
+LLLYYLLGTLLGTLLGWLILI Dimer - Monomer = 690 - -340 = 1.03e+03
+Compute Monomer Energy 1 finished. Time: Mon Sep 26 09:30:20 2022
+Elapsed time of program: 258min
+
+Backbone repack replicate 1 started. Time: Mon Sep 26 09:30:20 2022
+Elapsed time of program: 258min
+
+Time to calculate energies for backbone repack: 0
+***GEOMETRY SHIFT***
+xShift;        Before: 6.54; After: 6.52
+crossingAngle; Before: -35.5; After: -36.3
+axialRotation; Before: -72.7; After: -73.7
+zShift;        Before: 1.11; After: 1.37
+
+Energy;        Before: 1.8e+08; After: 410
+
+Completed all cycles. Accepted 84/305
+Final energy is 410 after repack, indicating clashes. Choose a different geometry
+Backbone repack replicate 1 finished. Time: Mon Sep 26 11:05:29 2022
+Elapsed time of program: 353min
+
+Sequence search replicate 2 started. Time: Mon Sep 26 11:05:29 2022
+Elapsed time of program: 353min
+
+Self and Pair of all amino acids calculation 2 started. Time: Mon Sep 26 11:05:40 2022
+Elapsed time of program: 353min
+
+Self and Pair of all amino acids calculation 2 finished. Time: Mon Sep 26 11:53:19 2022
+Elapsed time of program: 401min
+
+End monte carlo sequence search #2: 11.8min
+Monte Carlo ended at Temp: 0.653
+
+Sequence search replicate 2 finished. Time: Mon Sep 26 12:05:28 2022
+Elapsed time of program: 413min
+
+Compute Monomer Energy 2 started. Time: Mon Sep 26 12:05:28 2022
+Elapsed time of program: 413min
+
+LLLYYLLGWLLGTLLGWLILI Dimer - Monomer = 71.8 - -331 = 403
+Compute Monomer Energy 2 finished. Time: Mon Sep 26 12:12:16 2022
+Elapsed time of program: 420min
+
+Backbone repack replicate 2 started. Time: Mon Sep 26 12:12:16 2022
+Elapsed time of program: 420min
+
+Time to calculate energies for backbone repack: 1
+***GEOMETRY SHIFT***
+xShift;        Before: 6.52; After: 6.55
+crossingAngle; Before: -36.3; After: -36.1
+axialRotation; Before: -73.7; After: -73.5
+zShift;        Before: 1.37; After: 1.67
+
+Energy;        Before: 3.18e+08; After: 165
+
+Completed all cycles. Accepted 84/263
+Final energy is 163 after repack, indicating clashes. Choose a different geometry
+Backbone repack replicate 2 finished. Time: Mon Sep 26 14:21:49 2022
+Elapsed time of program: 549min
+
+Sequence	Interface	InterfaceSequence	Baseline	Dimer	Dimerw/Baseline	HBONDDimer	HBONDMonomer	IMM1Dimer	IMM1Monomer	Monomer	MonomerSasa	SequenceProbability	Total	VDWDimer	VDWMonomer	acceptCycleNumber	axialRotation	bestEnergyTotal	crossingAngle	currEnergyTotal	currEntropy	endAxialRotation	endCrossingAngle	endXShift	endZShift	energyComparison	entropyDiff	geometryNumber	prevEntropy	startEnergy	xShift	zShift	
+LLLYWLLGTLLGTLLGWLILI	133002300220031003102	L--YW--GT--GT-LGW-IL-	353.161	2240	2593.16	-76.5326	-72.5472	-227.703	-282.763	-352.417	4673.75	3.96713e-07	1028.03	2544.24	2.89241	119	-72.85	2594.73	-35.44	2594.39	1.23103	-72.6877	-35.4699	6.541	1.10818	0.337172	-1.15198	0	0.0790506	2592.42	6.58	0.86	
+LLLYYLLGTLLGTLLGWLILI	133002300220031003102	L--YY--GT--GT-LGW-IL-	341.855	690.195	1032.05	-80.266	-72.5472	-228.143	-277.59	-340.021	4634.93	6.94248e-07	410.39	998.603	10.1161	122	-72.6877	1033.36	-35.4699	1033	0.952787	-73.7033	-36.323	6.51623	1.37204	0.361144	-0.820686	1	0.132101	1030.22	6.541	1.10818	
+LLLYYLLGWLLGTLLGWLILI	133002300220031003102	L--YY--GW--GT-LGW-IL-	343.302	71.815	415.117	-66.7676	-58.7227	-234.293	-286.753	-330.989	4637.58	2.94529e-07	162.676	372.876	14.4867	119	-73.7033	415.656	-36.323	415.575	0.457728	-73.5058	-36.1359	6.55099	1.6712	0.0806452	-0.0912572	2	0.366471	402.804	6.51623	1.37204	
+Total Time: 549 minutes

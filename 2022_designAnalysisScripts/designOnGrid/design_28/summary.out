@@ -1,0 +1,59 @@
+09_25_2022
+
+Backbone:           LLLLLLLLLLLLLLLLLLILI
+Variable Positions: 000110011001100110000
+Rotamers Levels:    123001300120032003212
+Identify Interface finished. Time: Sun Sep 25 10:12:04 2022
+Elapsed time of program: 0.0548min
+
+Self Consistent Mean Field started. Time: Sun Sep 25 10:12:13 2022
+Elapsed time of program: 0.206min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLTGLLTGLLLGLLTTLILI
+Best Sequence:      LLLTGLLTGLLLGLLTTLILI
+Interface Sequence: L--TGL-TGL-LG--TT--L-
+Interface:          000110011001100110000
+Total Energy:       6.58e+03
+VDW:                6.52e+03
+HBOND:              -91.5
+
+End SelfPairManager Optimization: 2.87e+03s
+Self Consistent Mean Field finished. Time: Sun Sep 25 11:00:24 2022
+Elapsed time of program: 48.4min
+
+Sequence search replicate 0 started. Time: Sun Sep 25 11:00:25 2022
+Elapsed time of program: 48.4min
+
+Self and Pair of all amino acids calculation 0 started. Time: Sun Sep 25 11:00:36 2022
+Elapsed time of program: 48.6min
+
+Self and Pair of all amino acids calculation 0 finished. Time: Sun Sep 25 11:48:07 2022
+Elapsed time of program: 96.1min
+
+End monte carlo sequence search #0: 2.67min
+Monte Carlo ended at Temp: 0.653
+
+Sequence search replicate 0 finished. Time: Sun Sep 25 11:51:09 2022
+Elapsed time of program: 99.1min
+
+LLLAGLLTGLLIGLLTTLILI Dimer - Monomer = 6.22e+03 - -366 = 6.59e+03
+Backbone repack replicate 0 started. Time: Sun Sep 25 11:52:05 2022
+Elapsed time of program: 100min
+
+Time to calculate energies for backbone repack: 0
+***STARTING GEOMETRY***
+xShift:        6.51
+crossingAngle: -39
+axialRotation: -37.8
+zShift:        5.29
+
+***AFTER REPACK GEOMETRY***
+xShift:        6.49
+crossingAngle: -37.9
+axialRotation: -37.4
+zShift:        5.17
+
+Monte Carlo repack complete. Time: 556 s/9.27min
+
+Final energy is 5.63e+03 after repack, indicating clashes. Choose a different geometry
