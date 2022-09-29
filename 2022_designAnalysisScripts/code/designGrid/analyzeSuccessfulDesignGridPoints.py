@@ -2,6 +2,7 @@ import sys
 import os
 import pandas as pd
 from designGridFunctions import *
+from datetime import date
 
 # read in the config file
 configFile = sys.argv[1]
@@ -40,12 +41,25 @@ inputDir = sys.argv[2]
 # get current working directory
 cwd = os.getcwd() + "/"
 
-# sample
-sample = 'left'
+# get the date
+today = date.today()
+today = today.strftime("%Y_%m_%d")
+
+# get the name of the input directory
+inputDirName = os.path.basename(os.path.normpath(inputDir))
+# remove the date from the input directory name
+inputDirName = inputDirName.split("_")[1]
+
+# get the output directory
+outputDir = cwd + today + "_adjustedAxAndZGridData/" + inputDirName + "/"
+
+# make the output directory if it doesn't exist
+if not os.path.exists(outputDir):
+    os.makedirs(outputDir)
 
 # get the column names
 cols = 'xShift,crossingAngle,axialRotation,zShift'.split(',')
-outputFile = cwd + '/designGeometryGrid_'+sample+'.csv'
+outputFile = outputDir + 'designGeometryGrid.csv'
 
 df = pd.DataFrame()
 # check if output file exists
@@ -78,16 +92,10 @@ else:
             #print(xShift, crossingAngle, axialRotation, zShift)
             # add to a dataframe
             outputDf = pd.concat([outputDf, pd.DataFrame([[xShift, crossingAngle, axialRotation, zShift]], columns=cols)])
-    # set the output file name
-    outputFile = cwd + '/designGeometryGrid_'+sample+'.csv'
     # write the output file
     outputDf.to_csv(outputFile, index=False)
-    # TODO: the below doesn't work; fix
-    df = pd.concat([df, outputDf])
-
-# bin data
-#xBins = np.arange(6.5, 7.5, 0.1)
-#crossBins = np.arange(, , 5)
+    # save the output dataframe to df
+    df = outputDf
 
 # get the min and max of the xShift 
 xMin = df['xShift'].min()
@@ -95,24 +103,37 @@ xMax = df['xShift'].max()
 crossMin = df['crossingAngle'].min()
 crossMax = df['crossingAngle'].max()
 
-# get the df for min and max xShift
-dfXMin = df[df['xShift'] == xMin]
-dfXMax = df[df['xShift'] == xMax]
-
 # plot geometry density plot for xShift and crossingAngle
-#plotKde(df, 'xShift', 'crossingAngle', xMin, xMax, crossMin, crossMax, cwd, sample)
+plotKde(df, 'xShift', 'crossingAngle', xMin, xMax, xInc, crossMin, crossMax, crossInc, outputDir, inputDirName)
+
+# get absolute value of axial rotation
+df['axialRotation'] = df['axialRotation'].abs()# I'm running the negatives, but this just makes it more viewable
+
+# adjust axial rot and zShift to the input values from 0-100(ax) and 0-6(z)
+adjustedAxialRot = (10*df['axialRotation']/9)-(200*df['zShift']/27)
+adjustedZShift = (10/9*df['zShift'])-(0.15*df['axialRotation']/9)
+df['axialRotation'] = round(adjustedAxialRot, 2)
+df['zShift'] = round(adjustedZShift, 2)
 
 # get the list of crossing angles
 crossingAngles = np.arange(crossMin, crossMax+2, crossInc)
 
-# loop through crossingAngle and xShift values
-for cross in crossingAngles:
-    tmpDf = df[df['crossingAngle'] == cross]
-    # plot kde for axial rotation and zShift
-    outputTitle = sample+'_cross_' + str(cross)
-    plotKde(tmpDf, 'axialRotation', 'zShift', -100, 0, 0, 6, cwd, outputTitle)
+# get the df for min and max xShift
+dfXMin = df[df['xShift'] == xMin]
+dfXMax = df[df['xShift'] == xMax]
 
-minOut = sample+"_"+str(xMin)
-maxOut = sample+"_"+str(xMax)
-plotKde(dfXMin, 'axialRotation', 'zShift', -100, 0, 0, 6, cwd, minOut)
-plotKde(dfXMax, 'axialRotation', 'zShift', -100, 0, 0, 6, cwd, maxOut)
+minOut = str(xMin)
+maxOut = str(xMax)
+plotKde(dfXMin, 'axialRotation', 'zShift', 0, 100, axInc, 0, 6, zInc, outputDir, minOut)
+plotKde(dfXMax, 'axialRotation', 'zShift', 0, 100, axInc, 0, 6, zInc, outputDir, maxOut)
+
+# add df for min and max xShift to list
+dfList = [dfXMin, dfXMax]
+outputList = [minOut, maxOut]
+# loop through crossingAngle and xShift values
+for df, out in zip(dfList,outputList):
+    for cross in crossingAngles:
+        tmpDf = df[df['crossingAngle'] == cross]
+        # plot kde for axial rotation and zShift
+        outputTitle = out+'_cross_' + str(cross)
+        plotKde(tmpDf, 'axialRotation', 'zShift', 0, 100, axInc, 0, 6, zInc, outputDir, outputTitle)

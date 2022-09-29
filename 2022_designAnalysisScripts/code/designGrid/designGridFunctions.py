@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
-from datetime import date
 import seaborn as sns
 import configparser
 from scipy import stats
@@ -67,7 +66,7 @@ def getSetGeometryGrid(ranges, increments, xStarts, crossStarts):
             negAngle = 'true'
             interface = '000110011001100110000'
             if (xStart < 8):
-                sequence = 'LLLAGLLAGLLGALLGALILI'
+                sequence = 'LLLGALLGALLGALLGALILI'
             else:
                 sequence = 'LLLAALLAALLAALLAALILI'
         else:
@@ -85,8 +84,10 @@ def getSetGeometryGrid(ranges, increments, xStarts, crossStarts):
             for crossingAngle in crossingAngleList:
                 for axialRotation in axialRotationList:
                     for zShift in zShiftList:
-                        print(x, crossingAngle, axialRotation, zShift, interface, sequence)
-                        tmpDf = pd.concat([tmpDf, pd.DataFrame([[x, crossingAngle, negAngle, axialRotation, 'true', zShift, interface, sequence]], columns=cols)])
+                        adjustedAxRot = axialRotation+(20*zShift/3)
+                        adjustedZShift = zShift+(0.015*axialRotation)
+                        #print(axialRotation, adjustedAxRot, zShift, adjustedZShift)
+                        tmpDf = pd.concat([tmpDf, pd.DataFrame([[x, crossingAngle, negAngle, adjustedAxRot, 'true', adjustedZShift, interface, sequence]], columns=cols)])
     return tmpDf
 
 # Method to read config file settings
@@ -132,9 +133,13 @@ def plotHist(df, column, outputDir, binList, title):
     plt.savefig(outputDir+"/histogram.png", bbox_inches='tight', dpi=150)
     plt.close()
 
-def plotKde(df, xAxis, yAxis, xMin, xMax, yMin, yMax, outputDir, title):
-    #Variable set up depending on data that I'm running
-    X, Y = np.mgrid[xMin:xMax:20j, yMin:yMax:12j]
+def plotKde(df, xAxis, yAxis, xMin, xMax, xInc, yMin, yMax, yInc, outputDir, title):
+    # grid the data for kde plots (split x into 20 bins, y into 12 bins)
+    #X, Y = np.mgrid[xMin:xMax:20j, yMin:yMax:12j]
+    X, Y = np.mgrid[xMin:xMax+xInc:xInc, yMin:yMax+yInc:yInc]
+    # round all values to 2 decimal places
+    X = np.around(X, 2)
+    Y = np.around(Y, 2)
     x = df.loc[:, xAxis]
     y = df.loc[:, yAxis]
 
@@ -151,7 +156,7 @@ def plotKde(df, xAxis, yAxis, xMin, xMax, yMin, yMax, outputDir, title):
     plt.grid(True)
     plt.xlabel(xAxis)
     plt.ylabel(yAxis)
-    plt.title(xAxis+"_v_"+yAxis)
+    plt.title(title)
     ax.use_sticky_edges = False
     q = ax.imshow(np.rot90(Z), cmap=plt.cm.Blues,
         extent=[xMin, xMax, yMin, yMax], aspect="auto")
@@ -162,26 +167,27 @@ def plotKde(df, xAxis, yAxis, xMin, xMax, yMin, yMax, outputDir, title):
     ax.set_ylim([yMin, yMax])
     axes = plt.gca()
 
-    #save and show plot figure
-    today = date.today()
-    today = today.strftime("%Y_%m_%d")
     #plt.colorbar(q)
     # get min and max of column
     plt.text(xMin-0.2, yMin-0.5, 'n = '+str(len(df)))
-    plt.savefig(today+"_"+outputTitle+".png", bbox_inches='tight')
+    plt.savefig(outputDir+outputTitle+".png", bbox_inches='tight')
     #plt.show()
 
-    sns.kdeplot(df[xAxis], df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, shade_lowest=False)
+    sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False)
 
     # Extract kde and write into output file
     Z = kernel(positions).T
 
-    # Output in date_xAxis_v_yAxis format
-    #fid = open(today+"_"+outputTitle+".csv",'w')
-    ##for currentIndex,elem in enumerate(positions):
-    #for currentIndex,elem in enumerate(Z):
-    #    s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
-    #    #s1 = '%f, %f, %f, %f, %f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], positions[2][currentIndex], positions[3][currentIndex], positions[4][currentIndex], positions[5][currentIndex], Z[currentIndex]*10000000 )
-    #    fid.write(s1)
-    #fid.close()
-    return Z
+    # turn z into a percentage
+    zMax = Z.max()
+    Z = Z/zMax
+    # round all values to 2 decimal places
+    Z = np.around(Z, 2)
+    # Output the density data for each geometry
+    fid = open(outputDir+outputTitle+".csv",'w')
+    #for currentIndex,elem in enumerate(positions):
+    for currentIndex,elem in enumerate(Z):
+        s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
+        #s1 = '%f, %f, %f, %f, %f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], positions[2][currentIndex], positions[3][currentIndex], positions[4][currentIndex], positions[5][currentIndex], Z[currentIndex]*10000000 )
+        fid.write(s1)
+    fid.close()

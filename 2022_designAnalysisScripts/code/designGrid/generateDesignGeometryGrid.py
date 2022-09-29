@@ -4,6 +4,7 @@ import pandas as pd
 import random as rand
 import numpy as np
 import configparser
+from designGridFunctions import *
 
 """
 This script generates a csv file with all possible combinations of design parameters
@@ -61,4 +62,4 @@ crossStarts = [GASrightCrossStart, rightCrossStart, leftCrossStart]
 # save increments to a dictionary
 increments = {'xShift': xInc, 'crossingAngle': crossInc, 'axialRotation': axInc, 'zShift': zInc}
 incrementDf = getSetGeometryGrid(ranges, increments, xStarts, crossStarts)
-incrementDf.to_csv(cwd + '/incrementedDesignGeometryGrid_test.csv', index=False)
+incrementDf.to_csv(cwd + '/incrementedDesignGeometryGrid_AdjustedAxAndZ.csv', index=False)
