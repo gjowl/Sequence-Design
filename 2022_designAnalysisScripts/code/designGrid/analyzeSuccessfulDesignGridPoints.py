@@ -58,7 +58,7 @@ if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
 # get the column names
-cols = 'xShift,crossingAngle,axialRotation,zShift'.split(',')
+cols = 'xShift,crossingAngle,axialRotation,zShift,energy'.split(',')
 outputFile = outputDir + 'designGeometryGrid.csv'
 
 df = pd.DataFrame()
@@ -78,20 +78,22 @@ else:
             # split file by "_"
             splitFile = file.split('_')
             # get xShift, crossingAngle, axialRotation, and zShift
-            xShift, crossingAngle, axialRotation, zShift = splitFile[0], splitFile[1], splitFile[2], splitFile[3]
+            xShift, crossingAngle, axialRotation, zShift, energy = splitFile[0], splitFile[1], splitFile[2], splitFile[3], splitFile[4]
             # keep only numbers
             xShift = xShift.replace('x', '')
             crossingAngle = crossingAngle.replace('cross', '')
             axialRotation = axialRotation.replace('ax', '')
             zShift = zShift.replace('z', '')
+            energy = energy.replace('energy', '')
             # convert to float
             xShift = float(xShift)
             crossingAngle = float(crossingAngle)
             axialRotation = float(axialRotation)
             zShift = float(zShift)
+            energy = float(energy)
             #print(xShift, crossingAngle, axialRotation, zShift)
             # add to a dataframe
-            outputDf = pd.concat([outputDf, pd.DataFrame([[xShift, crossingAngle, axialRotation, zShift]], columns=cols)])
+            outputDf = pd.concat([outputDf, pd.DataFrame([[xShift, crossingAngle, axialRotation, zShift, energy]], columns=cols)])
     # write the output file
     outputDf.to_csv(outputFile, index=False)
     # save the output dataframe to df
@@ -104,7 +106,7 @@ crossMin = df['crossingAngle'].min()
 crossMax = df['crossingAngle'].max()
 
 # plot geometry density plot for xShift and crossingAngle
-plotKde(df, 'xShift', 'crossingAngle', xMin, xMax, xInc, crossMin, crossMax, crossInc, outputDir, inputDirName)
+#plotKde(df, 'xShift', 'crossingAngle', xMin, xMax, xInc, crossMin, crossMax, crossInc, outputDir, inputDirName)
 
 # get absolute value of axial rotation
 df['axialRotation'] = df['axialRotation'].abs()# I'm running the negatives, but this just makes it more viewable
@@ -136,4 +138,9 @@ for df, out in zip(dfList,outputList):
         tmpDf = df[df['crossingAngle'] == cross]
         # plot kde for axial rotation and zShift
         outputTitle = out+'_cross_' + str(cross)
-        plotKde(tmpDf, 'axialRotation', 'zShift', 0, 100, axInc, 0, 6, zInc, outputDir, outputTitle)
+        Z = plotKde(tmpDf, 'axialRotation', 'zShift', 0, 100, axInc, 0, 6, zInc, outputDir, outputTitle)
+        xAxis = df['axialRotation']
+        yAxis = df['zShift']
+        data = df['energy']
+        dataColumn = 'energy'
+        plotKdeOverlay(Z, xAxis, 0, 100, yAxis, 0, 6, data, dataColumn, outputDir, outputTitle)

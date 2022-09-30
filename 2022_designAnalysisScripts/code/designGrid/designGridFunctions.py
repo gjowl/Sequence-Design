@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 import seaborn as sns
@@ -135,8 +136,8 @@ def plotHist(df, column, outputDir, binList, title):
 
 def plotKde(df, xAxis, yAxis, xMin, xMax, xInc, yMin, yMax, yInc, outputDir, title):
     # grid the data for kde plots (split x into 20 bins, y into 12 bins)
-    #X, Y = np.mgrid[xMin:xMax:20j, yMin:yMax:12j]
-    X, Y = np.mgrid[xMin:xMax+xInc:xInc, yMin:yMax+yInc:yInc]
+    X, Y = np.mgrid[xMin:xMax:21j, yMin:yMax:13j]
+    
     # round all values to 2 decimal places
     X = np.around(X, 2)
     Y = np.around(Y, 2)
@@ -147,13 +148,14 @@ def plotKde(df, xAxis, yAxis, xMin, xMax, xInc, yMin, yMax, yInc, outputDir, tit
     positions = np.vstack([X.ravel(), Y.ravel()])
     values = np.vstack([x, y])
     kernel = stats.gaussian_kde(values)
-    kernel.set_bandwidth(bw_method='silverman')
+    bw = 0.2
+    kernel.set_bandwidth(bw_method=bw) # position to change the bandwidth of the kde
     Z = np.reshape(kernel(positions).T, X.shape)
 
     outputTitle = xAxis+"_v_"+yAxis+"_"+title
     # Plotting code below
     fig, ax = plt.subplots()
-    plt.grid(True)
+    plt.grid(False)
     plt.xlabel(xAxis)
     plt.ylabel(yAxis)
     plt.title(title)
@@ -172,22 +174,70 @@ def plotKde(df, xAxis, yAxis, xMin, xMax, xInc, yMin, yMax, yInc, outputDir, tit
     plt.text(xMin-0.2, yMin-0.5, 'n = '+str(len(df)))
     plt.savefig(outputDir+outputTitle+".png", bbox_inches='tight')
     #plt.show()
-
     sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False)
 
-    # Extract kde and write into output file
-    Z = kernel(positions).T
+    Zout = kernel(positions).T
+    outputGridCsv(Zout, positions, outputDir, outputTitle)
+    return Z
 
+# for a reason I haven't figured out yet, this kde code slightly changes the grid points, but the image looks correct
+# the values are similar regardless, so I'm converting it to the right grid points below
+def outputGridCsv(Z, positions, outputDir, outputTitle):
     # turn z into a percentage
     zMax = Z.max()
     Z = Z/zMax
     # round all values to 2 decimal places
     Z = np.around(Z, 2)
     # Output the density data for each geometry
-    fid = open(outputDir+outputTitle+".csv",'w')
+    fid = open(outputDir+outputTitle+"test.csv",'w')
     #for currentIndex,elem in enumerate(positions):
     for currentIndex,elem in enumerate(Z):
         s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
-        #s1 = '%f, %f, %f, %f, %f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], positions[2][currentIndex], positions[3][currentIndex], positions[4][currentIndex], positions[5][currentIndex], Z[currentIndex]*10000000 )
         fid.write(s1)
     fid.close()
+
+def plotKdeOverlay(kdeZScores, xAxis, xmin, xmax, yAxis, ymin, ymax, data, dataColumn, outputDir, outputTitle):
+    # Plotting code below
+    fig, ax = plt.subplots()
+    # plotting labels and variables 
+    plt.grid(False)
+    plt.xlabel("Axial Rot")
+    plt.ylabel("Z")
+    plt.title(dataColumn)
+    # Setup for plotting output
+    plt.rc('font', size=10)
+    plt.rc('xtick', labelsize=10)
+    plt.rc('ytick', labelsize=10)
+    # setup kde plot for original geometry dataset
+    ax.use_sticky_edges = False
+    q = ax.imshow(np.rot90(kdeZScores), cmap=plt.cm.Blues,
+        extent=[xmin, xmax, ymin, ymax], aspect="auto")
+    ax.set_xlim([xmin, xmax])
+    ax.set_ylim([ymin, ymax])
+    
+    # Plot datapoints onto the graph with fluorescence as size
+    # get colormap shades of green
+    cmap = plt.cm.Reds
+    cmap = cmap.reversed()
+    # get min and max of the data
+    min_val = np.min(data)
+    max_val = np.max(data)
+    # flip the data so that the min is at the top of the colorbar
+    norm = matplotlib.colors.Normalize(vmin=-15, vmax=10) # TODO: change this to the min and max of the data
+    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    # normalize the fluorescent data to the range of the colorbar
+    sm.set_array([])  # only needed for matplotlib < 3.1
+    fig.colorbar(sm)
+    # add the number of datapoints to the plot
+    plt.text(xmin-0.2, ymin-0.5, "# Geometries = " + str(len(xAxis)), fontsize=10)
+    axes = plt.gca()
+
+    #plt.colorbar(q)
+    # output the number of sequences in the dataset onto plot
+    plt.savefig(outputDir+"/"+outputTitle+"_kdeOverlay.png", bbox_inches='tight', dpi=150)
+    plt.close()
+
+#TODO:
+# is it possible to get the kde density for a single point?
+# if so, do that for each geometric parameter
