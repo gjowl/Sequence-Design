@@ -44,15 +44,9 @@ def getRandomGeometryGrid(numGeometries, ranges, xStarts, crossStarts):
 def getSetGeometryGrid(ranges, increments, xStarts, crossStarts):
     cols = 'xShift,crossingAngle,negAngle,axialRotation,negRot,zShift,interface,sequence'.split(',')
     # get geometry range from ranges
-    xShiftRange = ranges['xShift']
-    crossingAngleRange = ranges['crossingAngle']
-    axialRotationRange = ranges['axialRotation']
-    zShiftRange = ranges['zShift']
+    xShiftRange, crossingAngleRange, axialRotationRange, zShiftRange = ranges['xShift'], ranges['crossingAngle'], ranges['axialRotation'], ranges['zShift']
     # get geometry increments from increments
-    xInc = increments['xShift']
-    crossInc = increments['crossingAngle']
-    axInc = increments['axialRotation']
-    zInc = increments['zShift']
+    xInc, crossInc, axInc, zInc = increments['xShift'], increments['crossingAngle'], increments['axialRotation'], increments['zShift']
     # loop through the xShifts and crossingAngles
     tmpDf = pd.DataFrame()
     for xStart, cross in zip(xStarts, crossStarts):

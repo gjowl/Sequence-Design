@@ -5,7 +5,7 @@ from findNonClashingGridPointsFunc import *
 from datetime import date
 
 # get the input directory
-inputDir = sys.argv[2]
+inputDir = sys.argv[1]
 
 # get current working directory
 cwd = os.getcwd() + "/"
@@ -26,23 +26,17 @@ outputDir = cwd + today + "_adjustedAxAndZGridData/" + inputDirName + "/"
 if not os.path.exists(outputDir):
     os.makedirs(outputDir)
 
-# get the column names
+# hardcoded column names
 cols = 'xShift,crossingAngle,axialRotation,zShift,energy'.split(',')
 outputFile = outputDir + 'designGeometryGrid.csv'
 
 df = pd.DataFrame()
-# check if output file exists
-if os.path.isfile(outputFile):
-    # read in the file
-    df = pd.read_csv(outputFile)
-else:
+# check if output file doesn't exist
+if not os.path.exists(outputFile):
     getNonClashingGeometryData(inputDir, outputFile, cols)
 
-# get the min and max of the xShift 
-xMin = df['xShift'].min()
-xMax = df['xShift'].max()
-crossMin = df['crossingAngle'].min()
-crossMax = df['crossingAngle'].max()
+# read the output file into a dataframe
+df = pd.read_csv(outputFile)
 
 # plot geometry density plot for xShift and crossingAngle
 #plotKde(df, 'xShift', 'crossingAngle', xMin, xMax, xInc, crossMin, crossMax, crossInc, outputDir, inputDirName)
@@ -56,15 +50,14 @@ adjustedZShift = (10/9*df['zShift'])-(0.15*df['axialRotation']/9)
 df['axialRotation'] = round(adjustedAxialRot, 2)
 df['zShift'] = round(adjustedZShift, 2)
 
-# get the list of crossing angles
-crossingAngles = np.arange(crossMin, crossMax+2, crossInc)
+# get the min and max of xShift and a list of the crossing angles
+dfXMin, dfXMax = getDfMinAndMax(df, 'xShift')
 
-# get the df for min and max xShift
-dfXMin = df[df['xShift'] == xMin]
-dfXMax = df[df['xShift'] == xMax]
+# get a list of crossing angles from df
+crossingAngles = df['crossingAngle'].unique()
 
 # add in a dictionary for axialRotation and zShift
-valuesDict = {'axialRotation': {}, 'zShift': {}}
+axAndZDict = {'axialRotation': {}, 'zShift': {}}
 
 # add axialRotation min, max, and increment to the dictionary
 axAndZDict['axialRotation']['min'] = 0
@@ -72,21 +65,20 @@ axAndZDict['axialRotation']['max'] = 100
 axAndZDict['zShift']['min'] = 0
 axAndZDict['zShift']['max'] = 6
 
-minOut = str(xMin)
-maxOut = str(xMax)
-plotKde(dfXMin, 'axialRotation', 'zShift', axAndZDict, acceptCutoff, outputDir, minOut)
-plotKde(dfXMax, 'axialRotation', 'zShift', axAndZDict, acceptCutoff, outputDir, maxOut)
-
 # add df for min and max xShift to list
 dfList = [dfXMin, dfXMax]
-outputList = [minOut, maxOut]
+min, max = str(dfXMin['xShift'].values[0]), str(dfXMax['xShift'].values[0])
+outputList = [min, max]
+acceptCutoff = 0.5
 # loop through crossingAngle and xShift values
 for df, out in zip(dfList,outputList):
     for cross in crossingAngles:
         tmpDf = df[df['crossingAngle'] == cross]
         # plot kde for axial rotation and zShift
         outputTitle = out+'_cross_' + str(cross)
-        Z = plotKde(tmpDf, 'axialRotation', 'zShift', axAndZDict, accceptCutoff, outputDir, outputTitle)
+        Z, acceptGrid = plotKde(tmpDf, 'axialRotation', 'zShift', axAndZDict, acceptCutoff, outputDir, outputTitle)
+        print(acceptGrid)
+        exit()
         xAxis = df['axialRotation']
         yAxis = df['zShift']
         data = df['energy']

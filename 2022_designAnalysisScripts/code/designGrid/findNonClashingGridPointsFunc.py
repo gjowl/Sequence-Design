@@ -2,6 +2,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy import stats
+import seaborn as sns
 
 def getNonClashingGeometryData(inputDir, outputFile, columns):
     # setup output dataframe
@@ -29,7 +31,16 @@ def getNonClashingGeometryData(inputDir, outputFile, columns):
     # write the output file
     outputDf.to_csv(outputFile, index=False)
 
-def plotKde(df, xAxis, yAxis, xAndYDict, accceptCutoff, outputDir, title):
+def getDfMinAndMax(df, col):
+    # get the min and max of the xShift 
+    min = df[col].min()
+    max = df[col].max()
+    # get the min and max of the column
+    dfMin = df[df[col] == min]
+    dfMax = df[df[col] == max]
+    return dfMin, dfMax
+
+def plotKde(df, xAxis, yAxis, xAndYDict, acceptCutoff, outputDir, title):
     # get the x and y values from the dictionary
     xMin, xMax = xAndYDict[xAxis]['min'], xAndYDict[xAxis]['max']
     yMin, yMax = xAndYDict[yAxis]['min'], xAndYDict[yAxis]['max']
@@ -79,23 +90,21 @@ def plotKde(df, xAxis, yAxis, xAndYDict, accceptCutoff, outputDir, title):
 # for a reason I haven't figured out yet, this kde code slightly changes the grid points, but the image looks correct
 # the values are similar regardless, so I'm converting it to the right grid points below
 def getAcceptGridCsv(Z, positions, outputDir, outputTitle, acceptCutoff):
+    outputDf = pd.DataFrame()
     # turn z into a percentage
     zMax = Z.max()
     Z = Z/zMax
     # round all values to 2 decimal places
     Z = np.around(Z, 2)
-    print(Z)
     # remove all values below the cutoff
-    Z[Z < acceptCutoff] = 0
-    print(Z)
-    exit()
+    #TODO: start here tomorrow, output the acceptGrid properly
+    Z = Z[Z < acceptCutoff]
     # Output the density data for each geometry
-    fid = open(outputDir+outputTitle+"test.csv",'w')
     for currentIndex,elem in enumerate(Z):
         s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
-        fid.write(s1)
-    fid.close()
-    return Z
+        # add to the dataframe
+        outputDf = pd.concat([outputDf, pd.DataFrame([[positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex]]], columns=['x', 'y', 'z'])])
+    return outputDf
 
 def plotKdeOverlay(kdeZScores, xAxis, xmin, xmax, yAxis, ymin, ymax, data, dataColumn, outputDir, outputTitle):
     # Plotting code below
