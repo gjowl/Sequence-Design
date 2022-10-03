@@ -80,7 +80,8 @@ def plotKde(df, xAxis, yAxis, xAndYDict, acceptCutoff, outputDir, title):
 
     # output the figure
     outputTitle = xAxis+"_v_"+yAxis+"_"+title
-    sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False)
+    #sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False)
+    sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, levels = 10, thresh=False)
     plt.savefig(outputDir+outputTitle+".png", bbox_inches='tight')
     
     Zout = kernel(positions).T
@@ -96,14 +97,13 @@ def getAcceptGridCsv(Z, positions, outputDir, outputTitle, acceptCutoff):
     Z = Z/zMax
     # round all values to 2 decimal places
     Z = np.around(Z, 2)
-    # remove all values below the cutoff
-    #TODO: start here tomorrow, output the acceptGrid properly
-    Z = Z[Z < acceptCutoff]
     # Output the density data for each geometry
     for currentIndex,elem in enumerate(Z):
-        s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
-        # add to the dataframe
-        outputDf = pd.concat([outputDf, pd.DataFrame([[positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex]]], columns=['x', 'y', 'z'])])
+        # remove all values below the cutoff
+        if Z[currentIndex] > acceptCutoff:
+            s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
+            # add to the dataframe
+            outputDf = pd.concat([outputDf, pd.DataFrame([[positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex]]], columns=['x', 'y', 'z'])])
     return outputDf
 
 def plotKdeOverlay(kdeZScores, xAxis, xmin, xmax, yAxis, ymin, ymax, data, dataColumn, outputDir, outputTitle):

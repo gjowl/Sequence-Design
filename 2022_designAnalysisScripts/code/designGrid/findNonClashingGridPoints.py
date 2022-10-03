@@ -3,30 +3,32 @@ import os
 import pandas as pd
 from findNonClashingGridPointsFunc import *
 from datetime import date
+import random as rand
 
-# get the input directory
-inputDir = sys.argv[1]
-
-# get current working directory
-cwd = os.getcwd() + "/"
-
-# get the date
-today = date.today()
-today = today.strftime("%Y_%m_%d")
-
-# get the name of the input directory
-inputDirName = os.path.basename(os.path.normpath(inputDir))
-# remove the date from the input directory name
-inputDirName = inputDirName.split("_")[1]
-
-# get the output directory
-outputDir = cwd + today + "_adjustedAxAndZGridData/" + inputDirName + "/"
-
-# make the output directory if it doesn't exist
-if not os.path.exists(outputDir):
-    os.makedirs(outputDir)
-
-# hardcoded column names
+## get the input directory
+#inputDir = sys.argv[1]
+#
+## get current working directory
+#cwd = os.getcwd() + "/"
+#
+## get the date
+#today = date.today()
+#today = today.strftime("%Y_%m_%d")
+#
+## get the name of the input directory
+#inputDirName = os.path.basename(os.path.normpath(inputDir))
+## remove the date from the input directory name
+#inputDirName = inputDirName.split("_")[1]
+#
+## get the output directory
+#outputDir = cwd + today + "_adjustedAxAndZGridData/" + inputDirName + "/"
+#
+## make the output directory if it doesn't exist
+#if not os.path.exists(outputDir):
+#    os.makedirs(outputDir)
+#
+## hardcoded column names
+outputDir = sys.argv[1]
 cols = 'xShift,crossingAngle,axialRotation,zShift,energy'.split(',')
 outputFile = outputDir + 'designGeometryGrid.csv'
 
@@ -70,17 +72,43 @@ dfList = [dfXMin, dfXMax]
 min, max = str(dfXMin['xShift'].values[0]), str(dfXMax['xShift'].values[0])
 outputList = [min, max]
 acceptCutoff = 0.5
+randomGeomGrid = pd.DataFrame()
+numGeometries = 100
+
+numGeomPerCrossingAngle = int(numGeometries/len(crossingAngles))
 # loop through crossingAngle and xShift values
 for df, out in zip(dfList,outputList):
     for cross in crossingAngles:
         tmpDf = df[df['crossingAngle'] == cross]
         # plot kde for axial rotation and zShift
         outputTitle = out+'_cross_' + str(cross)
-        Z, acceptGrid = plotKde(tmpDf, 'axialRotation', 'zShift', axAndZDict, acceptCutoff, outputDir, outputTitle)
-        print(acceptGrid)
-        exit()
-        xAxis = df['axialRotation']
-        yAxis = df['zShift']
-        data = df['energy']
-        dataColumn = 'energy'
-        plotKdeOverlay(Z, xAxis, 0, 100, yAxis, 0, 6, data, dataColumn, outputDir, outputTitle)
+        Z, tmpGrid = plotKde(tmpDf, 'axialRotation', 'zShift', axAndZDict, acceptCutoff, outputDir, outputTitle)
+        # add col names axialRot, zShift, and density
+        tmpGrid.columns = ['axialRotation', 'zShift', 'density'] 
+        # pick x random geometries from the acceptGrid
+        for i in range(0,numGeomPerCrossingAngle):
+            randRow = tmpGrid.sample(n=1)
+            # get a random float between -5 and +5
+            randAxFloat = rand.uniform(-5,5)
+            # add the random float to the axial rotation
+            randRow['axialRotation'] = randRow['axialRotation'] + randAxFloat
+            # get a random float between -0.5 and +0.5
+            randZFloat = rand.uniform(-0.5,0.5)
+            # add the random float to the zShift
+            randRow['zShift'] = randRow['zShift'] + randZFloat
+            # add the random row to the randomGrid
+            randomGeomGrid = pd.concat([randomGeomGrid, randRow], ignore_index=True)
+        # TODO: try running this tomorrow
+        #xAxis = df['axialRotation']
+        #yAxis = df['zShift']
+        #data = df['energy']
+        #dataColumn = 'energy'
+        #plotKdeOverlay(Z, xAxis, 0, 100, yAxis, 0, 6, data, dataColumn, outputDir, outputTitle)
+
+# write the acceptGrid to a csv file
+randomGeomGrid.to_csv(outputDir + 'randomGeometryDesignGrid.csv', index=False) 
+
+# define set of random geometries to design on from the acceptGrid
+for i in range(0,numGeometries):
+    # get a random row from the acceptGrid
+    randRow = acceptGrid.sample(n=1)
