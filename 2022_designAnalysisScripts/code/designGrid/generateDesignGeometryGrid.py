@@ -4,7 +4,7 @@ import pandas as pd
 import random as rand
 import numpy as np
 import configparser
-from designGridFunctions import *
+from generateDesignGeometryGridFunc import *
 
 """
 This script generates a csv file with all possible combinations of design parameters

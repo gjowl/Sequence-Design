@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 import seaborn as sns
+import os
 
 def getNonClashingGeometryData(inputDir, outputFile, columns):
     # setup output dataframe
@@ -58,7 +59,8 @@ def plotKde(df, xAxis, yAxis, xAndYDict, acceptCutoff, outputDir, title):
     y = df.loc[:, yAxis]
     values = np.vstack([x, y])
     kernel = stats.gaussian_kde(values)
-    bw = 0.2
+    #bw = 0.2
+    bw = 'silverman'
     kernel.set_bandwidth(bw_method=bw) # position to change the bandwidth of the kde
     Z = np.reshape(kernel(positions).T, X.shape)
 
@@ -81,7 +83,6 @@ def plotKde(df, xAxis, yAxis, xAndYDict, acceptCutoff, outputDir, title):
     # output the figure
     outputTitle = xAxis+"_v_"+yAxis+"_"+title
     #sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False)
-    sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, levels = 10, thresh=False)
     plt.savefig(outputDir+outputTitle+".png", bbox_inches='tight')
     
     Zout = kernel(positions).T
@@ -118,6 +119,7 @@ def plotKdeOverlay(kdeZScores, xAxis, xmin, xmax, yAxis, ymin, ymax, data, dataC
     plt.rc('font', size=10)
     plt.rc('xtick', labelsize=10)
     plt.rc('ytick', labelsize=10)
+
     # setup kde plot for original geometry dataset
     ax.use_sticky_edges = False
     q = ax.imshow(np.rot90(kdeZScores), cmap=plt.cm.Blues,
@@ -129,13 +131,16 @@ def plotKdeOverlay(kdeZScores, xAxis, xmin, xmax, yAxis, ymin, ymax, data, dataC
     # get colormap shades of green
     cmap = plt.cm.Reds
     cmap = cmap.reversed()
+
     # get min and max of the data
     min_val = np.min(data)
     max_val = np.max(data)
+    
     # flip the data so that the min is at the top of the colorbar
     norm = matplotlib.colors.Normalize(vmin=-15, vmax=10) # TODO: change this to the min and max of the data
     ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+
     # normalize the fluorescent data to the range of the colorbar
     sm.set_array([])  # only needed for matplotlib < 3.1
     fig.colorbar(sm)
