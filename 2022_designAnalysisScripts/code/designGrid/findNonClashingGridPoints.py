@@ -3,7 +3,6 @@ import os
 import pandas as pd
 from findNonClashingGridPointsFunc import *
 from datetime import date
-import random as rand
 
 # get the input directory
 inputDir = sys.argv[1]
@@ -57,78 +56,63 @@ dfXMin, dfXMax = getDfMinAndMax(df, 'xShift')
 crossingAngles = df['crossingAngle'].unique()
 
 # add in a dictionary for axialRotation and zShift
-axAndZDict = {'axialRotation': {}, 'zShift': {}}
+geomDict = {'xShift':{}, 'crossingAngle':{}, 'axialRotation': {}, 'zShift': {}}
 
 # add axialRotation min, max, and increment to the dictionary
-axAndZDict['axialRotation']['min'] = 0
-axAndZDict['axialRotation']['max'] = 100
-axAndZDict['zShift']['min'] = 0
-axAndZDict['zShift']['max'] = 6
+geomDict['axialRotation']['min'] = 0
+geomDict['axialRotation']['max'] = 100
+geomDict['axialRotation']['inc'] = 5
+geomDict['zShift']['min'] = 0
+geomDict['zShift']['max'] = 6
+geomDict['zShift']['inc'] = 0.5
+geomDict['xShift']['min'] = df['xShift'].min()
+geomDict['xShift']['max'] = df['xShift'].max()
+geomDict['xShift']['inc'] = 0.2
+if crossingAngles[0] < 0:
+    geomDict['crossingAngle']['min'] = df['crossingAngle'].max()# flip min and max for crossing angle; helps with multipurpose functions
+    geomDict['crossingAngle']['max'] = df['crossingAngle'].min()
+else:
+    geomDict['crossingAngle']['min'] = df['crossingAngle'].min()
+    geomDict['crossingAngle']['max'] = df['crossingAngle'].max()
+geomDict['crossingAngle']['inc'] = 2 
 
-# add df for min and max xShift to list
-dfList = [dfXMin, dfXMax]
-min, max = dfXMin['xShift'].values[0], dfXMax['xShift'].values[0]
-xShifts = [min, max]
 acceptCutoff = 0.8
 randomGeomGrid = pd.DataFrame()
-numGeometries = 3
+numGeometries = 50
+    
+# make kde output dir
+kdeOutputDir = outputDir + "densityPlots/"
+if not os.path.exists(kdeOutputDir):
+    os.makedirs(kdeOutputDir)
 
-# loop through crossingAngle and xShift values
-for df, xShift in zip(dfList,xShifts):
-    for cross in crossingAngles:
-        tmpDf = df[df['crossingAngle'] == cross]
+# setup geomGridList
+geomGrid = pd.DataFrame()
+# loop through unique xShifts and crossing angles plots
+for xShift in df['xShift'].unique():
+    # get the df for the current xShift
+    xDf = df[df['xShift'] == xShift]
+    for cross in xDf['crossingAngle'].unique():
+        # get the df for the current crossing angle
+        crossDf = xDf[xDf['crossingAngle'] == cross] 
         # plot kde for axial rotation and zShift
         outputTitle = str(xShift)+'_cross_' + str(cross)
-        Z, tmpGrid = plotKde(tmpDf, 'axialRotation', 'zShift', axAndZDict, acceptCutoff, outputDir, outputTitle)
+        Z, tmpGrid = plotKde(crossDf, 'axialRotation', 'zShift', geomDict, kdeOutputDir, outputTitle)
         # add col names axialRot, zShift, and density
-        tmpGrid.columns = ['axialRotation', 'zShift', 'density'] 
-        # pick x random geometries from the acceptGrid
-        for i in range(0,numGeometries):
-            randRow = tmpGrid.sample(n=1)
-            # get a random float between -5 and +5
-            randAxFloat = rand.uniform(-5,5)
-            # add the random float to the axial rotation
-            randRow['axialRotation'] = randRow['axialRotation'] + randAxFloat
-            if randRow['axialRotation'].values[0] >100:
-                randRow['axialRotation'] = 100
-            if randRow['axialRotation'].values[0] <0:
-                randRow['axialRotation'] = 0
-            # get a random float between -0.5 and +0.5
-            randZFloat = rand.uniform(-0.5,0.5)
-            # add the random float to the zShift
-            randRow['zShift'] = randRow['zShift'] + randZFloat
-            if randRow['zShift'].values[0] >6:
-                randRow['zShift'] = 6
-            if randRow['zShift'].values[0] <0:
-                randRow['zShift'] = 0
-            # get a crossing angle within 2 of the crossing angle and within the range of allowed crossing angles
-            randCross = rand.uniform(cross-2, cross+2)
-            # if the crossing angle is greater than -35, set it to -35
-            if randCross < 0:
-                if randCross > -35:
-                    randCross = -35
-                # if the crossing angle is less than -45, set it to -45
-                if randCross < -45:
-                    randCross = -45
-            else:
-                if randCross < 18:
-                    randCross = 18
-                if randCross > 28:
-                    randCross = 28
-            # get a xShift within xShift range
-            # check if xShift is the lower value in xShifts list
-            if xShift == xShifts[0]:
-                randXShift = rand.uniform(xShift, xShift+0.5)
-            else:
-                randXShift = rand.uniform(xShift-0.5, xShift)
-            # add randXShift and randCross to the front of randRow
-            randRow.insert(0, 'crossingAngle', randCross)
-            randRow.insert(0, 'xShift', randXShift)
-            # add the random row to the randomGrid
-            randomGeomGrid = pd.concat([randomGeomGrid, randRow], ignore_index=True)
+        tmpGrid.columns = ['axialRotation', 'zShift', 'density']
+        # add xShift and crossing angle to front of the df
+        tmpGrid.insert(0, 'xShift', xShift)
+        tmpGrid.insert(1, 'crossingAngle', cross)
+        # concat the tmpGrid to geomGrid
+        geomGrid = pd.concat([geomGrid, tmpGrid], ignore_index=True)
 
+# geometry columns
+geomColumns = 'xShift,crossingAngle,axialRotation,zShift,density'.split(',')
+# define random geom grid
+randomGeomGrid = getRandomGeometryDf(geomGrid, numGeometries, acceptCutoff, geomDict, geomColumns)
+print(randomGeomGrid)
 # convert grid to input csv for design run
 designGrid = randomGeomGrid.copy()
+
 # get first crossing angle
 cross = designGrid['crossingAngle'].values[0]
 # check if negative crossing angle
@@ -151,9 +135,8 @@ designGrid.insert(crossIndex+1, 'negCross', negCross)
 axIndex = designGrid.columns.get_loc('axialRotation')
 # put the negRot column right after the axialRotation column
 designGrid.insert(axIndex+1, 'negRot', negRot)
-
 # round all values to 2 decimal places
-designGrid = designGrid.round(3)
+designGrid = designGrid.round(4)
 
 # write the acceptGrid to a csv file
 randomGeomGrid.to_csv(outputDir + 'randomGeometryDesignGrid.csv', index=False) 

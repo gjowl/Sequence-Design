@@ -5,6 +5,7 @@ import pandas as pd
 from scipy import stats
 import seaborn as sns
 import os
+import random as rand
 
 def getNonClashingGeometryData(inputDir, outputFile, columns):
     # setup output dataframe
@@ -41,7 +42,7 @@ def getDfMinAndMax(df, col):
     dfMax = df[df[col] == max]
     return dfMin, dfMax
 
-def plotKde(df, xAxis, yAxis, xAndYDict, acceptCutoff, outputDir, title):
+def plotKde(df, xAxis, yAxis, xAndYDict, outputDir, title):
     # get the x and y values from the dictionary
     xMin, xMax = xAndYDict[xAxis]['min'], xAndYDict[xAxis]['max']
     yMin, yMax = xAndYDict[yAxis]['min'], xAndYDict[yAxis]['max']
@@ -59,8 +60,8 @@ def plotKde(df, xAxis, yAxis, xAndYDict, acceptCutoff, outputDir, title):
     y = df.loc[:, yAxis]
     values = np.vstack([x, y])
     kernel = stats.gaussian_kde(values)
-    #bw = 0.2
-    bw = 'silverman'
+    bw = 0.2
+    #bw = 'silverman'
     kernel.set_bandwidth(bw_method=bw) # position to change the bandwidth of the kde
     Z = np.reshape(kernel(positions).T, X.shape)
 
@@ -86,12 +87,13 @@ def plotKde(df, xAxis, yAxis, xAndYDict, acceptCutoff, outputDir, title):
     plt.savefig(outputDir+outputTitle+".png", bbox_inches='tight')
     
     Zout = kernel(positions).T
-    acceptGrid = getAcceptGridCsv(Zout, positions, outputDir, outputTitle, acceptCutoff)
+    acceptGrid = getAcceptGridCsv(Zout, positions, outputDir, outputTitle)
+    plt.close()
     return Z, acceptGrid
 
 # for a reason I haven't figured out yet, this kde code slightly changes the grid points, but the image looks correct
 # the values are similar regardless, so I'm converting it to the right grid points below
-def getAcceptGridCsv(Z, positions, outputDir, outputTitle, acceptCutoff):
+def getAcceptGridCsv(Z, positions, outputDir, outputTitle):
     outputDf = pd.DataFrame()
     # turn z into a percentage
     zMax = Z.max()
@@ -100,11 +102,9 @@ def getAcceptGridCsv(Z, positions, outputDir, outputTitle, acceptCutoff):
     Z = np.around(Z, 2)
     # Output the density data for each geometry
     for currentIndex,elem in enumerate(Z):
-        # remove all values below the cutoff
-        if Z[currentIndex] > acceptCutoff:
-            s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
-            # add to the dataframe
-            outputDf = pd.concat([outputDf, pd.DataFrame([[positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex]]], columns=['x', 'y', 'z'])])
+        s1 = '%f, %f, %f\n'%(positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex] )
+        # add to the dataframe
+        outputDf = pd.concat([outputDf, pd.DataFrame([[positions[0][currentIndex], positions[1][currentIndex], Z[currentIndex]]], columns=['x', 'y', 'z'])])
     return outputDf
 
 def plotKdeOverlay(kdeZScores, xAxis, xmin, xmax, yAxis, ymin, ymax, data, dataColumn, outputDir, outputTitle):
@@ -152,3 +152,54 @@ def plotKdeOverlay(kdeZScores, xAxis, xmin, xmax, yAxis, ymin, ymax, data, dataC
     # output the number of sequences in the dataset onto plot
     plt.savefig(outputDir+"/"+outputTitle+"_kdeOverlay.png", bbox_inches='tight', dpi=150)
     plt.close()
+
+# loops through all of the geometry grids output from the kde function and  
+def getRandomGeometryDf(geomGrid, numGeometries, acceptCutoff, geometryDict, cols):
+    # remove geometries with density less than the cutoff
+    geomGrid = geomGrid[geomGrid['density'] >= acceptCutoff]
+    # pick x random geometries from the acceptGrid
+    randRows = geomGrid.sample(n=numGeometries)
+    # initialize the dictionary
+    randGeomDict = {}
+    # loop through the rangome rows in the randRows dataframe
+    for col in cols:
+        geoms = []
+        for index, row in randRows.iterrows():
+            if col != "density":
+                # get the geometry for the column from the dataRow
+                geometry = row[col]
+                # get a random geometry for the current column
+                randomGeom = getRandomGeom(col, geometryDict, geometry)
+                # add the geometry to the list of geometries
+                geoms.append(randomGeom)
+            else:
+                # get the geometry for the column from the dataRow
+                density = row[col]
+                # add the geometry to the list of geometries
+                geoms.append(density)
+        # add the geometry to a dictionary
+        geometryDict[col] = geoms
+    # convert the dictionary to a dataframe
+    randomGeomGrid = pd.DataFrame.from_dict(geometryDict)
+    return randomGeomGrid
+
+# gets a random geometry from a given row of data for a given column
+def getRandomGeom(col, geometryDict, geometry):
+    # get the min, max, and inc for the geometry from the dictionary
+    colMin = geometryDict[col]['min']
+    colMax = geometryDict[col]['max']
+    inc = geometryDict[col]['inc']
+    # get random float between -inc and inc
+    randFloat = rand.uniform(-inc, inc)
+    # add the random float to the geometry value
+    randGeom = geometry + randFloat
+    # check if the randGeom is less than the colMin
+    if randGeom < colMin:
+        # set randGeom to colMin
+        randGeom = colMin
+    # check if the randGeom is greater than the colMax
+    elif randGeom > colMax:
+        # set randGeom to colMax
+        randGeom = colMax
+    # return the randGeom
+    return randGeom
