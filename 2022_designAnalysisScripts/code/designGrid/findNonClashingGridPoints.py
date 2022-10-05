@@ -122,6 +122,31 @@ if cross < 0:
 else:
     designGrid['negCross'] = 'false'
     designGrid['interface'] = '000011011001101100000'
+    # create a multiple lines to define interface using y=mx (slope is from hard coded y1=1, y2=6, x1=20, x2=60; and y1=0, y2=4.5, x1=60, x2=100)
+    # loop through the randomGeomGrid
+    for index, row in designGrid.iterrows():
+        # get the zShift and axialRotation from the row
+        zShift = row['zShift']
+        axialRot = row['axialRotation']
+        # get the slope for the zShift and axialRotation
+        if zShift < 4.5 and axialRot > 60 and axialRot < 100:
+            slope = (4.5-0)/(100-60)
+            # get the axialRot by multiplying the slope by the zShift
+            refAxialRot = zShift / slope
+            # compare the axialRot to the refAxialRot
+            if axialRot > refAxialRot:
+                # replace interface with shifted interface (seen shifted in structures)
+                designGrid.at[index, 'interface'] = '000011001101100110000'
+        elif axialRot <= 60:
+            slope = (6-1)/(60-20)
+            refAxialRot = zShift / slope
+            if axialRot < refAxialRot:
+                # replace interface with shifted interface (seen shifted in structures)
+                designGrid.at[index, 'interface'] = '000110011011001100000'
+
+
+
+
 designGrid['crossingAngle'] = abs(designGrid['crossingAngle'])
 designGrid['negRot'] = 'true'
 # pop the negCross and negRot columns
