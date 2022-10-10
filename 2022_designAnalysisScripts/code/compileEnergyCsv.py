@@ -13,7 +13,7 @@ currentDir = os.getcwd()
 cwd = os.getcwd()+"/"
 
 # define the search directory
-searchDir = cwd+sys.argv[1]
+searchDir = sys.argv[1]
 
 # define the output dataframe
 outputDf = pd.DataFrame()
@@ -40,4 +40,4 @@ for dir in os.listdir(searchDir):
                 outputDf = pd.concat([outputDf,df],axis=0)
 
 # remove the first column
-outputDf.to_csv(searchDir+"/compiledEnergies.csv")
+outputDf.to_csv(cwd+"/compiledEnergies.csv")
