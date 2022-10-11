@@ -69,8 +69,8 @@ geomDict['xShift']['min'] = df['xShift'].min()
 geomDict['xShift']['max'] = df['xShift'].max()
 geomDict['xShift']['inc'] = 0.2
 if crossingAngles[0] < 0:
-    geomDict['crossingAngle']['min'] = df['crossingAngle'].max()# flip min and max for crossing angle; helps with multipurpose functions
-    geomDict['crossingAngle']['max'] = df['crossingAngle'].min()
+    geomDict['crossingAngle']['min'] = df['crossingAngle'].min()# flip min and max for crossing angle; helps with multipurpose functions
+    geomDict['crossingAngle']['max'] = df['crossingAngle'].max()
 else:
     geomDict['crossingAngle']['min'] = df['crossingAngle'].min()
     geomDict['crossingAngle']['max'] = df['crossingAngle'].max()
@@ -78,7 +78,7 @@ geomDict['crossingAngle']['inc'] = 2
 
 acceptCutoff = 0.8
 randomGeomGrid = pd.DataFrame()
-numGeometries = 50
+numGeometries = 2000
     
 # make kde output dir
 kdeOutputDir = outputDir + "densityPlots/"

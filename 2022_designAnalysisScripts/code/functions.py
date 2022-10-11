@@ -21,11 +21,11 @@ def setupOutputDir(inputFile):
     # make output directory named after the input file
     outputDir = inputDir + '/' + os.path.basename(inputFile).split('.')[0]
     # check if the analysis directory exists
-    if not os.path.exists(analysisDir):
-        os.makedirs(analysisDir)
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
     return outputDir
 
-def parseDataframe(df, energyCutoff):
+def parseDf(df, energyCutoff):
     '''
         This function gets rid of any duplicate sequences and keeps sequences with
         an energy score less than the cutoff.
