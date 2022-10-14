@@ -3,11 +3,6 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
-from matplotlib.ticker import PercentFormatter
-from matplotlib.ticker import PercentFormatter
-from matplotlib.ticker import PercentFormatter
-from matplotlib.ticker import PercentFormatter
-
 
 def setupOutputDir(inputFile):
     '''
