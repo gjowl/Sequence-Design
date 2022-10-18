@@ -24,6 +24,16 @@ def getRepackEnergies(df):
     df['HBONDRepackDiff'] = df['HBONDDimerBBOptimize'] - df['HBONDDimerPreBBOptimize']
     df['IMM1RepackDiff'] = df['IMM1DimerBBOptimize'] - df['IMM1DimerPreBBOptimize']
     df['RepackChange'] = df['Total'] - df['TotalPreBBOptimize']
+    df['EntropyChange'] = df['currEntropy'] - df['prevEntropy']
+    df['SASADiff'] = df['BBOptimizeSasa'] - df['MonomerSasa']
+    return df
+
+def getGeomChanges(df):
+    # add in dimer vs monomer energy difference
+    df['AxChange'] = df['endAxialRotationPrime'] - df['startAxialRotationPrime']
+    df['xChange'] = df['endXShift'] - df['startXShift']
+    df['crossChange'] = df['endCrossingAngle'] - df['startCrossingAngle']
+    df['zChange'] = df['endZShiftPrime'] - df['startZShiftPrime']
     return df
 
 def plotMeanAndSDBarGraph(df, xAxis, yAxis):
@@ -39,43 +49,116 @@ def plotMeanAndSDBarGraph(df, xAxis, yAxis):
     plt.savefig(outputDir+'/avgRepackChange.png')
     plt.close()
 
-def plotEnergyDiffs(df, outputDir, region):
+def plotEnergyDiffs(df, outputDir):
     # data columns to plot
     n = len(df)
     x = np.arange(n)*3
-    width = 1
+    #numBars = len(energyList)
+    numBars = 5
+    width = 1/numBars
+    #fig, ax = plt.subplots()
+    #for energy in energyList:
+    #    energy = df[energy]
+    #    p = plt.bar(x, height)
     # get the VDW energy difference column
     VDWDiff = df['VDWDiff']
     # get the HBOND energy difference column
     HBONDDiff = df['HBONDDiff']
     # get the IMM1 energy difference column
     IMM1Diff = df['IMM1Diff']
+    total = df['Total']
+    entropy = df['Entropy']
+    sasa = df['SASADiff']
     # setup the bar plots for each energy difference
     fig, ax = plt.subplots()
     # plot the VDW energy difference with standard deviation
     #ax.bar(x, VDWDiff, width, color='cornflowerblue', edgecolor='black', yerr=df['sdVDW'], label='VDW')
     #ax.bar(x, VDWDiff, width, yerr=df['VDWRepackDiff'].std(), label='VDW')
-    p1 = plt.bar(x-0.5, VDWDiff, width, yerr=df['sdVDW'], color='cornflowerblue', edgecolor='black')
+    p1 = plt.bar(x-width*2, VDWDiff, width, yerr=df['sdVDW'], color='cornflowerblue', edgecolor='black')
     # plot the HBOND energy difference adjacent to the VDW energy difference
-    p2 = plt.bar(x+0.5, HBONDDiff, width, yerr=df['sdHBOND'], color='lightcoral', edgecolor='black')
-    p3 = plt.bar(x+1.5, IMM1Diff, width, yerr=df['sdIMM1'],color='g', edgecolor='black')
+    p2 = plt.bar(x-width, HBONDDiff, width, yerr=df['sdHBOND'], color='lightcoral', edgecolor='black')
+    p3 = plt.bar(x, IMM1Diff, width, yerr=df['sdIMM1'],color='palegreen', edgecolor='black')
+    p4 = plt.bar(x+width, total, width, yerr=df['sdTotal'],color='thistle', edgecolor='black')
+    p5 = plt.bar(x+width*2, entropy, width, yerr=df['sdEntropy'],color='blanchedalmond', edgecolor='black')
+    #p6 = plt.bar(x+width*3, entropy, width, yerr=df['sdSASA'],color='azure', edgecolor='black')
     # change the dpi to make the image smaller
     fig.set_dpi(2000)
     plt.ylabel('Energy')
-    plt.title(region+' Energy Plot')
-    #plt.ylim(-90,-35)
-    #plt.yticks(np.arange(-90, -30, 10))
-    plt.legend((p1[0], p2[0], p3[0]), ('VDW', 'HBOND', 'IMM1'))
-    # save the number of designs on the plot
-    # output the number of sequences in the dataset onto plot top left corner
-    #plt.text(0.2, -33, 'N = '+str(n))
-    # save plot
-    # set empty x axis labels
-    plt.xticks(x, [])
+    plt.title('Energy Plot')
+    plt.legend((p1[0], p2[0], p3[0], p4[0], p5[0]), ('VDW', 'HBOND', 'IMM1', 'Total', 'Entropy'))
+    # set x axis labels as regions
+    plt.xticks(x, df['Region'])
     fig.savefig(outputDir+'/energyDiffPlot.png')
+    plt.close()
+
+def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis, region):
+    # read in kde file from command line, or default to 2020_09_23_kdeData.csv
+    #df_data = df_data.drop_duplicates('crossingAngle',keep='first')
+
+    # get the x and y axes data to be plotted from the dataframe
+    x = df_data.loc[:, xAxis]
+    y = df_data.loc[:, yAxis]
+    energies = df_data[dataColumn].values
+
+    # get the kde plot for the geometry data
+    kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
+
+    # plot the kde plot with an overlay of the input dataset   
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir, region)
+
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region):
+    # Plotting code below
+    fig, ax = plt.subplots()
+    # plotting labels and variables 
+    plt.grid(False)
+    plt.xlabel("Distance (Å)")
+    plt.ylabel("Angle (°)")
+    plt.title(dataColumn)
+    # Setup for plotting output
+    plt.rc('font', size=10)
+    plt.rc('xtick', labelsize=10)
+    plt.rc('ytick', labelsize=10)
+    # hardcoded variable set up for plot limits
+    xmin, xmax, ymin, ymax = 6, 12, -100, 100
+    # setup kde plot for original geometry dataset
+    ax.use_sticky_edges = False
+    q = ax.imshow(np.rot90(kdeZScores), cmap=plt.cm.Blues,
+        extent=[xmin, xmax, ymin, ymax], aspect="auto")
+    
+    # Plot datapoints onto the graph with fluorescence as size
+    # get colormap shades of green
+    cmap = plt.cm.Reds
+    cmap = cmap.reversed()
+    # get min and max of the data
+    min_val = np.min(data)
+    max_val = np.max(data)
+    # flip the data so that the min is at the top of the colorbar
+    norm = matplotlib.colors.Normalize(vmin=-55, vmax=-5) # TODO: change this to the min and max of the data
+    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
+    sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
+    # normalize the fluorescent data to the range of the colorbar
+    sm.set_array([])  # only needed for matplotlib < 3.1
+    fig.colorbar(sm)
+    # add the number of datapoints to the plot
+    plt.text(xmin-1, ymax+7, "# Sequences = " + str(len(xAxis)), fontsize=10)
+    #ax.scatter(xAxis, yAxis, c='r', s=5, marker='o', alpha=0.5)
+    # Plot data points onto the graph with fluorescence as color
+    #ax.scatter(xAxis, yAxis, c=fluor, s=5, marker='o', alpha=0.5)
+    # Plot the datapoints onto the graph
+    #ax.scatter(xAxis, yAxis, c='r', s=5, marker='o', alpha=0.5)
+    plt.text(xmin-1, ymax+7, "# Geometries = " + str(len(xAxis)), fontsize=10)
+    ax.set_xlim([xmin, xmax])
+    ax.set_ylim([ymin, ymax])
+    ax.set_xticks([6,7,8,9,10,11,12])
+    axes = plt.gca()
+
+    #plt.colorbar(q)
+    # output the number of sequences in the dataset onto plot
+    plt.savefig(outputDir+"/kdeOverlay_"+region+".png", bbox_inches='tight', dpi=150)
+    plt.close()
 
 # Read in the data from the csv file
-df = pd.read_csv(sys.argv[1], sep='\t', header=0)
+df = pd.read_csv(sys.argv[1], sep=',', header=0)
 kdeFile = os.getcwd()+'/' + '2020_09_23_kdeData.csv'
 
 # read in kde data as a dataframe
@@ -84,35 +167,70 @@ df_kde = pd.read_csv(kdeFile)
 # Set up output directory
 outputDir = setupOutputDir(sys.argv[1])
 
-# sort by total energy
-df = df.sort_values(by=['Total'])
-df.to_csv(outputDir+'/allData.csv')
-
 # rid of anything with Total > 0 and repack energy > 0
 df = df[df['Total'] < -10]
 df = df[df['VDWDimer'] < 0]
 
+# only keep the unique sequence with best total energy
+df = df.sort_values(by=['Total'], ascending=True)
+df = df.drop_duplicates(subset=['Sequence'], keep='first')
+
+# loop through dataframe rows
+for index, row in df.iterrows():
+    # check the xShift value
+    if row['startXShift'] <= 7.5:
+        # add region column GAS
+        df.loc[index, 'Region'] = 'GAS'
+    elif row['startXShift'] > 7.5 and row['startCrossingAngle'] < 0:
+        # add region column GAS
+        df.loc[index, 'Region'] = 'Right'
+    elif row['startXShift'] > 7.5 and row['startCrossingAngle'] > 0:
+        # add region column Left
+        df.loc[index, 'Region'] = 'Left'
+
+# sort by total energy
+df = df.sort_values(by=['Total'])
+df.to_csv(outputDir+'/allData.csv')
+
 # get the top 100 sequences in Total Energy for each region
-df_top = df.nsmallest(100, 'Total')
-df = getRepackEnergies(df_top)
+df_GAS = df[df['Region'] == 'GAS'].head(10)
+df_Left = df[df['Region'] == 'Left'].head(10)
+df_Right = df[df['Region'] == 'Right'].head(10)
 
-# get average VDWDiff, HBONDDiff, and IMM1Diff from the top 100 sequences
-avgVDWDiff, sdVDW = df['VDWDiff'].mean(), df['VDWDiff'].std()
-avgHBONDDiff, sdHBOND = df['HBONDDiff'].mean(), df['HBONDDiff'].std()
-avgIMM1Diff, sdIMM1 = df['IMM1Diff'].mean(), df['IMM1Diff'].std()
+# add region dataframes to a list
+df_list = [df_GAS, df_Left, df_Right]
 
-# add the average VDWDiff, HBONDDiff, and IMM1Diff to a new dataframe
-df_avg = pd.DataFrame({'VDWDiff':[avgVDWDiff], 'HBONDDiff':[avgHBONDDiff], 'IMM1Diff':[avgIMM1Diff], 'sdVDW':[sdVDW], 'sdHBOND':[sdHBOND], 'sdIMM1':[sdIMM1]})
+# output the dataframes to csv files
+for i in range(len(df_list)):
+    df_list[i].to_csv(outputDir+'/top10_'+df_list[i]['Region'].iloc[0]+'.csv')
 
+df_avg = pd.DataFrame()
+# loop through the region dataframes
+for df in df_list:
+    tmpDf = getRepackEnergies(df)
+    tmpDf = getGeomChanges(tmpDf)
+    # get region name
+    region = df['Region'].iloc[0]
+    # get average VDWDiff, HBONDDiff, and IMM1Diff from the top 100 sequences
+    avgVDWDiff, sdVDW = tmpDf['VDWDiff'].mean(), tmpDf['VDWDiff'].std()
+    avgHBONDDiff, sdHBOND = tmpDf['HBONDDiff'].mean(), tmpDf['HBONDDiff'].std()
+    avgIMM1Diff, sdIMM1 = tmpDf['IMM1Diff'].mean(), tmpDf['IMM1Diff'].std()
+    avgEntropy, sdEntropy = tmpDf['EntropyChange'].mean(), tmpDf['EntropyChange'].std()
+    avgTotal, sdTotal = tmpDf['Total'].mean(), tmpDf['Total'].std()
+    avgSasa, sdSasa = tmpDf['SASADiff'].mean(), tmpDf['SASADiff'].std()
+    # add the region and average VDWDiff, HBONDDiff, IMM1Diff, and Total to dataframe using concat
+    df_avg = pd.concat([df_avg, pd.DataFrame({'Region': [region], 'VDWDiff': [avgVDWDiff], 'sdVDW': [sdVDW], 'HBONDDiff': [avgHBONDDiff], 'sdHBOND': [sdHBOND], 'IMM1Diff': [avgIMM1Diff], 'sdIMM1': [sdIMM1], 'Entropy': [avgEntropy], 'sdEntropy': [sdEntropy], 'Total': [avgTotal], 'sdTotal': [sdTotal], 'SASADiff': [avgSasa], 'sdSASA': [sdSasa]})], ignore_index=True)
+    #df_avg = pd.concat([df_avg, pd.DataFrame({'Region': [region], 'VDWDiff': [avgVDWDiff], 'sdVDW': [sdVDW], 'HBONDDiff': [avgHBONDDiff], 'sdHBOND': [sdHBOND], 'IMM1Diff': [avgIMM1Diff], 'sdIMM1': [sdIMM1], 'Entropy': [avgEntropy], 'sdEntropy': [sdEntropy], 'Total': [avgTotal], 'sdTotal': [sdTotal]})])
+    #df_avg = pd.concat([df_avg, pd.DataFrame({'Region': [region], 'VDWDiff': [avgVDWDiff], 'sdVDW': [sdVDW], 'HBONDDiff': [avgHBONDDiff], 'sdHBOND': [sdHBOND], 'IMM1Diff': [avgIMM1Diff], 'sdIMM1': [sdIMM1], 'Total': [avgTotal], 'sdTotal': [sdTotal]})])
+    plotGeomKde(df_kde, df, 'Total', outputDir, 'startXShift', 'startCrossingAngle', region)
+    plotHist(df, 'Total',outputDir, region)
+
+print(df_avg)
 plotMeanAndSDBarGraph(df, 'geometryNumber', 'VDWDiff')
-plotEnergyDiffs(df_avg, outputDir, "Right")
-
+plotEnergyDiffs(df_avg, outputDir)
+exit()
 # output the top 100 sequences to a csv file
 df_top.to_csv(outputDir+'/top100.csv')
-
-# analysis of the top 100 sequences
-plotGeomKde(df_kde, df, 'Total', outputDir)
-plotHist(df, 'Total',outputDir, filename)
 
 # sort the dataframes by vdwDiff plus hbondDiff using loc
 df = df.sort_values(by=['VDWDiff', 'HBONDDiff'])
