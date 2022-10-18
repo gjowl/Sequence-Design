@@ -78,7 +78,7 @@ geomDict['crossingAngle']['inc'] = 2
 
 acceptCutoff = 0.8
 randomGeomGrid = pd.DataFrame()
-numGeometries = 2000
+numGeometries = 200
     
 # make kde output dir
 kdeOutputDir = outputDir + "densityPlots/"
@@ -119,6 +119,12 @@ cross = designGrid['crossingAngle'].values[0]
 if cross < 0:
     designGrid['negCross'] = 'true'
     designGrid['interface'] = '000110011001100110000'
+    xShift = designGrid['xShift'].values[0]
+    if xShift > 7.5:
+        for index, row in designGrid.iterrows():
+            axialRot = row['axialRotation']
+            if axialRot > 90: 
+                designGrid.at[index, 'interface'] = '000110111011101100000'
 else:
     designGrid['negCross'] = 'false'
     designGrid['interface'] = '000011011001101100000'
@@ -143,9 +149,6 @@ else:
             if axialRot < refAxialRot:
                 # replace interface with shifted interface (seen shifted in structures)
                 designGrid.at[index, 'interface'] = '000110011011001100000'
-
-
-
 
 designGrid['crossingAngle'] = abs(designGrid['crossingAngle'])
 designGrid['negRot'] = 'true'
