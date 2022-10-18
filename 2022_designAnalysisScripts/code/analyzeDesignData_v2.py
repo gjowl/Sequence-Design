@@ -193,6 +193,23 @@ df = df.sort_values(by=['Total'])
 df.to_csv(outputDir+'/allData.csv')
 
 # get the top 100 sequences in Total Energy for each region
+df_GAS = df[df['Region'] == 'GAS']
+df_Left = df[df['Region'] == 'Left']
+df_Right = df[df['Region'] == 'Right']
+
+# add region dataframes to a list
+df_list = [df_GAS, df_Left, df_Right]
+
+xUpperBounds = []
+crossUpperBounds = []
+axUpperBounds = []
+zUpperBounds = []
+
+# get the upper bounds for each region
+
+
+
+# get the top 100 sequences in Total Energy for each region
 df_GAS = df[df['Region'] == 'GAS'].head(10)
 df_Left = df[df['Region'] == 'Left'].head(10)
 df_Right = df[df['Region'] == 'Right'].head(10)
