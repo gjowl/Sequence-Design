@@ -200,14 +200,24 @@ df_Right = df[df['Region'] == 'Right']
 # add region dataframes to a list
 df_list = [df_GAS, df_Left, df_Right]
 
-xUpperBounds = []
-crossUpperBounds = []
-axUpperBounds = []
-zUpperBounds = []
+# loop through the region dataframes
+for df in df_list:
+    # normalize the xShift, crossing angle, axialRotation, and zShift data using min-max normalization
+    df['xShift'] = (df['startXShift'] - df['startXShift'].min()) / (df['startXShift'].max() - df['startXShift'].min())
+    df['crossingAngle'] = (df['startCrossingAngle'] - df['startCrossingAngle'].min()) / (df['startCrossingAngle'].max() - df['startCrossingAngle'].min())
+    df['axialRotation'] = (df['startAxialRotation'] - df['startAxialRotation'].min()) / (df['startAxialRotation'].max() - df['startAxialRotation'].min())
+    df['zShift'] = (df['startZShift'] - df['startZShift'].min()) / (df['startZShift'].max() - df['startZShift'].min())
+    # normalize the end xShift, crossing angle, axialRotation, and zShift data using min-max normalization
+    df['endXShift'] = (df['endXShift'] - df['startXShift'].min()) / (df['startXShift'].max() - df['startXShift'].min())
+    df['endCrossingAngle'] = (df['endCrossingAngle'] - df['startCrossingAngle'].min()) / (df['startCrossingAngle'].max() - df['startCrossingAngle'].min())
+    df['endAxialRotation'] = (df['endAxialRotation'] - df['startAxialRotation'].min()) / (df['startAxialRotation'].max() - df['startAxialRotation'].min())
+    df['endZShift'] = (df['endZShift'] - df['startZShift'].min()) / (df['startZShift'].max() - df['startZShift'].min())
+    # calculate the distance between the start and end points
+    df['normStartEndDistance'] = np.sqrt((df['normStartXShift'] - df['normEndXShift'])**2 + (df['normStartCrossingAngle'] - df['normEndCrossingAngle'])**2 + (df['normStartAxialRotation'] - df['normEndAxialRotation'])**2 + (df['normStartZShift'] - df['normEndZShift'])**2)
+    # output the dataframe to a csv file
+    df.to_csv(outputDir+'/normalizedData.csv')
 
-# get the upper bounds for each region
-
-
+exit(0)
 
 # get the top 100 sequences in Total Energy for each region
 df_GAS = df[df['Region'] == 'GAS'].head(10)
