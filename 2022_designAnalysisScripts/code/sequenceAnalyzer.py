@@ -74,7 +74,8 @@ for filename, df in zip(filenames, dfs):
         print(aa, tmpDf[aa].sum())
         s = tmpDf[aa].sum()
         # add sum to outputDf using concat
-        outputDf = outputDf.append({'AA': aa, 'Count': s}, ignore_index=True)
+        outputDf = pd.concat([outputDf, pd.DataFrame([s], columns=[aa])], axis=0)
+        #outputDf = outputDf.append({'AA': aa, 'Count': s}, ignore_index=True)
     #outputDf = outputDf.append({'AA': 'Total', 'Count': outputDf['Count'].sum()}, ignore_index=True)
     # sum count column
     count = outputDf['Count'].sum()
@@ -83,5 +84,3 @@ for filename, df in zip(filenames, dfs):
     outputFile = analysisDir+filename+'sequenceComposition.csv'
     # print outputDf to csv
     outputDf.to_csv(outputFile, index=False)
-
-# maybe look and see if Josh has sequences that pass maltose test to look at their distribution to compare to?
