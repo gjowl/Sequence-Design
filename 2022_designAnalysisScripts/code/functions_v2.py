@@ -210,4 +210,12 @@ def addGeometricDistanceToDataframe(df_list, outputDir):
         tmpDf.to_csv(outputDir+'/'+region+'_geometricDistance.csv')
         # append to the list of dataframes
         geomDfList.append(tmpDf)
+        # make a 4x4 scatterplot of the start and end points
+        plt.scatter(tmpDf['xDist'], tmpDf['crossDist'], s=5, alpha=0.5)
+        plt.savefig(outputDir+'/'+region+'_crossXgeometricDistance.png', bbox_inches='tight', dpi=150)
+        plt.close()
+        plt.scatter(tmpDf['axialDist'], tmpDf['zDist'], s=5, alpha=0.5)
+        # output the plot
+        plt.savefig(outputDir+'/'+region+'_axZgeometricDistance.png', bbox_inches='tight', dpi=150)
+        plt.close()
     return geomDfList

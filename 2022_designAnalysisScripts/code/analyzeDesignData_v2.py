@@ -4,6 +4,7 @@ import os
 import numpy as np
 from functions_v2 import *
 import matplotlib.pyplot as plt
+import matplotlib.colors
 
 '''
     This file is used to analyze the data from my second set of design runs after CHIP1.
@@ -53,22 +54,19 @@ df_Right = df[df['Region'] == 'Right']
 df_list = [df_GAS, df_Left, df_Right]
 df_list = addGeometricDistanceToDataframe(df_list, outputDir)
 
-import matplotlib.colors
 # rid of anything with Total > 0 and repack energy > 0
 df = df[df['Total'] < -10]
 df = df[df['VDWDimer'] < 0]
 
-# get the top 100 sequences in Total Energy for each region
-df_GAS = df[df['Region'] == 'GAS'].head(10)
-df_Left = df[df['Region'] == 'Left'].head(10)
-df_Right = df[df['Region'] == 'Right'].head(10)
-
-# add region dataframes to a list
-df_list = [df_GAS, df_Left, df_Right]
-
 # output the dataframes to csv files
-for i in range(len(df_list)):
-    df_list[i].to_csv(outputDir+'/top10_'+df_list[i]['Region'].iloc[0]+'.csv')
+for df in df_list:
+    # rid of anything with geometric distance > 1
+    df = df[df['GeometricDistance'] < 1]
+    # sort by total energy
+    df = df.sort_values(by=['Total'])
+    # get the top 100 sequences in Total Energy
+    df = df.head(100)
+    df.to_csv(outputDir+'/top100_'+df['Region'].iloc[0]+'.csv')
 
 df_avg = pd.DataFrame()
 # loop through the region dataframes
@@ -105,6 +103,7 @@ for df in df_list:
     outputFile = outputDir+"/"+region+'_sequenceComposition.csv'
     # print outputDf to csv
     outputDf.to_csv(outputFile, index=False)
+
 # output the top 100 sequences to a csv file
 df_top.to_csv(outputDir+'/top100.csv')
 exit(0)
