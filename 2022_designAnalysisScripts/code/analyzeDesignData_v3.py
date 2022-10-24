@@ -2,7 +2,7 @@ import pandas as pd
 import sys
 import os
 import numpy as np
-from functions_v2 import *
+from functions_v3 import *
 import matplotlib.pyplot as plt
 import matplotlib.colors
 
@@ -28,7 +28,7 @@ outputDir = setupOutputDir(sys.argv[1])
 df = df.sort_values(by=['Total'], ascending=True)
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
 
-# loop through dataframe rows
+# loop through dataframe rows and break down into regions
 for index, row in df.iterrows():
     # check the xShift value
     if row['startXShift'] <= 7.5:
@@ -45,36 +45,42 @@ for index, row in df.iterrows():
 df = df.sort_values(by=['Total'])
 df.to_csv(outputDir+'/allData.csv')
 
-# get the top 100 sequences in Total Energy for each region
+# trim the data
+df = df[df['Total'] < -10]
+df = df[df['Total'] < df['TotalPreBBOptimize']]
+# any other ways to trim? SASA score? 
+df['repackEnergyDifference'] = df['Total'] - df['TotalPreBBOptimize']
+
+# divide data into dataframes for each region
 df_GAS = df[df['Region'] == 'GAS']
 df_Left = df[df['Region'] == 'Left']
 df_Right = df[df['Region'] == 'Right']
 
 # add region dataframes to a list
 df_list = [df_GAS, df_Left, df_Right]
-df_list = addGeometricDistanceToDataframe(df_list, outputDir)
+geomList = ['xShift', 'crossingAngle', 'axialRotationPrime', 'zShiftPrime']
+df_list = addGeometricDistanceToDataframe(df_list, outputDir, geomList)
 
-# rid of anything with Total > 0 and repack energy > 0
-df = df[df['Total'] < -10]
-df = df[df['VDWDimer'] < 0]
-
-# output the dataframes to csv files
-for df in df_list:
-    # rid of anything with geometric distance > 1
-    df = df[df['GeometricDistance'] < 1]
-    # sort by total energy
-    df = df.sort_values(by=['Total'])
-    # get the top 100 sequences in Total Energy
-    df = df.head(50)
-    df.to_csv(outputDir+'/top50_'+df['Region'].iloc[0]+'.csv')
-
+# analyze the repack energy
+# loop through each region
 df_avg = pd.DataFrame()
-# loop through the region dataframes
 for df in df_list:
     tmpDf = getRepackEnergies(df)
     tmpDf = getGeomChanges(tmpDf)
-    # get region name
-    region = df['Region'].iloc[0]
+    region = tmpDf['Region'].values[0]
+    dir = outputDir + '/' + region
+    # make a directory for each region
+    if not os.path.exists(dir):
+        os.makedirs(dir)
+    # get the top 100 sequences in Total Energy for each region
+    tmpDf = tmpDf[tmpDf['geometryNumber'] > 0]
+    # remove sequences where repack energy is greater than 0
+    tmpDf = tmpDf[tmpDf['repackEnergyDifference'] < 0]
+    # rid of anything with geometric distance > 0.5
+    tmpDf = tmpDf[tmpDf['GeometricDistance'] < 0.5]
+    # loop through each geometryNumber
+    outputFile = dir + '/repackEnergyAnalysis.png'
+    plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'repackEnergyDifference')
     # get average VDWDiff, HBONDDiff, and IMM1Diff from the top 100 sequences
     avgVDWDiff, sdVDW = tmpDf['VDWDiff'].mean(), tmpDf['VDWDiff'].std()
     avgHBONDDiff, sdHBOND = tmpDf['HBONDDiff'].mean(), tmpDf['HBONDDiff'].std()
@@ -82,16 +88,15 @@ for df in df_list:
     avgEntropy, sdEntropy = tmpDf['EntropyChange'].mean(), tmpDf['EntropyChange'].std()
     avgTotal, sdTotal = tmpDf['Total'].mean(), tmpDf['Total'].std()
     avgSasa, sdSasa = tmpDf['SASADiff'].mean(), tmpDf['SASADiff'].std()
-    # add the region and average VDWDiff, HBONDDiff, IMM1Diff, and Total to dataframe using concat
     df_avg = pd.concat([df_avg, pd.DataFrame({'Region': [region], 'VDWDiff': [avgVDWDiff], 'sdVDW': [sdVDW], 'HBONDDiff': [avgHBONDDiff], 'sdHBOND': [sdHBOND], 'IMM1Diff': [avgIMM1Diff], 'sdIMM1': [sdIMM1], 'Entropy': [avgEntropy], 'sdEntropy': [sdEntropy], 'Total': [avgTotal], 'sdTotal': [sdTotal], 'SASADiff': [avgSasa], 'sdSASA': [sdSasa]})], ignore_index=True)
-    #df_avg = pd.concat([df_avg, pd.DataFrame({'Region': [region], 'VDWDiff': [avgVDWDiff], 'sdVDW': [sdVDW], 'HBONDDiff': [avgHBONDDiff], 'sdHBOND': [sdHBOND], 'IMM1Diff': [avgIMM1Diff], 'sdIMM1': [sdIMM1], 'Entropy': [avgEntropy], 'sdEntropy': [sdEntropy], 'Total': [avgTotal], 'sdTotal': [sdTotal]})])
-    #df_avg = pd.concat([df_avg, pd.DataFrame({'Region': [region], 'VDWDiff': [avgVDWDiff], 'sdVDW': [sdVDW], 'HBONDDiff': [avgHBONDDiff], 'sdHBOND': [sdHBOND], 'IMM1Diff': [avgIMM1Diff], 'sdIMM1': [sdIMM1], 'Total': [avgTotal], 'sdTotal': [sdTotal]})])
-    tmpDf = tmpDf[tmpDf['Total'] < -20]
     plotGeomKde(df_kde, tmpDf, 'Total', outputDir, 'startXShift', 'startCrossingAngle', region)
-    #plotHist(df, 'Total',outputDir, region)
-
-plotMeanAndSDBarGraph(df, outputDir, 'Total', 'TotalPreBBOptimize')
+    bestDf = tmpDf.head(50)
+    bestDf.to_csv(outputDir+'/top50_'+bestDf['Region'].iloc[0]+'.csv')
+# from here, start defining what data I want to keep: geometric distance < 0.5
+# rid of anything with Total > 0 and repack energy > 0
+df = df[df['VDWDimer'] < 0]
 plotEnergyDiffs(df_avg, outputDir)
+
 listAA = ["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"]
 for df in df_list:
     outputDf = pd.DataFrame()
@@ -101,13 +106,10 @@ for df in df_list:
         outputDf[aa] = df['Sequence'].str.count(aa)
     outputDf['Sequence'] = df['Sequence']
     region = df['Region'].iloc[0]
-    outputFile = outputDir+"/"+region+'_sequenceComposition.csv'
+    dir = outputDir + '/' + region
+    outputFile = dir+'/sequenceComposition.csv'
     # print outputDf to csv
     outputDf.to_csv(outputFile, index=False)
-
-# output the top 100 sequences to a csv file
-df_top.to_csv(outputDir+'/top100.csv')
-exit(0)
 
 # ideas for analysis
 """
