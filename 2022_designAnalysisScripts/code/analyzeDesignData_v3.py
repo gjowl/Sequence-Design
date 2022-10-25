@@ -98,18 +98,62 @@ df = df[df['VDWDimer'] < 0]
 plotEnergyDiffs(df_avg, outputDir)
 
 listAA = ["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"]
+# make a dictionary of amino acids and the number of times they appear in the top 100 sequences
+# 
+seqCountDfList = []
 for df in df_list:
-    outputDf = pd.DataFrame()
-    # trim the sequence column to residues 4-18
-    df['Sequence'] = df['Sequence'].str[3:17]
+    aaDict = {}
     for aa in listAA:
-        outputDf[aa] = df['Sequence'].str.count(aa)
-    outputDf['Sequence'] = df['Sequence']
-    region = df['Region'].iloc[0]
-    dir = outputDir + '/' + region
-    outputFile = dir+'/sequenceComposition.csv'
-    # print outputDf to csv
-    outputDf.to_csv(outputFile, index=False)
+        aaDict[aa] = 0
+    for index, row in df.iterrows():
+        for aa in listAA:
+            aaDict[aa] += row['Sequence'].count(aa)
+            # count the number of times each amino acid appears in the top 100 sequences in the interface
+            aaDict[aa] += row['InterfaceSequence'].count(aa)
+    # make a dataframe of the amino acid dictionary
+    df_aa = pd.DataFrame.from_dict(aaDict, orient='index', columns=['Count'])
+    # sum the total number of amino acids
+    df_aa['Total'] = df_aa['Count'].sum()
+    # get the percentage of each amino acid by dividing the count by the total
+    df_aa['Percent'] = df_aa['Count'] / df_aa['Total']
+    # add to the list of dataframes
+    seqCountDfList.append(df_aa)
+
+ind = np.arange(len(seqCountDfList))
+width = 0.25
+# make a bar graph of the amino acid percentages
+fig, ax = plt.subplots()
+# get the amino acid percentages for each region
+GAS = seqCountDfList[0]['Percent']
+print(GAS)
+rects1 = ax.bar(ind, GAS, width, color='r')
+rects2 = ax.bar(ind + width, seqCountDfList[1]['Percent'], width, color='g')
+rects3 = ax.bar(ind + width*2, seqCountDfList[2]['Percent'], width, color='b')
+ax.set_ylabel('Percent')
+ax.set_title('Amino Acid Percentages')
+ax.set_xticks(ind + width)
+ax.set_xticklabels(seqCountDfList[0].index)
+ax.legend((rects1[0], rects2[0], rects3[0]), ('GAS', 'Left', 'Right'))
+plt.savefig(outputDir + '/aminoAcidPercentages.png')
+plt.close()
+
+    #df_aa = df_aa.sort_values(by=['Count'], ascending=False)
+    #df_aa.to_csv(outputDir+'/aaCount.csv')
+
+#for df in df_list:
+#    outputDf = pd.DataFrame()
+#    # trim the sequence column to residues 4-18
+#    df['Sequence'] = df['Sequence'].str[3:17]
+#    for aa in listAA:
+#        outputDf[aa] = df['Sequence'].str.count(aa)
+#        #outputDf[aa] = df['InterfaceSequence'].str.count(aa)
+#    
+#    outputDf['Sequence'] = df['Sequence']
+#    region = df['Region'].iloc[0]
+#    dir = outputDir + '/' + region
+#    outputFile = dir+'/sequenceComposition.csv'
+#    # print outputDf to csv
+#    outputDf.to_csv(outputFile, index=False)
 
 # ideas for analysis
 """
