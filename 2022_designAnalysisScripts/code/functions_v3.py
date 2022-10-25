@@ -2,6 +2,7 @@ import pandas as pd
 import sys
 import os
 import numpy as np
+from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 import matplotlib.colors
 from scipy import stats
@@ -61,13 +62,8 @@ def plotEnergyDiffs(df, outputDir):
     # data columns to plot
     n = len(df)
     x = np.arange(n)*3
-    #numBars = len(energyList)
-    numBars = 5
+    numBars = 4
     width = 1/numBars
-    #fig, ax = plt.subplots()
-    #for energy in energyList:
-    #    energy = df[energy]
-    #    p = plt.bar(x, height)
     # get the VDW energy difference column
     VDWDiff = df['VDWDiff']
     # get the HBOND energy difference column
@@ -75,42 +71,45 @@ def plotEnergyDiffs(df, outputDir):
     # get the IMM1 energy difference column
     IMM1Diff = df['IMM1Diff']
     total = df['Total']
-    entropy = df['Entropy']
-    sasa = df['SASADiff']
     # setup the bar plots for each energy difference
     fig, ax = plt.subplots()
-    # plot the VDW energy difference with standard deviation
-    #ax.bar(x, VDWDiff, width, color='cornflowerblue', edgecolor='black', yerr=df['sdVDW'], label='VDW')
-    #ax.bar(x, VDWDiff, width, yerr=df['VDWRepackDiff'].std(), label='VDW')
-    p1 = plt.bar(x-width*2, VDWDiff, width, yerr=df['sdVDW'], color='cornflowerblue', edgecolor='black')
-    # plot the HBOND energy difference adjacent to the VDW energy difference
-    p2 = plt.bar(x-width, HBONDDiff, width, yerr=df['sdHBOND'], color='lightcoral', edgecolor='black')
-    p3 = plt.bar(x, IMM1Diff, width, yerr=df['sdIMM1'],color='palegreen', edgecolor='black')
-    p4 = plt.bar(x+width, total, width, yerr=df['sdTotal'],color='thistle', edgecolor='black')
-    p5 = plt.bar(x+width*2, entropy, width, yerr=df['sdEntropy'],color='blanchedalmond', edgecolor='black')
-    #p6 = plt.bar(x+width*3, entropy, width, yerr=df['sdSASA'],color='azure', edgecolor='black')
+    # plot the energy differences with standard deviation
+    p1 = plt.bar(x-width*2, VDWDiff, width, yerr=df['VDWDiffSD'], color='cornflowerblue', edgecolor='black')
+    p2 = plt.bar(x-width, HBONDDiff, width, yerr=df['HBONDDiffSD'], color='lightcoral', edgecolor='black')
+    p3 = plt.bar(x, IMM1Diff, width, yerr=df['IMM1DiffSD'],color='palegreen', edgecolor='black')
+    p4 = plt.bar(x+width, total, width, yerr=df['TotalSD'],color='thistle', edgecolor='black')
     # change the dpi to make the image smaller
     fig.set_dpi(2000)
     plt.ylabel('Energy')
     plt.title('Energy Plot')
-    plt.legend((p1[0], p2[0], p3[0], p4[0], p5[0]), ('VDW', 'HBOND', 'IMM1', 'Total', 'Entropy'))
+    # add legend with the legend to the right of the plot
+    plt.legend((p1[0], p2[0], p3[0], p4[0]), ('VDW', 'HBOND', 'IMM1', 'Total'), loc='center left', bbox_to_anchor=(1.0, 0.5))
+    # set size so that the legend fits
+    plt.gcf().set_size_inches(12, 5)
     # set x axis labels as regions
     plt.xticks(x, df['Region'])
     fig.savefig(outputDir+'/energyDiffPlot.png')
     plt.close()
 
-def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis, region):
-    # read in kde file from command line, or default to 2020_09_23_kdeData.csv
-    #df_data = df_data.drop_duplicates('crossingAngle',keep='first')
+#def plotEnergyDiffs(df, outputDir, enerColumns):
+#    # keep only the energy columns from the df
+#    tmpDf = df[enerColumns]
+#    # plot the energy differences
+#    df.plot(kind='bar', yerr=tmpDf.std(), title='Energy Differences', figsize=(10,10))
+#    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+#    # add in y-axis label
+#    plt.ylabel('Percent')
+#    plt.savefig(outputDir+'/energyDiffs.png')
+#    plt.close()
 
+def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis):
     # get the x and y axes data to be plotted from the dataframe
     x = df_data.loc[:, xAxis]
     y = df_data.loc[:, yAxis]
     energies = df_data[dataColumn].values
-
+    region = df_data['Region'].values[0]
     # get the kde plot for the geometry data
     kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
-
     # plot the kde plot with an overlay of the input dataset   
     plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir, region)
 
@@ -121,7 +120,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region
     plt.grid(False)
     plt.xlabel("Distance (Å)")
     plt.ylabel("Angle (°)")
-    plt.title(dataColumn)
+    plt.title(region)
     # Setup for plotting output
     plt.rc('font', size=10)
     plt.rc('xtick', labelsize=10)
@@ -132,7 +131,6 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region
     ax.use_sticky_edges = False
     q = ax.imshow(np.rot90(kdeZScores), cmap=plt.cm.Blues,
         extent=[xmin, xmax, ymin, ymax], aspect="auto")
-    
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
     cmap = plt.cm.Reds
@@ -149,20 +147,13 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region
     fig.colorbar(sm)
     # add the number of datapoints to the plot
     plt.text(xmin-1, ymax+7, "# Sequences = " + str(len(xAxis)), fontsize=10)
-    #ax.scatter(xAxis, yAxis, c='r', s=5, marker='o', alpha=0.5)
-    # Plot data points onto the graph with fluorescence as color
-    #ax.scatter(xAxis, yAxis, c=fluor, s=5, marker='o', alpha=0.5)
-    # Plot the datapoints onto the graph
-    #ax.scatter(xAxis, yAxis, c='r', s=5, marker='o', alpha=0.5)
-    plt.text(xmin-1, ymax+7, "# Geometries = " + str(len(xAxis)), fontsize=10)
     ax.set_xlim([xmin, xmax])
     ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
 
-    #plt.colorbar(q)
     # output the number of sequences in the dataset onto plot
-    plt.savefig(outputDir+"/kdeOverlay_"+region+".png", bbox_inches='tight', dpi=150)
+    plt.savefig(outputDir+"/kdeOverlay.png", bbox_inches='tight', dpi=150)
     plt.close()
 
 def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
@@ -170,11 +161,9 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     xmin, xmax, ymin, ymax = 6, 12, -100, 100
     # create the kde grid (hardcoded 24 by 40)
     X, Y = np.mgrid[xmin:xmax:24j, ymin:ymax:40j]
-
     # get the x and y axes data to be plotted from the dataframe
     x = df_kde.loc[:, xAxis]
     y = df_kde.loc[:, yAxis]
-
     #Kernel Density Estimate Calculation
     positions = np.vstack([X.ravel(), Y.ravel()])
     values = np.vstack([x, y])
@@ -189,50 +178,27 @@ def addGeometricDistanceToDataframe(df_list, outputDir, geomList):
     geomDfList = []
     for df in df_list:
         tmpDf = df.copy()
-        #tmpDf = df[['Sequence', 'Total', 'Region',]]
         distList = []
         for geom in geomList:
             # capitalize the first letter of the geometry
             tmpGeom = geom[0].upper() + geom[1:]
             # add start and end to the geometry name
-            startGeom = "start" + tmpGeom
-            endGeom = "end" + tmpGeom
+            startGeom, endGeom = "start" + tmpGeom, "end" + tmpGeom
             # min denominator
             denominator = df[startGeom].max() - df[startGeom].min()
-            startNumerator = (df[startGeom] - df[startGeom].min())
-            endNumerator = (df[endGeom] - df[startGeom].min())
+            startNumerator, endNumerator = (df[startGeom] - df[startGeom].min()), (df[endGeom] - df[startGeom].min())
             # calculate the normalized distance for the geometry
-            normStart = startNumerator / denominator
-            normEnd = endNumerator / denominator
+            normStart, normEnd = startNumerator / denominator, endNumerator / denominator
             # save the normalized distance to the dataframe
-            normStartCol = startGeom + '_norm'
-            normEndCol = endGeom + '_norm'
-            tmpDf[normStartCol] = normStart
-            tmpDf[normEndCol] = normEnd
+            normStartCol, normEndCol = startGeom + '_norm', endGeom + '_norm'
+            tmpDf[normStartCol], tmpDf[normEndCol] = normStart, normEnd
             # distance calculation
-            distCol = geom + '_dist'
             dist = (tmpDf[normEndCol] - tmpDf[normStartCol])
+            distCol = geom + '_dist'
             tmpDf[distCol] = np.sqrt(dist**2)
             distList.append(dist**2)
         # calculate the min-max normalized distance for the geometry
         tmpDf['GeometricDistance'] = np.sqrt(np.sum(distList, axis=0))
-        ## normalize the xShift, crossing angle, axialRotation, and zShift data using min-max normalization
-        #tmpDf['normStartXShift'] = (tmpDf['startXShift'] - tmpDf['startXShift'].min()) / (tmpDf['startXShift'].max() - tmpDf['startXShift'].min())
-        #tmpDf['normStartCrossingAngle'] = (tmpDf['startCrossingAngle'] - tmpDf['startCrossingAngle'].min()) / (tmpDf['startCrossingAngle'].max() - tmpDf['startCrossingAngle'].min())
-        #tmpDf['normStartAxialRotation'] = (tmpDf['startAxialRotationPrime'] - tmpDf['startAxialRotationPrime'].min()) / (tmpDf['startAxialRotationPrime'].max() - tmpDf['startAxialRotationPrime'].min())
-        #tmpDf['normStartZShift'] = (tmpDf['startZShiftPrime'] - tmpDf['startZShiftPrime'].min()) / (tmpDf['startZShiftPrime'].max() - tmpDf['startZShiftPrime'].min())
-        ## normalize the end xShift, crossing angle, axialRotation, and zShift data using min-max normalization
-        #tmpDf['normEndXShift'] = (tmpDf['endXShift'] - tmpDf['startXShift'].min()) / (tmpDf['startXShift'].max() - tmpDf['startXShift'].min())
-        #tmpDf['normEndCrossingAngle'] = (tmpDf['endCrossingAngle'] - tmpDf['startCrossingAngle'].min()) / (tmpDf['startCrossingAngle'].max() - tmpDf['startCrossingAngle'].min())
-        #tmpDf['normEndAxialRotation'] = (tmpDf['endAxialRotationPrime'] - tmpDf['startAxialRotationPrime'].min()) / (tmpDf['startAxialRotationPrime'].max() - tmpDf['startAxialRotationPrime'].min())
-        #tmpDf['normEndZShift'] = (tmpDf['endZShiftPrime'] - tmpDf['startZShiftPrime'].min()) / (tmpDf['startZShiftPrime'].max() - tmpDf['startZShiftPrime'].min())
-        ## calculate the distance between the start and end points for each geometry
-        #tmpDf['xDist'] = np.sqrt((tmpDf['normEndXShift'] - tmpDf['normStartXShift'])**2)
-        #tmpDf['crossDist'] = np.sqrt((tmpDf['normEndCrossingAngle'] - tmpDf['normStartCrossingAngle'])**2)
-        #tmpDf['axialDist'] = np.sqrt((tmpDf['normEndAxialRotation'] - tmpDf['normStartAxialRotation'])**2)
-        #tmpDf['zDist'] = np.sqrt((tmpDf['normEndZShift'] - tmpDf['normStartZShift'])**2)
-        ## calculate the total distance between the start and end points for each geometry
-        #tmpDf['GeometricDistance'] = np.sqrt((tmpDf['normStartXShift'] - tmpDf['normEndXShift'])**2 + (tmpDf['normStartCrossingAngle'] - tmpDf['normEndCrossingAngle'])**2 + (tmpDf['normStartAxialRotation'] - tmpDf['normEndAxialRotation'])**2 + (tmpDf['normStartZShift'] - tmpDf['normEndZShift'])**2)
         region = tmpDf['Region'].iloc[0]
         # output the dataframe to a csv file
         dir = outputDir + '/' + region
@@ -244,10 +210,77 @@ def addGeometricDistanceToDataframe(df_list, outputDir, geomList):
         geomDfList.append(tmpDf)
         # make a 4x4 scatterplot of the start and end points
         plt.scatter(tmpDf['xShift_dist'], tmpDf['crossingAngle_dist'], s=5, alpha=0.5)
+        # add title and labels
+        plt.title(region)
+        plt.xlabel("xShift")
+        plt.ylabel("crossingAngle")
+        # get a trendline for the data
+        z = np.polyfit(tmpDf['xShift_dist'], tmpDf['crossingAngle_dist'], 1)
+        p = np.poly1d(z)
+        plt.plot(tmpDf['xShift_dist'],p(tmpDf['xShift_dist']),"r--")
+        # output the equation of the trendline and the r-squared value
+        plt.text(0.1, -0.1, "y=%.6fx+(%.6f)"%(z[0],z[1]), ha='center', va='center', transform=plt.gca().transAxes)
+        plt.text(0.1, -0.2, "r-squared=%.6f"%(r2_score(tmpDf['xShift_dist'], tmpDf['crossingAngle_dist'])), ha='center', va='center', transform=plt.gca().transAxes)
         plt.savefig(dir+'/crossXgeometricDistance.png', bbox_inches='tight', dpi=150)
         plt.close()
         plt.scatter(tmpDf['axialRotationPrime_dist'], tmpDf['zShiftPrime_dist'], s=5, alpha=0.5)
+        # get a trendline for the data
+        z = np.polyfit(tmpDf['axialRotationPrime_dist'], tmpDf['zShiftPrime_dist'], 1)
+        p = np.poly1d(z)
+        plt.plot(tmpDf['axialRotationPrime_dist'],p(tmpDf['axialRotationPrime_dist']),"r--")
+        # output the equation of the trendline next to the line
+        plt.text(0.1, -0.1, 'y=%.6fx+(%.6f)'%(z[0],z[1]), ha='center', va='center', transform=plt.gca().transAxes)
+        plt.text(0.1, -0.2, "r-squared=%.6f"%(r2_score(tmpDf['axialRotationPrime_dist'], tmpDf['zShiftPrime_dist'])), ha='center', va='center', transform=plt.gca().transAxes)
+        # add title and labels
+        plt.title(region)
+        plt.xlabel("axialRotation")
+        plt.ylabel("zShift")
         # output the plot
         plt.savefig(dir+'/axZgeometricDistance.png', bbox_inches='tight', dpi=150)
         plt.close()
     return geomDfList
+
+def getMeanAndSDDf(df, colNames):
+    tmpDf = pd.DataFrame()
+    for col in colNames:
+        mean, sd = df[col].mean(), df[col].std()
+        tmpDf = pd.merge(tmpDf, pd.DataFrame({col: [mean], col+'SD': [sd]}), how='outer', left_index=True, right_index=True)
+    return tmpDf
+
+def getAAPercentageComposition(df_list, percentCompositionFile, listAA, seqColumn, outputDir):
+    # get the percentage composition of each amino acid in the sequence
+    # read in the AA sequence composition data with columns: AA, Entropy
+    mergedCountsDf = pd.read_csv(percentCompositionFile, sep=',', header=0)
+    # loop through dataframe regions
+    for df in df_list:
+        # make a dictionary of amino acids
+        aaDict = {}
+        for aa in listAA:
+            aaDict[aa] = 0
+        for index, row in df.iterrows():
+            for aa in listAA:
+                # count the number of times each amino acid appears in the interface
+                aaDict[aa] += row[seqColumn].count(aa)
+        # make a dataframe of the amino acid dictionary with columns for AA and count
+        tmpDf = pd.DataFrame.from_dict(aaDict, orient='index')
+        tmpDf = tmpDf.reset_index()
+        tmpDf.columns = ['AA', 'Count']
+        # sum the total number of amino acids
+        tmpDf['Total'] = tmpDf['Count'].sum()
+        region = df['Region'].iloc[0]
+        # get the percentage of each amino acid by dividing the count by the total
+        tmpDf[region] = tmpDf['Count'] / tmpDf['Total']
+        # add the region AA percentage to a merged dataframe
+        mergedCountsDf = pd.merge(mergedCountsDf, tmpDf[['AA', region]], on='AA')
+    # output the merged dataframe
+    mergedCountsDf.to_csv(outputDir+'/aaPercentagesByRegion.csv')
+    # plot the AA percentages for each region in a bar chart with different colors
+    mergedCountsDf.plot.bar(x='AA', rot=0, color=['royalblue', 'firebrick', 'cornsilk', 'lightsalmon'], edgecolor='black')
+    # set the plot size
+    plt.gcf().set_size_inches(12, 5)
+    plt.legend(loc='center left', bbox_to_anchor=(1.0, 0.5))
+    plt.title('Amino Acid Percent Composition Per region')
+    # add in y-axis label
+    plt.ylabel('Percent')
+    plt.savefig(outputDir+'/AApercentages_'+seqColumn+'.png')
+    plt.close()
