@@ -14,10 +14,14 @@ import matplotlib.colors
     output depending on the energies, geometry, and sequence of the protein.
 '''
 
-def getEnergyDifferenceDf(df_list, columns):
+def getEnergyDifferenceDf(df_list, columns, numSeqs):
     # loop through each region
     outputDf = pd.DataFrame()
     for df in df_list:
+        # sort the df by energy
+        df = df.sort_values(by=['Total'])
+        # only keep the top numSeqs
+        df = df.head(numSeqs)
         # get the mean and standard deviation for each column
         tmpDf = getMeanAndSDDf(df, cols)
         # merge the region column
@@ -57,6 +61,8 @@ for index, row in df.iterrows():
         # add region column Left
         df.loc[index, 'Region'] = 'Left'
 
+
+
 # sort by total energy
 df = df.sort_values(by=['Total'])
 df = getRepackEnergies(df)
@@ -67,18 +73,26 @@ df.to_csv(outputDir+'/allData.csv')
 df = df[df['Total'] < -10]
 df = df[df['Total'] < df['TotalPreBBOptimize']]
 
-# divide data into dataframes for each region
-df_GAS = df[df['Region'] == 'GAS']
-df_Left = df[df['Region'] == 'Left']
-df_Right = df[df['Region'] == 'Right']
-
+df_list = []
+# check number of unique regions, if only one, then skip the region analysis
+if len(df['Region'].unique()) > 1:
+    # divide data into dataframes for each region
+    df_GAS = df[df['Region'] == 'GAS']
+    df_Left = df[df['Region'] == 'Left']
+    df_Right = df[df['Region'] == 'Right']
+    df_list.append(df_GAS)
+    df_list.append(df_Left)
+    df_list.append(df_Right)
+else: 
+    df_list.append(df)
 # add region dataframes to a list
-df_list = [df_GAS, df_Left, df_Right]
+
 geomList = ['xShift', 'crossingAngle', 'axialRotationPrime', 'zShiftPrime']
 df_list = addGeometricDistanceToDataframe(df_list, outputDir, geomList)
 
 # loop through each region
 df_avg = pd.DataFrame()
+cols = ['xShift_dist', 'crossingAngle_dist', 'axialRotationPrime_dist', 'zShiftPrime_dist']
 for df in df_list:
     region = df['Region'].values[0]
     # add region column to start of df
@@ -91,20 +105,20 @@ for df in df_list:
     # remove sequences where repack energy is greater than 0
     tmpDf = tmpDf[tmpDf['RepackChange'] < 0]
     # rid of anything with geometric distance > 0.5
-    tmpDf = tmpDf[tmpDf['GeometricDistance'] < 1]
+    #tmpDf = tmpDf[tmpDf['GeometricDistance'] < 1]
     # loop through each geometryNumber
     outputFile = dir + '/repackEnergyAnalysis.png'
     plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'RepackChange')
     outputFile = dir + '/SASADiff.png'
     plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'SASADiff')
-    
+    plotScatterMatrix(df, cols, dir)
     # set the below up to look at just the regions, not the whole geom
     plotGeomKde(df_kde, tmpDf, 'Total', dir, 'startXShift', 'startCrossingAngle')
     bestDf = tmpDf.head(50)
     bestDf.to_csv(outputDir+'/top50_'+bestDf['Region'].iloc[0]+'.csv')
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
-df_avg = getEnergyDifferenceDf(df_list, cols)
+df_avg = getEnergyDifferenceDf(df_list, cols, 20)
 
 plotEnergyDiffs(df_avg, outputDir)
 getAAPercentageComposition(df_list, seqEntropyFile, listAA, 'InterfaceSequence', outputDir)

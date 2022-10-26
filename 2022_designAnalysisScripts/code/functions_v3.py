@@ -6,6 +6,7 @@ from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 import matplotlib.colors
 from scipy import stats
+import seaborn as sns
 
 def setupOutputDir(inputFile):
     '''
@@ -208,37 +209,23 @@ def addGeometricDistanceToDataframe(df_list, outputDir, geomList):
         tmpDf.to_csv(dir+'/geometricDistance.csv')
         # append to the list of dataframes
         geomDfList.append(tmpDf)
-        # make a 4x4 scatterplot of the start and end points
-        plt.scatter(tmpDf['xShift_dist'], tmpDf['crossingAngle_dist'], s=5, alpha=0.5)
-        # add title and labels
-        plt.title(region)
-        plt.xlabel("xShift")
-        plt.ylabel("crossingAngle")
-        # get a trendline for the data
-        z = np.polyfit(tmpDf['xShift_dist'], tmpDf['crossingAngle_dist'], 1)
-        p = np.poly1d(z)
-        plt.plot(tmpDf['xShift_dist'],p(tmpDf['xShift_dist']),"r--")
-        # output the equation of the trendline and the r-squared value
-        plt.text(0.1, -0.1, "y=%.6fx+(%.6f)"%(z[0],z[1]), ha='center', va='center', transform=plt.gca().transAxes)
-        plt.text(0.1, -0.2, "r-squared=%.6f"%(r2_score(tmpDf['xShift_dist'], tmpDf['crossingAngle_dist'])), ha='center', va='center', transform=plt.gca().transAxes)
-        plt.savefig(dir+'/crossXgeometricDistance.png', bbox_inches='tight', dpi=150)
-        plt.close()
-        plt.scatter(tmpDf['axialRotationPrime_dist'], tmpDf['zShiftPrime_dist'], s=5, alpha=0.5)
-        # get a trendline for the data
-        z = np.polyfit(tmpDf['axialRotationPrime_dist'], tmpDf['zShiftPrime_dist'], 1)
-        p = np.poly1d(z)
-        plt.plot(tmpDf['axialRotationPrime_dist'],p(tmpDf['axialRotationPrime_dist']),"r--")
-        # output the equation of the trendline next to the line
-        plt.text(0.1, -0.1, 'y=%.6fx+(%.6f)'%(z[0],z[1]), ha='center', va='center', transform=plt.gca().transAxes)
-        plt.text(0.1, -0.2, "r-squared=%.6f"%(r2_score(tmpDf['axialRotationPrime_dist'], tmpDf['zShiftPrime_dist'])), ha='center', va='center', transform=plt.gca().transAxes)
-        # add title and labels
-        plt.title(region)
-        plt.xlabel("axialRotation")
-        plt.ylabel("zShift")
-        # output the plot
-        plt.savefig(dir+'/axZgeometricDistance.png', bbox_inches='tight', dpi=150)
-        plt.close()
     return geomDfList
+
+def plotScatterMatrix(df, cols, outputDir):
+    # trim the dataframe to only the columns of interest
+    tmpDf = df[cols]
+    # rename the columns to be more readable by removing _dist
+    tmpDf.columns = ['xShift', 'crossingAngle', 'axialRotation', 'zShift']
+    pd.plotting.scatter_matrix(tmpDf, alpha=0.2, figsize=(6, 6))
+    # add a trendline to the plot
+    sns.pairplot(tmpDf, kind="reg")
+    # add the correlation coefficient and r-squared to each plot
+    for i, j in zip(*np.triu_indices_from(tmpDf, 1)):
+        ax = plt.subplot(4, 4, i * 4 + j + 1)
+        ax.text(0.05, 0.9, 'r = {:.2f}'.format(tmpDf.iloc[:, i].corr(tmpDf.iloc[:, j])), transform=ax.transAxes, fontsize=10)
+        ax.text(0.05, 0.8, 'r-squared = {:.2f}'.format(tmpDf.iloc[:, i].corr(tmpDf.iloc[:, j])**2), transform=ax.transAxes, fontsize=10)
+    plt.savefig(outputDir+'/scatterMatrix.png', bbox_inches='tight', dpi=150)
+    plt.close()
 
 def getMeanAndSDDf(df, colNames):
     tmpDf = pd.DataFrame()
