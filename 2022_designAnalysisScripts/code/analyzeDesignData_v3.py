@@ -61,8 +61,6 @@ for index, row in df.iterrows():
         # add region column Left
         df.loc[index, 'Region'] = 'Left'
 
-
-
 # sort by total energy
 df = df.sort_values(by=['Total'])
 df = getRepackEnergies(df)
@@ -72,6 +70,7 @@ df.to_csv(outputDir+'/allData.csv')
 # trim the data
 df = df[df['Total'] < -10]
 df = df[df['Total'] < df['TotalPreBBOptimize']]
+df = df[df['IMM1Diff'] > 10]
 
 df_list = []
 # check number of unique regions, if only one, then skip the region analysis
@@ -114,11 +113,12 @@ for df in df_list:
     plotScatterMatrix(df, cols, dir)
     # set the below up to look at just the regions, not the whole geom
     plotGeomKde(df_kde, tmpDf, 'Total', dir, 'startXShift', 'startCrossingAngle')
+    # remove sequences where repack energy IMM1Diff < 0
     bestDf = tmpDf.head(50)
     bestDf.to_csv(outputDir+'/top50_'+bestDf['Region'].iloc[0]+'.csv')
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
-df_avg = getEnergyDifferenceDf(df_list, cols, 20)
+df_avg = getEnergyDifferenceDf(df_list, cols, 100)
 
 plotEnergyDiffs(df_avg, outputDir)
 getAAPercentageComposition(df_list, seqEntropyFile, listAA, 'InterfaceSequence', outputDir)
