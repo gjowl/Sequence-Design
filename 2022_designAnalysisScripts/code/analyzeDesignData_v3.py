@@ -70,7 +70,7 @@ df.to_csv(outputDir+'/allData.csv')
 # trim the data
 df = df[df['Total'] < -10]
 df = df[df['Total'] < df['TotalPreBBOptimize']]
-df = df[df['IMM1Diff'] > 5]
+#df = df[df['IMM1Diff'] > 5]
 
 df_list = []
 # check number of unique regions, if only one, then skip the region analysis
