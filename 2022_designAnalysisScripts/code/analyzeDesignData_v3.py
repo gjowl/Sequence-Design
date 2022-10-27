@@ -70,7 +70,7 @@ df.to_csv(outputDir+'/allData.csv')
 # trim the data
 df = df[df['Total'] < -10]
 df = df[df['Total'] < df['TotalPreBBOptimize']]
-df = df[df['IMM1Diff'] > 10]
+df = df[df['IMM1Diff'] > 5]
 
 df_list = []
 # check number of unique regions, if only one, then skip the region analysis
@@ -84,8 +84,8 @@ if len(df['Region'].unique()) > 1:
     df_list.append(df_Right)
 else: 
     df_list.append(df)
-# add region dataframes to a list
 
+# add region dataframes to a list
 geomList = ['xShift', 'crossingAngle', 'axialRotationPrime', 'zShiftPrime']
 df_list = addGeometricDistanceToDataframe(df_list, outputDir, geomList)
 
