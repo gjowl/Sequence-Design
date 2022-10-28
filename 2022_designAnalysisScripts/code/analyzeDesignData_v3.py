@@ -5,6 +5,8 @@ import numpy as np
 from functions_v3 import *
 import matplotlib.pyplot as plt
 import matplotlib.colors
+import seaborn as sns
+from mpl_toolkits.mplot3d import Axes3D
 
 '''
     This file is used to analyze the data from my second set of design runs after CHIP1.
@@ -13,22 +15,6 @@ import matplotlib.colors
     data to the previous design runs from CHIP1, aiming to have an expectation for the fluorescence
     output depending on the energies, geometry, and sequence of the protein.
 '''
-
-def getEnergyDifferenceDf(df_list, columns, numSeqs):
-    # loop through each region
-    outputDf = pd.DataFrame()
-    for df in df_list:
-        # sort the df by energy
-        df = df.sort_values(by=['Total'])
-        # only keep the top numSeqs
-        df = df.head(numSeqs)
-        # get the mean and standard deviation for each column
-        tmpDf = getMeanAndSDDf(df, cols)
-        # merge the region column
-        tmpDf = pd.merge(tmpDf, pd.DataFrame({'Region': [df['Region'].values[0]]}), how='outer', left_index=True, right_index=True)
-        # concat the tmpDf to the outputDf
-        outputDf = pd.concat([outputDf, tmpDf], axis=0, ignore_index=True)
-    return outputDf
 
 # Read in the data from the csv file
 df = pd.read_csv(sys.argv[1], sep=',', header=0)
@@ -116,12 +102,17 @@ for df in df_list:
     # remove sequences where repack energy IMM1Diff < 0
     bestDf = tmpDf.head(50)
     bestDf.to_csv(outputDir+'/top50_'+bestDf['Region'].iloc[0]+'.csv')
+    # shift the names of the geometry columns to be the same as the geomList
+    bestDf = bestDf.rename(columns={'endXShift': 'xShift', 'endCrossingAngle': 'crossingAngle', 'endAxialRotationPrime': 'axialRotation', 'endZShiftPrime': 'zShift'})
+    x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
+    scatter3DWithColorbar(bestDf, x, y, z, c, dir)
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df_list, cols, 100)
 
 plotEnergyDiffs(df_avg, outputDir)
 getAAPercentageComposition(df_list, seqEntropyFile, listAA, 'InterfaceSequence', outputDir)
+
 
 """
     - compare geometries from duplicate sequences

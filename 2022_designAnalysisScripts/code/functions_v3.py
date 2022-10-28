@@ -271,3 +271,37 @@ def getAAPercentageComposition(df_list, percentCompositionFile, listAA, seqColum
     plt.ylabel('Percent')
     plt.savefig(outputDir+'/AApercentages_'+seqColumn+'.png')
     plt.close()
+
+def getEnergyDifferenceDf(df_list, columns, numSeqs):
+    # loop through each region
+    outputDf = pd.DataFrame()
+    for df in df_list:
+        # sort the df by energy
+        df = df.sort_values(by=['Total'])
+        # only keep the top numSeqs
+        df = df.head(numSeqs)
+        # get the mean and standard deviation for each column
+        tmpDf = getMeanAndSDDf(df, cols)
+        # merge the region column
+        tmpDf = pd.merge(tmpDf, pd.DataFrame({'Region': [df['Region'].values[0]]}), how='outer', left_index=True, right_index=True)
+        # concat the tmpDf to the outputDf
+        outputDf = pd.concat([outputDf, tmpDf], axis=0, ignore_index=True)
+    return outputDf
+
+def scatter3DWithColorbar(df, xAxis, yAxis, zAxis, colorbar, outputDir):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+    x, y, z, a = df[xAxis], df[yAxis], df[zAxis], df[colorbar]
+    sc = ax.scatter(x, y, z, c=a, cmap='viridis', linewidth=0.5)
+    # set labels and title
+    ax.set_xlabel(xAxis, fontweight='bold')
+    ax.set_ylabel(yAxis, fontweight='bold')
+    ax.set_zlabel(zAxis, fontweight='bold')
+    ax.set_title('3D Scatter Plot')
+    # move colorbar to the side of the z label
+    cbar = plt.colorbar(sc, pad=0.2, shrink=0.5, aspect=15)
+    # add a label to the colorbar
+    plt.clabel(colorbar)
+    # save plot
+    plt.savefig(outputDir+'/3DScatter.png')
+    plt.close()
