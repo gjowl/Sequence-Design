@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors
 import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
+import logomaker
 
 '''
     This file is used to analyze the data from my second set of design runs after CHIP1.
@@ -15,6 +16,19 @@ from mpl_toolkits.mplot3d import Axes3D
     data to the previous design runs from CHIP1, aiming to have an expectation for the fluorescence
     output depending on the energies, geometry, and sequence of the protein.
 '''
+
+def makeInterfaceSeqLogo(df, outputDir):
+    '''This function will make a logo of the interface sequence'''
+    # get the interface sequences
+    seq = df['InterfaceSequence']
+    # get the 
+    mat = logomaker.alignment_to_matrix(seq)
+    # use logomaker to make the logo
+    logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+    # save the logo
+    logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
+    # close the figure
+    plt.close()
 
 # Read in the data from the csv file
 df = pd.read_csv(sys.argv[1], sep=',', header=0)
@@ -55,7 +69,7 @@ df.to_csv(outputDir+'/allData.csv')
 
 # trim the data
 df = df[df['Total'] < -10]
-df = df[df['Total'] < df['TotalPreBBOptimize']]
+df = df[df['Total'] < df['TotalPreOptimize']]
 #df = df[df['IMM1Diff'] > 5]
 
 df_list = []
@@ -106,13 +120,13 @@ for df in df_list:
     bestDf = bestDf.rename(columns={'endXShift': 'xShift', 'endCrossingAngle': 'crossingAngle', 'endAxialRotationPrime': 'axialRotation', 'endZShiftPrime': 'zShift'})
     x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
     scatter3DWithColorbar(bestDf, x, y, z, c, dir)
+    makeInterfaceSeqLogo(tmpDf, dir)
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df_list, cols, 100)
 
 plotEnergyDiffs(df_avg, outputDir)
 getAAPercentageComposition(df_list, seqEntropyFile, listAA, 'InterfaceSequence', outputDir)
-
 
 """
     - compare geometries from duplicate sequences

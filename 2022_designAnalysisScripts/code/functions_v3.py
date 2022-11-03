@@ -26,15 +26,24 @@ def setupOutputDir(inputFile):
 
 def getRepackEnergies(df):
     # add in dimer vs monomer energy difference
-    df['VDWDiff'] = df['VDWDimerBBOptimize'] - df['VDWMonomer']
-    df['HBONDDiff'] = df['HBONDDimerBBOptimize'] - df['HBONDMonomer']
-    df['IMM1Diff'] = df['IMM1DimerBBOptimize'] - df['IMM1Monomer']
-    df['VDWRepackDiff'] = df['VDWDimerBBOptimize'] - df['VDWDimerPreBBOptimize']
-    df['HBONDRepackDiff'] = df['HBONDDimerBBOptimize'] - df['HBONDDimerPreBBOptimize']
-    df['IMM1RepackDiff'] = df['IMM1DimerBBOptimize'] - df['IMM1DimerPreBBOptimize']
-    df['RepackChange'] = df['Total'] - df['TotalPreBBOptimize']
+    #df['VDWDiff'] = df['VDWDimerBBOptimize'] - df['VDWMonomer']
+    #df['HBONDDiff'] = df['HBONDDimerBBOptimize'] - df['HBONDMonomer']
+    #df['IMM1Diff'] = df['IMM1DimerBBOptimize'] - df['IMM1Monomer']
+    #df['VDWRepackDiff'] = df['VDWDimerBBOptimize'] - df['VDWDimerPreBBOptimize']
+    #df['HBONDRepackDiff'] = df['HBONDDimerBBOptimize'] - df['HBONDDimerPreBBOptimize']
+    #df['IMM1RepackDiff'] = df['IMM1DimerBBOptimize'] - df['IMM1DimerPreBBOptimize']
+    #df['RepackChange'] = df['Total'] - df['TotalPreBBOptimize']
+    #df['EntropyChange'] = df['currEntropy'] - df['prevEntropy']
+    #df['SASADiff'] = df['BBOptimizeSasa'] - df['MonomerSasa']
+    df['VDWDiff'] = df['VDWDimerOptimize'] - df['VDWMonomer']
+    df['HBONDDiff'] = df['HBONDDimerOptimize'] - df['HBONDMonomer']
+    df['IMM1Diff'] = df['IMM1DimerOptimize'] - df['IMM1Monomer']
+    df['VDWRepackDiff'] = df['VDWDimerOptimize'] - df['VDWDimerPreOptimize']
+    df['HBONDRepackDiff'] = df['HBONDDimerOptimize'] - df['HBONDDimerPreOptimize']
+    df['IMM1RepackDiff'] = df['IMM1DimerOptimize'] - df['IMM1DimerPreOptimize']
+    df['RepackChange'] = df['Total'] - df['TotalPreOptimize']
     df['EntropyChange'] = df['currEntropy'] - df['prevEntropy']
-    df['SASADiff'] = df['BBOptimizeSasa'] - df['MonomerSasa']
+    df['SASADiff'] = df['OptimizeSasa'] - df['MonomerSasa']
     return df
 
 def getGeomChanges(df):
@@ -281,7 +290,7 @@ def getEnergyDifferenceDf(df_list, columns, numSeqs):
         # only keep the top numSeqs
         df = df.head(numSeqs)
         # get the mean and standard deviation for each column
-        tmpDf = getMeanAndSDDf(df, cols)
+        tmpDf = getMeanAndSDDf(df, columns)
         # merge the region column
         tmpDf = pd.merge(tmpDf, pd.DataFrame({'Region': [df['Region'].values[0]]}), how='outer', left_index=True, right_index=True)
         # concat the tmpDf to the outputDf
