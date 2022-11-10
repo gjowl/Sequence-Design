@@ -17,6 +17,7 @@ import logomaker
     output depending on the energies, geometry, and sequence of the protein.
 '''
 
+#TODO: change the below function: need to only look at the given interface positions on a sequence, not the overall interface sequence
 def makeInterfaceSeqLogo(df, outputDir):
     '''This function will make a logo of the interface sequence'''
     # get the interface sequences
@@ -31,7 +32,7 @@ def makeInterfaceSeqLogo(df, outputDir):
     plt.close()
 
 # Read in the data from the csv file
-df = pd.read_csv(sys.argv[1], sep=',', header=0)
+df = pd.read_csv(sys.argv[1], sep=',', header=0, dtype={'Interface': str})
 cwd = os.getcwd()
 kdeFile = cwd+'/2020_09_23_kdeData.csv'
 seqEntropyFile = cwd+'/2021_12_05_seqEntropies.csv'
@@ -70,7 +71,7 @@ df.to_csv(outputDir+'/allData.csv')
 # trim the data
 df = df[df['Total'] < -10]
 df = df[df['Total'] < df['TotalPreOptimize']]
-#df = df[df['IMM1Diff'] > 5]
+df = df[df['IMM1Diff'] > 10]
 
 df_list = []
 # check number of unique regions, if only one, then skip the region analysis
@@ -126,7 +127,19 @@ cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df_list, cols, 100)
 
 plotEnergyDiffs(df_avg, outputDir)
-getAAPercentageComposition(df_list, seqEntropyFile, listAA, 'InterfaceSequence', outputDir)
+
+for df in df_list:
+    interfaceSeqList = []
+    for interface,seq in zip(df['Interface'], df['Sequence']):
+        # loop through the interface and keep only the amino acids that are in the interface
+        interfaceSeq = ''
+        for i in range(len(str(interface))):
+            if str(interface)[i] == '1':
+                interfaceSeq += seq[i]
+        interfaceSeqList.append(interfaceSeq)
+    df['InterfaceSeq'] = interfaceSeqList
+
+getAAPercentageComposition(df_list, seqEntropyFile, listAA, 'InterfaceSeq', outputDir)
 
 """
     - compare geometries from duplicate sequences

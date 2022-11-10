@@ -42,7 +42,7 @@ def getRepackEnergies(df):
     df['HBONDRepackDiff'] = df['HBONDDimerOptimize'] - df['HBONDDimerPreOptimize']
     df['IMM1RepackDiff'] = df['IMM1DimerOptimize'] - df['IMM1DimerPreOptimize']
     df['RepackChange'] = df['Total'] - df['TotalPreOptimize']
-    df['EntropyChange'] = df['currEntropy'] - df['prevEntropy']
+    #df['EntropyChange'] = df['currEntropy'] - df['prevEntropy']
     df['SASADiff'] = df['OptimizeSasa'] - df['MonomerSasa']
     return df
 

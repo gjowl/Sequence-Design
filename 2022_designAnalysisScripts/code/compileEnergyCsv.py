@@ -35,10 +35,13 @@ for dir in os.listdir(searchDir):
                 filename = currDir+file
                 # read the csv file into a dataframe
                 header = pd.read_csv(filename,sep='\t',header=None, nrows=1)
-                df = pd.read_csv(filename, sep='\t', header=None, skiprows=1)
+                # read csv with interface column as string and skip last column
+                df = pd.read_csv(filename, sep='\t', header=None, skiprows=1, dtype={2: str})# sets the interface column as a string
                 df.columns = header.iloc[0]
                 # add the directory name to the dataframe
                 df['Directory'] = dir
+                # make the interface columns strings
+                df['Interface'] = df['Interface'].astype(str)
                 # combine the dataframes
                 outputDf = pd.concat([outputDf,df],axis=0)
 
