@@ -43,7 +43,7 @@ def getRepackEnergies(df):
     df['IMM1RepackDiff'] = df['IMM1DimerOptimize'] - df['IMM1DimerPreOptimize']
     df['RepackChange'] = df['Total'] - df['TotalPreOptimize']
     #df['EntropyChange'] = df['currEntropy'] - df['prevEntropy']
-    df['SASADiff'] = df['OptimizeSasa'] - df['MonomerSasa']
+    df['SasaDiff'] = df['OptimizeSasa'] - df['MonomerSasa']
     return df
 
 def getGeomChanges(df):

@@ -8,6 +8,7 @@ import matplotlib.colors
 import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
 import logomaker
+from functions import *
 
 '''
     This file is used to analyze the data from my second set of design runs after CHIP1.
@@ -31,18 +32,24 @@ def makeInterfaceSeqLogo(df, outputDir):
     # close the figure
     plt.close()
 
-# Read in the data from the csv file
-df = pd.read_csv(sys.argv[1], sep=',', header=0, dtype={'Interface': str})
+# read in the config file
+configFile = sys.argv[1]
+globalConfig = read_config(configFile)
+config = globalConfig['analyzeDesignData']
 cwd = os.getcwd()
-kdeFile = cwd+'/2020_09_23_kdeData.csv'
-seqEntropyFile = cwd+'/2021_12_05_seqEntropies.csv'
+
+# get the config file options
+kdeFile = config['kdeFile']
+seqEntropyFile = config['seqEntropyFile']
+dataFile = config['dataFile']
+outputDir = config['outputDir']
+
+# Read in the data from the csv file
+df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str})
 listAA = ["A", "F", "G", "I", "L", "S", "T", "V", "W", "Y"]
 
 # read in kde data as a dataframe
 df_kde = pd.read_csv(kdeFile)
-
-# Set up output directory
-outputDir = setupOutputDir(sys.argv[1])
 
 # only keep the unique sequence with best total energy
 df = df.sort_values(by=['Total'], ascending=True)
@@ -72,6 +79,8 @@ df.to_csv(outputDir+'/allData.csv')
 df = df[df['Total'] < -10]
 df = df[df['Total'] < df['TotalPreOptimize']]
 df = df[df['IMM1Diff'] > 10]
+df = df[df['OptimizeSasa'] < df['PreBBOptimizeSasa']]
+df = df[df['SasaDiff'] < -700]
 
 df_list = []
 # check number of unique regions, if only one, then skip the region analysis
@@ -109,8 +118,8 @@ for df in df_list:
     # loop through each geometryNumber
     outputFile = dir + '/repackEnergyAnalysis.png'
     plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'RepackChange')
-    outputFile = dir + '/SASADiff.png'
-    plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'SASADiff')
+    outputFile = dir + '/SasaDiff.png'
+    plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'SasaDiff')
     plotScatterMatrix(df, cols, dir)
     # set the below up to look at just the regions, not the whole geom
     plotGeomKde(df_kde, tmpDf, 'Total', dir, 'startXShift', 'startCrossingAngle')

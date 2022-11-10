@@ -6,24 +6,54 @@ import configparser
 
 # create config file object
 config_file = configparser.ConfigParser()
+configFile = 'analyzeDesigns.config'
 
 # set up directory structure
 currDir = os.getcwd()
 
-# main code config options
-programName = 'designAnalysis'
-
 # input files
-kdeFile = currDir + '/2020_09_23_kdeData.csv'
-seqEntropyFile = currDir + '/2021_12_05_seqEntropies.csv'
-sequenceProbabilitiesFile = currDir + '/2021_12_05_sequenceProbabilities.csv'
+inputDir = currDir + '/inputFiles'
+kdeFile = inputDir + '/2020_09_23_kdeData.csv'
+seqEntropyFile = inputDir + '/2021_12_05_seqEntropies.csv'
+sequenceProbabilitiesFile = inputDir + '/2021_12_05_sequenceProbabilities.csv'
+requirementsFile = inputDir + '/requirements.txt'
+
+# input directories
+dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
+dirToAnalyze = '/2022-11-8_leuRun'
+rawDataDir = dataDir+dirToAnalyze+'/'
+
+# scripts
+scriptDir = currDir + '/code'
+compileEnergyScript = scriptDir + '/compileEnergyFiles.py'
+designAnalysisScript = scriptDir + '/analyzeDesignData_v3.py'
+
+# output
+outputDir = currDir + dirToAnalyze
+dataFile = outputDir + '/compiledData.csv'
 
 # main code section
 config_file["main"]={
-    "programName": programName,
     "kdeFile": kdeFile,
     "seqEntropyFile": seqEntropyFile,
-    "sequenceProbabilitiesFile": sequenceProbabilitiesFile
+    "sequenceProbabilitiesFile": sequenceProbabilitiesFile,
+    "requirementsFile": requirementsFile,
+    "compileEnergyScript": compileEnergyScript,
+    "designAnalysisScript": designAnalysisScript,
+}
+
+config_file["compileEnergyFiles"]={
+    "outputDir": outputDir,
+    "rawDataDir": rawDataDir,
+    "dataFile": dataFile,
+}
+
+config_file["analyzeDesignData"]={
+    "kdeFile": kdeFile,
+    "seqEntropyFile": seqEntropyFile,
+    "sequenceProbabilitiesFile": sequenceProbabilitiesFile,
+    "outputDir": outputDir,
+    "dataFile": dataFile,
 }
 
 # SAVE CONFIG FILE
@@ -32,7 +62,7 @@ with open(configFile, 'w+') as configfileObj:
     configfileObj.flush()
     configfileObj.close()
 
-print("Config file "+programName+".config created")
+print("Config file "+configFile+" created")
 
 # PRINT FILE CONTENT
 read_file = open(configFile, "r")
