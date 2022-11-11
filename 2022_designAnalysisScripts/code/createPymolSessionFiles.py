@@ -26,7 +26,7 @@ for file in bestFiles:
         # get the directory name
         dirName = df['Directory'][i]
         # get the design number by splitting the directory name by _
-        designNum = df['Directory'][i].split('_')[1]
+        designNum, repNum = dirName.split('_')[1], df['replicateNumber'][i]
         # get the replicate number
         repNum = df['replicateNumber'][i]
         # pdbName
