@@ -27,6 +27,7 @@ rawDataDir = dataDir+dirToAnalyze+'/'
 scriptDir = currDir + '/code'
 compileEnergyScript = scriptDir + '/compileEnergyFiles.py'
 designAnalysisScript = scriptDir + '/analyzeDesignData_v3.py'
+createPseScript = scriptDir + '/createPymolSessionFiles.py'
 
 # output
 outputDir = currDir + dirToAnalyze
@@ -40,6 +41,7 @@ config_file["main"]={
     "requirementsFile": requirementsFile,
     "compileEnergyScript": compileEnergyScript,
     "designAnalysisScript": designAnalysisScript,
+    "createPseScript": createPseScript,
 }
 
 config_file["compileEnergyFiles"]={
@@ -54,6 +56,13 @@ config_file["analyzeDesignData"]={
     "sequenceProbabilitiesFile": sequenceProbabilitiesFile,
     "outputDir": outputDir,
     "dataFile": dataFile,
+}
+
+numSeqs = 10
+config_file["createPseScript"]={
+    "outputDir": outputDir,
+    "rawDataDir": rawDataDir,
+    "numSeqs": numSeqs,
 }
 
 # SAVE CONFIG FILE

@@ -21,7 +21,9 @@ config = globalConfig['main']
 requirementsFile = config['requirementsFile']
 compileEnergyScript = config['compileEnergyScript']
 designAnalysisScript = config['designAnalysisScript']
+createPseScript = config['createPseScript']
 #outputDir = config['outputDir']
+
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
@@ -40,3 +42,7 @@ if __name__ == '__main__':
     # execute design analysis script
     execDesignAnalysis = 'python3 '+designAnalysisScript+' '+configFile
     os.system(execDesignAnalysis)
+
+    # execute create pymol session files script
+    execCreatePymolSessionFiles = 'python3 '+createPseScript+' '+configFile
+    os.system(execCreatePymolSessionFiles)
