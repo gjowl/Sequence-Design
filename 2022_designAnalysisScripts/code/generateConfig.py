@@ -20,7 +20,7 @@ requirementsFile = inputDir + '/requirements.txt'
 
 # input directories
 dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
-dirToAnalyze = '/2022-11-8_leuRun'
+dirToAnalyze = '/2022-11-8_leuNoSeqEntropy'
 rawDataDir = dataDir+dirToAnalyze+'/'
 
 # scripts
@@ -42,6 +42,7 @@ config_file["main"]={
     "compileEnergyScript": compileEnergyScript,
     "designAnalysisScript": designAnalysisScript,
     "createPseScript": createPseScript,
+    "outputDir": outputDir,
 }
 
 config_file["compileEnergyFiles"]={

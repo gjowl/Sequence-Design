@@ -78,9 +78,12 @@ df.to_csv(outputDir+'/allData.csv')
 # trim the data
 df = df[df['Total'] < -10]
 df = df[df['Total'] < df['TotalPreOptimize']]
-df = df[df['IMM1Diff'] > 10]
 df = df[df['OptimizeSasa'] < df['PreBBOptimizeSasa']]
-df = df[df['SasaDiff'] < -700]
+df = df[df['SasaDiff'] < -600]
+# check to see if IMM1Diff is not empty
+#if df[df['IMM1Diff'] != 0] is not empty:
+#    df = df[df['IMM1Diff'] > 10]
+#df = df[df['IMM1Diff'] > 10]
 
 df_list = []
 # check number of unique regions, if only one, then skip the region analysis
@@ -131,6 +134,8 @@ for df in df_list:
     x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
     scatter3DWithColorbar(bestDf, x, y, z, c, dir)
     makeInterfaceSeqLogo(tmpDf, dir)
+    # output the dataframe to a csv file
+    df.to_csv(outputDir+'/'+region+'data.csv')
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df_list, cols, 100)
