@@ -20,7 +20,7 @@ requirementsFile = inputDir + '/requirements.txt'
 
 # input directories
 dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
-dirToAnalyze = '/2022-11-8_leuNoSeqEntropy'
+dirToAnalyze = '/2022-11-14_leuLowSerAndThr'
 rawDataDir = dataDir+dirToAnalyze+'/'
 
 # scripts
@@ -51,15 +51,16 @@ config_file["compileEnergyFiles"]={
     "dataFile": dataFile,
 }
 
+numSeqs = 10
 config_file["analyzeDesignData"]={
     "kdeFile": kdeFile,
     "seqEntropyFile": seqEntropyFile,
     "sequenceProbabilitiesFile": sequenceProbabilitiesFile,
     "outputDir": outputDir,
     "dataFile": dataFile,
+    "numSeqs": numSeqs,
 }
 
-numSeqs = 10
 config_file["createPseScript"]={
     "outputDir": outputDir,
     "rawDataDir": rawDataDir,

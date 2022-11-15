@@ -184,10 +184,10 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     return Z
 
 # loop through the region dataframes
-def addGeometricDistanceToDataframe(df_list, outputDir, geomList):
-    geomDfList = []
-    for df in df_list:
-        tmpDf = df.copy()
+def addGeometricDistanceToDataframe(df, outputDir, geomList):
+    outputDf = pd.DataFrame()
+    for region in df['Region'].unique():
+        tmpDf = df[df['Region'] == region].copy()
         distList = []
         for geom in geomList:
             # capitalize the first letter of the geometry
@@ -216,9 +216,9 @@ def addGeometricDistanceToDataframe(df_list, outputDir, geomList):
         if not os.path.exists(dir):
             os.makedirs(dir)
         tmpDf.to_csv(dir+'/geometricDistance.csv')
-        # append to the list of dataframes
-        geomDfList.append(tmpDf)
-    return geomDfList
+        # concatenate the dataframes
+        outputDf = pd.concat([outputDf, tmpDf])
+    return outputDf 
 
 def plotScatterMatrix(df, cols, outputDir):
     # trim the dataframe to only the columns of interest
@@ -243,17 +243,18 @@ def getMeanAndSDDf(df, colNames):
         tmpDf = pd.merge(tmpDf, pd.DataFrame({col: [mean], col+'SD': [sd]}), how='outer', left_index=True, right_index=True)
     return tmpDf
 
-def getAAPercentageComposition(df_list, percentCompositionFile, listAA, seqColumn, outputDir):
+def getAAPercentageComposition(df, percentCompositionFile, listAA, seqColumn, outputDir):
     # get the percentage composition of each amino acid in the sequence
     # read in the AA sequence composition data with columns: AA, Entropy
     mergedCountsDf = pd.read_csv(percentCompositionFile, sep=',', header=0)
     # loop through dataframe regions
-    for df in df_list:
+    for region in df['Region'].unique():
+        tmpDf = df[df['Region'] == region]
         # make a dictionary of amino acids
         aaDict = {}
         for aa in listAA:
             aaDict[aa] = 0
-        for index, row in df.iterrows():
+        for index, row in tmpDf.iterrows():
             for aa in listAA:
                 # count the number of times each amino acid appears in the interface
                 aaDict[aa] += row[seqColumn].count(aa)
@@ -263,7 +264,6 @@ def getAAPercentageComposition(df_list, percentCompositionFile, listAA, seqColum
         tmpDf.columns = ['AA', 'Count']
         # sum the total number of amino acids
         tmpDf['Total'] = tmpDf['Count'].sum()
-        region = df['Region'].iloc[0]
         # get the percentage of each amino acid by dividing the count by the total
         tmpDf[region] = tmpDf['Count'] / tmpDf['Total']
         # add the region AA percentage to a merged dataframe
@@ -281,16 +281,18 @@ def getAAPercentageComposition(df_list, percentCompositionFile, listAA, seqColum
     plt.savefig(outputDir+'/AApercentages_'+seqColumn+'.png')
     plt.close()
 
-def getEnergyDifferenceDf(df_list, columns, numSeqs):
+def getEnergyDifferenceDf(df, columns, numSeqs):
     # loop through each region
     outputDf = pd.DataFrame()
-    for df in df_list:
+    for region in df['Region'].unique():
+        # get the dataframe for the region
+        tmpDf = df[df['Region'] == region]
         # sort the df by energy
-        df = df.sort_values(by=['Total'])
+        tmpDf = tmpDf.sort_values(by=['Total'])
         # only keep the top numSeqs
-        df = df.head(numSeqs)
+        tmpDf = tmpDf.head(numSeqs)
         # get the mean and standard deviation for each column
-        tmpDf = getMeanAndSDDf(df, columns)
+        tmpDf = getMeanAndSDDf(tmpDf, columns)
         # merge the region column
         tmpDf = pd.merge(tmpDf, pd.DataFrame({'Region': [df['Region'].values[0]]}), how='outer', left_index=True, right_index=True)
         # concat the tmpDf to the outputDf
@@ -314,3 +316,20 @@ def scatter3DWithColorbar(df, xAxis, yAxis, zAxis, colorbar, outputDir):
     # save plot
     plt.savefig(outputDir+'/3DScatter.png')
     plt.close()
+
+def getInterfaceSequence(df):
+    outputDf = pd.DataFrame()
+    for region in df['Region'].unique():
+        tmpDf = df[df['Region'] == region].copy()
+        interfaceSeqList = []
+        for interface,seq in zip(tmpDf['Interface'], tmpDf['Sequence']):
+            # loop through the interface and keep only the amino acids that are in the interface
+            interfaceSeq = ''
+            for i in range(len(str(interface))):
+                if str(interface)[i] == '1':
+                    interfaceSeq += seq[i]
+            interfaceSeqList.append(interfaceSeq)
+        tmpDf['InterfaceSeq'] = interfaceSeqList
+        # concatenate the dataframes
+        outputDf = pd.concat([outputDf, tmpDf])
+    return outputDf
