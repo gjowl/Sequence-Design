@@ -98,12 +98,9 @@ df = df[df['SasaDiff'] < -600]
 #df = df[df['IMM1Diff'] > 10]
 # normalize the sequence entropy
 df = normalizeColumn(df, 'SequenceEntropy')
-print(len(df))
 # set the sequence entropy limit
 seqEntropyLimit = 0.0001
 df = df[df['SequenceEntropyNorm'] < seqEntropyLimit]
-print(len(df))
-exit(0)
 
 # add region dataframes to a list
 geomList = ['xShift', 'crossingAngle', 'axialRotationPrime', 'zShiftPrime']
