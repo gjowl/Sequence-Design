@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import matplotlib.colors
 import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
-import logomaker
 from functions import *
 
 '''
@@ -19,18 +18,6 @@ from functions import *
 '''
 
 #TODO: change the below function: need to only look at the given interface positions on a sequence, not the overall interface sequence
-def makeInterfaceSeqLogo(df, outputDir):
-    '''This function will make a logo of the interface sequence'''
-    # get the interface sequences
-    seq = df['InterfaceSequence']
-    # get the 
-    mat = logomaker.alignment_to_matrix(seq)
-    # use logomaker to make the logo
-    logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
-    # save the logo
-    logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
-    # close the figure
-    plt.close()
 
 def normalizeColumn(df, colName):
     '''This function will normalize a column in a dataframe'''
@@ -54,7 +41,8 @@ kdeFile = config['kdeFile']
 seqEntropyFile = config['seqEntropyFile']
 dataFile = config['dataFile']
 outputDir = config['outputDir']
-numSeqs = int(config['numSeqs'])
+#numSeqs = int(config['numSeqs'])
+numSeqs = 20
 
 # Read in the data from the csv file
 df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str})
@@ -99,8 +87,8 @@ df = df[df['SasaDiff'] < -600]
 # normalize the sequence entropy
 df = normalizeColumn(df, 'SequenceEntropy')
 # set the sequence entropy limit
-seqEntropyLimit = 0.0001
-df = df[df['SequenceEntropyNorm'] < seqEntropyLimit]
+#seqEntropyLimit = 0.0001
+#df = df[df['SequenceEntropyNorm'] < seqEntropyLimit]
 
 # add region dataframes to a list
 geomList = ['xShift', 'crossingAngle', 'axialRotationPrime', 'zShiftPrime']
@@ -108,38 +96,36 @@ df = addGeometricDistanceToDataframe(df, outputDir, geomList)
 
 # loop through each region
 df_avg = pd.DataFrame()
-cols = ['xShift_dist', 'crossingAngle_dist', 'axialRotationPrime_dist', 'zShiftPrime_dist']
 for region in df['Region'].unique():
     # add region column to start of df
-    dir = outputDir + '/' + region
+    regionDir = outputDir + '/' + region
     # make a directory for each region
-    if not os.path.exists(dir):
-        os.makedirs(dir)
+    if not os.path.exists(regionDir):
+        os.makedirs(regionDir)
     # get the region dataframe
     tmpDf = df[df['Region'] == region]
     # get the top 100 sequences in Total Energy for each region
-    tmpDf = df[df['geometryNumber'] > 0]
+    #tmpDf = df[df['geometryNumber'] > 0]
     # remove sequences where repack energy is greater than 0
     tmpDf = tmpDf[tmpDf['RepackChange'] < 0]
+    # sort by total energy
+    tmpDf = tmpDf.sort_values(by=['Total'])
     # rid of anything with geometric distance > 0.5
     #tmpDf = tmpDf[tmpDf['GeometricDistance'] < 1]
-    # loop through each geometryNumber
-    outputFile = dir + '/repackEnergyAnalysis.png'
-    plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'RepackChange')
-    outputFile = dir + '/SasaDiff.png'
-    plotMeanAndSDBarGraph(tmpDf, outputFile, 'geometryNumber', 'SasaDiff')
-    plotScatterMatrix(df, cols, dir)
-    # set the below up to look at just the regions, not the whole geom
-    plotGeomKde(df_kde, tmpDf, 'Total', dir, 'startXShift', 'startCrossingAngle')
-    bestDf = tmpDf.head(numSeqs)
-    bestDf.to_csv(outputDir+'/top'+str(numSeqs)+'_'+bestDf['Region'].iloc[0]+'.csv')
-    # shift the names of the geometry columns to be the same as the geomList
-    bestDf = bestDf.rename(columns={'endXShift': 'xShift', 'endCrossingAngle': 'crossingAngle', 'endAxialRotationPrime': 'axialRotation', 'endZShiftPrime': 'zShift'})
-    x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
-    scatter3DWithColorbar(bestDf, x, y, z, c, dir)
-    makeInterfaceSeqLogo(tmpDf, dir)
+    # separate the dataframe with positive and negative hydrogen bonding
+    tmpDf_pos = tmpDf[tmpDf['HBONDDiff'] > 0]
+    tmpDf_neg = tmpDf[tmpDf['HBONDDiff'] < 0]
     # output the dataframe to a csv file
-    tmpDf.to_csv(outputDir+'/'+region+'data.csv')
+    tmpDf_neg.to_csv(regionDir+'/'+region+'Data_negativeHbond.csv')
+    tmpDf_pos.to_csv(regionDir+'/'+region+'Data_positiveHbond.csv')
+    makePlotsForDataframe(tmpDf_neg, df_kde, regionDir, 'negativeHbond')
+    makePlotsForDataframe(tmpDf_pos, df_kde, regionDir, 'positiveHbond')
+    # get the top sequences in Total Energy for each region 
+    tmpDf_neg = tmpDf_neg.head(numSeqs)
+    tmpDf_pos = tmpDf_pos.head(numSeqs)
+    tmpDf_neg.to_csv(outputDir+'/top'+str(numSeqs)+'_'+tmpDf_neg['Region'].iloc[0]+'_neg.csv')
+    tmpDf_pos.to_csv(outputDir+'/top'+str(numSeqs)+'_'+tmpDf_pos['Region'].iloc[0]+'_pos.csv')
+
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df, cols, 100)

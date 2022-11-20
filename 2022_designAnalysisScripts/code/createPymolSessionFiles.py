@@ -22,7 +22,8 @@ for file in bestFiles:
     # read into a dataframe
     print('Reading file', outputDir+'/'+file)
     df = pd.read_csv(outputDir+'/'+file, sep=',', header=0, dtype={'Interface': str})
-    for i in range(0, numSeqs):
+    # loop through the entire dataframe
+    for i in range(len(df)):
         # get the directory name
         dirName = df['Directory'][i]
         # get the design number by splitting the directory name by _
@@ -46,9 +47,9 @@ for file in bestFiles:
                 cmd.color('red', 'interface and resi '+str(j+23))
     # show spheres
     cmd.show('spheres')
-    # get region name from dataframe
-    region = df['Region'][0]
+    # get the filename
+    filename = file.split('.')[0]
     # save the session file
-    cmd.save(outputDir+'/top'+str(numSeqs)+'_'+region+'.pse')
+    cmd.save(outputDir+'/'+filename+'.pse')
     # reset the pymol session
     cmd.reinitialize()

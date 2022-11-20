@@ -20,7 +20,10 @@ requirementsFile = inputDir + '/requirements.txt'
 
 # input directories
 dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
-dirToAnalyze = '/2022-11-14_leuLowSerAndThr'
+#dirToAnalyze = '/2022-11-20_alaNoSeqEntropy'
+dirToAnalyze = '/2022-11-20_leuNoSeqEntropy'
+#dirToAnalyze = '/2022-11-19_leuEntropyCompare'
+#dirToAnalyze = '/2022-11-19_alaEntropyCompare'
 rawDataDir = dataDir+dirToAnalyze+'/'
 
 # scripts

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors
 from scipy import stats
 import seaborn as sns
+import logomaker
 
 def setupOutputDir(inputFile):
     '''
@@ -54,7 +55,7 @@ def getGeomChanges(df):
     df['zChange'] = df['endZShiftPrime'] - df['startZShiftPrime']
     return df
 
-def plotMeanAndSDBarGraph(df, outputFile, xAxis, yAxis):
+def plotMeanAndSDBarGraph(df, dir, xAxis, yAxis):
     df_avg = df.groupby(xAxis)[yAxis].mean().reset_index()
     # plot the mean and standard deviation of the repack change for each geometry number on a bar graph using matplotlib
     fig, ax = plt.subplots()
@@ -65,7 +66,7 @@ def plotMeanAndSDBarGraph(df, outputFile, xAxis, yAxis):
     ax.set_title('Average '+yAxis+' for '+xAxis)
     # set x axis to be integers
     ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True))
-    plt.savefig(outputFile)
+    plt.savefig(dir+'/'+xAxis+'_'+yAxis+'_barGraph.png')
     plt.close()
 
 def plotEnergyDiffs(df, outputDir):
@@ -220,7 +221,8 @@ def addGeometricDistanceToDataframe(df, outputDir, geomList):
         outputDf = pd.concat([outputDf, tmpDf])
     return outputDf 
 
-def plotScatterMatrix(df, cols, outputDir):
+def plotScatterMatrix(df, outputDir):
+    cols = ['xShift_dist', 'crossingAngle_dist', 'axialRotationPrime_dist', 'zShiftPrime_dist']
     # trim the dataframe to only the columns of interest
     tmpDf = df[cols]
     # rename the columns to be more readable by removing _dist
@@ -299,7 +301,7 @@ def getEnergyDifferenceDf(df, columns, numSeqs):
         outputDf = pd.concat([outputDf, tmpDf], axis=0, ignore_index=True)
     return outputDf
 
-def scatter3DWithColorbar(df, xAxis, yAxis, zAxis, colorbar, outputDir):
+def scatter3DWithColorbar(df, xAxis, yAxis, zAxis, colorbar, outputDir, name):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
     x, y, z, a = df[xAxis], df[yAxis], df[zAxis], df[colorbar]
@@ -314,7 +316,7 @@ def scatter3DWithColorbar(df, xAxis, yAxis, zAxis, colorbar, outputDir):
     # add a label to the colorbar
     plt.clabel(colorbar)
     # save plot
-    plt.savefig(outputDir+'/3DScatter.png')
+    plt.savefig(outputDir+'/3DScatter_'+name+'.png')
     plt.close()
 
 def getInterfaceSequence(df):
@@ -333,3 +335,66 @@ def getInterfaceSequence(df):
         # concatenate the dataframes
         outputDf = pd.concat([outputDf, tmpDf])
     return outputDf
+
+def makePlotsForDataframe(df, df_kde, currentDir, name):
+    # make a new output directory combining the outputDir and name
+    outputDir = currentDir+'/'+name
+    # make the output directory if it doesn't exist
+    if not os.path.exists(outputDir):
+        os.makedirs(outputDir)
+    # loop through each geometryNumber
+    xCol = 'replicateNumber'
+    plotMeanAndSDBarGraph(df, outputDir, xCol, 'RepackChange')
+    plotMeanAndSDBarGraph(df, outputDir, xCol, 'SasaDiff')
+    plotScatterMatrix(df, outputDir)
+    # set the below up to look at just the regions, not the whole geom
+    plotGeomKde(df_kde, df, 'Total', outputDir, 'startXShift', 'startCrossingAngle')
+    # shift the names of the geometry columns to be the same as the geomList
+    x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
+    tmpDf = df.rename(columns={'endXShift': x, 'endCrossingAngle': y, 'endAxialRotationPrime': c, 'endZShiftPrime': z})
+    scatter3DWithColorbar(tmpDf, x, y, z, c, outputDir, name)
+    makeInterfaceSeqLogo(tmpDf, outputDir)
+    
+
+def makeInterfaceSeqLogo(df, outputDir):
+    '''This function will make a logo of the interface sequence'''
+    # check if there are unique interfaces
+    if len(df['Interface'].unique()) > 1:
+        for interface in df['Interface'].unique():
+            tmpDf = df[df['Interface'] == interface]
+            # get the interface sequences
+            sequences = tmpDf['Sequence']
+            # loop through the interface and keep only the amino acids that are in the interface
+            interfaceSequences = []
+            for seq in sequences:
+                # loop through each position in the interface
+                for j in range(len(str(interface))):
+                    if str(interface)[j] == '0':
+                        # replace the amino acid with a dash if it is not in the interface (if 0 at that position)
+                        seq = seq[:j] + '-' + seq[j+1:]
+                interfaceSequences.append(seq)
+            mat = logomaker.alignment_to_matrix(interfaceSequences)
+            # use logomaker to make the logo
+            logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+            # save the logo
+            logo.fig.savefig(outputDir + '/interfaceSeqLogo_'+str(interface)+'.png')
+    else:
+        # get the interface sequences
+        sequences = df['Sequence']
+        # get the interface
+        interfaces = df['Interface']
+        # loop through the interface and keep only the amino acids that are in the interface
+        interfaceSequences = []
+        for interface in interfaces: 
+            for seq in sequences:
+                # loop through each position in the interface
+                for j in range(len(str(interface))):
+                    if str(interface)[j] == '0':
+                        # replace the amino acid with a dash if it is not in the interface (if 0 at that position)
+                        seq = seq[:j] + '-' + seq[j+1:]
+                interfaceSequences.append(seq)
+        mat = logomaker.alignment_to_matrix(interfaceSequences)
+        # use logomaker to make the logo
+        logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+        # save the logo
+        logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
