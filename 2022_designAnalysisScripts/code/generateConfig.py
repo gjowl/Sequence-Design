@@ -26,7 +26,7 @@ rawDataDir = dataDir+dirToAnalyze+'/'
 # scripts
 scriptDir = currDir + '/code'
 compileEnergyScript = scriptDir + '/compileEnergyFiles.py'
-designAnalysisScript = scriptDir + '/analyzeDesignData_v3.py'
+designAnalysisScript = scriptDir + '/analyzeDesignData.py'
 createPseScript = scriptDir + '/createPymolSessionFiles.py'
 
 # output
