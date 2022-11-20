@@ -22,8 +22,11 @@ requirementsFile = config['requirementsFile']
 compileEnergyScript = config['compileEnergyScript']
 designAnalysisScript = config['designAnalysisScript']
 createPseScript = config['createPseScript']
-#outputDir = config['outputDir']
+outputDir = config['outputDir']
 
+# check if the output directory exists
+if not os.path.isdir(outputDir):
+    os.mkdir(outputDir)
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
