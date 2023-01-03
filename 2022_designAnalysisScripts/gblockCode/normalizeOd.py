@@ -11,14 +11,14 @@ today = date.today()
 csvFile = sys.argv[1]
 
 # read csv file with OD600 values
-df = pd.read_csv(csvFile, sep='\t', header=0)
+df = pd.read_csv(csvFile, sep=',', header=0)
 print(df)
 
 # get the lowest OD600 value
-lowest = df.min()
+lowest = df['OD600'].min()
 
 # normalize the OD600 values to the lowest value
-df['Normalize'] = df / lowest
+df['Normalize'] = df['OD600'] / lowest
 
 # set the amount of uL to add to each well
 wellVolume = 350
