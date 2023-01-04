@@ -25,9 +25,9 @@ wellVolume = 350
 
 # normalize the OD600 values to the lowest value by dividing well volume by the normalized value
 df['Cell Volume'] = wellVolume / df['Normalize'] 
-df['Cell Volume'] = df['Cell Volume'].round(2)
+df['Cell Volume'] = df['Cell Volume'].round(1)
 df['Water Volume'] = wellVolume - df['Cell Volume']
-df['Water Volume'] = df['Water Volume'].round(2)
+df['Water Volume'] = df['Water Volume'].round(1)
 
 # output the df to a csv file
 df.to_csv(str(today)+'_normalizedOd.csv', sep='\t')
