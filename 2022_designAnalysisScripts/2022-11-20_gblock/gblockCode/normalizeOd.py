@@ -21,13 +21,13 @@ lowest = df['OD600'].min()
 df['Normalize'] = df['OD600'] / lowest
 
 # set the amount of uL to add to each well
-wellVolume = 350
+wellVolume = 500
 
-# normalize the OD600 values to the lowest value by dividing well volume by the normalized value
+# normalize the OD600 values to the lowest value by dividing well volume by the normalized value (maybe switch this so cell volume always rounds up)
 df['Cell Volume'] = wellVolume / df['Normalize'] 
 df['Cell Volume'] = df['Cell Volume'].round(0)
-df['Water Volume'] = wellVolume - df['Cell Volume']
-df['Water Volume'] = df['Water Volume'].round(0)
+df['LB Volume'] = wellVolume - df['Cell Volume']
+df['LB Volume'] = df['LB Volume'].round(0)
 
 # output the df to a csv file
 df.to_csv(str(today)+'_normalizedOd.csv', sep='\t')
