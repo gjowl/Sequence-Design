@@ -25,8 +25,13 @@ def fractionDimerToKd(fractionDimer):
     # conversion below:
     # Kd = (1-fd)*4*chiT + sqrt((1-fd)^2*16*chiT^2 + 8*chiT)
     # chiT = 1.8*10^-4 from figure 5b in Diaz Vazquez et al. 2022
+    # Kd = 2chiT/fd -4chiT*fd + 2chiT * fd^2
     # check this conversion by hand
     Kd = (1-fractionDimer)*4*1.8*10^-4 + np.sqrt((1-fractionDimer)**2*16*1.8*10^-4**2 + 8*1.8*10^-4)
+    kd2 = 2*1.8*10^-4/fractionDimer - 4*1.8*10^-4*fractionDimer + 2*1.8*10^-4 * fractionDimer**2
+    print("Kd:",Kd)
+    print("Kd2:",kd2)
+    exit(0)
     return Kd
 
 # get the current directory
