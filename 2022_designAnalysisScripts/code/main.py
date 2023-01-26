@@ -39,8 +39,8 @@ if __name__ == '__main__':
     os.system(execInstallRequirements)
     
     # execute compile script 
-    #execCompileEnergyFiles = 'python3 '+compileEnergyScript+' '+configFile
-    #os.system(execCompileEnergyFiles)
+    execCompileEnergyFiles = 'python3 '+compileEnergyScript+' '+configFile
+    os.system(execCompileEnergyFiles)
 
     # execute design analysis script
     execDesignAnalysis = 'python3 '+designAnalysisScript+' '+configFile

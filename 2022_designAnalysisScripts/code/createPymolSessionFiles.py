@@ -4,15 +4,9 @@ import pandas as pd
 import sys
 from functions import *
 
-# read in the config file
-configFile = sys.argv[1]
-globalConfig = read_config(configFile)
-config = globalConfig['createPseScript']
-
 # read in the config arguments
-rawDataDir = config['rawDataDir']
-outputDir = config['outputDir']
-numSeqs = int(config['numSeqs'])
+rawDataDir = sys.argv[1]
+outputDir = sys.argv[2]
 
 # find files in the output directory that contain the string top and end with csv
 bestFiles = [f for f in os.listdir(outputDir) if 'top' in f and f.endswith('.csv')]
