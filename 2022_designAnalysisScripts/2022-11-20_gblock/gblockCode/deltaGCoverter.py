@@ -27,21 +27,19 @@ def fractionDimerToKd(fractionDimer):
     # chiT = 1.8*10^-4 from figure 5b in Diaz Vazquez et al. 2022
     # Kd = 2chiT/fd -4chiT*fd + 2chiT * fd^2
     # check this conversion by hand
-    Kd = (1-fractionDimer)*4*1.8*10^-4 + np.sqrt((1-fractionDimer)**2*16*1.8*10^-4**2 + 8*1.8*10^-4)
-    kd2 = 2*1.8*10^-4/fractionDimer - 4*1.8*10^-4*fractionDimer + 2*1.8*10^-4 * fractionDimer**2
-    print("Kd:",Kd)
-    print("Kd2:",kd2)
-    exit(0)
+    #Kd = (1-fractionDimer)*4*1.8*10^(-4) + np.sqrt((1-fractionDimer)**2*16*1.8*10^(-4)**2 + 8*1.8*10^(-4))
+    # by hand conversion
+    Kd = 2*1.8*10**(-4)/fractionDimer - 4*1.8*10**(-4)*fractionDimer + 2*1.8*10**(-4) * fractionDimer**2
     return Kd
 
 # get the current directory
 cwd = os.getcwd()
 
 # get the csv file from the command line
-csvFile = sys.argv[1]
+inputFile = sys.argv[1]
 
 # read in csv as a dataframe
-df = pd.read_csv(csvFile, sep=',', header=0)
+df = pd.read_csv(inputFile, sep=',', header=0)
 
 # convert toxgreen to toxcat
 df['toxcat'] = greenToCatFunction(df['PercentGpA'])
@@ -52,5 +50,11 @@ df['fractionDimer'] = catToFractionDimer(df['toxcat'])
 # convert fraction dimer to Kd
 df['Kd'] = fractionDimerToKd(df['fractionDimer'])
 
+# rid of the negative Kd values
+df = df[df['Kd'] > 0]
+
+# convert Kd to deltaG
+df['deltaG'] = np.log(df['Kd']) * 0.593
+
 # output the df to a csv file
-df.to_csv(cwd+'text.csv', sep='\t')
+df.to_csv(cwd+'/test.csv', sep=',')
