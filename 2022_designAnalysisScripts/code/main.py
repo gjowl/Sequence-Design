@@ -14,15 +14,17 @@ globalConfig = read_config(configFile)
 config = globalConfig['main']
 
 # read in the config arguments
-#kdeFile = config['kdeFile']
-#seqEntropyFile = config['seqEntropyFile']
-#sequenceProbabilitiesFile = config['sequenceProbabilitiesFile']
-#rawDataDir = config['rawDataDir']
+kdeFile = config['kdeFile']
+seqEntropyFile = config['seqEntropyFile']
+sequenceProbabilitiesFile = config['sequenceProbabilitiesFile']
+rawDataDir = config['rawDataDir']
 requirementsFile = config['requirementsFile']
 compileEnergyScript = config['compileEnergyScript']
 designAnalysisScript = config['designAnalysisScript']
 createPseScript = config['createPseScript']
 outputDir = config['outputDir']
+dataFile = config['dataFile']
+numSeqs = config['numSeqs']
 
 # check if the output directory exists
 if not os.path.isdir(outputDir):
@@ -39,13 +41,13 @@ if __name__ == '__main__':
     os.system(execInstallRequirements)
     
     # execute compile script 
-    execCompileEnergyFiles = 'python3 '+compileEnergyScript+' '+configFile
+    execCompileEnergyFiles = f'python3 {compileEnergyScript} {rawDataDir} {outputDir} {dataFile}'
     os.system(execCompileEnergyFiles)
 
     # execute design analysis script
-    execDesignAnalysis = 'python3 '+designAnalysisScript+' '+configFile
+    execDesignAnalysis = f'python3 {designAnalysisScript} {kdeFile} {seqEntropyFile} {dataFile} {outputDir} {numSeqs}'
     os.system(execDesignAnalysis)
 
     # execute create pymol session files script
-    #execCreatePymolSessionFiles = 'python3 '+createPseScript+' '+configFile
-    #os.system(execCreatePymolSessionFiles)
+    execCreatePymolSessionFiles = f'python3 {rawDataDir} {outputDir}'
+    os.system(execCreatePymolSessionFiles)
