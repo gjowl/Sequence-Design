@@ -30,19 +30,15 @@ def normalizeColumn(df, colName):
     # return the dataframe
     return df
 
-# read in the config file
-configFile = sys.argv[1]
-globalConfig = read_config(configFile)
-config = globalConfig['analyzeDesignData']
+# get the current directory
 cwd = os.getcwd()
 
 # get the config file options
-kdeFile = config['kdeFile']
-seqEntropyFile = config['seqEntropyFile']
-dataFile = config['dataFile']
-outputDir = config['outputDir']
-#numSeqs = int(config['numSeqs'])
-numSeqs = 20
+kdeFile = sys.argv[1]
+seqEntropyFile = sys.argv[2]
+dataFile = sys.argv[3]
+outputDir = sys.argv[4]
+numSeqs = sys.argv[5]
 
 # Read in the data from the csv file
 df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str})
