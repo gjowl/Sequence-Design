@@ -35,6 +35,7 @@ createPseScript = scriptDir + '/createPymolSessionFiles.py'
 # output
 outputDir = currDir + dirToAnalyze
 dataFile = outputDir + '/compiledData.csv'
+numSeqs = 10
 
 # main code section
 config_file["main"]={
@@ -46,27 +47,8 @@ config_file["main"]={
     "designAnalysisScript": designAnalysisScript,
     "createPseScript": createPseScript,
     "outputDir": outputDir,
-}
-
-config_file["compileEnergyFiles"]={
-    "outputDir": outputDir,
     "rawDataDir": rawDataDir,
     "dataFile": dataFile,
-}
-
-numSeqs = 10
-config_file["analyzeDesignData"]={
-    "kdeFile": kdeFile,
-    "seqEntropyFile": seqEntropyFile,
-    "sequenceProbabilitiesFile": sequenceProbabilitiesFile,
-    "outputDir": outputDir,
-    "dataFile": dataFile,
-    "numSeqs": numSeqs,
-}
-
-config_file["createPseScript"]={
-    "outputDir": outputDir,
-    "rawDataDir": rawDataDir,
     "numSeqs": numSeqs,
 }
 

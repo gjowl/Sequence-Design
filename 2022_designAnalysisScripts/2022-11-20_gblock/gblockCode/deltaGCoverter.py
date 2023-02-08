@@ -25,11 +25,13 @@ def fractionDimerToKd(fractionDimer):
     # conversion below:
     # Kd = (1-fd)*4*chiT + sqrt((1-fd)^2*16*chiT^2 + 8*chiT)
     # chiT = 1.8*10^-4 from figure 5b in Diaz Vazquez et al. 2022
+    chiT = 1.8*10**(-4)
     # Kd = 2chiT/fd -4chiT*fd + 2chiT * fd^2
     # check this conversion by hand
     #Kd = (1-fractionDimer)*4*1.8*10^(-4) + np.sqrt((1-fractionDimer)**2*16*1.8*10^(-4)**2 + 8*1.8*10^(-4))
     # by hand conversion
-    Kd = 2*1.8*10**(-4)/fractionDimer - 4*1.8*10**(-4)*fractionDimer + 2*1.8*10**(-4) * fractionDimer**2
+    #Kd = 2*1.8*10**(-4)/fractionDimer - 4*1.8*10**(-4)*fractionDimer + 2*1.8*10**(-4) * fractionDimer
+    Kd = 2*chiT*((1+fractionDimer**2-2*fractionDimer)/fractionDimer)
     return Kd
 
 # get the current directory
@@ -54,7 +56,10 @@ df['Kd'] = fractionDimerToKd(df['fractionDimer'])
 df = df[df['Kd'] > 0]
 
 # convert Kd to deltaG
-df['deltaG'] = np.log(df['Kd']) * 0.593
+R = 0.0019872 # kcal/mol/K
+#T = 298.15 # K
+T = 310 # K
+df['deltaG'] = np.log(df['Kd']) * R * T
 
 # output the df to a csv file
 df.to_csv(cwd+'/test.csv', sep=',')

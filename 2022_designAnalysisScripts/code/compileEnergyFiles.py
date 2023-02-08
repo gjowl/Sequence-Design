@@ -7,16 +7,13 @@ from functions import *
     Compiles energyFile.csv files from an input directory
 """
 
-# read in config file
-configFile = sys.argv[1]
-globalConfig = read_config(configFile)
-config = globalConfig['compileEnergyFiles']
+# get the current directory
 cwd = os.getcwd()
 
 # get the config file options
-rawDataDir = config['rawDataDir']
-outputDir = config['outputDir']
-dataFile = config['dataFile']
+rawDataDir = sys.argv[1]
+outputDir = sys.argv[2]
+dataFile = sys.argv[3]
 
 # check if dataFile exists
 if os.path.isfile(dataFile):
