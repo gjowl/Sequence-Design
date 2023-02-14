@@ -13,13 +13,30 @@ outputDir = sys.argv[2]
 df = df.sort_values(by=['Total'])
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
 
-# rid of any sequences where the PercentStd > 10
+# rid of any sequences where the PercentStd > 10 and greater than 0
 df = df[df['PercentGpaStdDev'] < 10]
+df = df[df['PercentGpaStdDev'] > 0]
+
+# sort the df by the percent gpa
+df = df.sort_values(by=['PercentGpa'])
+
+# make a histogram of percent gpa on the y axis and sequence on the x axis
+df.plot.bar(x='Sequence', y='PercentGpa', title='Percent GpA', color='lightskyblue')
+plt.ylim(0, 120)
+
+# change the color of the bars to red if angle < 0
+for i, row in df.iterrows():
+    if row['endCrossingAngle'] < 0:
+        plt.gca().get_children()[i].set_color('red')
+
+# add the standard deviation
+plt.errorbar(df['Sequence'], df['PercentGpa'], yerr=df['PercentGpaStdDev'], fmt='none', ecolor='black')
+plt.savefig(f'{outputDir}/hist_PercentGpA.png')
 
 # rid of any sequences where the PercentGpa < 40 (G83I)
 df_G83I = df[df['PercentGpa'] > 40]
 
-# rid of any sequences where the PercentGpa < 50 (G83I+10, somewhat arbitrary in terms of dimerization or not)
+# rid of any sequences where the PercentGpa < 45 (G83I+10, somewhat arbitrary in terms of dimerization or not)
 df_G83I_dimer = df[df['PercentGpa'] > 45]
 
 # add all dfs to a list
@@ -36,6 +53,7 @@ for df, name in zip(dfs, dfsNames):
     # make an output directory for the plots
     os.makedirs(outDir, exist_ok=True)
 
+    
     # make a scatter plot of the total energy vs the percent gpa
     df.plot.scatter(x='Total', y='PercentGpa', title='Total Energy vs Percent GpA')
 
@@ -58,3 +76,6 @@ for df, name in zip(dfs, dfsNames):
 
     # output the df to a csv file
     df.to_csv(f'{outDir}/totalEnergyVsPercentGpA.csv')
+
+    # reset the plot
+    plt.clf()
