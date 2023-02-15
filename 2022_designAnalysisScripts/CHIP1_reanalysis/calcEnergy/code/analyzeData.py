@@ -25,9 +25,9 @@ df.plot.bar(x='Sequence', y='PercentGpa', title='Percent GpA', color='lightskybl
 plt.ylim(0, 120)
 
 # change the color of the bars to red if angle < 0
-for i, row in df.iterrows():
-    if row['endCrossingAngle'] < 0:
-        plt.gca().get_children()[i].set_color('red')
+#for i, row in df.iterrows():
+#    if row['endCrossingAngle'] < 0:
+#        plt.gca().get_children()[i].set_color('red')
 
 # add the standard deviation
 plt.errorbar(df['Sequence'], df['PercentGpa'], yerr=df['PercentGpaStdDev'], fmt='none', ecolor='black')
@@ -52,7 +52,6 @@ for df, name in zip(dfs, dfsNames):
 
     # make an output directory for the plots
     os.makedirs(outDir, exist_ok=True)
-
     
     # make a scatter plot of the total energy vs the percent gpa
     df.plot.scatter(x='Total', y='PercentGpa', title='Total Energy vs Percent GpA')
