@@ -21,6 +21,8 @@ df.plot.scatter(x='Total', y='PercentGpA', title='Total Energy vs Percent GpA')
 
 # add in the standard deviation
 plt.errorbar(df['Total'], df['PercentGpA'], yerr=df['PercentStd'], fmt='none', ecolor='black')
+plt.text(0.99, 1.10, f'N = {len(df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
+plt.savefig(f'{outputDir}/scatter.png')
 
 # add a line of best fit and an r^2 value
 m, b = np.polyfit(df['Total'], df['PercentGpA'], 1)
@@ -28,5 +30,5 @@ plt.plot(df['Total'], m*df['Total'] + b, color='red')
 
 # add the r^2 value to the top left of the plot
 r2 = np.corrcoef(df['Total'], df['PercentGpA'])[0,1]**2
-plt.text(0.05, 0.95, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
-plt.savefig(f'{outputDir}/totalEnergyVsPercentGpA.png')
+plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+plt.savefig(f'{outputDir}/scatterRegression.png')

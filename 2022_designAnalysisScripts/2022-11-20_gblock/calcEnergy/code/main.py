@@ -25,6 +25,10 @@ dataFile = config['dataFile']
 requirementsFile = config['requirementsFile']
 toxgreenFile = config['toxgreenFile']
 
+# make the output directory if it doesn't exist
+if not os.path.exists(outputDir):
+    os.makedirs(outputDir)
+
 if __name__ == "__main__":
     # install the requirements
     execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
