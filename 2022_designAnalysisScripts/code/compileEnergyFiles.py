@@ -33,12 +33,12 @@ parentDirName = os.path.basename(parentDir)
 for dir in os.listdir(rawDataDir):
     # loop through the files in the directory
     # check if the directory is a directory
-    if os.path.isdir(rawDataDir+dir):
-        for file in os.listdir(rawDataDir+dir):
-            currDir = rawDataDir+dir+'/'
+    currDir = f'{rawDataDir}/{dir}'
+    if os.path.isdir(currDir):
+        for file in os.listdir(currDir):
             # check filename
             if file == "energyFile.csv":
-                filename = currDir+file
+                filename = f'{currDir}/{file}'
                 # read the csv file into a dataframe
                 header = pd.read_csv(filename,sep='\t',header=None, nrows=1)
                 # read csv with interface column as string 
@@ -53,5 +53,5 @@ for dir in os.listdir(rawDataDir):
 outputDf = outputDf.sort_values(by=['Total'])
 # get rid of any empty columns
 outputDf = outputDf.dropna(axis=1, how='all')
-# output the dataframe to a csv file
-outputDf.to_csv(dataFile)
+# output the dataframe to a csv file without the index
+outputDf.to_csv(dataFile, index=False)
