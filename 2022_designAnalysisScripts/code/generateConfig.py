@@ -4,37 +4,38 @@ Example code for generating a configuration file for ngsAnalysis
 import os
 import configparser
 
+# input directories
+#dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
+dataDir = '/mnt/c/Users/gjowl/Downloads'
+#dirToAnalyze = '/2022-11-20_alaNoSeqEntropy'
+dirToAnalyze = '2023-2-14_alaDesigns'
+#dirToAnalyze = '/2022-11-19_leuEntropyCompare'
+#dirToAnalyze = '/2022-11-19_alaEntropyCompare'
+rawDataDir = f'{dataDir}/{dirToAnalyze}'
+
 # create config file object
 config_file = configparser.ConfigParser()
-configFile = 'analyzeDesigns.config'
+configFile = f'{dirToAnalyze}.config'
 
 # set up directory structure
 currDir = os.getcwd()
 
 # input files
-inputDir = currDir + '/inputFiles'
-kdeFile = inputDir + '/2020_09_23_kdeData.csv'
-seqEntropyFile = inputDir + '/2021_12_05_seqEntropies.csv'
-sequenceProbabilitiesFile = inputDir + '/2021_12_05_sequenceProbabilities.csv'
-requirementsFile = inputDir + '/requirements.txt'
-
-# input directories
-dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
-#dirToAnalyze = '/2022-11-20_alaNoSeqEntropy'
-dirToAnalyze = '/2022-11-20_leuNoSeqEntropy'
-#dirToAnalyze = '/2022-11-19_leuEntropyCompare'
-#dirToAnalyze = '/2022-11-19_alaEntropyCompare'
-rawDataDir = dataDir+dirToAnalyze+'/'
+inputDir = f'{currDir}/inputFiles'
+kdeFile = f'{inputDir}/2020_09_23_kdeData.csv'
+seqEntropyFile = f'{inputDir}/2021_12_05_seqEntropies.csv'
+sequenceProbabilitiesFile = f'{inputDir}/2021_12_05_sequenceProbabilities.csv'
+requirementsFile = f'{inputDir}/requirements.txt'
 
 # scripts
-scriptDir = currDir + '/code'
-compileEnergyScript = scriptDir + '/compileEnergyFiles.py'
-designAnalysisScript = scriptDir + '/analyzeDesignData.py'
-createPseScript = scriptDir + '/createPymolSessionFiles.py'
+scriptDir = f'{currDir}/code'
+compileEnergyScript = f'{scriptDir}/compileEnergyFiles.py'
+designAnalysisScript = f'{scriptDir}/analyzeDesignData.py'
+createPseScript = f'{scriptDir}/createPymolSessionFiles.py'
 
 # output
-outputDir = currDir + dirToAnalyze
-dataFile = outputDir + '/compiledData.csv'
+outputDir = f'{currDir}/{dirToAnalyze}'
+dataFile = f'{outputDir}/compiledData.csv'
 numSeqs = 10
 
 # main code section
