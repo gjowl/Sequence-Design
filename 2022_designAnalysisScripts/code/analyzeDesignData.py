@@ -124,7 +124,7 @@ for region in df['Region'].unique():
     tmpDf_neg.to_csv(f'{outputDir}/top_{numSeqs}_{region}_neg.csv', index=False)
     tmpDf_pos.to_csv(f'{outputDir}/top_{numSeqs}_{region}_pos.csv', index=False)
     # add the top sequences to a dataframe using concat
-    topSeqsDf = pd.concat([topSeqsDf, tmpDf_neg.head(50)])
+    topSeqsDf = pd.concat([topSeqsDf, tmpDf.head(50)])
 
 # make plot for the entire dataframe
 makePlotsForDataframe(topSeqsDf, df_kde, outputDir, 'top150')

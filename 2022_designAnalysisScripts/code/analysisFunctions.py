@@ -348,7 +348,7 @@ def makePlotsForDataframe(df, df_kde, currentDir, name):
     plotMeanAndSDBarGraph(df, outputDir, xCol, 'SasaDiff')
     plotScatterMatrix(df, outputDir)
     # set the below up to look at just the regions, not the whole geom
-    plotGeomKde(df_kde, df, 'Total', outputDir, 'startXShift', 'startCrossingAngle')
+    plotGeomKde(df_kde, df, 'Total', outputDir, 'endXShift', 'endCrossingAngle')
     # shift the names of the geometry columns to be the same as the geomList
     x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
     tmpDf = df.rename(columns={'endXShift': x, 'endCrossingAngle': y, 'endAxialRotationPrime': c, 'endZShiftPrime': z})
