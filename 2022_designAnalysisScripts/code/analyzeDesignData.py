@@ -38,7 +38,7 @@ kdeFile = sys.argv[1]
 seqEntropyFile = sys.argv[2]
 dataFile = sys.argv[3]
 outputDir = sys.argv[4]
-numSeqs = sys.argv[5]
+numSeqs = int(sys.argv[5])
 
 # Read in the data from the csv file
 df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str})
@@ -90,11 +90,15 @@ df = normalizeColumn(df, 'SequenceEntropy')
 geomList = ['xShift', 'crossingAngle', 'axialRotationPrime', 'zShiftPrime']
 df = addGeometricDistanceToDataframe(df, outputDir, geomList)
 
+# make plot for the entire dataframe
+makePlotsForDataframe(df, df_kde, outputDir, 'all')
+
 # loop through each region
 df_avg = pd.DataFrame()
+topSeqsDf = pd.DataFrame()
 for region in df['Region'].unique():
     # add region column to start of df
-    regionDir = outputDir + '/' + region
+    regionDir = f'{outputDir}/{region}'
     # make a directory for each region
     if not os.path.exists(regionDir):
         os.makedirs(regionDir)
@@ -106,22 +110,24 @@ for region in df['Region'].unique():
     tmpDf = tmpDf[tmpDf['RepackChange'] < 0]
     # sort by total energy
     tmpDf = tmpDf.sort_values(by=['Total'])
-    # rid of anything with geometric distance > 0.5
-    #tmpDf = tmpDf[tmpDf['GeometricDistance'] < 1]
     # separate the dataframe with positive and negative hydrogen bonding
     tmpDf_pos = tmpDf[tmpDf['HBONDDiff'] > 0]
     tmpDf_neg = tmpDf[tmpDf['HBONDDiff'] < 0]
     # output the dataframe to a csv file
-    tmpDf_neg.to_csv(regionDir+'/'+region+'Data_negativeHbond.csv')
-    tmpDf_pos.to_csv(regionDir+'/'+region+'Data_positiveHbond.csv')
+    tmpDf_neg.to_csv(f'{regionDir}/{region}_Data_negativeHbond.csv', index=False)
+    tmpDf_pos.to_csv(f'{regionDir}/{region}_Data_positiveHbond.csv', index=False)
     makePlotsForDataframe(tmpDf_neg, df_kde, regionDir, 'negativeHbond')
     makePlotsForDataframe(tmpDf_pos, df_kde, regionDir, 'positiveHbond')
     # get the top sequences in Total Energy for each region 
     tmpDf_neg = tmpDf_neg.head(numSeqs)
     tmpDf_pos = tmpDf_pos.head(numSeqs)
-    tmpDf_neg.to_csv(outputDir+'/top'+str(numSeqs)+'_'+tmpDf_neg['Region'].iloc[0]+'_neg.csv')
-    tmpDf_pos.to_csv(outputDir+'/top'+str(numSeqs)+'_'+tmpDf_pos['Region'].iloc[0]+'_pos.csv')
+    tmpDf_neg.to_csv(f'{outputDir}/top_{numSeqs}_{region}_neg.csv', index=False)
+    tmpDf_pos.to_csv(f'{outputDir}/top_{numSeqs}_{region}_pos.csv', index=False)
+    # add the top sequences to a dataframe using concat
+    topSeqsDf = pd.concat([topSeqsDf, tmpDf_neg.head(50)])
 
+# make plot for the entire dataframe
+makePlotsForDataframe(topSeqsDf, df_kde, outputDir, 'top150')
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df, cols, 100)
@@ -140,8 +146,8 @@ df_high = df[df['HBONDDiff'] > -5]
 df_low = df_low.sort_values(by=['Total'])
 df_high = df_high.sort_values(by=['Total'])
 # output to a csv file
-df_low.to_csv(outputDir+'/lowHbond.csv')
-df_high.to_csv(outputDir+'/highHbond.csv')
+df_low.to_csv(f'{outputDir}/lowHbond.csv')
+df_high.to_csv(f'{outputDir}/highHbond.csv')
 
 
 """
