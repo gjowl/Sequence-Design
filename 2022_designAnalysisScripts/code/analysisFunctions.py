@@ -378,6 +378,8 @@ def makeInterfaceSeqLogo(df, outputDir):
             logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
             # save the logo
             logo.fig.savefig(outputDir + '/interfaceSeqLogo_'+str(interface)+'.png')
+            # close the figure
+            plt.close()
     else:
         # get the interface sequences
         sequences = df['Sequence']
@@ -398,3 +400,5 @@ def makeInterfaceSeqLogo(df, outputDir):
         logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
         # save the logo
         logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
+        # close the logo
+        plt.close()
