@@ -7,7 +7,7 @@ import configparser
 # input directories
 #dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
 dataDir = '/mnt/c/Users/gjowl/Downloads'
-inputDirName = '2023-2-14_alaDesigns'
+inputDirName = 'gblock_rosetta'
 rawDataDir = f'{dataDir}/{inputDirName}'
 
 # create config file object
@@ -18,7 +18,7 @@ configFile = f'{inputDirName}.config'
 currDir = os.getcwd()
 
 # input files
-inputDir = f'{currDir}/inputFiles'
+inputDir = f'{currDir}'
 requirementsFile = f'{inputDir}/requirements.txt'
 
 # scripts
@@ -29,14 +29,21 @@ script3 = f'{scriptDir}/createCalcEnergyCsv.py'
 
 # output
 outputDir = f'{currDir}/{inputDirName}'
+extractionDir = f'{outputDir}/{inputDirName}_extracted'
+outputFile = f'{inputDirName}_calcEnergy.csv'
+pdbDir = f'{outputDir}/{inputDirName}_pdbs'
 
 # main code section
 config_file["main"]={
     "requirementsFile": requirementsFile,
-    "untarFolder": script1,
+    "inputDir": rawDataDir,
+    "untarFolders": script1,
     "addPdbsToDir": script2,
     "createCalcEnergyCsv": script3,
     "outputDir": outputDir,
+    "extractionDir": extractionDir,
+    "pdbDir": pdbDir,
+    "outputFile": outputFile 
 }
 
 # SAVE CONFIG FILE

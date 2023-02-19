@@ -2,6 +2,7 @@ import sys, os
 
 # get input directory from command line
 inputDir = sys.argv[1]
+outputDir = sys.argv[2]
 
 # get the name of the input directory without the path
 inputDirName = os.path.basename(inputDir)
@@ -10,8 +11,8 @@ inputDirName = os.path.basename(inputDir)
 for dir in os.listdir(inputDir):
     # loop through all files in the directory
     for file in os.listdir(f'{inputDir}/{dir}'):
-        # get the files with the .pdb extension
-        if file.endswith('.pdb'):
+        # get the files with the .pdb extension that contain 'prepacked'
+        if file.endswith('.pdb') and 'prepacked' in file:
             # copy the file to the output directory
             copy = f'cp {inputDir}/{dir}/{file} {outputDir}'
             os.system(copy)
