@@ -30,6 +30,8 @@ if __name__ == '__main__':
     #execUntar = f'python3 {untarScript} {inputDir} {extractionDir}'
     #os.system(execUntar)
 
+    # TODO: add in code to edit pdb files to remove mem and other unnecessary info
+
     # add the pdb files to the output directory
     execAddPdbs = f'python3 {addPdbsScript} {extractionDir} {pdbDir}'
     os.system(execAddPdbs)
