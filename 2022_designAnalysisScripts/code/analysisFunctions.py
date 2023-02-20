@@ -69,7 +69,7 @@ def plotMeanAndSDBarGraph(df, dir, xAxis, yAxis):
     plt.savefig(dir+'/'+xAxis+'_'+yAxis+'_barGraph.png')
     plt.close()
 
-def plotEnergyDiffs(df, outputDir):
+def plotEnergyDiffs(df, outputDir, outputName):
     # data columns to plot
     n = len(df)
     x = np.arange(n)*3
@@ -99,7 +99,7 @@ def plotEnergyDiffs(df, outputDir):
     plt.gcf().set_size_inches(12, 5)
     # set x axis labels as regions
     plt.xticks(x, df['Region'])
-    fig.savefig(outputDir+'/energyDiffPlot.png')
+    fig.savefig(outputDir+'/energyDiffPlot_'+outputName+'.png')
     plt.close()
 
 #def plotEnergyDiffs(df, outputDir, enerColumns):
@@ -296,7 +296,7 @@ def getEnergyDifferenceDf(df, columns, numSeqs):
         # get the mean and standard deviation for each column
         tmpDf = getMeanAndSDDf(tmpDf, columns)
         # merge the region column
-        tmpDf = pd.merge(tmpDf, pd.DataFrame({'Region': [df['Region'].values[0]]}), how='outer', left_index=True, right_index=True)
+        tmpDf = pd.merge(tmpDf, pd.DataFrame({'Region': [region]}), how='outer', left_index=True, right_index=True)
         # concat the tmpDf to the outputDf
         outputDf = pd.concat([outputDf, tmpDf], axis=0, ignore_index=True)
     return outputDf

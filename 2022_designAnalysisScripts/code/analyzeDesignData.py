@@ -96,6 +96,10 @@ makePlotsForDataframe(df, df_kde, outputDir, 'all')
 # loop through each region
 df_avg = pd.DataFrame()
 topSeqsDf = pd.DataFrame()
+
+# df list for each region
+df_neg = pd.DataFrame()
+df_pos = pd.DataFrame()
 for region in df['Region'].unique():
     # add region column to start of df
     regionDir = f'{outputDir}/{region}'
@@ -125,6 +129,8 @@ for region in df['Region'].unique():
     tmpDf_pos.to_csv(f'{outputDir}/top_{numSeqs}_{region}_pos.csv', index=False)
     # add the top sequences to a dataframe using concat
     topSeqsDf = pd.concat([topSeqsDf, tmpDf.head(50)])
+    df_neg = pd.concat([df_neg, tmpDf_neg])
+    df_pos = pd.concat([df_pos, tmpDf_pos])
 
 # make plot for the entire dataframe
 makePlotsForDataframe(topSeqsDf, df_kde, outputDir, 'top150')
@@ -132,13 +138,17 @@ makePlotsForDataframe(topSeqsDf, df_kde, outputDir, 'top150')
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df, cols, 100)
 
-plotEnergyDiffs(df_avg, outputDir)
+df_neg_avg = getEnergyDifferenceDf(df_neg, cols, 100)
+df_pos_avg = getEnergyDifferenceDf(df_pos, cols, 100)
+plotEnergyDiffs(df_neg_avg, outputDir, 'neg')
+plotEnergyDiffs(df_pos_avg, outputDir, 'pos')
 
 df = getInterfaceSequence(df)
 getAAPercentageComposition(df, seqEntropyFile, listAA, 'InterfaceSeq', outputDir)
 
 # could I look at the geometries for sequences that have low hbond energy and high vdw energy?
 # i think I need to do some comparisons and outputs for the top x sequences that I am interested in looking at?
+
 # split each into high and low hbond energy
 df_low = df[df['HBONDDiff'] < -5]
 df_high = df[df['HBONDDiff'] > -5]
@@ -148,6 +158,17 @@ df_high = df_high.sort_values(by=['Total'])
 # output to a csv file
 df_low.to_csv(f'{outputDir}/lowHbond.csv')
 df_high.to_csv(f'{outputDir}/highHbond.csv')
+
+df_low_avg = getEnergyDifferenceDf(df_low, cols, 100)
+df_high_avg = getEnergyDifferenceDf(df_high, cols, 100)
+plotEnergyDiffs(df_low_avg, outputDir, 'lowHbond')
+plotEnergyDiffs(df_high_avg, outputDir, 'highHbond')
+
+#TODO: make a heat map of angle (y-axis) vs xShift, Z, axialRotation (x-axis) with hbonding, imm1, and vdw as the color
+df_test = df.pivot(index='endCrossingAngle', columns='endXShift', values='HBONDDiff')
+sns.heatmap(df_test, annot=True, fmt="d")
+# save the heatmap
+plt.savefig(f'{outputDir}/heatmap.png')
 
 
 """
