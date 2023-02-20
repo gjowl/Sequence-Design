@@ -160,15 +160,25 @@ df_low.to_csv(f'{outputDir}/lowHbond.csv')
 df_high.to_csv(f'{outputDir}/highHbond.csv')
 
 df_low_avg = getEnergyDifferenceDf(df_low, cols, 100)
+
+
 df_high_avg = getEnergyDifferenceDf(df_high, cols, 100)
 plotEnergyDiffs(df_low_avg, outputDir, 'lowHbond')
 plotEnergyDiffs(df_high_avg, outputDir, 'highHbond')
 
+# reset plot
+plt.clf()
+
+# get the top 100 sequences in Total Energy for each GASright
+df_gas = df[df['Region'] == 'GAS']
 #TODO: make a heat map of angle (y-axis) vs xShift, Z, axialRotation (x-axis) with hbonding, imm1, and vdw as the color
-df_test = df.pivot(index='endCrossingAngle', columns='endXShift', values='HBONDDiff')
-sns.heatmap(df_test, annot=True, fmt="d")
+df_test = df_gas.pivot(index='endCrossingAngle', columns='endXShift', values='HBONDDiff')
+# setup the dataframe for the heatmap: count sequences for each 5 degree bin for each angle and less than 7.5 xShift, average hbond energy for each bin
+# plot the heatmap with the 
+plt.imshow(df_test, cmap='hot', interpolation='nearest')
 # save the heatmap
 plt.savefig(f'{outputDir}/heatmap.png')
+plt.close()
 
 
 """
