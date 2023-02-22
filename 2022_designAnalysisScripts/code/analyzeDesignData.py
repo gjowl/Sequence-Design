@@ -167,44 +167,6 @@ plotEnergyDiffs(df_high_avg, outputDir, 'highHbond')
 # reset plot
 plt.clf()
 
-# get the top 100 sequences in Total Energy for each GASright
-df_gas = df[df['Region'] == 'GAS']
-
-angleList = [-50, -45, -40]
-xShiftList = [6, 6.5, 7]
-# loop through the crossing angles
-outputDf = pd.DataFrame()
-for crossingAngle, xShift in zip(angleList,xShiftList):
-        df = pd.DataFrame()
-        # get the average hbond difference for crossingAngles between -50 and -48
-        df = df_gas[df_gas['endCrossingAngle'] > crossingAngle]
-        df = df[df['endCrossingAngle'] < crossingAngle+5]
-        # define the crossing angle
-        df['crossingAngle'] = crossingAngle
-        df['xShift'] = xShift
-        # get the average hbond difference
-        df['HBOND'] = df['HBONDDiff'].mean()
-        # get the average vdw difference
-        df['VDW'] = df['VDWDiff'].mean()
-        # get the average imm1 difference
-        df['IMM1'] = df['IMM1Diff'].mean()
-        outputDf = pd.concat([outputDf, df])
-
-print(outputDf)
-# drop duplicate indices
-outputDf = outputDf.drop_duplicates(keep='first')
-print(outputDf)
-#TODO: make a heat map of angle (y-axis) vs xShift, Z, axialRotation (x-axis) with hbonding, imm1, and vdw as the color
-# setup the dataframe for the heatmap: count sequences for each 5 degree bin for each angle and less than 7.5 xShift, average hbond energy for each bin
-outputDf = outputDf.pivot('crossingAngle', 'xShift', 'HBOND')
-# plot the heatmap with the crossing angle on the y-axis and the xShift on the x-axis
-sns.heatmap(outputDf, xticklabels=True, yticklabels=True)
-
-# save the heatmap
-plt.savefig(f'{outputDir}/heatmap.png')
-plt.close()
-
-
 """
     - compare geometries from duplicate sequences
     - compare geometries from non-duplicate sequences (kde plots for this and above?)\

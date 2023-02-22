@@ -336,7 +336,8 @@ def getInterfaceSequence(df):
         outputDf = pd.concat([outputDf, tmpDf])
     return outputDf
 
-def makePlotsForDataframe(df, df_kde, currentDir, name):
+# TODO: fix this function so that it's easier to make more plots 
+def makePlotsForDataframe(df, df_kde, currentDir, name, energyList):
     # make a new output directory combining the outputDir and name
     outputDir = currentDir+'/'+name
     # make the output directory if it doesn't exist
@@ -375,7 +376,8 @@ def makeInterfaceSeqLogo(df, outputDir):
                 interfaceSequences.append(seq)
             mat = logomaker.alignment_to_matrix(interfaceSequences)
             # use logomaker to make the logo
-            logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+            #logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+            logo = logomaker.Logo(mat, color_scheme='hydrophobicity')
             # save the logo
             logo.fig.savefig(outputDir + '/interfaceSeqLogo_'+str(interface)+'.png')
             # close the figure
@@ -397,7 +399,8 @@ def makeInterfaceSeqLogo(df, outputDir):
                 interfaceSequences.append(seq)
         mat = logomaker.alignment_to_matrix(interfaceSequences)
         # use logomaker to make the logo
-        logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+        #logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+        logo = logomaker.Logo(mat, color_scheme='hydrophobicity')
         # save the logo
         logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
         # close the logo
