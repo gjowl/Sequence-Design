@@ -65,6 +65,10 @@ for index, row in df.iterrows():
         # add region column Left
         df.loc[index, 'Region'] = 'Left'
 
+# lists for graphs
+barGraphColList = ['Total', 'RepackChange', 'SasaDiff']
+energyTerms = ['Total', 'HBONDDiff', 'VDWDiff', 'IMM1Diff']
+
 # sort by total energy
 df = df.sort_values(by=['Total'])
 df = getRepackEnergies(df)
@@ -76,10 +80,6 @@ df = df[df['Total'] < 0]
 df = df[df['Total'] < df['TotalPreOptimize']]
 df = df[df['OptimizeSasa'] < df['PreBBOptimizeSasa']]
 df = df[df['SasaDiff'] < -600]
-# check to see if IMM1Diff is not empty
-#if df[df['IMM1Diff'] != 0] is not empty:
-#    df = df[df['IMM1Diff'] > 10]
-#df = df[df['IMM1Diff'] > 10]
 # normalize the sequence entropy
 df = normalizeColumn(df, 'SequenceEntropy')
 # set the sequence entropy limit
@@ -90,50 +90,58 @@ df = normalizeColumn(df, 'SequenceEntropy')
 geomList = ['xShift', 'crossingAngle', 'axialRotationPrime', 'zShiftPrime']
 df = addGeometricDistanceToDataframe(df, outputDir, geomList)
 
-# make plot for the entire dataframe
-makePlotsForDataframe(df, df_kde, outputDir, 'all')
+# shift the names of the geometry columns to be the same as the geomList
+x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
+df = df.rename(columns={'endXShift': x, 'endCrossingAngle': y, 'endAxialRotationPrime': c, 'endZShiftPrime': z})
 
-# loop through each region
+# make plot for the entire dataframe
+makePlotsForDataframe(df, df_kde, outputDir, 'all', barGraphColList, energyTerms)
+
 df_avg = pd.DataFrame()
 topSeqsDf = pd.DataFrame()
 
 # df list for each region
 df_neg = pd.DataFrame()
 df_pos = pd.DataFrame()
+
+# loop through each region
 for region in df['Region'].unique():
     # add region column to start of df
     regionDir = f'{outputDir}/{region}'
     # make a directory for each region
-    if not os.path.exists(regionDir):
-        os.makedirs(regionDir)
+    os.makedirs(regionDir, exist_ok=True)
     # get the region dataframe
     tmpDf = df[df['Region'] == region]
-    # get the top 100 sequences in Total Energy for each region
-    #tmpDf = df[df['geometryNumber'] > 0]
     # remove sequences where repack energy is greater than 0
     tmpDf = tmpDf[tmpDf['RepackChange'] < 0]
     # sort by total energy
     tmpDf = tmpDf.sort_values(by=['Total'])
-    # separate the dataframe with positive and negative hydrogen bonding
-    tmpDf_pos = tmpDf[tmpDf['HBONDDiff'] > 0]
-    tmpDf_neg = tmpDf[tmpDf['HBONDDiff'] < 0]
-    # output the dataframe to a csv file
-    tmpDf_neg.to_csv(f'{regionDir}/{region}_Data_negativeHbond.csv', index=False)
-    tmpDf_pos.to_csv(f'{regionDir}/{region}_Data_positiveHbond.csv', index=False)
-    makePlotsForDataframe(tmpDf_neg, df_kde, regionDir, 'negativeHbond')
-    makePlotsForDataframe(tmpDf_pos, df_kde, regionDir, 'positiveHbond')
-    # get the top sequences in Total Energy for each region 
-    tmpDf_neg = tmpDf_neg.head(numSeqs)
-    tmpDf_pos = tmpDf_pos.head(numSeqs)
-    tmpDf_neg.to_csv(f'{outputDir}/top_{numSeqs}_{region}_neg.csv', index=False)
-    tmpDf_pos.to_csv(f'{outputDir}/top_{numSeqs}_{region}_pos.csv', index=False)
-    # add the top sequences to a dataframe using concat
-    topSeqsDf = pd.concat([topSeqsDf, tmpDf.head(50)])
-    df_neg = pd.concat([df_neg, tmpDf_neg])
-    df_pos = pd.concat([df_pos, tmpDf_pos])
+    # get the positive and negative hydrogen bonding dataframes
+    tmpDf_pos, tmpDf_neg = tmpDf[tmpDf['HBONDDiff'] > 0], tmpDf[tmpDf['HBONDDiff'] < 0]
+    # add to a list of dataframes
+    dfs, dfNames = [tmpDf_pos, tmpDf_neg], ['posHbond', 'negHbond']
+    for tmpDf,name in zip(dfs,dfNames):
+        # make a new output directory combining the outputDir and name
+        df_outputDir = f'{regionDir}/{name}'
+        # make the output directory if it doesn't exist
+        os.makedirs(df_outputDir, exist_ok=True)
+        # plot the mean and standard deviation of the data for the given columns
+        makePlotsForDataframe(tmpDf, df_kde, df_outputDir, name, barGraphColList, energyTerms)
+        # output the dataframe to a csv file
+        tmpDf.to_csv(f'{regionDir}/{region}_{name}.csv', index=False)
+        # get the top sequences in Total Energy for each region 
+        tmpDf_top = tmpDf.head(numSeqs)
+        tmpDf_top.to_csv(f'{regionDir}/top_{numSeqs}_{name}.csv', index=False)
+        # add the top sequences to a dataframe using concat
+        topSeqsDf = pd.concat([topSeqsDf, tmpDf.head(50)])
+        # check if name contains 'neg' to add to the appropriate dataframe
+        if 'neg' in name:
+            df_neg = pd.concat([df_neg, tmpDf])
+        else:
+            df_pos = pd.concat([df_pos, tmpDf])
 
 # make plot for the entire dataframe
-makePlotsForDataframe(topSeqsDf, df_kde, outputDir, 'top150')
+makePlotsForDataframe(topSeqsDf, df_kde, outputDir, 'top150', barGraphColList, energyTerms)
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df, cols, 100)

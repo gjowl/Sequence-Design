@@ -146,11 +146,11 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region
     # get colormap shades of green
     cmap = plt.cm.Reds
     cmap = cmap.reversed()
-    # get min and max of the data
-    min_val = np.min(data)
-    max_val = np.max(data)
+    # get min and max of the data rounded to the nearest 5
+    minData = int(np.floor(np.min(data)/5)*5)
+    maxData = int(np.ceil(np.max(data)/5)*5)
     # flip the data so that the min is at the top of the colorbar
-    norm = matplotlib.colors.Normalize(vmin=-55, vmax=-5) # TODO: change this to the min and max of the data
+    norm = matplotlib.colors.Normalize(vmin=minData, vmax=maxData) 
     ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
@@ -164,7 +164,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region
     axes = plt.gca()
 
     # output the number of sequences in the dataset onto plot
-    plt.savefig(outputDir+"/kdeOverlay.png", bbox_inches='tight', dpi=150)
+    plt.savefig(f'{outputDir}/kdeOverlay_{dataColumn}.png', bbox_inches='tight', dpi=150)
     plt.close()
 
 def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
@@ -337,25 +337,19 @@ def getInterfaceSequence(df):
     return outputDf
 
 # TODO: fix this function so that it's easier to make more plots 
-def makePlotsForDataframe(df, df_kde, currentDir, name, energyList):
-    # make a new output directory combining the outputDir and name
-    outputDir = currentDir+'/'+name
-    # make the output directory if it doesn't exist
-    if not os.path.exists(outputDir):
-        os.makedirs(outputDir)
+def makePlotsForDataframe(df, df_kde, outputDir, name, barGraphCols, energyList):
     # loop through each geometryNumber
     xCol = 'replicateNumber'
-    plotMeanAndSDBarGraph(df, outputDir, xCol, 'RepackChange')
-    plotMeanAndSDBarGraph(df, outputDir, xCol, 'SasaDiff')
+    for col in barGraphCols:
+        plotMeanAndSDBarGraph(df, outputDir, xCol, col)
     plotScatterMatrix(df, outputDir)
     # set the below up to look at just the regions, not the whole geom
-    plotGeomKde(df_kde, df, 'Total', outputDir, 'endXShift', 'endCrossingAngle')
+    for energy in energyList:
+        plotGeomKde(df_kde, df, energy, outputDir, 'xShift', 'crossingAngle')
     # shift the names of the geometry columns to be the same as the geomList
     x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
-    tmpDf = df.rename(columns={'endXShift': x, 'endCrossingAngle': y, 'endAxialRotationPrime': c, 'endZShiftPrime': z})
-    scatter3DWithColorbar(tmpDf, x, y, z, c, outputDir, name)
-    makeInterfaceSeqLogo(tmpDf, outputDir)
-    
+    scatter3DWithColorbar(df, x, y, z, c, outputDir, name)
+    makeInterfaceSeqLogo(df, outputDir)
 
 def makeInterfaceSeqLogo(df, outputDir):
     '''This function will make a logo of the interface sequence'''
