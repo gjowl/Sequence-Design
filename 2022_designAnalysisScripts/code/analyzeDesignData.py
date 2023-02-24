@@ -73,6 +73,8 @@ energyTerms = ['Total', 'HBONDDiff', 'VDWDiff', 'IMM1Diff']
 df = df.sort_values(by=['Total'])
 df = getRepackEnergies(df)
 df = getGeomChanges(df)
+#remove monomerWithoutAlaEnds col
+#df = df.drop(columns=['MonomerWithoutAlaEnds'])
 df.to_csv(outputDir+'/allData.csv', index=False)
 
 # trim the data
@@ -95,7 +97,9 @@ x, y, z, c = 'xShift', 'crossingAngle', 'zShift', 'axialRotation'
 df = df.rename(columns={'endXShift': x, 'endCrossingAngle': y, 'endAxialRotationPrime': c, 'endZShiftPrime': z})
 
 # make plot for the entire dataframe
-makePlotsForDataframe(df, df_kde, outputDir, 'all', barGraphColList, energyTerms)
+allDir = f'{outputDir}/all'
+os.makedirs(allDir, exist_ok=True)
+makePlotsForDataframe(df, df_kde, allDir, 'all', barGraphColList, energyTerms)
 
 df_avg = pd.DataFrame()
 topSeqsDf = pd.DataFrame()
@@ -114,6 +118,7 @@ for region in df['Region'].unique():
     tmpDf = df[df['Region'] == region]
     # remove sequences where repack energy is greater than 0
     tmpDf = tmpDf[tmpDf['RepackChange'] < 0]
+    makeInterfaceSeqLogo(tmpDf, regionDir)
     # sort by total energy
     tmpDf = tmpDf.sort_values(by=['Total'])
     # get the positive and negative hydrogen bonding dataframes
@@ -141,7 +146,9 @@ for region in df['Region'].unique():
             df_pos = pd.concat([df_pos, tmpDf])
 
 # make plot for the entire dataframe
-makePlotsForDataframe(topSeqsDf, df_kde, outputDir, 'top150', barGraphColList, energyTerms)
+topDir = f'{outputDir}/top'
+os.makedirs(topDir, exist_ok=True)
+makePlotsForDataframe(topSeqsDf, df_kde, topDir, 'top', barGraphColList, energyTerms)
 
 cols = ['VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total', 'GeometricDistance']
 df_avg = getEnergyDifferenceDf(df, cols, 100)

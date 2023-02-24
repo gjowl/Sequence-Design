@@ -8,7 +8,7 @@ import configparser
 #dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
 dataDir = '/mnt/c/Users/gjowl/Downloads'
 #dirToAnalyze = '/2022-11-20_alaNoSeqEntropy'
-dirToAnalyze = '2023-2-14_alaDesigns'
+dirToAnalyze = '2023-2-23_leuDesigns'
 #dirToAnalyze = '/2022-11-19_leuEntropyCompare'
 #dirToAnalyze = '/2022-11-19_alaEntropyCompare'
 rawDataDir = f'{dataDir}/{dirToAnalyze}'

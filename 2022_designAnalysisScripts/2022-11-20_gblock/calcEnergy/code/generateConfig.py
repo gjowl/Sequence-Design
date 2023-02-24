@@ -6,19 +6,19 @@ import configparser
 
 # create config file object
 config_file = configparser.ConfigParser()
-configFile = 'calcEnergyAnalysis.config'
+configFile = 'calcEnergyAnalysis_normalSeqs.config'
 
 # set up directory structure
 currDir = os.getcwd()
 
 
 # input directories
-dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
-dirToAnalyze = '2023-2-9_gblockAlaEnds'
+dataDir = '/mnt/c/Users/gjowl/Downloads'
+dirToAnalyze = '2023-2-7_calcEnergy_normalSeqs'
 rawDataDir = f'{dataDir}/{dirToAnalyze}/'
 
 # output
-outputDir = f'{currDir}/data'
+outputDir = f'{currDir}/data_originalGblockSeqs'
 dataFile = f'{outputDir}/{dirToAnalyze}.csv'
 requirementsFile = f'{currDir}/requirements.txt'
 toxgreenFile = f'{currDir}/data/toxgreen.csv'
