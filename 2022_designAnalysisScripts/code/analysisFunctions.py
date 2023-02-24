@@ -216,7 +216,7 @@ def addGeometricDistanceToDataframe(df, outputDir, geomList):
         # make a directory for each region
         if not os.path.exists(dir):
             os.makedirs(dir)
-        tmpDf.to_csv(dir+'/geometricDistance.csv')
+        tmpDf.to_csv(dir+'/geometricDistance.csv', index=False)
         # concatenate the dataframes
         outputDf = pd.concat([outputDf, tmpDf])
     return outputDf 
@@ -271,7 +271,7 @@ def getAAPercentageComposition(df, percentCompositionFile, listAA, seqColumn, ou
         # add the region AA percentage to a merged dataframe
         mergedCountsDf = pd.merge(mergedCountsDf, tmpDf[['AA', region]], on='AA')
     # output the merged dataframe
-    mergedCountsDf.to_csv(outputDir+'/aaPercentagesByRegion.csv')
+    mergedCountsDf.to_csv(outputDir+'/aaPercentagesByRegion.csv', index=False)
     # plot the AA percentages for each region in a bar chart with different colors
     mergedCountsDf.plot.bar(x='AA', rot=0, color=['royalblue', 'firebrick', 'cornsilk', 'lightsalmon'], edgecolor='black')
     # set the plot size

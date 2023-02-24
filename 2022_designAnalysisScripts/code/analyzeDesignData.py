@@ -73,7 +73,7 @@ energyTerms = ['Total', 'HBONDDiff', 'VDWDiff', 'IMM1Diff']
 df = df.sort_values(by=['Total'])
 df = getRepackEnergies(df)
 df = getGeomChanges(df)
-df.to_csv(outputDir+'/allData.csv')
+df.to_csv(outputDir+'/allData.csv', index=False)
 
 # trim the data
 df = df[df['Total'] < 0]
@@ -163,9 +163,9 @@ df_high = df[df['HBONDDiff'] > -5]
 # sort by total energy
 df_low = df_low.sort_values(by=['Total'])
 df_high = df_high.sort_values(by=['Total'])
-# output to a csv file
-df_low.to_csv(f'{outputDir}/lowHbond.csv')
-df_high.to_csv(f'{outputDir}/highHbond.csv')
+# output to a csv file without the index
+df_low.to_csv(f'{outputDir}/lowHbond.csv', index=False)
+df_high.to_csv(f'{outputDir}/highHbond.csv', index=False)
 
 df_low_avg = getEnergyDifferenceDf(df_low, cols, 100)
 df_high_avg = getEnergyDifferenceDf(df_high, cols, 100)
