@@ -7,9 +7,12 @@ Directories:
     - designAnalysisScripts: contains all of the scripts that have been used to analyze my designs, organized by year
     - 2022_designData: design data for prepping for a second CHIP run
     - 2022-2023_gblock: data from the gblock I ordered on 2022-11-20
-    - 2023_proteinDesign: design runs for my second CHIP and the analyzed data
+    - 2023_designData: design runs for my second CHIP and the analyzed data
     - CHIP1_Analysis: analyzed data from my CHIP1
     - ngsReconstruction: fluorescence reconstruction of CHIP1, containing both data and code
     - PDB Scraping: functions that were used to analyze the data scraped from the membrane protein pdbs
+    - rosetta: code and files for creating a file for a rosetta docking run (TODO: move the code here as well?)
+    - extractRosettaPdbsForCalcEnergy: code and files for untarring the rosetta outputs and prepping a csv file for calculating
+      the energy using MSL energetics
     - IN PROGRESS:
         - CHIP1_reanalysis: after running rosetta on my CHIP1 sequences (and/or code that takes structures and repacks them), reanalyze them here
