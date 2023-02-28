@@ -16,6 +16,7 @@ config = globalConfig['main']
 untarScript = config['untarFolders']
 addPdbsScript = config['addPdbsToDir']
 createCsvScript = config['createCalcEnergyCsv']
+deleteExcessInfoScript = config['deleteExcessInfo']
 inputDir = config['inputDir']
 outputFile = config['outputFile']
 extractionDir = config['extractionDir']
@@ -27,15 +28,17 @@ os.makedirs(name=pdbDir, exist_ok=True)
 
 if __name__ == '__main__':
     # untar the files
-    #execUntar = f'python3 {untarScript} {inputDir} {extractionDir}'
-    #os.system(execUntar)
-
-    # TODO: add in code to edit pdb files to remove mem and other unnecessary info
+    execUntar = f'python3 {untarScript} {inputDir} {extractionDir}'
+    os.system(execUntar)
 
     # add the pdb files to the output directory
     execAddPdbs = f'python3 {addPdbsScript} {extractionDir} {pdbDir}'
     os.system(execAddPdbs)
 
+    # delete the excess info from the pdb files
+    execDeleteExcessInfo = f'python3 {deleteExcessInfoScript} {pdbDir} {pdbDir}_edited'
+    os.system(execDeleteExcessInfo)
+
     # create the csv file
-    execCreateCsv = f'python3 {createCsvScript} {extractionDir} {outputFile}'
+    execCreateCsv = f'python3 {createCsvScript} {pdbDir} {outputFile}'
     os.system(execCreateCsv)

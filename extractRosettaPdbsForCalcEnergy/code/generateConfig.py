@@ -7,7 +7,7 @@ import configparser
 # input directories
 #dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
 dataDir = '/mnt/c/Users/gjowl/Downloads'
-inputDirName = 'gblock_rosetta'
+inputDirName = 'gblock_rosetta_rerun'
 rawDataDir = f'{dataDir}/{inputDirName}'
 
 # create config file object
@@ -26,6 +26,7 @@ scriptDir = f'{currDir}/code'
 script1 = f'{scriptDir}/untarFolders.py'
 script2 = f'{scriptDir}/addPdbsToDir.py'
 script3 = f'{scriptDir}/createCalcEnergyCsv.py'
+script4 = f'{scriptDir}/deleteExcessInfoFromPDB.py'
 
 # output
 outputDir = f'{currDir}/{inputDirName}'
@@ -40,6 +41,7 @@ config_file["main"]={
     "untarFolders": script1,
     "addPdbsToDir": script2,
     "createCalcEnergyCsv": script3,
+    "deleteExcessInfo": script4,
     "outputDir": outputDir,
     "extractionDir": extractionDir,
     "pdbDir": pdbDir,
