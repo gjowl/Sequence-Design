@@ -5,17 +5,21 @@ import os
 import configparser
 
 # input directories
-#dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
+rootDir = os.getcwd()
 dataDir = '/mnt/c/Users/gjowl/Downloads'
 #dirToAnalyze = '/2022-11-20_alaNoSeqEntropy'
-dirToAnalyze = '2023-2-23_leuDesigns'
+dirToAnalyze = 'test_leu_design'
 #dirToAnalyze = '/2022-11-19_leuEntropyCompare'
 #dirToAnalyze = '/2022-11-19_alaEntropyCompare'
 rawDataDir = f'{dataDir}/{dirToAnalyze}'
+configDir = f'{rootDir}/config'
+
+# make the config directory if it doesn't exist
+os.makedirs(configDir, exist_ok=True)
 
 # create config file object
 config_file = configparser.ConfigParser()
-configFile = f'{dirToAnalyze}.config'
+configFile = f'{configDir}/{dirToAnalyze}.config'
 
 # set up directory structure
 currDir = os.getcwd()

@@ -40,9 +40,9 @@ for dir in os.listdir(rawDataDir):
             if file == "energyFile.csv":
                 filename = f'{currDir}/{file}'
                 # read the csv file into a dataframe
-                header = pd.read_csv(filename,sep='\t',header=None, nrows=1)
+                header = pd.read_csv(filename,sep=',',header=None, nrows=1)
                 # read csv with interface column as string 
-                df = pd.read_csv(filename, sep='\t', header=None, skiprows=1, dtype={2: str})# sets the interface column as a string
+                df = pd.read_csv(filename, sep=',', header=None, skiprows=1, dtype={2: str})# sets the interface column as a string
                 df.columns = header.iloc[0]
                 # add the directory name to the dataframe
                 df['Directory'] = dir

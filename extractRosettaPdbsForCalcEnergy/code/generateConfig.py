@@ -1,18 +1,25 @@
 """
-Example code for generating a configuration file for ngsAnalysis
+Code for generating a configuration file. Run from the command line with:
+$ python3 code/generateConfig.py
+
+This will output the config file to the config folder found in the root directory of the project.
 """
 import os
 import configparser
 
 # input directories
-#dataDir = '/data02/gloiseau/Sequence_Design_Project/DesignRun2'
+rootDir = os.getcwd()
 dataDir = '/mnt/c/Users/gjowl/Downloads'
-inputDirName = 'gblock_rosetta_rerun'
+inputDirName = 'gblock_native'
 rawDataDir = f'{dataDir}/{inputDirName}'
+configDir = f'{rootDir}/config'
+
+# make the config directory if it doesn't exist
+os.makedirs(configDir, exist_ok=True)
 
 # create config file object
 config_file = configparser.ConfigParser()
-configFile = f'{inputDirName}.config'
+configFile = f'{configDir}/{inputDirName}.config'
 
 # set up directory structure
 currDir = os.getcwd()
