@@ -27,8 +27,7 @@ dataFile = config['dataFile']
 numSeqs = config['numSeqs']
 
 # check if the output directory exists
-if not os.path.isdir(outputDir):
-    os.mkdir(outputDir)
+os.makedirs(name=outputDir, exist_ok=True)
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
