@@ -1,12 +1,15 @@
-import sys
-import os
-import pandas as pd
-from functions import *
+import os, sys, pandas as pd
+import configparser
 
-'''
-This file is the main program for running analysis on design data. It reads in a config file and runs the analysis
-through other files in the code directory
-'''
+"""
+
+"""
+
+# Helper file for reading the config file of interest for running the program
+def read_config(configFile):
+    config = configparser.ConfigParser()
+    config.read(configFile)
+    return config
 
 # read in the config file
 configFile = sys.argv[1]
@@ -19,9 +22,9 @@ seqEntropyFile = config['seqEntropyFile']
 sequenceProbabilitiesFile = config['sequenceProbabilitiesFile']
 rawDataDir = config['rawDataDir']
 requirementsFile = config['requirementsFile']
-compileEnergyScript = config['compileEnergyScript']
-designAnalysisScript = config['designAnalysisScript']
-createPseScript = config['createPseScript']
+untarFoldersScript = config['untarFoldersScript']
+extractScoreScript = config['extractScoreScript']
+analyzeScoreScript = config['analyzeScoreScript']
 outputDir = config['outputDir']
 dataFile = config['dataFile']
 numSeqs = config['numSeqs']
@@ -39,15 +42,14 @@ if __name__ == '__main__':
     execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     os.system(execInstallRequirements)
     
-    # execute compile script 
-    execCompileEnergyFiles = f'python3 {compileEnergyScript} {rawDataDir} {outputDir} {dataFile}'
-    os.system(execCompileEnergyFiles)
+    # execute untar folders script 
+    execUntar = f'python3 {untarFoldersScript} {rawDataDir} {outputDir}'
+    os.system(execUntar)
 
-    # execute design analysis script
-    execDesignAnalysis = f'python3 {designAnalysisScript} {kdeFile} {seqEntropyFile} {dataFile} {outputDir} {numSeqs}'
-    os.system(execDesignAnalysis)
+    # execute extract score script 
+    execExtractScore = f'python3 {extractScoreScript} {outputDir}'
+    os.system(execExtractScore)
 
-    # TODO: below doesn't currently work
-    # execute create pymol session files script
-    #execCreatePymolSessionFiles = f'python3 {createPseScript} {rawDataDir} {outputDir}'
-    #os.system(execCreatePymolSessionFiles)
+    # execute analyze score script
+    execAnalyzeScore = f'python3 {analyzeScoreScript} {rawDataDir} {outputDir}'
+    os.system(execAnalyzeScore)
