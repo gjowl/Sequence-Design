@@ -26,11 +26,14 @@ untarFoldersScript = config['untarFoldersScript']
 extractScoreScript = config['extractScoreScript']
 analyzeScoreScript = config['analyzeScoreScript']
 outputDir = config['outputDir']
+scoreDir = config['scoreDir']
+analysisDir = config['analysisDir']
 dataFile = config['dataFile']
 numSeqs = config['numSeqs']
 
 # check if the output directory exists
 os.makedirs(name=outputDir, exist_ok=True)
+os.makedirs(name=scoreDir, exist_ok=True)
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
@@ -47,9 +50,17 @@ if __name__ == '__main__':
     os.system(execUntar)
 
     # execute extract score script 
-    execExtractScore = f'python3 {extractScoreScript} {outputDir}'
+    execExtractScore = f'python3 {extractScoreScript} {outputDir} {scoreDir}'
     os.system(execExtractScore)
 
-    # execute analyze score script
-    execAnalyzeScore = f'python3 {analyzeScoreScript} {rawDataDir} {outputDir}'
-    os.system(execAnalyzeScore)
+    # execute analyze score script for each score file
+    for scoreFile in os.listdir(scoreDir):
+        # convert score files to csv
+        execConvertScore = f'python3 {convertScoreScript} {scoreDir}/{scoreFile} {scoreDir}'
+        os.system(execConvertScore)
+        # delete the extracted score file (copied from the original directory)
+        os.remove(f'{scoreDir}/{scoreFile}')
+        # analyze the score file that is now in csv format
+        execAnalyzeScore = f'python3 {analyzeScoreScript} {scoreDir}/{scoreFile} {analysisDir}'
+        os.system(execAnalyzeScore)
+        exit(0)

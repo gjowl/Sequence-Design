@@ -5,13 +5,18 @@ import os
 import configparser
 
 # input directories
+rootDir = os.getcwd()
 dataDir = '/mnt/c/Users/gjowl/Downloads'
 dirToAnalyze = 'toxcat_rosetta'
 rawDataDir = f'{dataDir}/{dirToAnalyze}'
+configDir = f'{rootDir}/config'
+
+# make the config directory if it doesn't exist
+os.makedirs(configDir, exist_ok=True)
 
 # create config file object
 config_file = configparser.ConfigParser()
-configFile = f'{dirToAnalyze}.config'
+configFile = f'{configDir}/{dirToAnalyze}.config'
 
 # set up directory structure
 currDir = os.getcwd()
@@ -31,6 +36,8 @@ script3 = f'{scriptDir}/analyzeScoreFiles.py'
 
 # output
 outputDir = f'{currDir}/{dirToAnalyze}'
+scoreDir = f'{outputDir}/scoreFiles'
+analysisDir = f'{outputDir}/analysis'
 dataFile = f'{outputDir}/compiledData.csv'
 numSeqs = 50
 
@@ -45,6 +52,8 @@ config_file["main"]={
     "analyzeScoreScript": script3,
     "outputDir": outputDir,
     "rawDataDir": rawDataDir,
+    "scoreDir": scoreDir,
+    "analysisDir": analysisDir,
     "dataFile": dataFile,
     "numSeqs": numSeqs,
 }

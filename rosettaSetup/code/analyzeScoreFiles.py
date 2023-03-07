@@ -1,6 +1,6 @@
 import os, sys, pandas as pd
 import matplotlib.pyplot as plt
-import sklearn.
+#import sklearn.
 
 """
 This script analyzes the score files in the output directory and outputs a csv file with the data.

@@ -21,8 +21,8 @@ for directory in os.listdir(inputDir):
         for file in os.listdir(directoryPath):
             # get the file path
             filePath = os.path.join(directoryPath, file)
-            # check if the file is a score file
-            if file.endswith('.sc'):
+            # check if the filename is 'docked.sc'
+            if file == 'docked.sc':
                 # get the new file name
                 newFileName = f'{directory}.sc'
                 # read in the score file as a dataframe
