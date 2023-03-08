@@ -8,8 +8,15 @@ This script extracts the score files from the output directory and renames them 
 inputDir = sys.argv[1]
 outputDir = sys.argv[2]
 
-# make the output directory if it doesn't exist
-os.makedirs(outputDir, exist_ok=True)
+
+
+# if the output directory exists, quit
+if os.path.exists(outputDir):
+    print(f'{outputDir} already exists. Files have already been extracted, delete {outputDir} to extract again.')
+    quit()
+else:
+    # make the output directory if it doesn't exist
+    os.makedirs(outputDir, exist_ok=True)
 
 # loop through the directories in the input directory
 for directory in os.listdir(inputDir):

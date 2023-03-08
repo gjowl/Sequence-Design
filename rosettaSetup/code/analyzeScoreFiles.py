@@ -19,10 +19,6 @@ scoreData = pd.read_csv(scoreFile, sep=',', header=0)
 # sort the data by rms
 scoreData = scoreData.sort_values(by=['rms'])
 
-# get the number of sequences with an rms less than 3.0
-rmsLessThan3 = scoreData[scoreData['rms'] < 3.0]
-print(f'The number of sequences with an rms less than 3.0 is {len(rmsLessThan3)}')
-
 # create a scatter plot of the rms vs the interface score
 
 # TODO:

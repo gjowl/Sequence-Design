@@ -7,7 +7,7 @@ import configparser
 # input directories
 rootDir = os.getcwd()
 dataDir = '/mnt/c/Users/gjowl/Downloads'
-dirToAnalyze = 'toxcat_rosetta'
+dirToAnalyze = 'gblock_rosetta'
 rawDataDir = f'{dataDir}/{dirToAnalyze}'
 configDir = f'{rootDir}/config'
 
@@ -32,7 +32,8 @@ requirementsFile = f'{inputDir}/requirements.txt'
 scriptDir = f'{currDir}/code'
 script1 = f'{scriptDir}/untarFolders.py'
 script2 = f'{scriptDir}/extractScoreFiles.py'
-script3 = f'{scriptDir}/analyzeScoreFiles.py'
+script3 = f'{scriptDir}/convertScoreFileToCsv.py'
+script4 = f'{scriptDir}/analyzeScoreFiles.py'
 
 # output
 outputDir = f'{currDir}/{dirToAnalyze}'
@@ -49,7 +50,8 @@ config_file["main"]={
     "requirementsFile": requirementsFile,
     "untarFoldersScript": script1,
     "extractScoreScript": script2,
-    "analyzeScoreScript": script3,
+    "convertScoreScript": script3,
+    "analyzeScoreScript": script4,
     "outputDir": outputDir,
     "rawDataDir": rawDataDir,
     "scoreDir": scoreDir,

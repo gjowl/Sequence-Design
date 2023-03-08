@@ -6,6 +6,7 @@ outputDir = sys.argv[2]
 
 # get the name of the input file without the path and extension
 inputFileName = os.path.splitext(os.path.basename(inputFile))[0]
+print(inputFileName)
 
 # read the input file line by line
 df = pd.DataFrame()
@@ -31,4 +32,4 @@ df[df.columns[:-1]] = df[df.columns[:-1]].astype(float)
 # sort the dataframe by the rms column
 df = df.sort_values(by=['rms'])
 # save the dataframe as a csv file
-df.to_csv(f'{outputDir}/{inputFile}.csv', index=False)
+df.to_csv(f'{outputDir}/{inputFileName}.csv', index=False)

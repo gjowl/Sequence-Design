@@ -8,7 +8,7 @@ import configparser
 rootDir = os.getcwd()
 dataDir = '/mnt/c/Users/gjowl/Downloads'
 #dirToAnalyze = '/2022-11-20_alaNoSeqEntropy'
-dirToAnalyze = 'test_leu_design'
+dirToAnalyze = '2023-3-7_leuDesigns'
 #dirToAnalyze = '/2022-11-19_leuEntropyCompare'
 #dirToAnalyze = '/2022-11-19_alaEntropyCompare'
 rawDataDir = f'{dataDir}/{dirToAnalyze}'
