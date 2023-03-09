@@ -14,15 +14,21 @@ def plotLinearRegression(df, outputDir, xAxis, yAxis):
 
     regr = lr()
     regr.fit(X_train, y_train)
-    print(regr.score(X_test, y_test))
+    print(xAxis, yAxis, regr.score(X_test, y_test))
 
     # plot the data
     y_pred = regr.predict(X_test)
     plt.scatter(X_test, y_test, color ='b')
     plt.plot(X_test, y_pred, color ='k')
 
+    # putting labels for x-axis and y-axis
+    plt.xlabel(xAxis)
+    plt.ylabel(yAxis)
+
     # save the plot
     plt.savefig(f'{outputDir}/{xAxis}_vs_{yAxis}.png')
+    # reset the plot
+    plt.clf()
 
 # read in the data from command line
 data = sys.argv[1]
@@ -34,7 +40,23 @@ os.makedirs(name='outputDir', exist_ok=True)
 # read in the data to a dataframe
 df = pd.read_csv(data)
 
-# next we're going to be dividing the data into groupings based on geometry
-# to do so, we're going to cluster our data based on the geometry in another script
+# loop through the unique clusters
+for cluster in df['cluster'].unique():
+    # get the data for the cluster
+    clusterData = df[df['cluster'] == cluster]
 
-
+    # plot the data
+    plotLinearRegression(clusterData, outputDir, 'endXShift', 'endCrossingAngle')
+    plotLinearRegression(clusterData, outputDir, 'endXShift', 'endAxialRotation')
+    plotLinearRegression(clusterData, outputDir, 'endXShift', 'endZShift')
+    plotLinearRegression(clusterData, outputDir, 'endCrossingAngle', 'endAxialRotation')
+    plotLinearRegression(clusterData, outputDir, 'endCrossingAngle', 'endZShift')
+    plotLinearRegression(clusterData, outputDir, 'endAxialRotation', 'endZShift')
+    plotLinearRegression(clusterData, outputDir, 'Total', 'VDWDiff')
+    plotLinearRegression(clusterData, outputDir, 'Total', 'HBONDDiff')
+    plotLinearRegression(clusterData, outputDir, 'Total', 'IMM1Diff')
+    plotLinearRegression(clusterData, outputDir, 'Total', 'endXShift')
+    plotLinearRegression(clusterData, outputDir, 'Total', 'endCrossingAngle')
+    plotLinearRegression(clusterData, outputDir, 'Total', 'endAxialRotation')
+    plotLinearRegression(clusterData, outputDir, 'Total', 'endZShift')
+    exit(0)
