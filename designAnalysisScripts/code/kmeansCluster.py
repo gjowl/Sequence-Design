@@ -107,22 +107,26 @@ def kmeanCluster(df, cols, n_clusters, outputDir):
     plt.clf()
     return df
 
+"""
+This script takes in a csv file with the following columns: endXShift, endCrossingAngle, endAxialRotation, endZShift
+and outputs a csv file with the k-means cluster number for each data point.
+"""
 if __name__ == "__main__":
     # read in the data from command line
     data = sys.argv[1]
     outputDir = sys.argv[2]
-    
+
     # make the output directory if it doesn't exist
     os.makedirs(name=f'{outputDir}', exist_ok=True)
-    
+
     # read in the data to a dataframe with interface as string
     df = pd.read_csv(data, dtype={'Interface': str})
-    
+
     # keep only data where total < -5
     df = df[df['Total'] < -5]
-    
+
     # columns of data to be used for clustering
     cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift']
-    
+
     n_clusters = getClusterNumber(df, outputDir)
     kmeanCluster(df, cols, n_clusters, outputDir)
