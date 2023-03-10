@@ -48,10 +48,11 @@ def plotLinearRegression(df, outputDir, xAxis, yAxis):
         # reset the plot
         plt.clf()
 
+"""
+Pair this script with a clustering script. This script will read in a csv file from the command line
+ and output linear regression plots for each cluster
+"""
 if __name__ == "__main__":
-    """
-    This script will read in a csv file from the command line and output linear regression plots for each cluster in each region
-    """
     # read in the data from command line
     data = sys.argv[1]
     outputDir = sys.argv[2]
