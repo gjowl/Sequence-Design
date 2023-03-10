@@ -25,7 +25,7 @@ def kmeanCluster(df, cols, n_clusters):
     plt.savefig(f'{outputDir}/clustered.png')
 
     # output the dataframes to csv
-    df.to_csv(f'{outputDir}/clustered.csv', index=False)
+    df.to_csv(f'{outputDir}/clusteredData.csv', index=False)
     # reset the plot
     plt.clf()
 
@@ -47,9 +47,3 @@ cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift']
 
 n_clusters = 10
 kmeanCluster(df, cols, n_clusters)
-# loop through the unique regions
-#for region in df['Region'].unique():
-#    # get the data for the region
-#    regionData = df[df['Region'] == region]
-#    kmeanCluster(regionData, cols, n_clusters)
-#    exit(0)
