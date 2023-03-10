@@ -8,23 +8,23 @@ from sklearn.linear_model import LinearRegression as lr
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import silhouette_score
-from clusterStructureByGeometry import kmeanCluster, getClusterNumber
+from kmeansCluster import kmeanCluster, getClusterNumber
 from linearRegressionAnalysis import plotLinearRegression
 
 if __name__ == "__main__":
     # read in a dataframe from the command line
     df = pd.read_csv(sys.argv[1], dtype={'Interface': str})
     output_dir = sys.argv[2]
-    
+
     # keep only data where total < -5
     df = df[df['Total'] < -5]
-    
+
     # columns of data to be used for clustering
     #cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift', 'Total']
     cols = ['endXShift', 'endCrossingAngle', 'Total']
     cluster_cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total']
     n_clusters = 3
-    
+
     # loop through the unique regions to cluster and plot linear regressions for each cluster in each region
     for region in df['Region'].unique():
         # get the data for the region
