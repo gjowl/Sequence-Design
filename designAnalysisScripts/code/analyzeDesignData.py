@@ -118,7 +118,13 @@ for region in df['Region'].unique():
     tmpDf = df[df['Region'] == region]
     # remove sequences where repack energy is greater than 0
     tmpDf = tmpDf[tmpDf['RepackChange'] < 0]
-    makeInterfaceSeqLogo(tmpDf, regionDir)
+    # make sequence logos
+    if len(df['Interface'].unique()) > 1:
+        for interface in tmpDf['Interface'].unique():
+            interface_df = tmpDf[tmpDf['Interface'] == interface]
+            makeInterfaceSeqLogo(interface_df, regionDir)
+    else:
+        makeInterfaceSeqLogo(tmpDf, regionDir)
     # sort by total energy
     tmpDf = tmpDf.sort_values(by=['Total'])
     # get the positive and negative hydrogen bonding dataframes

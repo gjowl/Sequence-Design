@@ -353,49 +353,28 @@ def makePlotsForDataframe(df, df_kde, outputDir, name, barGraphCols, energyList)
 
 def makeInterfaceSeqLogo(df, outputDir):
     '''This function will make a logo of the interface sequence'''
-    # check if there are unique interfaces
-    if len(df['Interface'].unique()) > 1:
-        for interface in df['Interface'].unique():
-            tmpDf = df[df['Interface'] == interface]
-            # get the interface sequences
-            sequences = tmpDf['Sequence']
-            # loop through the interface and keep only the amino acids that are in the interface
-            interfaceSequences = []
-            for seq in sequences:
-                # loop through each position in the interface
-                for j in range(len(str(interface))):
-                    if str(interface)[j] == '0':
-                        # replace the amino acid with a dash if it is not in the interface (if 0 at that position)
-                        seq = seq[:j] + '-' + seq[j+1:]
-                interfaceSequences.append(seq)
-            mat = logomaker.alignment_to_matrix(interfaceSequences)
-            # use logomaker to make the logo
-            #logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
-            logo = logomaker.Logo(mat, color_scheme='hydrophobicity')
-            # save the logo
-            logo.fig.savefig(outputDir + '/interfaceSeqLogo_'+str(interface)+'.png')
-            # close the figure
-            plt.close()
-    else:
-        # get the interface sequences
-        sequences = df['Sequence']
-        # get the interface
-        interfaces = df['Interface']
-        # loop through the interface and keep only the amino acids that are in the interface
-        interfaceSequences = []
-        for interface in interfaces: 
-            for seq in sequences:
-                # loop through each position in the interface
-                for j in range(len(str(interface))):
-                    if str(interface)[j] == '0':
-                        # replace the amino acid with a dash if it is not in the interface (if 0 at that position)
-                        seq = seq[:j] + '-' + seq[j+1:]
-                interfaceSequences.append(seq)
-        mat = logomaker.alignment_to_matrix(interfaceSequences)
-        # use logomaker to make the logo
-        #logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
-        logo = logomaker.Logo(mat, color_scheme='hydrophobicity')
-        # save the logo
-        logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
-        # close the logo
-        plt.close()
+    # get the interface sequences
+    sequences = df['Sequence']
+    # get the interface
+    interfaces = df['Interface']
+    # loop through the interface and keep only the amino acids that are in the interface
+    interfaceSequences = []
+    for interface in interfaces: 
+        for seq in sequences:
+            # loop through each position in the interface
+            for j in range(len(str(interface))):
+                if str(interface)[j] == '0':
+                    # replace the amino acid with a dash if it is not in the interface (if 0 at that position)
+                    seq = seq[:j] + '-' + seq[j+1:]
+            interfaceSequences.append(seq)
+    mat = logomaker.alignment_to_matrix(interfaceSequences)
+    # use logomaker to make the logo
+    #logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+    logo = logomaker.Logo(mat, color_scheme='hydrophobicity')
+    logo.ax.xaxis.set_ticks_position('none')
+    logo.ax.set_yticks([0, .5, 1])
+
+    # save the logo
+    logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
+    # close the logo
+    plt.close()
