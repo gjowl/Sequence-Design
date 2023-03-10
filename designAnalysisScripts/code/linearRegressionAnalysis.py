@@ -10,53 +10,66 @@ def plotLinearRegression(df, outputDir, xAxis, yAxis):
     x = np.array(df[xAxis].values.reshape(-1,1))
     y = np.array(df[yAxis].values.reshape(-1,1))
 
+    # split the data into training and testing
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size = 0.25)
 
+    # fit the linear regression model
     regr = lr()
     regr.fit(X_train, y_train)
-    print(xAxis, yAxis, regr.score(X_test, y_test))
+    regression_score = regr.score(X_test, y_test)
 
-    # plot the data
-    y_pred = regr.predict(X_test)
-    plt.scatter(X_test, y_test, color ='b')
-    plt.plot(X_test, y_pred, color ='k')
+    # check the regression score
+    if regression_score < 0.3:
+        return
+    # if the regression score is good, plot the data and output
+    else:
+        # plot the data for the regression
+        y_pred = regr.predict(X_test)
+        plt.scatter(X_test, y_test, color ='lightskyblue')
+        plt.plot(X_test, y_pred, color ='k')
 
-    # putting labels for x-axis and y-axis
-    plt.xlabel(xAxis)
-    plt.ylabel(yAxis)
+        # putting labels for x-axis and y-axis
+        plt.xlabel(xAxis)
+        plt.ylabel(yAxis)
 
-    # save the plot
-    plt.savefig(f'{outputDir}/{xAxis}_vs_{yAxis}.png')
-    # reset the plot
-    plt.clf()
+        # title of the plot
+        plt.title(f'{xAxis} vs {yAxis}')
 
-# read in the data from command line
-data = sys.argv[1]
-outputDir = sys.argv[2]
+        # show the correlation on the top left of the plot
+        plt.text(0.05, 1.10, f'R^2 = {regression_score:.2f}', horizontalalignment='left', verticalalignment='top', transform=plt.gca().transAxes)
+        # output the cluster number on the top right of the plot
+        cluster = df['cluster'].unique()[0]
+        plt.text(0.95, 1.10, f'Cluster {cluster}', horizontalalignment='right', verticalalignment='top', transform=plt.gca().transAxes)
+        # output the number of data points on the top right of the plot
+        plt.text(0.95, 1.05, f'N = {len(df)}', horizontalalignment='right', verticalalignment='top', transform=plt.gca().transAxes)
 
-# make the output directory if it doesn't exist
-os.makedirs(name='outputDir', exist_ok=True)
+        # save the plot
+        plt.savefig(f'{outputDir}/{xAxis}_vs_{yAxis}.png')
+        # reset the plot
+        plt.clf()
 
-# read in the data to a dataframe
-df = pd.read_csv(data)
+if __name__ == "__main__":
+    """
+    This script will read in a csv file from the command line and output linear regression plots for each cluster in each region
+    """
+    # read in the data from command line
+    data = sys.argv[1]
+    outputDir = sys.argv[2]
 
-# loop through the unique clusters
-for cluster in df['cluster'].unique():
-    # get the data for the cluster
-    clusterData = df[df['cluster'] == cluster]
+    # make the output directory if it doesn't exist
+    os.makedirs(name='outputDir', exist_ok=True)
 
-    # plot the data
-    plotLinearRegression(clusterData, outputDir, 'endXShift', 'endCrossingAngle')
-    plotLinearRegression(clusterData, outputDir, 'endXShift', 'endAxialRotation')
-    plotLinearRegression(clusterData, outputDir, 'endXShift', 'endZShift')
-    plotLinearRegression(clusterData, outputDir, 'endCrossingAngle', 'endAxialRotation')
-    plotLinearRegression(clusterData, outputDir, 'endCrossingAngle', 'endZShift')
-    plotLinearRegression(clusterData, outputDir, 'endAxialRotation', 'endZShift')
-    plotLinearRegression(clusterData, outputDir, 'Total', 'VDWDiff')
-    plotLinearRegression(clusterData, outputDir, 'Total', 'HBONDDiff')
-    plotLinearRegression(clusterData, outputDir, 'Total', 'IMM1Diff')
-    plotLinearRegression(clusterData, outputDir, 'Total', 'endXShift')
-    plotLinearRegression(clusterData, outputDir, 'Total', 'endCrossingAngle')
-    plotLinearRegression(clusterData, outputDir, 'Total', 'endAxialRotation')
-    plotLinearRegression(clusterData, outputDir, 'Total', 'endZShift')
-    exit(0)
+    # read in the data to a dataframe
+    df = pd.read_csv(data)
+
+    # define the columns to be used for the linear regression
+    cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total']
+
+    # loop through the unique clusters
+    for cluster in df['cluster'].unique():
+        # get the data for the cluster
+        clusterData = df[df['cluster'] == cluster]
+        # loop through the columns and plot the linear regression
+        for i in range(len(cols)):
+            for j in range(i+1, len(cols)):
+                plotLinearRegression(clusterData, outputDir, cols[i], cols[j])
