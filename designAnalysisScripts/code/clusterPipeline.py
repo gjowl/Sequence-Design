@@ -8,13 +8,14 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score, adjusted_rand_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from kmeansCluster import getClusterNumber
 
 """
 This pipeline takes in a dataframe, preproccesses it, and clusters it using k-means clustering.
 """
 
 # the below analyzes the data to get the best number of components to cluster with
-def getBestClusterNumber(pipe, cluster_data, true_labels, max_components):
+def getBestComponentNumber(pipe, cluster_data, true_labels, max_components):
     # Empty lists to hold evaluation metrics
     silhouette_scores, ari_scores = [], []
     for n in range(2, max_components):
@@ -68,7 +69,9 @@ if __name__ == "__main__":
 
     # columns of data to be used for clustering
     cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total']
-    n_clusters = 3
+
+    # get the best number of clusters
+    n_clusters = getClusterNumber(df, cols, output_dir)
 
     # implement PCA to reduce the number of dimensions
     preproccessor = Pipeline([
@@ -100,8 +103,10 @@ if __name__ == "__main__":
     label_encoder = LabelEncoder()
     true_labels = label_encoder.fit_transform(df['Region'].values)
 
+    # TODO: right here I think I need to somehow get the cluster number to go with the actual data somehow
+
     # get the best number of components to cluster with
-    n_components = getBestClusterNumber(pipe, cluster_data, true_labels, len(cols))
+    n_components = getBestComponentNumber(pipe, cluster_data, true_labels, len(cols))
 
     # fit the pipeline to the data (executes the preproccessor and clusterer on the data)
     pipe["preprocessor"]["pca"].n_components = n_components
@@ -133,7 +138,6 @@ if __name__ == "__main__":
 
     #plt.style.use("fivethirtyeight")
     plt.figure(figsize=(8, 8))
-    
     scat = sns.scatterplot(
         x = "component_1",
         y = "component_2",
