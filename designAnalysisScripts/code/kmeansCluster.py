@@ -62,7 +62,7 @@ def silhouetteMethod(scaled_df, kmeans_kwargs, outputDir):
     return n_clusters
 
 #https://realpython.com/k-means-clustering-python/#:~:text=The%20standard%20version%20of%20the%20k-means%20algorithm%20is,two%20runs%20can%20converge%20on%20different%20cluster%20assignments.
-def getClusterNumber(df, outputDir):
+def getClusterNumber(df, cols, outputDir):
     # create scaled dataframe for clustering
     scaled_df = MinMaxScaler().fit_transform(df[cols])
 
@@ -128,5 +128,5 @@ if __name__ == "__main__":
     # columns of data to be used for clustering
     cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift']
 
-    n_clusters = getClusterNumber(df, outputDir)
+    n_clusters = getClusterNumber(df, cols, outputDir)
     kmeanCluster(df, cols, n_clusters, outputDir)
