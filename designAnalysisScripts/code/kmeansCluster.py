@@ -83,8 +83,8 @@ def getClusterNumber(df, cols, outputDir):
     if elbow_n_clusters == sil_n_clusters:
         n_clusters = elbow_n_clusters
     else:
-        # random choice between the two
-        n_clusters = random.choice([elbow_n_clusters, sil_n_clusters])
+        # pick the higher number of clusters
+        n_clusters = max(elbow_n_clusters, sil_n_clusters)
     return n_clusters
 
 def kmeanCluster(df, cols, n_clusters, outputDir):
