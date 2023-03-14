@@ -13,6 +13,24 @@ from kmeansCluster import getClusterNumber
 """
 This pipeline takes in a dataframe, preproccesses it, and clusters it using k-means clustering.
 """
+# the below gets the most important components of the data (pca clusters on the top n_components)
+def getMostImportantComponents(pipe, cols, n_components, output_dir):
+    # get the index of the most important feature on EACH component
+    # LIST COMPREHENSION HERE
+    n_components = pipe['preprocessor']['pca'].components_.shape[0]
+    most_important = [np.abs(pipe['preprocessor']['pca'].components_[i]).argmax() for i in range(n_components)]
+    
+    initial_feature_names = cols
+    # get the names
+    most_important_names = [initial_feature_names[most_important[i]] for i in range(n_components)]
+
+    # LIST COMPREHENSION HERE AGAIN
+    dic = {'PC{}'.format(i): most_important_names[i] for i in range(n_components)}
+
+    # build the dataframe
+    df = pd.DataFrame(dic.items())
+    # output the dataframe
+    df.to_csv(f'{output_dir}/most_important_features.csv', index=False, header=False)
 
 # the below analyzes the data to get the best number of components to cluster with
 def getBestComponentNumber(pipe, cluster_data, true_labels, max_components):
@@ -48,11 +66,11 @@ def getBestComponentNumber(pipe, cluster_data, true_labels, max_components):
    
     plt.xlabel("n_components")
     plt.legend()
-    plt.title(f'Clustering Performance as a Function of {max_components} components')
+    plt.title(f'Clustering Performance as a Function of number of components')
     plt.tight_layout()
 
     # save the plot
-    plt.savefig(f'{output_dir}/getBestCluster.png')
+    plt.savefig(f'{output_dir}/cluster_components.png')
     plt.clf()
     return n_components
 
@@ -103,15 +121,17 @@ if __name__ == "__main__":
     label_encoder = LabelEncoder()
     true_labels = label_encoder.fit_transform(df['Region'].values)
 
-    # TODO: right here I think I need to somehow get the cluster number to go with the actual data somehow
-
     # get the best number of components to cluster with
-    n_components = getBestComponentNumber(pipe, cluster_data, true_labels, len(cols))
+    n_components = getBestComponentNumber(pipe, cluster_data, true_labels, len(cols)+1)
 
     # fit the pipeline to the data (executes the preproccessor and clusterer on the data)
     pipe["preprocessor"]["pca"].n_components = n_components
     pipe.fit(cluster_data)
+    
+    # get the most important components used for clustering in order of importance
+    getMostImportantComponents(pipe, cols, n_components, output_dir)
 
+    # preproccess the data using a transform
     preproccessed_data = pipe['preprocessor'].transform(cluster_data)
 
     # get the cluster labels
@@ -123,6 +143,7 @@ if __name__ == "__main__":
     # output the adjusted rand score
     print(f'Adjusted Rand Score: {adjusted_rand_score(true_labels, cluster_labels)}')
 
+    # save the sequences as labels for the data
     # make the pca columns list
     pca_cols = []
     for i in range(n_components):
@@ -136,8 +157,12 @@ if __name__ == "__main__":
     pcadf["predicted_cluster"] = pipe["clusterer"]["kmeans"].labels_
     pcadf["true_label"] = label_encoder.inverse_transform(true_labels)
 
+    # save the sequences as labels for the data to extract the data for further analysis
+    sequence_labels = label_encoder.fit_transform(df['Sequence'].values)
+    pcadf["sequence"] = label_encoder.inverse_transform(sequence_labels)
+
     #plt.style.use("fivethirtyeight")
-    plt.figure(figsize=(8, 8))
+    plt.figure(figsize=(12, 12))
     scat = sns.scatterplot(
         x = "component_1",
         y = "component_2",
@@ -152,9 +177,10 @@ if __name__ == "__main__":
         "Clustering results from all design data by geometry"
     )
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
+
     
     # save the plot
-    plt.savefig(f'{output_dir}/cluster.png')
+    plt.savefig(f'{output_dir}/cluster.png', bbox_inches='tight')
 
     # output the data with the cluster labels
     pcadf.to_csv(f'{output_dir}/clustered_data.csv')
