@@ -367,12 +367,16 @@ def makeInterfaceSeqLogo(df, outputDir):
                     # replace the amino acid with a dash if it is not in the interface (if 0 at that position)
                     seq = seq[:j] + '-' + seq[j+1:]
             interfaceSequences.append(seq)
-    mat = logomaker.alignment_to_matrix(interfaceSequences)
     # use logomaker to make the logo
-    #logo = logomaker.Logo(mat, font_name='Arial', color_scheme='hydrophobicity')
+    mat = logomaker.alignment_to_matrix(interfaceSequences, to_type='counts') #TODO: find a way to convert to percentages without aas at non-interface positions on the logo
     logo = logomaker.Logo(mat, color_scheme='hydrophobicity')
     logo.ax.xaxis.set_ticks_position('none')
-    logo.ax.set_yticks([0, .5, 1])
+    logo.style_spines(spines=['left', 'right'], visible=False)
+    # make a list for the xticks for the sequence length
+    xticks = []
+    for i in range(1, len(interfaceSequences[0])+1):
+        xticks.append(i)
+    logo.ax.set_xticks(xticks)
 
     # save the logo
     logo.fig.savefig(outputDir + '/interfaceSeqLogo.png')
