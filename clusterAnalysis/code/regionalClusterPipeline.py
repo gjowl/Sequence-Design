@@ -11,7 +11,8 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from kmeansCluster import getClusterNumber
 
 """
-This pipeline takes in a dataframe, preproccesses it, and clusters it using k-means clustering.
+This pipeline takes in a dataframe, preproccesses it using pca, and clusters it using k-means clustering.
+It outputs the pca results as a dataframe, cluster information as a png, and the input data with the cluster numbers as a csv.
 """
 # the below gets the most important components of the data (pca clusters on the top n_components)
 def getMostImportantComponents(pipe, cols, n_components, output_dir):
@@ -75,8 +76,15 @@ def getBestComponentNumber(pipe, cluster_data, true_labels, max_components):
     return n_components
 
 if __name__ == "__main__":
+    # get the input file from the command line
+    input_file = sys.argv[1]
+
+    # get the input file name without the extension and the path
+    input_file_name = os.path.splitext(input_file)[0]
+    input_file_name = os.path.basename(input_file_name)
+
     # read in a dataframe from the command line
-    df = pd.read_csv(sys.argv[1], dtype={'Interface': str})
+    df = pd.read_csv(input_file, dtype={'Interface': str})
     output_dir = sys.argv[2]
 
     # make the output directory if it doesn't exist
@@ -86,7 +94,7 @@ if __name__ == "__main__":
     df = df[df['Total'] < -5]
 
     # columns of data to be used for clustering
-    cols = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'Total']
+    cols = sys.argv[3].split(',')
 
     # get the best number of clusters
     n_clusters = getClusterNumber(df, cols, output_dir)
@@ -177,10 +185,15 @@ if __name__ == "__main__":
         "Clustering results from all design data by geometry"
     )
     plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.0)
-
     
     # save the plot
     plt.savefig(f'{output_dir}/cluster.png', bbox_inches='tight')
 
     # output the data with the cluster labels
     pcadf.to_csv(f'{output_dir}/clustered_data.csv')
+
+    # add the cluster column to the input dataframe with all of the data (I think the data is transformed in the same order, so don't need to make this complicated)
+    df['cluster'] = pcadf['predicted_cluster']
+
+    # output the dataframe
+    df.to_csv(f'{output_dir}/{input_file_name}_clusters.csv')

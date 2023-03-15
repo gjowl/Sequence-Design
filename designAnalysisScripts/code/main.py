@@ -47,7 +47,6 @@ if __name__ == '__main__':
     execDesignAnalysis = f'python3 {designAnalysisScript} {kdeFile} {seqEntropyFile} {dataFile} {outputDir} {numSeqs}'
     os.system(execDesignAnalysis)
 
-    # TODO: below doesn't currently work
     # execute create pymol session files script
     #execCreatePymolSessionFiles = f'python3 {createPseScript} {rawDataDir} {outputDir}'
     #os.system(execCreatePymolSessionFiles)
