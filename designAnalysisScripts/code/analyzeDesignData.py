@@ -80,7 +80,7 @@ df.to_csv(outputDir+'/allData.csv', index=False)
 # trim the data
 df = df[df['Total'] < 0]
 df = df[df['Total'] < df['TotalPreOptimize']]
-df = df[df['OptimizeSasa'] < df['PreBBOptimizeSasa']]
+#df = df[df['OptimizeSasa'] < df['PreBBOptimizeSasa']]
 df = df[df['SasaDiff'] < -600]
 # normalize the sequence entropy
 df = normalizeColumn(df, 'SequenceEntropy')
