@@ -6,9 +6,13 @@ import configparser
 
 # input directories
 rootDir = os.getcwd()
-dataDir = '/mnt/c/Users/gjowl/Downloads'
+#dataDir = '/mnt/c/Users/gjowl/Downloads'
+dataDir = '/home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2023_DesignData'
 #dirToAnalyze = '/2022-11-20_alaNoSeqEntropy'
-dirToAnalyze = '2023-3-7_leuDesigns'
+#dirToAnalyze = '2023-2-14_alaDesigns'
+dirToAnalyze = '2023-2-23_leuDesigns'
+#dirToAnalyze = '2023-3-7_leuDesigns'
+#dirToAnalyze = '2023-3-13_alaDesigns'
 #dirToAnalyze = '/2022-11-19_leuEntropyCompare'
 #dirToAnalyze = '/2022-11-19_alaEntropyCompare'
 rawDataDir = f'{dataDir}/{dirToAnalyze}'

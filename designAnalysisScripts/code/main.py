@@ -47,6 +47,8 @@ if __name__ == '__main__':
     execDesignAnalysis = f'python3 {designAnalysisScript} {kdeFile} {seqEntropyFile} {dataFile} {outputDir} {numSeqs}'
     os.system(execDesignAnalysis)
 
+    regions = ['GAS', 'Right', 'Left']
     # execute create pymol session files script
-    #execCreatePymolSessionFiles = f'python3 {createPseScript} {rawDataDir} {outputDir}'
-    #os.system(execCreatePymolSessionFiles)
+    for region in regions:
+        execCreatePymolSessionFiles = f'python3 {createPseScript} {rawDataDir} {outputDir}/{region}'
+        os.system(execCreatePymolSessionFiles)
