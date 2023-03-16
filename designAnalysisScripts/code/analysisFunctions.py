@@ -114,28 +114,25 @@ def plotEnergyDiffs(df, outputDir, outputName):
 #    plt.close()
 
 def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis):
+    # sort the data by the data column
+    df_data = df_data.sort_values(by=dataColumn, ascending=False)
     # get the x and y axes data to be plotted from the dataframe
     x = df_data.loc[:, xAxis]
     y = df_data.loc[:, yAxis]
     energies = df_data[dataColumn].values
-    region = df_data['Region'].values[0]
     # get the kde plot for the geometry data
     kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
     # plot the kde plot with an overlay of the input dataset   
-    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir, region)
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir)
 
-def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region):
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
     # Plotting code below
     fig, ax = plt.subplots()
     # plotting labels and variables 
     plt.grid(False)
-    plt.xlabel("Distance (Å)")
-    plt.ylabel("Angle (°)")
-    plt.title(region)
+    plt.xlabel("Distance (Å)"), plt.ylabel("Angle (°)"), plt.title("Geometry KDE Plot")
     # Setup for plotting output
-    plt.rc('font', size=10)
-    plt.rc('xtick', labelsize=10)
-    plt.rc('ytick', labelsize=10)
+    plt.rc('font', size=10), plt.rc('xtick', labelsize=10), plt.rc('ytick', labelsize=10)
     # hardcoded variable set up for plot limits
     xmin, xmax, ymin, ymax = 6, 12, -100, 100
     # setup kde plot for original geometry dataset
@@ -147,19 +144,17 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, region
     cmap = plt.cm.Reds
     cmap = cmap.reversed()
     # get min and max of the data rounded to the nearest 5
-    minData = int(np.floor(np.min(data)/5)*5)
-    maxData = int(np.ceil(np.max(data)/5)*5)
+    minData, maxData = int(np.floor(np.min(data)/5)*5), int(np.ceil(np.max(data)/5)*5) 
     # flip the data so that the min is at the top of the colorbar
-    norm = matplotlib.colors.Normalize(vmin=minData, vmax=maxData) 
-    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
+    norm = matplotlib.colors.Normalize(vmin=minData, vmax=maxData)
+    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=15, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
     sm.set_array([])  # only needed for matplotlib < 3.1
     fig.colorbar(sm)
     # add the number of datapoints to the plot
     plt.text(xmin-1, ymax+7, "# Sequences = " + str(len(xAxis)), fontsize=10)
-    ax.set_xlim([xmin, xmax])
-    ax.set_ylim([ymin, ymax])
+    ax.set_xlim([xmin, xmax]), ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
 
