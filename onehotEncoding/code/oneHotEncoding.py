@@ -97,9 +97,13 @@ if __name__ == "__main__":
                 # add the one-hot encoding for the position to a tmp column in the dataframe
                 output_df['tmp'] = output_df["OneHot"].str[i].astype(str)
                 # convert the one-hot encoding to the amino acid
-                output_df['tmp'] = output_df['tmp'].apply(convert_onehot_to_AA)
+                output_df['AA'] = output_df['tmp'].apply(convert_onehot_to_AA)
                 # keep only the data with matching amino acids at that position
-                output_df = output_df[output_df['tmp'].str.contains(amino_acid)]
+                output_df = output_df[output_df['AA'].str.contains(amino_acid)]
+                # add the position to the dataframe
+                output_df['Position'] = i
+                # remove the one-hot encoding from the dataframe
+                output_df = output_df.drop(columns=['OneHot', 'tmp'])
                 # make the amino acid directory if it doesn't exist
                 aa_dir = f'{output_dir}/{amino_acid}'
                 os.makedirs(name=aa_dir, exist_ok=True)
