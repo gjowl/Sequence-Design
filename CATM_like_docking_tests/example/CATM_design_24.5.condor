@@ -1,0 +1,26 @@
+batch_name = CATM
+baseDir    = /scratch/loiseau/catm
+
+universe   = Vanilla
+executable = /scratch/loiseau/programs/CATM_v24.5
+output     = $(baseDir)/out/$(id).out
+log        = $(baseDir)/log/$(id).log
+error      = $(baseDir)/err/$(id).err
+stream_output = TRUE
+stream_error  = TRUE
+
+configFile = CATM.config
+inputFileDir = /scratch/loiseau/inputFiles
+
+#Compute Resources
+request_cpus = 1
+request_memory = 4GB
+request_disk = 1GB
+
+should_transfer_files = YES
+transfer_input_files = $(baseDir)/$(configFile), $(inputFileDir)/69-gly-residue-helix.crd, $(inputFileDir)/top_all22_prot.inp, $(inputFileDir)/par_all22_prot.inp, $(inputFileDir)/par_hbond_CA.inp, $(inputFileDir)/solvpar22.inp, $(inputFileDir)/rotlib_combined_-60_-40.txt, $(inputFileDir)/CENTROIDS_0.5_cutoff-6_byHbond, $(inputFileDir)/TMRULES_byHbond.txt 
+when_to_transfer_output = ON_EXIT_OR_EVICT
+transfer_output_files = $(id)
+
+Arguments = "--config $(configFile) --fullSequence $(sequence) --uniprotAccession $(id)"
+queue sequence,id from $(baseDir)/sequenceFile.csv
