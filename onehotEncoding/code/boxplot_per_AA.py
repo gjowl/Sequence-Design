@@ -44,6 +44,7 @@ def plotBoxplot(df_data, output_dir, aa, xAxis, yAxis, output_name):
     # create a boxplot for each region using plt
     #df_data.boxplot(column=yAxis, by=xAxis, grid=False)
     mdf = pd.melt(df_data, id_vars=[xAxis], value_vars=[yAxis])
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax = sns.boxplot(x=xAxis, y='value', hue='variable', data=mdf, palette='Greens')
     # remove the legend
     ax.legend_.remove()
@@ -60,6 +61,7 @@ def plotBoxplot(df_data, output_dir, aa, xAxis, yAxis, output_name):
 
 def plotMultiBoxPlot(df_data, output_dir, aa, xAxis, yAxis_list, colors, output_name):
     mdf = pd.melt(df_data, id_vars=[xAxis], value_vars=yAxis_list)
+    fig, ax = plt.subplots(figsize=(10, 6))
     ax = sns.boxplot(x=xAxis, y='value', hue='variable', data=mdf)
     # move the legend to the bottom of the plot below the x label
     ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=5)
@@ -102,9 +104,13 @@ if __name__ == '__main__':
         # make sure the plot directory is empty 
         for file in os.listdir(plot_dir):
             os.remove(f'{plot_dir}/{file}')
+        # plot the boxplot for all of the data
+        plotBoxplot(df_data, plot_dir, aa, xAxis, yAxis, 'All')
         # loop through the regions and create a boxplot for each
         for region in df_data['Region'].unique():
             df_region = df_data[df_data['Region'] == region]
+            # remove data for any positions that have less than 10 data points
+            df_region = df_region.groupby('Position').filter(lambda x: len(x) >= 10)
             # normalize the geometries column
             df_region = normalizeGeometry(df_region, geom_list)
             plotBoxplot(df_region, plot_dir, aa, xAxis, yAxis, region)
