@@ -97,5 +97,7 @@ if __name__ == "__main__":
         # output the data to a csv file
         #region_output_df.to_csv(f'{region_dir}/seqs.csv', index=False)
         output_df = pd.concat(objs=[output_df, region_output_df], axis=0)
+        # output the region data to a csv file
+        region_output_df.to_csv(f'{output_dir}/{region}_seqs.csv', index=False)
     output_df.to_csv(f'{output_dir}/seqs.csv', index=False)
     plotGeomKde(df_kde, output_df, "Total", output_dir, "endXShift", "endCrossingAngle")
