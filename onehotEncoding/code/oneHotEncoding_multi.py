@@ -14,7 +14,6 @@ def getNextOneHotDf(df, amino_acid, unique_indices, current_pos, column_name):
         # get the one-hot encoding
         for i in unique_indices:
             if (i > current_pos):
-                print(f'Position: {current_pos}, Index: {i}')
                 unique_one_hot = df_position['OneHot'].str[i].astype(str).unique()
                 # loop through the unique one-hot encodings
                 for one_hot in unique_one_hot:
@@ -97,9 +96,10 @@ if __name__ == "__main__":
             # check if output_df is empty
             if (output_df.empty):
                 continue
+            # save the data to a csv file
+            #output_df.to_csv(f'{aa_dir}/{amino_acid}_{i}.csv', index=False)
             # separate the dataframes by unique positions
             for position in output_df['Position'].unique():
                 pos_df = output_df[output_df['Position'] == position]
                 # save the data to a csv file
                 pos_df.to_csv(f'{aa_dir}/{amino_acid}_{position}.csv', index=False)
-            exit(0)
