@@ -33,10 +33,13 @@ if __name__ == "__main__":
         unique_one_hot = df['OneHot'].str[i].astype(str).unique()
         if (len(unique_one_hot) > 1):
             # loop through the unique one-hot encodings
-            output_df = pd.DataFrame()
             for one_hot in unique_one_hot:
+                output_df = pd.DataFrame()
                 # convert the one-hot encoding to the amino acid
                 amino_acid = decode_one_hot(one_hot)
+                # make the amino acid directory if it doesn't exist
+                aa_dir = f'{output_dir}/{amino_acid}'
+                os.makedirs(name=aa_dir, exist_ok=True)
                 # get the dataframe with the matching one-hot encoding
                 df_single_one_hot = getMatchingOneHotDf(df, amino_acid, i, 'AA1')
                 # loop through the rest of the positions in the one-hot encoding
@@ -54,8 +57,10 @@ if __name__ == "__main__":
                             df_double_one_hot['Position'] = f'{i}_{j}'
                             # remove the one-hot encoding from the dataframe
                             df_double_one_hot = df_double_one_hot.drop(columns=['OneHot', 'tmp'])
-                            # make the amino acid directory if it doesn't exist
-                            aa_dir = f'{output_dir}/{amino_acid}'
-                            os.makedirs(name=aa_dir, exist_ok=True)
-                            # save the data to a csv file
-                            output_df.to_csv(f'{aa_dir}/{amino_acid}.csv', index=False)
+                            # add the dataframe to the output dataframe using concat
+                            output_df = pd.concat([output_df, df_double_one_hot])
+                # check if output_df is empty
+                if (output_df.empty):
+                    continue
+                # save the data to a csv file
+                output_df.to_csv(f'{aa_dir}/{amino_acid}_{i}.csv', index=False)

@@ -40,7 +40,7 @@ def normalizeGeometry(df, geomList):
         output_df[norm_geom] = (output_df[geom] - output_df[geom].min()) / (output_df[geom].max() - output_df[geom].min())
     return output_df
 
-def plotBoxplot(df_data, output_dir, aa, xAxis, yAxis, output_name):
+def plotBoxplot(df_data, output_dir, aa, xAxis, yAxis, yMin, yMax, output_name):
     # create a boxplot for each region using plt
     #df_data.boxplot(column=yAxis, by=xAxis, grid=False)
     mdf = pd.melt(df_data, id_vars=[xAxis], value_vars=[yAxis])
@@ -49,7 +49,7 @@ def plotBoxplot(df_data, output_dir, aa, xAxis, yAxis, output_name):
     # remove the legend
     ax.legend_.remove()
     # set the y axis value range
-    plt.ylim(0, 130)
+    plt.ylim(yMin, yMax)
     # set the title
     plt.title(f'Boxplot for {aa}: {output_name}')
     # set the y label
@@ -83,6 +83,8 @@ if __name__ == '__main__':
     # axes to plot
     xAxis = 'Position'
     yAxis = 'PercentGpa'
+    yMin = 0
+    yMax = 130
     geom_list = ['xShift', 'crossingAngle', 'axialRotation', 'zShift']
     norm_cols = [f'{col}Norm' for col in geom_list]
     colors = ['red', 'blue', 'green', 'orange']
@@ -105,7 +107,7 @@ if __name__ == '__main__':
         for file in os.listdir(plot_dir):
             os.remove(f'{plot_dir}/{file}')
         # plot the boxplot for all of the data
-        plotBoxplot(df_data, plot_dir, aa, xAxis, yAxis, 'All')
+        plotBoxplot(df_data, plot_dir, aa, xAxis, yAxis, yMin, yMax, 'All')
         # loop through the regions and create a boxplot for each
         for region in df_data['Region'].unique():
             df_region = df_data[df_data['Region'] == region]
