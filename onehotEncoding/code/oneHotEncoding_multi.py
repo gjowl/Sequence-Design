@@ -68,12 +68,12 @@ if __name__ == "__main__":
                 df_one_hot = df_single_one_hot.copy()
                 for j in range(aa_number):
                     df_one_hot = getNextOneHotDf(df_one_hot, amino_acid, i, one_hot_length, f'AA{i+j+1}') 
-                    print(df_one_hot)
-                exit(0)
                 # remove the one-hot encoding from the dataframe
-                df_one_hot = df_double_one_hot.drop(columns=['OneHot', 'tmp'])
+                df_one_hot = df_one_hot.drop(columns=['OneHot', 'tmp'])
+                output_df = pd.concat([output_df, df_one_hot])
                 # check if output_df is empty
                 if (output_df.empty):
                     continue
                 # save the data to a csv file
                 output_df.to_csv(f'{aa_dir}/{amino_acid}_{i}.csv', index=False)
+                exit(0)
