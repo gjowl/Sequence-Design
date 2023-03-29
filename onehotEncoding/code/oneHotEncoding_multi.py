@@ -27,7 +27,6 @@ def getNextOneHotDf(df, amino_acid, unique_indices, current_pos, column_name):
                     output_df = pd.concat([output_df, df_one_hot])
     return output_df
 
-
 def getUniqueOneHotIndex(df):
     one_hot_indices = []
     # reset the index of the dataframe; indices change when the dataframe is sliced
@@ -42,7 +41,8 @@ if __name__ == "__main__":
     # get the command line arguments
     input_file = sys.argv[1]
     output_dir= sys.argv[2]
-    aa_number = int(sys.argv[3])
+    # read in a list of integers from the command line
+    aa_numbers = [int(i) for i in sys.argv[3:]]
 
     # make the output directory if it doesn't exist
     os.makedirs(name=output_dir, exist_ok=True)
@@ -67,39 +67,45 @@ if __name__ == "__main__":
     one_hot_length = len(df['OneHot'][0])
 
     one_hot_indices = getUniqueOneHotIndex(df)
-    for i in one_hot_indices:
-        # get the number of unique amino acids at that position
-        unique_one_hot = df['OneHot'].str[i].astype(str).unique()
-        # loop through the unique one-hot encodings
-        for one_hot in unique_one_hot:
-            output_df = pd.DataFrame()
-            # convert the one-hot encoding to the amino acid
-            amino_acid = decode_one_hot(one_hot)
-            # make the amino acid directory if it doesn't exist
-            aa_dir = f'{output_dir}/{amino_acid}_{i}'
-            os.makedirs(name=aa_dir, exist_ok=True)
-            # get the dataframe with the matching one-hot encoding
-            df_single_one_hot = getMatchingOneHotDf(df, amino_acid, i, f'AA{i}')
-            # add the position to the dataframe
-            df_single_one_hot['Position'] = i
-            df_one_hot = df_single_one_hot.copy()
-            current_pos = i
-            for j in range(aa_number):
-                # get the next one-hot encoding index
-                unique_indices = getUniqueOneHotIndex(df_one_hot)
-                # get the next one-hot encoding dataframe
-                df_one_hot = getNextOneHotDf(df_one_hot, amino_acid, unique_indices, current_pos, f'AA{i+j+1}')
-            # remove the one-hot encoding from the dataframe
-            df_one_hot = df_one_hot.drop(columns=['OneHot', 'tmp'])
-            # split the position column by the underscore
-            output_df = pd.concat([output_df, df_one_hot])
-            # check if output_df is empty
-            if (output_df.empty):
-                continue
-            # save the data to a csv file
-            #output_df.to_csv(f'{aa_dir}/{amino_acid}_{i}.csv', index=False)
-            # separate the dataframes by unique positions
-            for position in output_df['Position'].unique():
-                pos_df = output_df[output_df['Position'] == position]
+    for aa_number in aa_numbers:
+        for i in one_hot_indices:
+            # get the number of unique amino acids at that position
+            unique_one_hot = df['OneHot'].str[i].astype(str).unique()
+            # get the index of i in the one_hot_indices list; increment by 1 to start amino acid position at 1
+            index = one_hot_indices.index(i)+1
+            # loop through the unique one-hot encodings
+            for one_hot in unique_one_hot:
+                output_df = pd.DataFrame()
+                # convert the one-hot encoding to the amino acid
+                amino_acid = decode_one_hot(one_hot)
+                # make the amino acid directory if it doesn't exist
+                aa_dir = f'{output_dir}_{aa_number}/{amino_acid}_{i}'
+                os.makedirs(name=aa_dir, exist_ok=True)
+                # get the dataframe with the matching one-hot encoding
+                df_single_one_hot = getMatchingOneHotDf(df, amino_acid, i, f'AA{index}')
+                # add the position to the dataframe
+                df_single_one_hot['Position'] = i
+                df_one_hot = df_single_one_hot.copy()
+                current_pos = i
+                for j in range(1, aa_number):
+                    # check if the dataframe is empty
+                    if (df_one_hot.empty):
+                        continue
+                    # get the next one-hot encoding index
+                    unique_indices = getUniqueOneHotIndex(df_one_hot)
+                    # get the next one-hot encoding dataframe
+                    df_one_hot = getNextOneHotDf(df_one_hot, amino_acid, unique_indices, current_pos, f'AA{index+j}')
+                # split the position column by the underscore
+                output_df = pd.concat([output_df, df_one_hot])
+                # check if output_df is empty
+                if (output_df.empty):
+                    continue
                 # save the data to a csv file
-                pos_df.to_csv(f'{aa_dir}/{amino_acid}_{position}.csv', index=False)
+                #output_df.to_csv(f'{aa_dir}/{amino_acid}_{i}.csv', index=False)
+                # separate the dataframes by unique positions
+                for position in output_df['Position'].unique():
+                    pos_df = output_df[output_df['Position'] == position]
+                    # remove the one-hot encoding from the dataframe
+                    pos_df = pos_df.drop(columns=['OneHot', 'tmp'])
+                    # save the data to a csv file
+                    pos_df.to_csv(f'{aa_dir}/{amino_acid}_{position}.csv', index=False)
