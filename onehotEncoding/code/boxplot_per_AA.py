@@ -8,13 +8,22 @@ def addRegion(df):
     # loop through dataframe rows and break down into regions
     for index, row in df.iterrows():
         # check the xShift value
-        if row['startXShift'] <= 7.5:
+        #if row['startXShift'] <= 7.5:
+        #    # add region column GAS
+        #    df.loc[index, 'Region'] = 'GAS'
+        #elif row['startXShift'] > 7.5 and row['startCrossingAngle'] < 0:
+        #    # add region column GAS
+        #    df.loc[index, 'Region'] = 'Right'
+        #elif row['startXShift'] > 7.5 and row['startCrossingAngle'] > 0:
+        #    # add region column Left
+        #    df.loc[index, 'Region'] = 'Left'
+        if row['xShift'] <= 7.5:
             # add region column GAS
             df.loc[index, 'Region'] = 'GAS'
-        elif row['startXShift'] > 7.5 and row['startCrossingAngle'] < 0:
+        elif row['xShift'] > 7.5 and row['crossingAngle'] < 0:
             # add region column GAS
             df.loc[index, 'Region'] = 'Right'
-        elif row['startXShift'] > 7.5 and row['startCrossingAngle'] > 0:
+        elif row['xShift'] > 7.5 and row['crossingAngle'] > 0:
             # add region column Left
             df.loc[index, 'Region'] = 'Left'
     return df
@@ -50,6 +59,9 @@ def plotBoxplot(df_data, output_dir, aa, xAxis, yAxis, yMin, yMax, output_name):
     ax.legend_.remove()
     # set the y axis value range
     plt.ylim(yMin, yMax)
+    # adjust the x axis tick labels and bold them
+    plt.xticks(fontweight='bold')
+    plt.xticks(rotation=45)
     # set the title
     plt.title(f'Boxplot for {aa}: {output_name}')
     # set the y label

@@ -12,8 +12,10 @@ if __name__ == '__main__':
     xAxis = 'AA'
     yAxis = 'PercentGpa'
     #yAxis = 'Total'
-    yMin = -55
-    yMax = 0 
+    #yMin = -55
+    #yMax = 0 
+    yMin = 0
+    yMax = 100 
     geom_list = ['endXShift', 'endCrossingAngle', 'endAxialRotation', 'endZShift']
     norm_cols = [f'{col}Norm' for col in geom_list]
     colors = ['red', 'blue', 'green', 'orange']
