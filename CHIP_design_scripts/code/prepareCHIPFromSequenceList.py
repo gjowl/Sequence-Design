@@ -13,13 +13,20 @@ This piece of code is for writing a csv file that can be used to purchase a CHIP
 TODO:
     - Write in a way to output the proper energies for each sequence
 """
+<<<<<<< HEAD
 import os, sys, pandas as pd
+=======
+>>>>>>> 00aac008ac90c90e1b7ea2d67f3488c2476b3c92
 from datetime import date
 from scipy import stats
 from matplotlib import gridspec
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+<<<<<<< HEAD
+=======
+import pandas as pd
+>>>>>>> 00aac008ac90c90e1b7ea2d67f3488c2476b3c92
 import re
 import random as rand
 from utilityFunctions import *
@@ -79,6 +86,7 @@ def getCHIPFile(df, dfFwdP, dfRevP, gpaSeq, g83ISeq, cut1, cut2, randomDNALength
     return outputDf
 
 # Local Variables
+<<<<<<< HEAD
 if __name__ == "__main__":
     input_file = sys.argv[1]
     output_dir = sys.argv[2]
@@ -125,3 +133,43 @@ if __name__ == "__main__":
     writeDataframeToSpreadsheet(dfCHIP, writer, 'CHIP')
 
     writer.close()
+=======
+outputDir = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\"
+inputFile = outputDir + 'optimizedBackboneAnalysis.xlsx'
+inputFile = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\2022_1_5_CHIP\\CHIP1_Segments.xlsx"
+primerFile = "C:\\Users\\gjowl\\Downloads\\Primers.csv"
+outputFile = outputDir + 'CHIP.xlsx'
+writer = pd.ExcelWriter(outputFile)
+cutSite1 = 'gctagc'
+cutSite2 = 'gatc'
+gpa = 'LIIFGVMAGVIG'#final T comes from one of the base pairs in annealed cutsite, so hardcoded the codon for T
+g83I = 'LIIFGVMAIVIG'
+randomDNALength = 21 #matches the number from Samantha's CHIP4
+seed = 1
+rand.seed(seed)
+
+# Main
+# Read in CHIP primer file
+dfPrimer = pd.read_csv(primerFile, sep=',')
+
+# Separate Primers and primer names and add to corresponding dataframes
+dfForwardPrimer = dfPrimer.iloc[0::2]
+dfReversePrimer = dfPrimer.iloc[1::2]
+dfForwardPrimer = dfForwardPrimer.reset_index()
+dfReversePrimer = dfReversePrimer.reset_index()
+dfForwardPrimer.pop('index')
+dfReversePrimer.pop('index')
+
+# read excel spreadsheet with the randomly chosen CHIP sequences from optimizedBackboneAnalysis
+dfAllSequences = pd.read_excel(inputFile, sheet_name='Segments')
+
+# nucleic acid sequences for gpa and g83I
+gpaSeq = reverse_translate(gpa)
+g83ISeq = reverse_translate(g83I)
+
+# convert AA sequences to DNA sequences and
+dfCHIP = getCHIPFile(dfAllSequences, dfForwardPrimer, dfReversePrimer, gpaSeq, g83ISeq, cutSite1, cutSite2, randomDNALength)
+writeDataframeToSpreadsheet(dfCHIP, writer, 'CHIP')
+
+writer.close()
+>>>>>>> 00aac008ac90c90e1b7ea2d67f3488c2476b3c92
