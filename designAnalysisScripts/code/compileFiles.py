@@ -15,6 +15,7 @@ rawDataDir = sys.argv[1]
 outputDir = sys.argv[2]
 dataFile = sys.argv[3]
 file_name = sys.argv[4]
+delimiter = sys.argv[5]
 
 # check if dataFile exists
 if os.path.isfile(dataFile):
@@ -38,20 +39,19 @@ for dir in os.listdir(rawDataDir):
     if os.path.isdir(currDir):
         for file in os.listdir(currDir):
             # check filename
-            if file == f'{file_name}':
+            if file == file_name:
                 filename = f'{currDir}/{file}'
                 # read the csv file into a dataframe
-                header = pd.read_csv(filename,sep='\t',header=None, nrows=1)
+                header = pd.read_csv(filename,sep=delimiter,header=None, nrows=1)
                 # read csv with interface column as string 
-                df = pd.read_csv(filename, sep='\t', header=None, skiprows=1, dtype={2: str})# sets the interface column as a string
+                df = pd.read_csv(filename, sep=delimiter, header=None, skiprows=1)# sets the interface column as a string
+                df = df.dropna(axis=1, how='all')
                 df.columns = header.iloc[0]
                 # add the directory name to the dataframe
                 df['Directory'] = dir
                 # combine the dataframes
                 outputDf = pd.concat([outputDf,df],axis=0)
 
-# sort the dataframe by the Total
-outputDf = outputDf.sort_values(by=['Total'])
 # get rid of any empty columns
 outputDf = outputDf.dropna(axis=1, how='all')
 # output the dataframe to a csv file without the index

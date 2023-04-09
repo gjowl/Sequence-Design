@@ -1,0 +1,160 @@
+03_03_2023
+Self Consistent Mean Field Start Time: Fri Mar  3 02:08:44 2023
+Elapsed time of program: 0.31min
+
+Running Self Consistent Mean Field
+Initial Sequence:   LLLGYLLGTLLGYLLSTLILI
+Best Sequence:      LLLGYLLGTLLGYLLSTLILI
+Interface Sequence: L--GY--GT-LGY-LST---I
+Total Energy:       -21.6
+VDW:                -49
+HBOND:              -89.1
+Self Consistent Mean Field End Time: Fri Mar  3 03:00:57 2023
+Elapsed time of program: 52.5min
+
+Monte Carlo Sequence Search Replicate 0 Start Time: Fri Mar  3 03:01:11 2023
+Elapsed time of program: 52.7min
+
+  - SelfPairManager energy calculation 0 Start Time: Fri Mar  3 03:01:27 2023
+Elapsed time of program: 53min
+
+  - SelfPairManager energy calculation 0 End Time: Fri Mar  3 03:02:12 2023
+Elapsed time of program: 53.8min
+
+- End monte carlo sequence search #0: 73.2min; Monte Carlo ended at Temp: 0.547
+
+- Best Sequence: LLLAYLLGLLLGTLLSFLILI; Energy w/ baseline: -19
+Monte Carlo Sequence Search Replicate 0 End Time: Fri Mar  3 04:15:21 2023
+Elapsed time of program: 127min
+
+Compute Monomer Energy Start Time: Fri Mar  3 04:15:48 2023
+Elapsed time of program: 127min
+
+-Dimer - Monomer = -364 - -355 = -8.58
+Compute Monomer Energy End Time: Fri Mar  3 04:20:08 2023
+Elapsed time of program: 132min
+
+Backbone optimize replicate 0 Start Time: Fri Mar  3 04:20:09 2023
+Elapsed time of program: 132min
+
+Backbone optimize replicate 0 End Time: Fri Mar  3 06:55:27 2023
+Elapsed time of program: 287min
+
+Monte Carlo Sequence Search Replicate 1 Start Time: Fri Mar  3 06:55:28 2023
+Elapsed time of program: 287min
+
+  - SelfPairManager energy calculation 1 Start Time: Fri Mar  3 06:55:43 2023
+Elapsed time of program: 287min
+
+  - SelfPairManager energy calculation 1 End Time: Fri Mar  3 06:56:24 2023
+Elapsed time of program: 288min
+
+- End monte carlo sequence search #1: 64.7min; Monte Carlo ended at Temp: 0.547
+
+- Best Sequence: LLLAVLLGLLLGFLLSTLILI; Energy w/ baseline: -17.1
+Monte Carlo Sequence Search Replicate 1 End Time: Fri Mar  3 08:01:07 2023
+Elapsed time of program: 353min
+
+Compute Monomer Energy Start Time: Fri Mar  3 08:01:31 2023
+Elapsed time of program: 353min
+
+-Dimer - Monomer = -372 - -362 = -10.3
+Compute Monomer Energy End Time: Fri Mar  3 08:04:27 2023
+Elapsed time of program: 356min
+
+Backbone optimize replicate 1 Start Time: Fri Mar  3 08:04:27 2023
+Elapsed time of program: 356min
+
+Backbone optimize replicate 1 End Time: Fri Mar  3 10:22:02 2023
+Elapsed time of program: 494min
+
+Monte Carlo Sequence Search Replicate 2 Start Time: Fri Mar  3 10:22:03 2023
+Elapsed time of program: 494min
+
+  - SelfPairManager energy calculation 2 Start Time: Fri Mar  3 10:22:19 2023
+Elapsed time of program: 494min
+
+  - SelfPairManager energy calculation 2 End Time: Fri Mar  3 10:23:00 2023
+Elapsed time of program: 495min
+
+- End monte carlo sequence search #2: 69.1min; Monte Carlo ended at Temp: 0.547
+
+- Best Sequence: LLLTLLLGLLLGFLLSALILI; Energy w/ baseline: -18.6
+Monte Carlo Sequence Search Replicate 2 End Time: Fri Mar  3 11:32:05 2023
+Elapsed time of program: 564min
+
+Compute Monomer Energy Start Time: Fri Mar  3 11:32:39 2023
+Elapsed time of program: 564min
+
+-Dimer - Monomer = -380 - -362 = -17.6
+Compute Monomer Energy End Time: Fri Mar  3 11:35:44 2023
+Elapsed time of program: 567min
+
+Backbone optimize replicate 2 Start Time: Fri Mar  3 11:35:45 2023
+Elapsed time of program: 567min
+
+Backbone optimize replicate 2 End Time: Fri Mar  3 13:43:44 2023
+Elapsed time of program: 695min
+
+Monte Carlo Sequence Search Replicate 3 Start Time: Fri Mar  3 13:43:44 2023
+Elapsed time of program: 695min
+
+  - SelfPairManager energy calculation 3 Start Time: Fri Mar  3 13:43:59 2023
+Elapsed time of program: 696min
+
+  - SelfPairManager energy calculation 3 End Time: Fri Mar  3 13:44:43 2023
+Elapsed time of program: 696min
+
+- End monte carlo sequence search #3: 74.6min; Monte Carlo ended at Temp: 0.547
+
+- Best Sequence: LLLAVLLGLLLGFLLSTLILI; Energy w/ baseline: -22.5
+Monte Carlo Sequence Search Replicate 3 End Time: Fri Mar  3 14:59:21 2023
+Elapsed time of program: 771min
+
+Compute Monomer Energy Start Time: Fri Mar  3 14:59:47 2023
+Elapsed time of program: 771min
+
+-Dimer - Monomer = -377 - -362 = -15.7
+Compute Monomer Energy End Time: Fri Mar  3 15:02:33 2023
+Elapsed time of program: 774min
+
+Backbone optimize replicate 3 Start Time: Fri Mar  3 15:02:34 2023
+Elapsed time of program: 774min
+
+Backbone optimize replicate 3 End Time: Fri Mar  3 16:38:06 2023
+Elapsed time of program: 870min
+
+Monte Carlo Sequence Search Replicate 4 Start Time: Fri Mar  3 16:38:07 2023
+Elapsed time of program: 870min
+
+  - SelfPairManager energy calculation 4 Start Time: Fri Mar  3 16:38:22 2023
+Elapsed time of program: 870min
+
+  - SelfPairManager energy calculation 4 End Time: Fri Mar  3 16:39:03 2023
+Elapsed time of program: 871min
+
+- End monte carlo sequence search #4: 65.8min; Monte Carlo ended at Temp: 0.547
+
+- Best Sequence: LLLTLLLGVLLGFLLSILILI; Energy w/ baseline: -26.7
+Monte Carlo Sequence Search Replicate 4 End Time: Fri Mar  3 17:44:49 2023
+Elapsed time of program: 936min
+
+Compute Monomer Energy Start Time: Fri Mar  3 17:45:20 2023
+Elapsed time of program: 937min
+
+-Dimer - Monomer = -387 - -361 = -25.5
+Compute Monomer Energy End Time: Fri Mar  3 17:48:36 2023
+Elapsed time of program: 940min
+
+Backbone optimize replicate 4 Start Time: Fri Mar  3 17:48:36 2023
+Elapsed time of program: 940min
+
+Backbone optimize replicate 4 End Time: Fri Mar  3 20:12:02 2023
+Elapsed time of program: 1.08e+03min
+
+Sequence,RotamerValues,Interface,InterfaceSequence,Seed,Density,Baseline,Dimer,Dimerw/Baseline,HBONDDimer,HBONDDimerOptimize,HBONDDimerPreOptimize,HBONDMonomer,IMM1Dimer,IMM1DimerOptimize,IMM1DimerPreOptimize,IMM1Monomer,Monomer,MonomerSasa,OptimizeSasa,PreBBOptimizeSasa,SequenceEntropy,SequenceProbability,Total,TotalPreOptimize,Totalw/Entropy,VDWDimer,VDWDimerOptimize,VDWDimerPreOptimize,VDWMonomer,acceptCycleNumber,acceptTemp,endAxialRotation,endAxialRotationPrime,endCrossingAngle,endXShift,endZShift,endZShiftPrime,firstRepackEnergy,preOptimizeAxialRotation,preOptimizeAxialRotationPrime,preOptimizeCrossingAngle,preOptimizeEnergy,preOptimizeXShift,preOptimizeZShift,preOptimizeZShiftPrime,preRepackTotal,replicateNumber,startAxialRotation,startAxialRotationPrime,startCrossingAngle,startXShift,startZShift,startZShiftPrime,
+LLLAVLLGLLLGFLLSTLILI,133002200210031003221,000110011001100110000,L--AV--GL-LGF-LST---I,1.67783e+09,1,354.808,-377.286,-22.478,-78.1629,-80.4631,-78.0235,-74.2158,-215.422,-216.757,-215.415,-236.636,-361.612,4395.98,3731.44,3600.24,48.8354,0.000261463,-23.0845,-15.546,26.3574,-83.7014,-87.4766,-83.7194,-50.76,492,113.638,-93.3512,41.9135,-45.1005,6.66484,6.161,5.2897,-20.3812,-93.3512,41.9135,-44.0256,-15.546,6.85846,6.161,5.2897,-15.6741,3,-93.3512,41.9135,-44.1361,7.4044,6.161,5.2897,
+LLLAYLLGLLLGTLLSFLILI,133002200210031003221,000110011001100110000,L--AY--GL-LGT-LSF---I,1.67783e+09,1,344.892,-363.866,-18.9742,-78.1481,-78.9816,-78.0094,-74.1783,-220.348,-220.383,-220.34,-242.98,-355.286,4532.17,3778.94,3760.74,54.4266,0.00010168,-14.7488,-8.45247,35.4524,-65.3702,-70.6704,-65.3896,-38.1279,506,60.9677,-93.3512,41.9135,-43.184,7.23572,6.161,5.2897,-12.3014,-93.3512,41.9135,-44.1361,-8.45247,7.4044,6.161,5.2897,-8.58006,0,-93.3512,41.9135,-44.1361,7.4044,6.161,5.2897,
+LLLTLLLGLLLGFLLSALILI,133002200210031003221,000110011001100110000,L--TL--GL-LGF-LSA---I,1.67783e+09,1,361.247,-379.866,-18.6193,-63.5803,-64.2658,-63.3866,-60.4258,-220.716,-222.987,-220.715,-241.903,-362.246,4465.16,3678.64,3558.94,49.8866,0.000218923,-28.6058,-17.4442,31.2673,-95.5701,-103.599,-95.5888,-59.9173,486,95.1175,-93.3512,41.9135,-44.0256,6.85846,6.161,5.2897,-24.1558,-93.3512,41.9135,-42.0897,-17.4442,7.05694,6.161,5.2897,-17.6206,2,-93.3512,41.9135,-44.1361,7.4044,6.161,5.2897,
+LLLTLLLGVLLGFLLSILILI,133002200210031003221,000110011001100110000,L--TL--GV-LGF-LSI---I,1.67783e+09,1,359.908,-386.638,-26.7296,-66.7781,-69.2316,-66.6321,-60.554,-224.04,-224.892,-224.039,-244.393,-361.164,4474.81,3584.65,3556.9,49.8243,0.000221238,-33.1635,-25.34,23.0947,-95.8196,-100.203,-95.8326,-56.2163,534,39.0787,-93.3512,41.9135,-43.277,6.48783,6.161,5.2897,-32.8425,-93.3512,41.9135,-45.1005,-25.34,6.66484,6.161,5.2897,-25.4743,4,-93.3512,41.9135,-44.1361,7.4044,6.161,5.2897,
+Total Time: 1084 minutes
