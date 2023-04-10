@@ -28,6 +28,7 @@ for file in bestFiles:
         pdbName = designNum+'_'+str(repNum)
         # put together the filename
         filename = rawDataDir+'/'+dirName+'/'+pdbName+'.pdb'
+        print(filename)
         # load the pdb file
         cmd.load(filename)
         # loop through the interface
