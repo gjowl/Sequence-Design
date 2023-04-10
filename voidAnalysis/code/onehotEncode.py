@@ -79,10 +79,14 @@ if __name__ == "__main__":
     # read in a dataframe from the command line
     df = pd.read_csv(input_file, dtype={'Interface': str})
 
+    # remove any sequences that don't have matching first 3 and last 3 residues between Sequence and Mutant
+    df = df[df['Sequence'].str[:3] == df['Mutant'].str[:3]]
+    df = df[df['Sequence'].str[-4:] == df['Mutant'].str[-4:]]
+
     for col in columns:
         # add the one-hot encoding to the dataframe
         df = add_onehot_to_df(df, col)
-
+    
     output_df = pd.DataFrame()
     # output the dataframe to a csv file
     for seq in df['Sequence'].unique():
