@@ -31,6 +31,8 @@ if __name__ == '__main__':
 
     # read in the csv file as a dataframe
     df = pd.read_csv(input_file, sep=',', header=0)
+    # get the SasaDifference
+    df['SasaDifference'] = df['WT_Sasa'] - df['Mutant_Sasa']
     # get the bottom 2 void mutants
     df_clash = getWorstVoidMutants(df)
     # save the dataframe to a csv file
