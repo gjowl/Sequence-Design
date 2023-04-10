@@ -14,6 +14,7 @@ cwd = os.getcwd()
 rawDataDir = sys.argv[1]
 outputDir = sys.argv[2]
 dataFile = sys.argv[3]
+file_name = sys.argv[4]
 
 # check if dataFile exists
 if os.path.isfile(dataFile):
@@ -37,7 +38,7 @@ for dir in os.listdir(rawDataDir):
     if os.path.isdir(currDir):
         for file in os.listdir(currDir):
             # check filename
-            if file == "energyFile.csv":
+            if file == f'{file_name}':
                 filename = f'{currDir}/{file}'
                 # read the csv file into a dataframe
                 header = pd.read_csv(filename,sep='\t',header=None, nrows=1)
