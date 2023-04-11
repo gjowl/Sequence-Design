@@ -24,6 +24,13 @@ def getWorstVoidMutants(df, numMutants=2):
         output_df = pd.concat([output_df, seq_df], axis=0)
     return output_df
 
+def chooseMutants(df, numMutants=2):
+    # loop through the sequences
+    for seq in df['Sequence'].unique():
+        # get the sequence dataframe
+        seq_df = df[df['Sequence'] == seq]
+
+
 if __name__ == '__main__':
     # read in the command line arguments
     mutant_file = sys.argv[1]
@@ -36,6 +43,8 @@ if __name__ == '__main__':
     # multiply the polyAla values by 2 to get the total sasa (currently loads up monomer sasa file)
     polyAla_df = polyAla_df * 2
 
+    # rid of data where Sequence == mutant
+    mutant_df = mutant_df[mutant_df['Sequence'] != mutant_df['Mutant']]
     # find positions in sequence that are not the same in the mutant
     mutant_df['Position'] = mutant_df.apply(lambda row: [i for i in range(len(row['Sequence'])) if row['Sequence'][i] != row['Mutant'][i]], axis=1)
     # convert the position column to an integer
@@ -65,9 +74,6 @@ if __name__ == '__main__':
     plt.title('Position Monomer Sasa Percent Difference per AA')
     plt.savefig('position_monomer_sasa_percent_difference_per_aa.png', dpi=500)
     plt.clf()
-
-    # keep the data where the position monomer sasa difference is less than 60
-    mutant_df = mutant_df[mutant_df['PositionMonomerSasaDiff'] < 60]
 
     # get the percentage of burial lost for each mutant
     mutant_df['BurialPercLost'] = (mutant_df['TotalMutant'] / mutant_df['Total_x']) * 100
@@ -119,6 +125,7 @@ if __name__ == '__main__':
     # output the dataframe to a csv file
     void_df.to_csv('void_mutants_0.csv', index=False)
 
+    test_df = chooseMutants(mutant_df, 2)
     # get the top 2 void mutants
     top_void_df = getTopVoidMutants(mutant_df)
     # output the dataframe to a csv file
@@ -137,6 +144,21 @@ if __name__ == '__main__':
         plt.savefig(f'void_mutants_sasadiff_{interface}.png', dpi=500)
         plt.clf()
 
+    # make a histogram of the count of the WT AA
+    plt.hist(top_void_df['WT_AA'], bins=20)
+    plt.xlabel('AA')
+    plt.ylabel('Count')
+    plt.title('Count of WT AA')
+    plt.savefig('void_mutants_wt_aa_count.png', dpi=500)
+    plt.clf()
+
+    # get the count of void mutants for each interface
+    plt.hist(mutant_df['WT_AA'], bins=20)
+    plt.xlabel('AA')
+    plt.ylabel('Count')
+    plt.title('Count of WT AA')
+    plt.savefig('total_wt_aa_count.png', dpi=500)
+    plt.clf()
     # get the worst 2 void mutants
     worst_void_df = getWorstVoidMutants(mutant_df)
     # output the dataframe to a csv file
