@@ -33,6 +33,8 @@ if __name__ == '__main__':
     # read in the csv file as a dataframe
     mutant_df = pd.read_csv(mutant_file, sep=',', header=0, dtype={'Interface': 'str'})
     polyAla_df = pd.read_csv(polyAla_file, sep=',', header=None)
+    # multiply the polyAla values by 2 to get the total sasa (currently loads up monomer sasa file)
+    polyAla_df = polyAla_df * 2
 
     # find positions in sequence that are not the same in the mutant
     mutant_df['Position'] = mutant_df.apply(lambda row: [i for i in range(len(row['Sequence'])) if row['Sequence'][i] != row['Mutant'][i]], axis=1)
@@ -41,6 +43,7 @@ if __name__ == '__main__':
 
     # initialize the SasaDifference list
     sasaDiff_list = []
+    sasaPercDiff_list = []
     # loop through the mutants 
     for mutant in mutant_df['Mutant']:
         # get the position of the mutant
@@ -51,7 +54,13 @@ if __name__ == '__main__':
         sasaDiff = polyAla - mutant_df[mutant_df['Mutant'] == mutant]['Mutant_AA'].values[0]
         # append the difference to the sasaDiff list
         sasaDiff_list.append(sasaDiff)
+        # get the sasa percentage difference
+        sasaPercDiff = (sasaDiff / polyAla) * 100
+        # append the sasa percentage difference to the sasaPercDiff list
+        sasaPercDiff_list.append(sasaPercDiff)
 
+    # add the SasaPercDifference to the mutant_df dataframe
+    mutant_df['SasaPercDifference'] = sasaPercDiff_list
     # add the SasaDifference to the mutant_df dataframe
     mutant_df['SasaDifference'] = sasaDiff_list
 
@@ -102,7 +111,7 @@ if __name__ == '__main__':
     for interface in mutant_df['Interface'].unique():
         interface_df = mutant_df[mutant_df['Interface'] == interface]
         # plot the boxplot for each position
-        sns.boxplot(x='Position', y='SasaDifference', data=interface_df)
+        sns.boxplot(x='Position', y='SasaPercDifference', data=interface_df)
         plt.xlabel('Position')
         plt.ylabel('SasaDifference')
         plt.title(f'SasaDifference for each position on interface {interface}')
