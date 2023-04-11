@@ -8,7 +8,7 @@ def getTopVoidMutants(df, numMutants=2):
         # loop through the sequences
         seq_df = df[df['Sequence'] == seq]
         # keep the sequences with the top 2 SasaDiff values
-        seq_df = seq_df.nlargest(numMutants, 'SasaDifference')
+        seq_df = seq_df.nlargest(numMutants, 'SasaPercDifference')
         # concat the directory_df to the top_void_df
         output_df = pd.concat([output_df, seq_df], axis=0)
     return output_df
@@ -19,7 +19,7 @@ def getWorstVoidMutants(df, numMutants=2):
         # loop through the sequences
         seq_df = df[df['Sequence'] == seq]
         # keep the sequences with the bottom 2 SasaDiff values
-        seq_df = seq_df.nsmallest(numMutants, 'SasaDifference')
+        seq_df = seq_df.nsmallest(numMutants, 'SasaPercDifference')
         # concat the directory_df to the top_void_df
         output_df = pd.concat([output_df, seq_df], axis=0)
     return output_df
@@ -115,8 +115,8 @@ if __name__ == '__main__':
         # plot the boxplot for each position
         sns.boxplot(x='Position', y='SasaPercDifference', data=interface_df)
         plt.xlabel('Position')
-        plt.ylabel('SasaDifference')
-        plt.title(f'SasaDifference for each position on interface {interface}')
+        plt.ylabel('Alanine SASA % Difference')
+        plt.title(f'Interface: {interface}')
         # set the y axis to be from 0-100
         plt.ylim(0, 100)
         plt.savefig(f'void_mutants_sasadiff_{interface}.png', dpi=500)
