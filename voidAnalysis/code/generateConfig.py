@@ -6,8 +6,8 @@ import configparser
 
 # input directories
 root_dir = os.getcwd()
-#raw_data_dir = '2023-3-7_leuCHIP_mutants_rerun'
-raw_data_dir = '2023-3-13_alaCHIP_mutants_rerun'
+#raw_data_dir = '2023-3-7_leuCHIP_mutants_rerun_2'
+raw_data_dir = '2023-3-13_alaCHIP_mutants_rerun_2'
 #raw_data_dir = 'CHIP1_data'
 #data_dir = f'/mnt/d/DesignRuns/{raw_data_dir}'
 data_dir = f'/home/loiseau@ad.wisc.edu/Downloads/{raw_data_dir}'
@@ -27,7 +27,7 @@ curr_dir = os.getcwd()
 analysis = 'void'
 
 # input files
-design_data_file_name = 'CHIPSeqs_ala.csv'
+design_data_file_name = 'allData_ala.csv'
 design_data_file = f'{curr_dir}/{design_data_file_name}'
 
 # output

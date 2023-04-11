@@ -40,6 +40,42 @@ if __name__ == '__main__':
     mutant_df['Position'] = mutant_df.apply(lambda row: [i for i in range(len(row['Sequence'])) if row['Sequence'][i] != row['Mutant'][i]], axis=1)
     # convert the position column to an integer
     mutant_df['Position'] = mutant_df['Position'].apply(lambda x: int(x[0]))
+    # get the AA in the sequence for the position
+    mutant_df['WT_AA'] = mutant_df.apply(lambda row: row['Sequence'][row['Position']], axis=1)
+
+    # get the wt position - mutant position monomer sasa difference
+    mutant_df['PositionMonomerSasaDiff'] = mutant_df['WT_Position_MonomerSasa'] - mutant_df['Mut_Position_MonomerSasa']
+    # get the percent position monomer sasa difference
+    mutant_df['PositionMonomerSasaPercDiff'] = (mutant_df['Mut_Position_MonomerSasa']/ mutant_df['WT_Position_MonomerSasa']) * 100
+    # keep only the data where the position monomer sasa difference is greater than 0
+    mutant_df = mutant_df[mutant_df['PositionMonomerSasaDiff'] > 0]
+    # save the mutant_df to a csv file
+    mutant_df.to_csv('mutant_df.csv', index=False)
+
+    # plot the position monomer sasa difference per aa
+    plt.figure()
+    sns.boxplot(x='WT_AA', y='PositionMonomerSasaDiff', data=mutant_df)
+    plt.title('Position Monomer Sasa Difference per AA')
+    plt.savefig('position_monomer_sasa_difference_per_aa.png', dpi=500)
+    plt.clf()
+
+    # plot the position monomer sasa percent difference per aa
+    plt.figure()
+    sns.boxplot(x='WT_AA', y='PositionMonomerSasaPercDiff', data=mutant_df)
+    plt.title('Position Monomer Sasa Percent Difference per AA')
+    plt.savefig('position_monomer_sasa_percent_difference_per_aa.png', dpi=500)
+    plt.clf()
+
+    # keep the data where the position monomer sasa difference is less than 60
+    mutant_df = mutant_df[mutant_df['PositionMonomerSasaDiff'] < 60]
+
+    # get the percentage of burial lost for each mutant
+    mutant_df['BurialPercLost'] = (mutant_df['TotalMutant'] / mutant_df['Total_x']) * 100
+    # keep only the data where the burial percentage lost is greater than 0
+    mutant_df = mutant_df[mutant_df['BurialPercLost'] > 100]
+    mutant_df.to_csv('mutant_df.csv', index=False)
+
+    mutant_df.rename(columns={'Mutant.1': 'Mutant_AA'}, inplace=True)
 
     # initialize the SasaDifference list
     sasaDiff_list = []
@@ -68,11 +104,38 @@ if __name__ == '__main__':
 
     # output the dataframe to a csv file
     mutant_df.to_csv(output_file, index=False) 
+    
+    # keep only the data where the Alanine SASA % Difference is greater than 50
+    #mutant_df = mutant_df[mutant_df['SasaPercDifference'] > 50]
+
+    
+    # TODO: trim the data:
+    # 1. remove the data by alanine burial in the monomer state differece?
+    # 2. remove data by the difference in exposure between the monomer and the dimer and plot
+    # 3. remove data by the difference in overall SASA between mutant and wild type and plot
+    
+    # keep the void mutants with a SasaDifference == 0
+    void_df = mutant_df[mutant_df['Mutant_AA'] == 0]
+    # output the dataframe to a csv file
+    void_df.to_csv('void_mutants_0.csv', index=False)
 
     # get the top 2 void mutants
     top_void_df = getTopVoidMutants(mutant_df)
     # output the dataframe to a csv file
     top_void_df.to_csv('top_void_mutants.csv', index=False)
+
+    # make a boxplot of the SasaDifference for each position for each interface
+    for interface in top_void_df['Interface'].unique():
+        interface_df = top_void_df[top_void_df['Interface'] == interface]
+        # plot the boxplot for each position
+        sns.boxplot(x='Position', y='SasaPercDifference', data=interface_df)
+        plt.xlabel('Position')
+        plt.ylabel('Alanine SASA % Difference')
+        plt.title(f'Interface: {interface}')
+        # set the y axis to be from 0-100
+        plt.ylim(0, 100)
+        plt.savefig(f'void_mutants_sasadiff_{interface}.png', dpi=500)
+        plt.clf()
 
     # get the worst 2 void mutants
     worst_void_df = getWorstVoidMutants(mutant_df)
@@ -94,8 +157,8 @@ if __name__ == '__main__':
     plt.gca().tick_params(axis='x', labelsize=6, labelrotation=45)
     plt.tight_layout()
     plt.savefig('void_mutants_position_count.png', dpi=500)
-
     plt.clf()
+
     # get the average SasaDifference for each position for each interface
     avg_df = mutant_df.groupby(['Interface', 'Position'])['SasaDifference'].mean().reset_index()
     # plot the position of the void mutants on the y axis with the interface on the x axis
@@ -108,23 +171,5 @@ if __name__ == '__main__':
     plt.tight_layout()
     plt.savefig('void_mutants_position.png', dpi=500)
     plt.clf()
-
-    # make a boxplot of the SasaDifference for each position for each interface
-    for interface in mutant_df['Interface'].unique():
-        interface_df = mutant_df[mutant_df['Interface'] == interface]
-        # plot the boxplot for each position
-        sns.boxplot(x='Position', y='SasaPercDifference', data=interface_df)
-        plt.xlabel('Position')
-        plt.ylabel('Alanine SASA % Difference')
-        plt.title(f'Interface: {interface}')
-        # set the y axis to be from 0-100
-        plt.ylim(0, 100)
-        plt.savefig(f'void_mutants_sasadiff_{interface}.png', dpi=500)
-        plt.clf()
-
-    # keep the void mutants with a SasaDifference == 0
-    void_df = mutant_df[mutant_df['Mutant_AA'] == 0]
-    # output the dataframe to a csv file
-    void_df.to_csv('void_mutants_0.csv', index=False)
 
 

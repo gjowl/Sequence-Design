@@ -44,7 +44,6 @@ for dir in os.listdir(rawDataDir):
                 header = pd.read_csv(filename,sep=delimiter,header=None, nrows=1)
                 # read csv with interface column as string 
                 df = pd.read_csv(filename, sep=delimiter, header=None, skiprows=1)# sets the interface column as a string
-                df = df.dropna(axis=1, how='all')
                 df.columns = header.iloc[0]
                 # add the directory name to the dataframe
                 df['Directory'] = dir
@@ -52,6 +51,7 @@ for dir in os.listdir(rawDataDir):
                 outputDf = pd.concat([outputDf,df],axis=0)
 
 # rename the Sequence and Directory columns
+outputDf = outputDf.dropna(axis=1, how='all')
 outputDf = outputDf.rename(columns={'Sequence': 'Mutant', 'Directory': 'Sequence'})
 # get rid of any empty columns
 outputDf = outputDf.dropna(axis=1, how='all')
