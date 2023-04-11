@@ -50,12 +50,14 @@ if __name__ == '__main__':
         position = mutant_df[mutant_df['Mutant'] == mutant]['Position'].values[0]
         # get the ith column of polyAla_df where i is the position of the mutant
         polyAla = polyAla_df.iloc[:, position].values[0]
+        # get the mutant sasa
+        mutant_sasa = mutant_df[mutant_df['Mutant'] == mutant]['Mutant_AA'].values[0]
         # get the difference between the polyAla and the mutant sasa
-        sasaDiff = polyAla - mutant_df[mutant_df['Mutant'] == mutant]['Mutant_AA'].values[0]
+        sasaDiff = polyAla - mutant_sasa
         # append the difference to the sasaDiff list
         sasaDiff_list.append(sasaDiff)
         # get the sasa percentage difference
-        sasaPercDiff = (sasaDiff / polyAla) * 100
+        sasaPercDiff = (mutant_sasa / polyAla) * 100
         # append the sasa percentage difference to the sasaPercDiff list
         sasaPercDiff_list.append(sasaPercDiff)
 
@@ -115,6 +117,8 @@ if __name__ == '__main__':
         plt.xlabel('Position')
         plt.ylabel('SasaDifference')
         plt.title(f'SasaDifference for each position on interface {interface}')
+        # set the y axis to be from 0-100
+        plt.ylim(0, 100)
         plt.savefig(f'void_mutants_sasadiff_{interface}.png', dpi=500)
         plt.clf()
 
