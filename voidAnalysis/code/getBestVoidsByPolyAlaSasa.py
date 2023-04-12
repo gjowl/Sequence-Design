@@ -30,7 +30,6 @@ def chooseMutants(df, numMutants=2):
         # get the sequence dataframe
         seq_df = df[df['Sequence'] == seq]
 
-
 if __name__ == '__main__':
     # read in the command line arguments
     mutant_file = sys.argv[1]
@@ -51,6 +50,22 @@ if __name__ == '__main__':
     mutant_df['Position'] = mutant_df['Position'].apply(lambda x: int(x[0]))
     # get the AA in the sequence for the position
     mutant_df['WT_AA'] = mutant_df.apply(lambda row: row['Sequence'][row['Position']], axis=1)
+
+    # TODO: compare the monomer sasa of the position to the dimer sasa of the position
+    # check if the monomer sasa of the position is greater than the dimer sasa of the position
+
+    # then do you get more sasa somewhere else in the sequence?
+
+
+    print(len(mutant_df))
+    # get the monomer without alanine sasa
+    mutant_df['Mutant_SASA_no_alanine'] = mutant_df['TotalMutant'] - mutant_df['Mut_Position_MonomerSasa']
+    # get the sasa without the wt position sasa
+    mutant_df['SASA_no_wt_position'] = mutant_df['Total_x'] - mutant_df['WT_Position_MonomerSasa']
+    # keep the data where the mutant sasa is greater than the sequence sasa
+    mutant_df = mutant_df[mutant_df['Mutant_SASA_no_alanine'] > mutant_df['SASA_no_wt_position']]
+    print(len(mutant_df))
+    exit(0)
 
     # get the wt position - mutant position monomer sasa difference
     mutant_df['PositionMonomerSasaDiff'] = mutant_df['WT_Position_MonomerSasa'] - mutant_df['Mut_Position_MonomerSasa']
