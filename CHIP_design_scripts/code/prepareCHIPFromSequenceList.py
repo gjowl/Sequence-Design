@@ -142,6 +142,7 @@ if __name__ == "__main__":
     df_CHIP_seqs = pd.read_csv(input_file, sep=',')
     # remove any redundant sequences that may have been added as mutants
     df_CHIP_seqs = df_CHIP_seqs.drop_duplicates(subset=['Sequence'], keep='first')
+    print(len(df_CHIP_seqs))
 
     # nucleic acid sequences for gpa and g83I
     # get the list of nucleic acid sequences for the controls
