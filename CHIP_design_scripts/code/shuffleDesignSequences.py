@@ -5,6 +5,9 @@ input_file = sys.argv[1]
 num_splits = int(sys.argv[2])
 output_dir = sys.argv[3]
 
+# get the input filename without the extension
+input_filename = os.path.splitext(os.path.basename(input_file))[0]
+
 # make the output directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)
 
@@ -30,6 +33,6 @@ for region in df['Region'].unique():
         output_df = pd.concat([output_df, region_df_i], axis=0)
 
 # save the output dataframe to a csv file
-output_df.to_csv(f'{output_dir}/shuffled.csv', index=False)
+output_df.to_csv(f'{output_dir}/{input_filename}_shuffled.csv', index=False)
 
 
