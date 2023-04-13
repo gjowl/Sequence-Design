@@ -75,7 +75,7 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, randomDNALength):
             controlDNASeq = fwd + cut1 + controlSeq + 'AC' + cut2 + rvs + randomDNAEnd
             i=0
             # At end of segment, add in the control sequences with a function
-            for i in range(0,5):
+            for i in range(0,3):
                 dictOutput['DNA Sequence'].append(controlDNASeq)
                 dictOutput['Segment Number'].append(segmentNum)
                 dictOutput['TM Sequence'].append(control)
@@ -111,14 +111,15 @@ if __name__ == "__main__":
     P_2H07 = 'IIVAMTAVGGSICVMLVVICL'
     P_2E06 = 'LALGLGACLLAGTSLSVLWVY'
     P_2H01 = 'FHMIAVGLSSSILGCLITLLV'
-    N_1E01 = 'FALGLGFCLPAGTSLSV'
-    N_1E11 = 'ILFVIAVASELGYFLCI'
+    #N_1E01 = 'FALGLGFCLPAGTSLSV'
+    #N_1E11 = 'ILFVIAVASELGYFLCI'
     N_2E11 = 'VVIIAVVCCVVGTSLVWIVII'
     N_2F12 = 'VVIIAIVCCVVGTSLVWVVII'
     N_2H11 = 'GIYFVLGVCFGLLLTLCLLVI'
 
     # add in the controls as a list
-    controls = [gpa, g83i, P_1G02, P_1C03, P_2H07, P_2E06, P_2H01, N_1E01, N_1E11, N_2E11, N_2F12, N_2H11]
+    #controls = [gpa, g83i, P_1G02, P_1C03, P_2H07, P_2E06, P_2H01, N_1E01, N_1E11, N_2E11, N_2F12, N_2H11]
+    controls = [gpa, g83i, P_1G02, P_1C03, P_2H07, P_2E06, P_2H01]
 
     # after this is working properly, add in the 10 controls as a list
     randomDNALength = 21 #matches the number from Samantha's CHIP4
@@ -153,9 +154,6 @@ if __name__ == "__main__":
 
     # convert AA sequences to DNA sequences and
     dfCHIP = getCHIPFile(df_CHIP_seqs, dfForwardPrimer, dfReversePrimer, df_controls, cutSite1, cutSite2, randomDNALength)
-    print(len(dfCHIP))
-    # remove any redundant sequences that have same interface but different design ends
-    dfCHIP = dfCHIP.drop_duplicates(subset=['TM Sequence'], keep='first')
     # reset the index and remove the old index column
     dfCHIP = dfCHIP.reset_index()
     dfCHIP.pop('index')
