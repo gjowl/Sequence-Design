@@ -16,7 +16,7 @@ if __name__ == '__main__':
     input_filename = os.path.splitext(os.path.basename(input_file))[0]
 
     # define the amino acids to mutate to
-    amino_acids = ['I', 'V', 'L', 'F']
+    amino_acids = ['I', 'L', 'A', 'F']
 
     # read in the input file as a dataframe
     df = pd.read_csv(input_file)
