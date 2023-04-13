@@ -39,21 +39,15 @@ if __name__ == "__main__":
     # rid of data where Sequence == mutant
     mutant_df = mutant_df[mutant_df['Sequence'] != mutant_df['Mutant']]
 
-    # rename columns to make them more readable
-    mutant_df.rename(columns={'Start': 'WT_Position_Sasa', 'Total_x': 'WT_Dimer_Sasa', 'TotalMutant': 'Mutant_Dimer_Sasa', 'Mutant.1': 'Mutant_Position_Sasa'}, inplace=True)
-    # rename multiple columns
-    mutant_df.rename(columns={'Total': 'Total_x', 'Total.1': 'TotalMutant'}, inplace=True)
-    print(len(mutant_df))
-
     # Step one: check if the monomer sasa of each amino acid is increased
     mutant_df = mutant_df[mutant_df['WT_Position_Sasa'] < mutant_df['WT_Position_MonomerSasa']*2]
     print(len(mutant_df))
 
     # Step two: check if the sasa with alanine at that position leads to more sasa elsewhere
     # get the monomer without alanine sasa
-    mutant_df['Mutant_SASA_no_alanine'] = mutant_df['Mutant_Dimer_Sasa'] - mutant_df['Mutant_Position_Sasa']
+    mutant_df['Mutant_SASA_no_alanine'] = mutant_df['Mutant_DimerSasa'] - mutant_df['Mutant_Position_Sasa']
     # get the sasa without the wt position sasa
-    mutant_df['SASA_no_wt_position'] = mutant_df['WT_Dimer_Sasa'] - mutant_df['WT_Position_Sasa']
+    mutant_df['SASA_no_wt_position'] = mutant_df['WT_DimerSasa'] - mutant_df['WT_Position_Sasa']
     # keep the data where the mutant sasa is greater than the sequence sasa
     mutant_df = mutant_df[mutant_df['Mutant_SASA_no_alanine'] > mutant_df['SASA_no_wt_position']]
     print(len(mutant_df))
