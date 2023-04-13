@@ -26,31 +26,10 @@ if __name__ == '__main__':
     df = df.drop_duplicates(subset=['Mutant'], keep='first')
 
     # find positions in sequence that are not the same in the mutant
-    df['Position'] = df.apply(lambda row: [i for i in range(len(row['Sequence'])) if row['Sequence'][i] != row['Mutant'][i]], axis=1)
+    #df['Position'] = df.apply(lambda row: [i for i in range(len(row['Sequence'])) if row['Sequence'][i] != row['Mutant'][i]], axis=1)
     # change the amino acid at the position in the mutant to I
-    df['Mutant'] = df.apply(lambda row: row['Mutant'][:row['Position'][0]] + 'I' + row['Mutant'][row['Position'][0]+1:], axis=1)
-    # remove the position column
-    df = df.drop(columns=['Position'])
+    df['Mutant'] = df.apply(lambda row: row['Mutant'][:row['Position']] + 'I' + row['Mutant'][row['Position']+1:], axis=1)
     # sort dataframe by region and sequence
     df = df.sort_values(by=['Region', 'Sequence'])
     # save the dataframe to a csv file
     df.to_csv(output_file, index=False)
-    
-    # create a boxplot of the SasaDifference
-    plt.figure()
-
-    # color the scatter plot differently for each region
-    for region in df['Region'].unique():
-        # get the data for the region
-        region_df = df[df['Region'] == region]
-        # plot the data
-        plt.scatter(region_df['Total'], region_df['SasaDifference'], label=region)
-    plt.title('SasaDifference')
-    # add a legend with the region names
-    plt.legend()
-    plt.xlabel('Total Energy')
-    plt.ylabel('SasaDifference')
-
-    # save the figure
-    plt.savefig(f'{input_file[:-4]}_bottom2.png', dpi=300)
-            
