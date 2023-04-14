@@ -34,6 +34,7 @@ kdeFile = f'{inputDir}/2020_09_23_kdeData.csv'
 seqEntropyFile = f'{inputDir}/2021_12_05_seqEntropies.csv'
 sequenceProbabilitiesFile = f'{inputDir}/2021_12_05_sequenceProbabilities.csv'
 requirementsFile = f'{inputDir}/requirements.txt'
+file_to_compile = 'energyFile.csv'
 
 # scripts
 scriptDir = f'{currDir}/code'
@@ -59,6 +60,7 @@ config_file["main"]={
     "rawDataDir": rawDataDir,
     "dataFile": dataFile,
     "numSeqs": numSeqs,
+    "file_to_compile": file_to_compile
 }
 
 # SAVE CONFIG FILE
