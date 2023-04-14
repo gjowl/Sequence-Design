@@ -10,7 +10,8 @@ if __name__ == '__main__':
     # read in the command line arguments
     input_file = sys.argv[1]
     output_dir = sys.argv[2]
-    positions_to_mutate = [int (i) for i in sys.argv[3:]]
+    num_mutations = int(sys.argv[3])
+    positions_to_mutate = [int (i) for i in sys.argv[4:]]
     
     # get the name of the input file without the file extension
     input_filename = os.path.splitext(os.path.basename(input_file))[0]
@@ -30,11 +31,10 @@ if __name__ == '__main__':
         # loop through the positions to mutate
         for position in positions_to_mutate:
             # loop through the amino acids to mutate to
-            successful_mutations = 0
             mutant_sequence_df = pd.DataFrame()
             for amino_acid in amino_acids:
-                # check if the number of successful mutations is greater than 2
-                if len(mutant_sequence_df) > 0:
+                # check if the number of successful mutations is greater than the number of mutations to make
+                if len(mutant_sequence_df) == num_mutations:
                     # if so, break out of the loop and go to the next sequence/position
                     break
                 # check if the amino acid is the same as the wild type
@@ -43,8 +43,8 @@ if __name__ == '__main__':
                     continue
                 # mutate the sequence at the position
                 mutant_sequence = mutateSequence(sequence, position, amino_acid)
-                # add the mutant sequence to the dataframe using concat
-                mutant_sequence_df = pd.concat([mutant_sequence_df, pd.Series(mutant_sequence)], axis=0)
+                # add the mutant sequence to the dataframe using concat with the rest of the sequence information
+                mutant_sequence_df = pd.concat([mutant_sequence_df, df[df['Sequence'] == sequence].drop(columns=['Sequence']).assign(Sequence=mutant_sequence)], axis=0)
             # add the mutant sequence dataframe to the output dataframe
             output_df = pd.concat([output_df, mutant_sequence_df], axis=0)
     
