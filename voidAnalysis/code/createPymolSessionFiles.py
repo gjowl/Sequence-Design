@@ -15,12 +15,24 @@ os.makedirs(output_dir, exist_ok=True)
 df = pd.read_csv(input_file, sep=',', header=0, dtype={'Interface': str})
 
 # loop through each of the unique sequences
+num_wrong = 0
 for seq in df['Sequence'].unique():
     # get the sequence dataframe
     seq_df = df[df['Sequence'] == seq]
     # get the wildtype pdb path
     wildtype_pdb_path = f'{raw_data_dir}/{seq}/{seq}.pdb'
-    cmd.load(wildtype_pdb_path, 'wildtype')
+    try:
+        cmd.load(wildtype_pdb_path, 'wildtype')
+    except FileNotFoundError:
+        num_wrong += 1
+        print('Error loading: '+wildtype_pdb_path)
+        print('Number wrong: '+str(num_wrong))
+        continue
+    except pymol.CmdException:
+        num_wrong += 1
+        print('Error loading: '+wildtype_pdb_path)
+        print('Number wrong: '+str(num_wrong))
+        continue
     # loop through the mutants
     for mutant in seq_df['Mutant'].unique():
         # get the mutant pdb path
@@ -34,7 +46,10 @@ for seq in df['Sequence'].unique():
         # concat the position, wt_aa, and sasa_diff
         mutant_name = f'{position}_{wt_aa}_{sasa_diff}'
         # load the mutant pdb with the name as the position, wt aa, and % Sasa difference
-        cmd.load(mutant_pdb_path, mutant_name)
+        try:
+            cmd.load(mutant_pdb_path, mutant_name)
+        except FileNotFoundError('File not found: '+mutant_pdb_path):
+            continue
         cmd.select('mutant', mutant_name)
         # color the residue for the current pdb
         cmd.color('red', 'mutant and resi '+str(position))
