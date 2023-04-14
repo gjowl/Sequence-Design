@@ -46,7 +46,7 @@ def getRandomDNAEnd(length):
         randSeq = randSeq+rand.choice(DNA)
     return randSeq
 
-def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, randomDNALength):
+def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, randomDNALength):
     dictOutput = {}
     colNames = ['Segment Number', 'TM Sequence', 'DNA Sequence']
     addColumnsToDictionary(dictOutput, colNames)
@@ -66,20 +66,21 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, randomDNALength):
             dictOutput['DNA Sequence'].append(seqForChip)
             dictOutput['Segment Number'].append(segmentNum)
             dictOutput['TM Sequence'].append(sequence[:15])
-        # Add in the controls
-        for control in df_controls['TM Sequence']:
-            # get the DNA sequence for the control from the dataframe
-            controlSeq = df_controls[df_controls['TM Sequence'] == control]['DNA Sequence'].values[0]
-            while controlSeq.find(fwd) is True or controlSeq.find(rvs) is True:
-                controlSeq = reverse_translate(control)
-            controlDNASeq = fwd + cut1 + controlSeq + 'AC' + cut2 + rvs + randomDNAEnd
-            i=0
-            # At end of segment, add in the control sequences with a function
-            for i in range(0,3):
-                dictOutput['DNA Sequence'].append(controlDNASeq)
-                dictOutput['Segment Number'].append(segmentNum)
-                dictOutput['TM Sequence'].append(control)
-                i+=1
+        # Add in the control
+        if segmentNum in control_segments:
+            for control in df_controls['TM Sequence']:
+                # get the DNA sequence for the control from the dataframe
+                controlSeq = df_controls[df_controls['TM Sequence'] == control]['DNA Sequence'].values[0]
+                while controlSeq.find(fwd) is True or controlSeq.find(rvs) is True:
+                    controlSeq = reverse_translate(control)
+                controlDNASeq = fwd + cut1 + controlSeq + 'AC' + cut2 + rvs + randomDNAEnd
+                i=0
+                # At end of segment, add in the control sequences with a function
+                for i in range(0,3):
+                    dictOutput['DNA Sequence'].append(controlDNASeq)
+                    dictOutput['Segment Number'].append(segmentNum)
+                    dictOutput['TM Sequence'].append(control)
+                    i+=1
     outputDf = pd.DataFrame.from_dict(dictOutput)
     return outputDf
 
@@ -89,6 +90,7 @@ if __name__ == "__main__":
     output_dir = sys.argv[2]
     output_file = sys.argv[3]
     primer_file = sys.argv[4]
+    control_file = sys.argv[5] # from Samantha's Thesis, page 116
 
     # make the output directory if it doesn't exist
     os.makedirs(name=output_dir, exist_ok=True)
@@ -102,31 +104,22 @@ if __name__ == "__main__":
     writer = pd.ExcelWriter(output_file)
     cutSite1 = 'gctagc'
     cutSite2 = 'gatc'
-    gpa = 'LIIFGVMAGVIG'#final T comes from one of the base pairs in annealed cutsite, so hardcoded the codon for T
-    g83i = 'LIIFGVMAIVIG'
+    # hardcoded control segments list
+    control_segments = [6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 22]
 
     # controls from Samantha's CHIP4 (?)
-    P_1G02 = 'CAVVVGVGLIVGFAVGL'
-    P_1C03 = 'VLGAAGTALLCAGLLLSLF'
-    P_2H07 = 'IIVAMTAVGGSICVMLVVICL'
-    P_2E06 = 'LALGLGACLLAGTSLSVLWVY'
-    P_2H01 = 'FHMIAVGLSSSILGCLITLLV'
+    #P_1G02 = 'CAVVVGVGLIVGFAVGL'
+    #P_1C03 = 'VLGAAGTALLCAGLLLSLF'
     #N_1E01 = 'FALGLGFCLPAGTSLSV'
     #N_1E11 = 'ILFVIAVASELGYFLCI'
-    N_2E11 = 'VVIIAVVCCVVGTSLVWIVII'
-    N_2F12 = 'VVIIAIVCCVVGTSLVWVVII'
-    N_2H11 = 'GIYFVLGVCFGLLLTLCLLVI'
-
-    # add in the controls as a list
-    #controls = [gpa, g83i, P_1G02, P_1C03, P_2H07, P_2E06, P_2H01, N_1E01, N_1E11, N_2E11, N_2F12, N_2H11]
-    controls = [gpa, g83i, P_1G02, P_1C03, P_2H07, P_2E06, P_2H01]
 
     # after this is working properly, add in the 10 controls as a list
     randomDNALength = 21 #matches the number from Samantha's CHIP4
     seed = 1
     rand.seed(seed)
 
-    # Main
+    # open the controls file as a dataframe
+    df_controls = pd.read_csv(control_file, sep=',')
     # Read in CHIP primer file
     dfPrimer = pd.read_csv(primer_file, sep=',')
 
@@ -140,21 +133,18 @@ if __name__ == "__main__":
 
     # read in the input file as a dataframe csv
     df_CHIP_seqs = pd.read_csv(input_file, sep=',')
-    # remove any redundant sequences that may have been added as mutants
+    # remove any redundant sequences that may have been added as mutants or between segments
     df_CHIP_seqs = df_CHIP_seqs.drop_duplicates(subset=['Sequence'], keep='first')
     print(len(df_CHIP_seqs))
 
-    # nucleic acid sequences for gpa and g83I
     # get the list of nucleic acid sequences for the controls
     controlNucleicAcidSeqs = []
-    for control in controls:
+    for control in df_controls['TM Sequence']:
         controlNucleicAcidSeqs.append(reverse_translate(control))
-    # add the nucleic acid sequences for the controls to the dataframe
-    df_controls = pd.DataFrame(controls, columns=['TM Sequence'])
     df_controls['DNA Sequence'] = controlNucleicAcidSeqs
 
     # convert AA sequences to DNA sequences and
-    dfCHIP = getCHIPFile(df_CHIP_seqs, dfForwardPrimer, dfReversePrimer, df_controls, cutSite1, cutSite2, randomDNALength)
+    dfCHIP = getCHIPFile(df_CHIP_seqs, dfForwardPrimer, dfReversePrimer, df_controls, cutSite1, cutSite2, control_segments, randomDNALength)
     # reset the index and remove the old index column
     dfCHIP = dfCHIP.reset_index()
     dfCHIP.pop('index')
