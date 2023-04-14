@@ -79,6 +79,9 @@ if __name__ == "__main__":
     # read in a dataframe from the command line
     df = pd.read_csv(input_file, dtype={'Interface': str})
 
+    # add the sequences that have _ to another dataframe
+    df_wt_data = df[df['Mutant'].str.contains('_')]
+
     # remove any sequences that don't have matching first 3 and last 3 residues between Sequence and Mutant
     df = df[df['Sequence'].str[:3] == df['Mutant'].str[:3]]
     df = df[df['Sequence'].str[-4:] == df['Mutant'].str[-4:]]
@@ -114,5 +117,7 @@ if __name__ == "__main__":
     
     # remove the one-hot encoding columns
     output_df = output_df.drop(columns=['Sequence_OneHot', 'Mutant_OneHot'])
+    # concat the wt sequences with the output_df
+    output_df = pd.concat([output_df, df_wt_data])
     # save the output dataframe to a csv file
     output_df.to_csv(f'{output_dir}/{output_file}', index=False)

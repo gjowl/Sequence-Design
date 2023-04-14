@@ -37,7 +37,7 @@ if __name__ == '__main__':
     output_file = sys.argv[3]
 
     # read in the csv file as a dataframe
-    mutant_df = pd.read_csv(mutant_file, sep=',', header=0, dtype={'Interface': 'str'})
+    mutant_df = pd.read_csv(mutant_file, sep=',', header=0, dtype={'Interface': str})
     polyAla_df = pd.read_csv(polyAla_file, sep=',', header=None)
     # multiply the polyAla values by 2 to get the total sasa (currently loads up monomer sasa file)
     polyAla_df = polyAla_df * 2

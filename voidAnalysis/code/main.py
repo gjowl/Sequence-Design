@@ -25,6 +25,7 @@ one_hot_file = config['one_hot_file']
 analyze_file = config['analyze_file']
 output_dir = config['output_dir']
 one_hot_columns = config['one_hot_columns'] 
+polyAla_file = config['polyAla_file']
 
 # make the output directory if it doesn't exist
 os.makedirs(output_dir, exist_ok=True)
@@ -43,5 +44,5 @@ if __name__ == "__main__":
     os.system(exec_one_hot)
 
     # analyze the data
-    exec_analyze = f'python3 code/analyzeVoidData.py {output_dir}/{one_hot_file} {analyze_file} {output_dir}'
+    exec_analyze = f'python3 code/voidIdeaFromAlessandro.py {output_dir}/{one_hot_file} {polyAla_file} {analyze_file} {output_dir}'
     os.system(exec_analyze)

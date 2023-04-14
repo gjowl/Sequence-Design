@@ -6,11 +6,11 @@ import configparser
 
 # input directories
 root_dir = os.getcwd()
-#raw_data_dir = '2023-3-7_leuCHIP_mutants_rerun_2'
-raw_data_dir = '2023-3-13_alaCHIP_mutants_rerun_2'
+raw_data_dir = '2023-3-7_leuCHIP_mutants'
+#raw_data_dir = '2023-3-13_alaCHIP_mutants'
 #raw_data_dir = 'CHIP1_data'
-#data_dir = f'/mnt/d/DesignRuns/{raw_data_dir}'
-data_dir = f'/home/loiseau@ad.wisc.edu/Downloads/{raw_data_dir}'
+data_dir = f'/mnt/d/DesignRuns/{raw_data_dir}'
+#data_dir = f'/home/loiseau@ad.wisc.edu/Downloads/{raw_data_dir}'
 config_dir = f'{root_dir}/config'
 
 # make the config directory if it doesn't exist
@@ -27,7 +27,8 @@ curr_dir = os.getcwd()
 analysis = 'void'
 
 # input files
-design_data_file_name = 'allData_ala.csv'
+#design_data_file_name = 'allData_ala.csv'
+design_data_file_name = 'CHIPSeqs_leu.csv'
 design_data_file = f'{curr_dir}/{design_data_file_name}'
 
 # output
@@ -39,6 +40,7 @@ one_hot_file = f'{raw_data_dir}_{analysis}_interface_mutants.csv'
 analyze_file = f'{raw_data_dir}_{analysis}_CHIP2Seqs.csv'
 output_dir = f'{curr_dir}/{raw_data_dir}_{analysis}'
 one_hot_columns = 'Mutant Sequence'
+polyAla_file = f'{curr_dir}/polyAla_sasa.csv'
 
 # main code section
 config_file["main"]={
@@ -52,6 +54,7 @@ config_file["main"]={
     "one_hot_columns": one_hot_columns,
     "analyze_file": analyze_file,
     "output_dir": output_dir,
+    "polyAla_file": polyAla_file
 }
 
 # SAVE CONFIG FILE
