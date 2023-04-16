@@ -9,8 +9,8 @@ root_dir = os.getcwd()
 #raw_data_dir = '2023-3-7_leuCHIP_mutants'
 raw_data_dir = '2023-3-13_alaCHIP_mutants'
 #raw_data_dir = 'CHIP1_data'
-#data_dir = f'/mnt/d/DesignRuns/{raw_data_dir}'
-data_dir = f'/home/loiseau@ad.wisc.edu/Downloads/{raw_data_dir}'
+data_dir = f'/mnt/d/DesignRuns/{raw_data_dir}'
+#data_dir = f'/home/loiseau@ad.wisc.edu/Downloads/{raw_data_dir}'
 config_dir = f'{root_dir}/config'
 
 # make the config directory if it doesn't exist
