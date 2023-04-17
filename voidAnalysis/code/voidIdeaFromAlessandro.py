@@ -151,6 +151,8 @@ if __name__ == "__main__":
     no_void_mutant_df['Mutant'] = no_void_mutant_df.apply(lambda row: row['Mutant'][:row['Position']] + 'I' + row['Mutant'][row['Position']+1:], axis=1)
     # rid of data where Sequence == mutant
     possible_clash_df = no_void_mutant_df[no_void_mutant_df['Sequence'] != no_void_mutant_df['Mutant']]
+    # output the dataframe to a csv file
+    possible_clash_df.to_csv(f'{output_dir}/possible_clash_mutants.csv', index=False)
 
     # get the worst 2 void mutants
     clash_column = 'SasaPercDifference'

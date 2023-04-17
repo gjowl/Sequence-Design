@@ -19,5 +19,8 @@ df = pd.merge(df, df_pdb_id, on='Sequence', how='inner')
 # keep the columns we want in order
 df = df[['Sequence', 'pdbFileName', 'Position']]
 
+# keep only the first sequence for each sequence
+df = df.drop_duplicates(subset=['Sequence'], keep='first')
+
 # output the data frame
 df.to_csv(output_file, sep=',', index=False)
