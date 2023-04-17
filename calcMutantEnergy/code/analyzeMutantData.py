@@ -5,16 +5,24 @@ import matplotlib.pyplot as plt
 input_file = sys.argv[1]
 
 # read the input file as a dataframe
-df = pd.read_csv(input_file, sep=',')
+df = pd.read_csv(input_file, sep=',', dtype={'Interface': str})
 
-# keep sequences that don't match the directory name
-df = df[df['Sequence'] != df['Directory']]
+column = 'Region'
 
-# get the Total energy by subtracting the Dimer from the Monomer
-df['Total'] = df['Dimer'] - df['Monomer']
-
-# get the range of Dimer values
-dimer_max = df['Total'].max()
-dimer_min = df['Total'].min()
-
-print(dimer_max, dimer_min)
+# loop through the regions
+for value in df[column].unique():
+    # get the interface dataframe
+    value_df = df[df[column] == value]
+    # plot a histogram of counts for each position
+    plt.hist(value_df['Position'], bins=range(1,19), align='left')
+    # set the title
+    plt.title(f'{value} mutant count per position')
+    # set the x and y labels
+    plt.xlabel('Position')
+    plt.ylabel('Count')
+    # adjust the x axis
+    plt.xticks(range(1,19))
+    # save the figure
+    plt.savefig(f'{value}.png')
+    # clear the figure
+    plt.clf()
