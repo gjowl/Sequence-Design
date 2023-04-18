@@ -34,7 +34,7 @@ for pos in positions:
     pos_df = df[df[f'AA{pos}'].isin(aa)]
     for pos2 in positions:
         if pos != pos2:
-            print(f'Number of sequences with GAS in position {pos} and without G in position {pos2}: {pos_df[pos_df[f"AA{pos2}"] != "G"].shape[0]}')
+            print(f'Number of sequences with GAS in position {pos} and without GAS in position {pos2}: {pos_df[~pos_df[f"AA{pos2}"].isin(aa)].shape[0]}')
 
 for pos in positions:
     # get the number of rows that do not have GAS in each position
