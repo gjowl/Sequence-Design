@@ -14,6 +14,22 @@ os.makedirs(output_dir, exist_ok=True)
 # read in the file as a dataframe
 df = pd.read_csv(input_file, sep=',', header=0, dtype={'Interface': str})
 
+# keep sequences that don't match the directory name
+df = df[df['Sequence'] != df['Directory']]
+
+# rename the sequence and directory columns
+df = df.rename(columns={'Sequence': 'Mutant', 'Directory': 'Sequence'})
+
+# get the Total energy by subtracting the Dimer from the Monomer
+df['Total'] = df['Dimer'] - df['Monomer']
+
+# find positions in sequence that are not the same in the mutant
+df['Position'] = df.apply(lambda row: [i for i in range(len(row['Sequence'])) if row['Sequence'][i] != row['Mutant'][i]], axis=1)
+# convert the position column to an integer
+df['Position'] = df['Position'].apply(lambda x: int(x[0]))
+# get the AA in the sequence for the position
+df['WT_AA'] = df.apply(lambda row: row['Sequence'][row['Position']], axis=1)
+
 # initialize the output dataframe
 output_df = pd.DataFrame()
 # loop through each of the unique sequences
@@ -39,12 +55,14 @@ for seq in df['Sequence'].unique():
     seq_df = seq_df[seq_df['Mutant'] != seq]
     # get the top 2 sequences with the highest CHARMM_VDW
     seq_df = seq_df.nlargest(2, 'CHARMM_VDW')
+    # concat the sequence dataframe with the output dataframe
+    output_df = pd.concat([output_df, seq_df], axis=0)
     # loop through the mutants
     for mutant in seq_df['Mutant'].unique():
         # get the mutant pdb path
         mutant_pdb_path = f'{raw_data_dir}/{seq}/{mutant}.pdb'
         # get the energy 
-        energy = round(seq_df[seq_df['Mutant'] == mutant]['CHARMM_VDW'].values[0], 2)
+        energy = round(seq_df[seq_df['Mutant'] == mutant]['Total'].values[0], 2)
         # get the position
         position = seq_df[seq_df['Mutant'] == mutant]['Position'].values[0]+23
         # get the wildtype aa
@@ -62,6 +80,9 @@ for seq in df['Sequence'].unique():
     # show spheres
     cmd.show('spheres')
     # save the session file
-    cmd.save(f'{output_dir}/{seq}_sasa_mutants.pse')
+    cmd.save(f'{output_dir}/{seq}_mutants.pse')
     # reset the pymol session
     cmd.reinitialize()
+
+# output the output dataframe to a csv file
+output_df.to_csv(f'top2Mutants.csv', index=False)
