@@ -74,6 +74,7 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, r
                 while controlSeq.find(fwd) is True or controlSeq.find(rvs) is True:
                     controlSeq = reverse_translate(control)
                 controlDNASeq = fwd + cut1 + controlSeq + 'AC' + cut2 + rvs + randomDNAEnd
+                #TODO: add in check; only add the AC to GpA and G83I
                 i=0
                 # At end of segment, add in the control sequences with a function
                 for i in range(0,3):
