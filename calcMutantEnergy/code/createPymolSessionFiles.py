@@ -3,6 +3,10 @@ import os
 import pandas as pd
 import sys
 
+"""
+Create a pymol session file for each sequence in the input file with the wildtype and the top 2 mutants.
+"""
+
 # read in the config arguments
 raw_data_dir = sys.argv[1]
 input_file = sys.argv[2]

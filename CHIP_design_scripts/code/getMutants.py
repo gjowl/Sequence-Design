@@ -1,5 +1,8 @@
 import os, sys, pandas as pd
 
+"""
+This script will take a csv file with a list of sequences and generate a csv file with the same sequences with mutations at the specified positions.
+"""
 def mutateSequence(sequence, position, replacement):
     # mutate the sequence
     mutant_sequence = sequence[:position] + replacement + sequence[position + 1:]

@@ -31,9 +31,6 @@ def addColumnsToDictionary(dict, colNames):
         for i in colNames:
             dict[i] = []
 
-def writeDataframeToSpreadsheet(df, writer, sheetName):
-    df.to_excel(writer, sheet_name=sheetName)
-
 def getPrimerSet(dfFwd, dfRvs, row):
     fwdPrimer = dfFwd['Fwd'][row]
     revPrimer = dfRvs['Rvs'][row]
@@ -59,13 +56,13 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, r
             randomDNAEnd = getRandomDNAEnd(randomDNALength)
             while randomDNAEnd.find(fwd) is True or randomDNAEnd.find(rvs) is True:
                 randomDNAEnd = getRandomDNAEnd(randomDNALength)
-            DNASeq = reverse_translate(sequence[:14])
+            DNASeq = reverse_translate(sequence[:17])
             while DNASeq.find(fwd) is True or DNASeq.find(rvs) is True:
-                DNASeq = reverse_translate(sequence[:14])
+                DNASeq = reverse_translate(sequence[:17])
             seqForChip = fwd + cut1 + DNASeq + 'TT' + cut2 + rvs + randomDNAEnd
             dictOutput['DNA Sequence'].append(seqForChip)
             dictOutput['Segment Number'].append(segmentNum)
-            dictOutput['TM Sequence'].append(sequence[:15])
+            dictOutput['TM Sequence'].append(sequence[:18])
         # Add in the control
         if segmentNum in control_segments:
             for control in df_controls['TM Sequence']:
@@ -73,8 +70,12 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, r
                 controlSeq = df_controls[df_controls['TM Sequence'] == control]['DNA Sequence'].values[0]
                 while controlSeq.find(fwd) is True or controlSeq.find(rvs) is True:
                     controlSeq = reverse_translate(control)
-                controlDNASeq = fwd + cut1 + controlSeq + 'AC' + cut2 + rvs + randomDNAEnd
-                #TODO: add in check; only add the AC to GpA and G83I
+                # get the uniprot ID for the control from the dataframe
+                uniprotID = df_controls[df_controls['TM Sequence'] == control]['Uniprot'].values[0]
+                if uniprotID == 'GpA' or uniprotID == 'G83I':
+                    controlDNASeq = fwd + cut1 + controlSeq + 'AC' + cut2 + rvs + randomDNAEnd
+                else:
+                    controlDNASeq = fwd + cut1 + controlSeq + 'TT' + cut2 + rvs + randomDNAEnd
                 i=0
                 # At end of segment, add in the control sequences with a function
                 for i in range(0,3):
@@ -96,13 +97,12 @@ if __name__ == "__main__":
     # make the output directory if it doesn't exist
     os.makedirs(name=output_dir, exist_ok=True)
     # define the output file name from the input file name
-    output_file = f'{output_dir}/{output_file}.xlsx'
+    output_file = f'{output_dir}/{output_file}'
     #inputFile = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\2022_1_5_CHIP\\CHIP1_Segments.xlsx"
     #outputDir = "C:\\Users\\gjowl\\Documents\\Senes Lab\\Design Research\\Sequence Design\\Analysis\\"
     #inputFile = outputDir + 'optimizedBackboneAnalysis.xlsx'
     #primerFile = "C:\\Users\\gjowl\\Downloads\\Primers.csv"
     #outputFile = outputDir + 'CHIP.xlsx'
-    writer = pd.ExcelWriter(output_file)
     cutSite1 = 'gctagc'
     cutSite2 = 'gatc'
     # hardcoded control segments list
@@ -150,6 +150,5 @@ if __name__ == "__main__":
     dfCHIP = dfCHIP.reset_index()
     dfCHIP.pop('index')
     print(len(dfCHIP))
-    writeDataframeToSpreadsheet(dfCHIP, writer, 'CHIP')
-
-    writer.close()
+    # write the dataframe to a csv file
+    dfCHIP.to_csv(output_file, sep=',', index=False)

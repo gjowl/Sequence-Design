@@ -1,5 +1,9 @@
 import os, sys, pandas as pd
 
+"""
+This script will take a mutant sequence file and shuffle the sequences within each segment.
+"""
+
 # read in the command line arguments
 input_file = sys.argv[1]
 num_splits = int(sys.argv[2])

@@ -1,5 +1,10 @@
 import os, sys, pandas as pd
 
+"""
+This script will take a wt sequence file and a mutant sequence file and add the segment information to the mutant sequence file.
+Specifically for designs labeled with the region column and the segment column.
+"""
+
 # read in the command line arguments
 wt_file = sys.argv[1]
 mutant_file = sys.argv[2]
@@ -24,6 +29,8 @@ for region in wt_df['Region'].unique():
 
 # sort by region and segment
 output_df = output_df.sort_values(by=['Region', 'Segment'])
+# add the size of the unique segments to the segment column
+output_df['Segment'] = output_df['Segment'] + output_df['Segment'].nunique()
 # save the output dataframe to a csv file
 output_df.to_csv(f'{mutant_filename}_withSegments.csv', index=False)
 
