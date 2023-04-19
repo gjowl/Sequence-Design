@@ -26,19 +26,22 @@ else:
 # get the number of rows that have G in each position
 total = df.shape[0]
 print(f'Total number of sequences: {total}')
-for pos in positions:
-    print(f'{pos}:')
-    print(f'Number of sequences with GAS in position {pos}: {df[df[f"AA{pos}"].isin(aa)].shape[0]}')
-    print(f'Number of sequences without GAS in position {pos}: {df[df[f"AA{pos}"] != "G"].shape[0]}')
-    # get the number of rows that do not have G in each position
-    pos_df = df[df[f'AA{pos}'].isin(aa)]
-    for pos2 in positions:
-        if pos != pos2:
-            print(f'Number of sequences with GAS in position {pos} and without GAS in position {pos2}: {pos_df[~pos_df[f"AA{pos2}"].isin(aa)].shape[0]}')
 
-for pos in positions:
-    # get the number of rows that do not have GAS in each position
-    print(f'Number of sequences with GAS in position {pos}: {total-df[~df[f"AA{pos}"].isin(aa)].shape[0]}')
+cutoffs = [-35, -20, -5]
+for cutoff in cutoffs:
+    cutoff_df = df[df['Total'] < cutoff]
+    print(f'Cutoff: {cutoff}, # sequences: {cutoff_df.shape[0]}')
+    # get the number of sequences with G in each position
+    for pos in positions:
+        print(f'{pos}:')
+        pos_df = cutoff_df[cutoff_df[f'AA{pos}'] == "G"]
+        #pos_df = df[df[f'AA{pos}'] == "G"]
+        print(f'# sequences w/ G in position {pos}: {pos_df.shape[0]}')
+        # get the number of rows that do not have G in each position
+        for pos2 in positions:
+            if pos != pos2:
+                print(f'# sequences w/ G in position {pos} and no GAS in position {pos2}: {pos_df[~pos_df[f"AA{pos2}"].isin(aa)].shape[0]}')
+                print(f'# sequences w/ G in position {pos} and no S in position {pos2}: {pos_df[pos_df[f"AA{pos2}"] != "S"].shape[0]}')
 
 # output the dataframe to a csv file without the index
 df.to_csv(f'{output_file}_{positions}.csv', index=False)

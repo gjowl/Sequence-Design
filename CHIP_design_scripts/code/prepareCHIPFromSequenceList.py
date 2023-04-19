@@ -88,11 +88,12 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, r
 
 # Local Variables
 if __name__ == "__main__":
-    input_file = sys.argv[1]
-    output_dir = sys.argv[2]
-    output_file = sys.argv[3]
-    primer_file = sys.argv[4]
-    control_file = sys.argv[5] # from Samantha's Thesis, page 116
+    primer_file = sys.argv[1]
+    control_file = sys.argv[2] # from Samantha's Thesis, page 116
+    output_dir = sys.argv[3]
+    output_file = sys.argv[4]
+    # get the sequence files from the command line as a list
+    sequence_files = sys.argv[5:]
 
     # make the output directory if it doesn't exist
     os.makedirs(name=output_dir, exist_ok=True)
@@ -106,7 +107,7 @@ if __name__ == "__main__":
     cutSite1 = 'gctagc'
     cutSite2 = 'gatc'
     # hardcoded control segments list
-    control_segments = [6, 7, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 22]
+    control_segments = [6, 7, 8, 9, 10, 11, 12, 14, 15, 17, 18, 19]
 
     # controls from Samantha's CHIP4 (?)
     #P_1G02 = 'CAVVVGVGLIVGFAVGL'
@@ -132,10 +133,14 @@ if __name__ == "__main__":
     dfForwardPrimer.pop('index')
     dfReversePrimer.pop('index')
 
-    # read in the input file as a dataframe csv
-    df_CHIP_seqs = pd.read_csv(input_file, sep=',')
-    # remove any redundant sequences that may have been added as mutants or between segments
-    df_CHIP_seqs = df_CHIP_seqs.drop_duplicates(subset=['Sequence'], keep='first')
+    # read in the input files as dataframes
+    df_CHIP_seqs = pd.DataFrame()
+    for input_file in sequence_files:
+        input_df = pd.read_csv(input_file, sep=',')
+        # remove redundant sequences
+        input_df = input_df.drop_duplicates(subset=['Sequence'], keep='first')
+        # concat the input dataframes into one dataframe
+        df_CHIP_seqs = pd.concat([df_CHIP_seqs, input_df], ignore_index=True)
     print(len(df_CHIP_seqs))
 
     # get the list of nucleic acid sequences for the controls
