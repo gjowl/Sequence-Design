@@ -109,12 +109,6 @@ if __name__ == "__main__":
     # hardcoded control segments list
     control_segments = [6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17, 19, 20, 21, 22, 23]
 
-    # controls from Samantha's CHIP4 (?)
-    #P_1G02 = 'CAVVVGVGLIVGFAVGL'
-    #P_1C03 = 'VLGAAGTALLCAGLLLSLF'
-    #N_1E01 = 'FALGLGFCLPAGTSLSV'
-    #N_1E11 = 'ILFVIAVASELGYFLCI'
-
     # after this is working properly, add in the 10 controls as a list
     randomDNALength = 21 #matches the number from Samantha's CHIP4
     seed = 1
@@ -155,5 +149,18 @@ if __name__ == "__main__":
     dfCHIP = dfCHIP.reset_index()
     dfCHIP.pop('index')
     print(len(dfCHIP))
+    # merge the CHIP dataframe with the columns from the input dataframe
+    df_CHIP_seqs['TM Sequence'] = df_CHIP_seqs['Sequence']
+    df_CHIP_seqs = df_CHIP_seqs.merge(dfCHIP, on='TM Sequence', how='left')
+
+    # remove the segment column
+    df_CHIP_seqs.pop('Segment')
+    df_CHIP_seqs.pop('TM Sequence')
+
     # write the dataframe to a csv file
-    dfCHIP.to_csv(output_file, sep=',', index=False)
+    #dfCHIP.to_csv(output_file, sep=',', index=False)
+
+    # write the dataframe to a csv file
+    # sort by segment number
+    df_CHIP_seqs = df_CHIP_seqs.sort_values(by=['Segment Number', 'Owner'])
+    df_CHIP_seqs.to_csv(output_file, sep=',', index=False)
