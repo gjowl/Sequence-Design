@@ -9,6 +9,8 @@
 @License :   (C)Copyright 2023, Gilbert Loiseau
 @Desc    :   Makes a structure file with the interface highlighted for each design in the input data_file.
              Outputs a pymol session file and a png file for each design into respective png and pse directories.
+
+@Usage   :   python3 interfacePdbs.py raw_data_directory data_file output_directory
 '''
 
 import os, sys, pandas as pd
@@ -79,7 +81,7 @@ if __name__ == '__main__':
         cmd.select('interface', selection_string)
         # color the residue for the current pdb on chain A
         cmd.color('red', 'interface and chain A')
-        # save the session file
+        # save the session file and png file
         cmd.save(pse_dir+'/'+pdbName+'.pse')
         cmd.png(png_dir+'/'+pdbName+'.png', width=1000, height=1000, ray=3, dpi=300)
         # reset the pymol session
