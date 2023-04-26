@@ -76,6 +76,12 @@ def getCutoffValues(df, analysis_column, output_column):
     output_df.loc[output_df[analysis_column] > 66, output_column] = 'high'
     return output_df
 
+# below is a function to apply to the indices that allowed me to set the values based on groupby
+# allows me to groupby sequences and then set the values based on the values within the group
+# from: https://stackoverflow.com/questions/35046725/pandas-set-value-in-groupby
+def applyOnMax(m, value):
+    void_data.loc[void_data['DimerSasaDifference'] == m, 'Void_Cutoff'] = value
+
 if __name__ == '__main__':
     # read the command line arguments
     void_data_file = sys.argv[1]
@@ -110,18 +116,10 @@ if __name__ == '__main__':
 
     # categorize the void mutants by DimerSasaDifference
     void_data['Void_Cutoff'] = 'low'
-    # set the next 2 DimerSasaDifference values to medium for each unique sequence
-    # get the indices for each unique sequence top 2 DimerSasaDifference values
-    #indices = void_data.groupby('Sequence')['DimerSasaDifference'].transform.nlargest(2)
-    #print(indices)
-    def applyOnMax(m, value):
-        void_data.loc[void_data['DimerSasaDifference'] == m, 'Void_Cutoff'] = value
-    #void_data.loc[indices, 'Void_Cutoff'] = 'medium'
+    # set the top 4 DimerSasaDifference values to medium 
     void_data.groupby('Sequence').DimerSasaDifference.nlargest(4).apply(applyOnMax, value='medium')
     # set the top 2 DimerSasaDifference values to high
     void_data.groupby('Sequence').DimerSasaDifference.nlargest(2).apply(applyOnMax, value='high')
-    #void_data.loc[void_data.groupby('Sequence')['DimerSasaDifference'].nlargest(2), 'Void_Cutoff'] = 'medium'
-    #void_data = void_data.groupby('Sequence').Void_Cutoff.transform(lambda x: void_data.loc[void_data['DimerSasaDifference'].nlargest(2), 'medium'])
     
     # get the cutoff values for the sasa percentage difference
     void_data = getCutoffValues(void_data, 'SasaPercDifference', 'Clash_Cutoff')
