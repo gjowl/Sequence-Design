@@ -56,6 +56,7 @@ if __name__ == '__main__':
     os.makedirs(name=output_dir, exist_ok=True)
     png_dir, pse_dir = f'{output_dir}/{cutoff_column}/png', f'{output_dir}/{cutoff_column}/pse'
 
+#TODO: might just be best to darken the positions of the interface that I chose to make mutants at?
     # make the png and pse directories if they don't exist
     os.makedirs(name=png_dir, exist_ok=True)
     os.makedirs(name=pse_dir, exist_ok=True)
