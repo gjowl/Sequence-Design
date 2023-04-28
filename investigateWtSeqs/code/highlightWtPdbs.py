@@ -42,19 +42,23 @@ for pdb in df['PDB Id']:
     # keep the rows with unique segments
     pdb_df = pdb_df.drop_duplicates(subset=['Segment 1 #', 'Segment 2 #'])
     # loop through the rows
-    # get chain letters for the segments
-    pdb_df = getChains(pdb_df)
     print(pdb_df)
-    # loop through the rows
+    pdb_df = pdb_df.reset_index(drop=True)
     for index, row in pdb_df.iterrows():
         # get the chain letters
         chain1, chain2 = row['Chain 1'], row['Chain 2']
         # get the start and end positions
         start1, end1 = row['Seg 1 Pos start #'], row['Seg 1 Pos end #']
         start2, end2 = row['Seg 2 Pos start #'], row['Seg 2 Pos end #']
+        # define the segments as selections
+        segment = f'chain {chain1} and resi {start1}-{end1} or chain {chain2} and resi {start2}-{end2}'
+        # select the segments
+        cmd.select(f'segment_{index}', segment)
         # highlight the segments
-        cmd.color('red', f'chain {chain1} and resi {start1}-{end1}')
-        cmd.color('red', f'chain {chain2} and resi {start2}-{end2}')
+        cmd.color('red', segment)
+        # hide anything that is not the segments
+        cmd.hide('everything', f'not segment_{index}')
+        
         # highlight the interface
         #cmd.color('blue', f'chain {chain1} and chain {chain2} and resi {start}-{end}')
     # save the pse
