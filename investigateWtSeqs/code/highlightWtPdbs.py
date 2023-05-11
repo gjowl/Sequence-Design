@@ -27,11 +27,37 @@ def getChains(df):
     output_df = pd.concat([output_df, pd.DataFrame({'Chain 1': chain1_list, 'Chain 2': chain2_list})], axis=1)
     return output_df 
 
+def getDesignPdb(df, sequence):
+    # get the sequence in the alignment file that matches this one
+    df_design = df[df['Sequence'] == sequence]
+    # get the directory name
+    dirName = df_design['Directory'].values[0]
+    # get the design number by splitting the directory name by _
+    designNum, repNum = dirName.split('_')[1], int(df_design['replicateNumber'].values[0])
+    # pdbName
+    pdbName = designNum+'_'+str(repNum)
+    return dirName, pdbName
+
 # read the command line arguments
-input_file = sys.argv[1]
+wt_file = sys.argv[1]
+align_file = sys.argv[2]
+raw_data_dir = sys.argv[3]
 
 # read the input file as a dataframe
-df = pd.read_csv(input_file, sep=',')
+df = pd.read_csv(wt_file, sep=',')
+df_align = pd.read_csv(align_file, sep=',')
+
+# get all of the angles between -180 and -100
+df_low = df[(df['Angle'] >= -180) & (df['Angle'] <= -100)]
+df_high = df[(df['Angle'] >= 100) & (df['Angle'] <= 180)]
+
+# convert angles less than or greater than 180 to their equivalent angles between 0 and 100 using loc
+df_low['Angle'].apply(lambda x: 180 + x)
+df_high['Angle'].apply(lambda x: x-180)
+
+# replace the original values of the angles with the new values
+df.update(df_low)
+df.update(df_high)
 
 # loop through the sequences
 for pdb in df['PDB Id']:
@@ -41,30 +67,49 @@ for pdb in df['PDB Id']:
     pdb_df = df[df['PDB Id'] == pdb]
     # keep the rows with unique segments
     pdb_df = pdb_df.drop_duplicates(subset=['Segment 1 #', 'Segment 2 #'])
-    # loop through the rows
-    print(pdb_df)
     pdb_df = pdb_df.reset_index(drop=True)
+    print(pdb_df)
     for index, row in pdb_df.iterrows():
         # get the chain letters
         chain1, chain2 = row['Chain 1'], row['Chain 2']
         # get the start and end positions
-        start1, end1 = row['Seg 1 Pos start #'], row['Seg 1 Pos end #']
-        start2, end2 = row['Seg 2 Pos start #'], row['Seg 2 Pos end #']
+        start1, end1, start2, end2 = row['Seg 1 Pos start #'], row['Seg 1 Pos end #'], row['Seg 2 Pos start #'], row['Seg 2 Pos end #']
         # define the segments as selections
         segment = f'chain {chain1} and resi {start1}-{end1} or chain {chain2} and resi {start2}-{end2}'
+        print()
         # select the segments
         cmd.select(f'segment_{index}', segment)
         # highlight the segments
         cmd.color('red', segment)
         # hide anything that is not the segments
         cmd.hide('everything', f'not segment_{index}')
-        
-        # highlight the interface
-        #cmd.color('blue', f'chain {chain1} and chain {chain2} and resi {start}-{end}')
+        # get the axial distance and angle for this pdb
+        axial_dist, axial_angle = row['Axial distance'], row['Angle']
+        # get the Sequence_Match for this pdb
+        seq_match = row['Sequence_Match']
+        dirName, pdbName = getDesignPdb(df_align, seq_match)
+        path = f'{raw_data_dir}/{dirName}/{pdbName}.pdb'
+        # load in the pdb
+        cmd.load(path)
+        # align using super 
+        cmd.super(f'segment_{index}', pdbName)
+        rmsd = cmd.super(f'segment_{index}', pdbName)[0]
+        # if the rmsd is less than 4, then save the pse
+        if rmsd < 4:
+            cmd.save(f'{pdb}_{index}.pse')
+        # up to here, the code can align pdbs by structure and saves them if the rmsd is less than 4
+        # TODO: highlight the residues that match the interface residues
+        # remove the pdb
+        cmd.delete(pdbName)
+        # remove the selection
+        cmd.delete(f'segment_{index}')
+    exit(0)
+
+
     # save the pse
     cmd.save(f'{pdb}.pse') 
-    exit(0)
     # convert segment #s to chain letters by getting the index in the alphabet
     # check if the segment # is greater than 26
     # keep the segments that are in the dataframe
-    cmd.remove(f'not resi {df[df["PDB Id"] == pdb]["Start"].values[0]}-{df[df["PDB Id"] == pdb]["End"].values[0]}')
+    #cmd.remove(f'not resi {df[df["PDB Id"] == pdb]["Start"].values[0]}-{df[df["PDB Id"] == pdb]["End"].values[0]}')
+    exit(0)
