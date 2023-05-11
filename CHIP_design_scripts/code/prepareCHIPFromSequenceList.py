@@ -45,14 +45,19 @@ def getRandomDNAEnd(length):
 
 def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, randomDNALength):
     dictOutput = {}
-    colNames = ['Segment Number', 'TM Sequence', 'DNA Sequence']
+    colNames = ['Segment Number', 'TM Sequence', 'DNA Sequence', 'Name', 'Owner']
     addColumnsToDictionary(dictOutput, colNames)
     for segmentNum in df['Segment'].unique():
         dfSegment = df[df['Segment'] == segmentNum]
         sequenceList = dfSegment["Sequence"]
+        
+        # get the current segment owner
+        owner = dfSegment['Owner'].values[0]
         fwd, rvs = getPrimerSet(dfFwdP, dfRevP, segmentNum)
         # For every sequence, make a random string that is 90% different from primers and cutSite
         for sequence in sequenceList:
+            # get the current sequence sample name
+            sampleName = dfSegment[df["Sequence"] == sequence]['Name'].values[0]
             randomDNAEnd = getRandomDNAEnd(randomDNALength)
             while randomDNAEnd.find(fwd) is True or randomDNAEnd.find(rvs) is True:
                 randomDNAEnd = getRandomDNAEnd(randomDNALength)
@@ -63,6 +68,8 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, r
             dictOutput['DNA Sequence'].append(seqForChip)
             dictOutput['Segment Number'].append(segmentNum)
             dictOutput['TM Sequence'].append(sequence[:18])
+            dictOutput['Name'].append(sampleName)
+            dictOutput['Owner'].append(owner)
         # Add in the control
         if segmentNum in control_segments:
             for control in df_controls['TM Sequence']:
@@ -82,6 +89,8 @@ def getCHIPFile(df, dfFwdP, dfRevP, df_controls, cut1, cut2, control_segments, r
                     dictOutput['DNA Sequence'].append(controlDNASeq)
                     dictOutput['Segment Number'].append(segmentNum)
                     dictOutput['TM Sequence'].append(control)
+                    dictOutput['Name'].append('Control')
+                    dictOutput['Owner'].append(owner)
                     i+=1
     outputDf = pd.DataFrame.from_dict(dictOutput)
     return outputDf
@@ -149,18 +158,20 @@ if __name__ == "__main__":
     dfCHIP = dfCHIP.reset_index()
     dfCHIP.pop('index')
     print(len(dfCHIP))
-    # merge the CHIP dataframe with the columns from the input dataframe
-    df_CHIP_seqs['TM Sequence'] = df_CHIP_seqs['Sequence']
-    df_CHIP_seqs = df_CHIP_seqs.merge(dfCHIP, on='TM Sequence', how='left')
 
-    # remove the segment column
-    df_CHIP_seqs.pop('Segment')
-    df_CHIP_seqs.pop('TM Sequence')
-
+    # organization of the dataframe
+    # add 1 to all segment numbers
+    dfCHIP['Segment Number'] = dfCHIP['Segment Number'] + 1
+    # move the name and owner columns to the front after segment number
+    cols = dfCHIP.columns.tolist()
+    cols = cols[0:2] + cols[-2:] + cols[2:-2]
+    dfCHIP = dfCHIP[cols]
     # write the dataframe to a csv file
-    #dfCHIP.to_csv(output_file, sep=',', index=False)
+    #dfCHIP = dfCHIP.sort_values(by='Segment Number')
+    dfCHIP.to_csv(output_file, sep=',', index=False)
 
     # write the dataframe to a csv file
     # sort by segment number
-    df_CHIP_seqs = df_CHIP_seqs.sort_values(by=['Segment Number', 'Owner'])
-    df_CHIP_seqs.to_csv(output_file, sep=',', index=False)
+    #df_CHIP_seqs = df_CHIP_seqs.sort_values(by=['Segment Number', 'Owner'])
+    #df_CHIP_seqs = df_CHIP_seqs.sort_values(by='Segment Number')
+    #df_CHIP_seqs.to_csv(output_file, sep=',', index=False)

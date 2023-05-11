@@ -42,4 +42,3 @@ for segment in chip_df['Segment'].unique():
 
 # write the output dataframe to a file
 output_df.to_csv(output_file, sep=",", index=False)
-
