@@ -20,9 +20,7 @@ for interface in df['Interface'].unique():
     for sequence in df_interface['Sequence'].unique():
         # keep the string for positions where interface is 1
         interface_str = ''.join([aa if interface[i] == '1' else '' for i, aa in enumerate(sequence)])
-        print(f'{sequence}\n{interface_str}\n')
         # keep the rows where the interface string matches 4 or more positions
-        test_list = ['AFGGGGGG', 'GFGGGGGG']
         count_list = []
         for wt_interface in wt_interface_df['Interface1']:
             count = sum([l1 == l2 for l1, l2 in zip(wt_interface, interface_str)])
