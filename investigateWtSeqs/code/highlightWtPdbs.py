@@ -47,6 +47,9 @@ raw_data_dir = sys.argv[3]
 df = pd.read_csv(wt_file, sep=',')
 df_align = pd.read_csv(align_file, sep=',')
 
+output_dir = 'output'
+os.makedirs(output_dir, exist_ok=True)
+
 # get all of the angles between -180 and -100
 df_low = df[(df['Angle'] >= -180) & (df['Angle'] <= -100)]
 df_high = df[(df['Angle'] >= 100) & (df['Angle'] <= 180)]
@@ -76,7 +79,6 @@ for pdb in df['PDB Id']:
         start1, end1, start2, end2 = row['Seg 1 Pos start #'], row['Seg 1 Pos end #'], row['Seg 2 Pos start #'], row['Seg 2 Pos end #']
         # define the segments as selections
         segment = f'chain {chain1} and resi {start1}-{end1} or chain {chain2} and resi {start2}-{end2}'
-        print()
         # select the segments
         cmd.select(f'segment_{index}', segment)
         # highlight the segments
@@ -96,20 +98,23 @@ for pdb in df['PDB Id']:
         rmsd = cmd.super(f'segment_{index}', pdbName)[0]
         # if the rmsd is less than 4, then save the pse
         if rmsd < 4:
-            cmd.save(f'{pdb}_{index}.pse')
+            cmd.save(f'{output_dir}/{pdb}_{index}.pse')
         # up to here, the code can align pdbs by structure and saves them if the rmsd is less than 4
         # TODO: highlight the residues that match the interface residues
+        # get the interface residues
+        #interface = df_align[df_align['Sequence'] == seqMatch]['Interface'].values[0]
+        #print(interface)
+        #exit(0)
+        #for j in range(0, len(interface)):
+        #    # if the interface is 1
+        #    if interface[j] == '1':
+        #        # select the current pdb
+        #        cmd.select('interface', pdbName)
+        #        # color the residue for the current pdb
+        #        cmd.color('red', 'interface and resi '+str(j+23))
         # remove the pdb
         cmd.delete(pdbName)
         # remove the selection
         cmd.delete(f'segment_{index}')
-    exit(0)
-
-
-    # save the pse
-    cmd.save(f'{pdb}.pse') 
-    # convert segment #s to chain letters by getting the index in the alphabet
-    # check if the segment # is greater than 26
-    # keep the segments that are in the dataframe
-    #cmd.remove(f'not resi {df[df["PDB Id"] == pdb]["Start"].values[0]}-{df[df["PDB Id"] == pdb]["End"].values[0]}')
-    exit(0)
+    # reinitialize the pymol session
+    cmd.reinitialize()
