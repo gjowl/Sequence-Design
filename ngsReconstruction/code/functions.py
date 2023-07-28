@@ -238,6 +238,7 @@ def convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir):
             execRunFastqTotxt = 'perl '+fastqTotxt+' --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+ outputFile 
             print(execRunFastqTotxt)
             os.system(execRunFastqTotxt)
+            exit(0)
         print("Files successfully converted")
     else:
         print("Files already converted. If you would like to reconvert files, delete " + outputDir)

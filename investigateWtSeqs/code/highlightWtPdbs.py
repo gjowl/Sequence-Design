@@ -63,7 +63,7 @@ df.update(df_low)
 df.update(df_high)
 
 # loop through the sequences
-for pdb in df['PDB Id']:
+for pdb in df['PDB Id'].unique():
     # fetch the pdb file
     cmd.fetch(pdb)
     # get the pdb dataframe
@@ -94,9 +94,14 @@ for pdb in df['PDB Id']:
         # load in the pdb
         cmd.load(path)
         # align using super 
-        cmd.super(f'segment_{index}', pdbName)
-        rmsd = cmd.super(f'segment_{index}', pdbName)[0]
+        cmd.super(f'segment_{index} and name CA', pdbName)
+        rmsd = cmd.super(f'segment_{index} and name CA', pdbName)[0]
+        #cmd.align(f'segment_{index} and name CA', pdbName)
+        #rmsd = cmd.align(f'segment_{index} and name CA', pdbName)[0]
+        rmsd = cmd.rms(f'segment_{index} and name CA', pdbName)
+        print(f'RMSD: {rmsd}')
         # if the rmsd is less than 4, then save the pse
+        # still looking for a good alignment method; some methods align poorly and give a low rmsd
         if rmsd < 4:
             cmd.save(f'{output_dir}/{pdb}_{index}.pse')
         # up to here, the code can align pdbs by structure and saves them if the rmsd is less than 4
@@ -116,5 +121,9 @@ for pdb in df['PDB Id']:
         cmd.delete(pdbName)
         # remove the selection
         cmd.delete(f'segment_{index}')
+        print(f'Finished {pdb}_{index}')
+        print(f'Interface: {row["Interface1"], row["Interface2"]}')
+        # recolor the segments
+        cmd.color('green', segment)
     # reinitialize the pymol session
     cmd.reinitialize()

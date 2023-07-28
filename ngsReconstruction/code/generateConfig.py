@@ -13,9 +13,10 @@ currDir = os.getcwd()
 
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = currDir+'/CHIP1/'
+analysisDir = currDir+'/CHIP2/'
 codeDir = os.getcwd()+'/code/'
-dataDir = '/data/NGS/'
+#dataDir = '/data/NGS/'
+dataDir = '/home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2023_CHIP2_Data/NGS_fastq/'
 #dataDir = '/mnt/d/2022-5-13/'
 outputDir = analysisDir + 'data/'
 inputDir = analysisDir + 'inputFiles/'
