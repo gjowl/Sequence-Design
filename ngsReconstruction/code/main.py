@@ -25,6 +25,7 @@ config = globalConfig[programName]
 
 # Config file options:
 outputDir            = config["outputDir"]
+extractionDir        = config["extractionDir"]
 requirementsFile     = config["requirementsFile"]
 dataDir              = config["dataDir"]
 fastqTotxt           = config["fastqTotxt"]
@@ -40,7 +41,9 @@ analyzeEnergies          = config["analyzeEnergies"]
 analyzeEnergies = bool(analyzeEnergies)
 if __name__ == '__main__':
     # make the output directory that these will all output to
-    makeOutputDir(outputDir)
+    os.makedirs(name=outputDir, exist_ok=True)
+    os.makedirs(name=extractionDir, exist_ok=True)
+
     #install required packages for the below programs; these are found in requirements.txt
     #if you decide to add more packages to these programs, execute the below and it will update the requirements file:
     #   -pip freeze > requirements.txt
@@ -51,26 +54,30 @@ if __name__ == '__main__':
     os.system(execInstallRequirements)
 
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
-    convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir)
+    convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, extractionDir)
+    # TODO: edited the above to not remove sequences without fwd primer, but this messes up controls, in particular GpA and G83I. I think if I just add in 
+    # a bit of other code for matching with these sequences from the sequencing txt files it should work
     
     # get list of sequences and add to dataframe
-    seqIdDf = outputGoodSequenceDataframe(outputDir)
+    seqIdDf = extractGoodSequenceDataframe(extractionDir, outputDir)
+    # save the dataframe to a csv file
+    #seqIdDf.to_csv(outputDir+'seqIdDf.csv', index=False)
 
     # get the sequence column (first column) and skip the summary data rows
-    seqColumn = seqIdDf.iloc[:,0].tolist()
+    #seqColumn = seqIdDf.iloc[:,0].tolist()
 
     # compile counts and percents from data files
     # go through all files and save into csv file
-    outputSequenceCountsCsv(seqColumn, outputDir, countFile)
-    outputSequencePercentsCsv(seqColumn, outputDir, percentFile)
+    #outputSequenceCountsCsv(seqColumn, extractionDir, countFile)
+    #outputSequencePercentsCsv(seqColumn, extractionDir, percentFile)
 
     # drop duplicates and reset the index
-    seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
-    seqIdDf = seqIdDf.reset_index(drop=True)
+    #seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
+    #seqIdDf = seqIdDf.reset_index(drop=True)
 
     # add the segment number to the counts and percents files to separate sequences by segment number
-    appendColumnFromInputFile(seqIdDf, 'Segment', countFile)
-    appendColumnFromInputFile(seqIdDf, 'Segment', percentFile)
+    #appendColumnFromInputFile(seqIdDf, 'Segment', countFile)
+    #appendColumnFromInputFile(seqIdDf, 'Segment', percentFile)
 
     # execute ngsAnalysis script 
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile

@@ -12,15 +12,17 @@ currDir = os.getcwd()
 
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = currDir+'/CHIP2/'
+#analysisDir = currDir+'/CHIP2/'
+analysisDir = currDir+'/JC_CHIP2/'
 codeDir = os.getcwd()+'/code/'
 #dataDir = '/data/NGS/'
 #dataDir = '/home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2023_CHIP2_Data/NGS_fastq/'
-dataDir = '/mnt/d/2023-7-28_NGS_CHIP2/'
+dataDir = '/mnt/d/2023-7-28_NGS_CHIP2/JC_fastq/'
 #analysisDir = '/mnt/d/github/Sequence-Design/ngsReconstruction/CHIP1/'
 #codeDir = '/mnt/d/github/Sequence-Design/ngsReconstruction/code/'
 #dataDir = '/mnt/d/2022-5-13/'
-outputDir = analysisDir + 'data/'
+extractionDir = analysisDir + 'data/'
+outputDir = analysisDir
 inputDir = analysisDir + 'inputFiles/'
 analyzedDataDir = analysisDir + 'analyzedData/'
 configFile = analysisDir+programName+".config" 
@@ -31,8 +33,8 @@ refFile = inputDir + "refSeqs.csv"
 namesFile = inputDir + "dataFilenames.csv"
 
 # output files
-countFile = analysisDir+"allCounts.csv"
-percentFile = analysisDir+"allPercents.csv"
+countFile = analysisDir+"Count.csv"
+percentFile = analysisDir+"Percentage.csv"
 
 # program files
 fastqTotxt = codeDir + "fastqToTxt.pl"
@@ -45,6 +47,7 @@ analyzeEnergies = False
 # main code section
 config_file["main"]={
     "programName":programName,
+    "extractionDir":extractionDir,
     "outputDir":outputDir,
     "dataDir":dataDir,
     "requirementsFile":requirementsFile,

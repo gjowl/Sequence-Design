@@ -54,7 +54,12 @@ def check_file_empty(path_of_file):
 def getCountsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
     columns = ['Sequence', 'Count', 'Percentage']
-    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=4, usecols=[0,1,2])
+    # try to read in the file as a csv; if it doesn't work, skip it
+    try:
+        dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=4, usecols=[0,1,2])
+    except:
+        print(f'{file} contains no sequences. Skipping.') # 2023-7-29: skip files where the NGS yielded no sequences
+        return dictSeq
     dfData.columns = columns
     # loop through all of the sequences and find count in dataframe
     for seq in listSeq:
@@ -97,7 +102,12 @@ def outputSequenceCountsCsv(listSeq, dir, outFile):
 def getPercentsForFile(listSeq, dictSeq, colName, file):
     # convert to csv and keep the sequence, count, and percentage columns
     columns = ['Sequence', 'Count', 'Percentage']
-    dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=4, usecols=[0,1,2])
+    # try to read in the file as a csv; if it doesn't work, skip it
+    try:
+        dfData = pd.read_csv(file, delimiter='\t', header=None, skiprows=4, usecols=[0,1,2])
+    except:
+        print(f'{file} contains no sequences. Skipping.') # 2023-7-29: skip files where the NGS yielded no sequences
+        return dictSeq
     dfData.columns = columns
     # loop through all of the sequences and find count in dataframe
     for seq in listSeq:
@@ -154,11 +164,10 @@ def getSequenceList(dir):
     return allSeqs
 
 # gets only sequences without unknown
-def outputGoodSequenceDataframe(dir):
-    listSeq = []
-    listSegment = []
-    for file in os.listdir(dir):
-        dataFile = os.path.join(dir, file)
+def extractGoodSequenceDataframe(input_dir, output_dir):
+    output_df = pd.DataFrame()
+    for file in os.listdir(input_dir):
+        dataFile = os.path.join(input_dir, file)
         # the below helps read csv files with differing numbers of columns: 
         # https://stackoverflow.com/questions/27020216/import-csv-with-different-number-of-columns-per-row-using-pandas
         # Delimiter
@@ -176,20 +185,69 @@ def outputGoodSequenceDataframe(dir):
                 largest_column_count = column_count if largest_column_count < column_count else largest_column_count
         colName = ''
         # get the proper column names if a bin file or LB and M9
-        if "C" in dataFile:
-            colName = file[0:7] # name and rep for bins
+        LBM9_check = re.search('LB|M9', dataFile)
+        if LBM9_check == None:
+            colName = file[0:7] # name, hour, and rep for LB/M9
         else:
-            colName = file[0:11] # name, hour, and rep for LB/M9 
+            colName = file[0:11] # name and rep for bins
         # Generate column names (will be 0, 1, 2, ..., largest_column_count - 1)
         column_names = [i for i in range(0, largest_column_count)]
+        # the above works, but if you run into an error for column mismatch then find the file that has too many and delete the extra columns
         dfData = pd.read_csv(dataFile, delimiter=delim, header=None, skiprows=4, names=column_names)
-        dfData = dfData[dfData.iloc[:,3] != 'Unknown']
-        numColumns = len(dfData.columns)
-        dfData.insert(numColumns, "Replicate", colName)
-        listSeq.extend(dfData.iloc[:,0].tolist())
-        listSegment.extend(dfData.iloc[:,3].tolist())
-    df = pd.DataFrame(zip(listSeq, listSegment), columns=['Sequence','Segment'])
-    return df
+        print(dataFile, dfData)
+        goodSequence_df = dfData[dfData.iloc[:,3] != 'Unknown']
+        # 2023-7-30: added below in for the noFwdPrimer files to get the GpA and G83I containing sequences 
+        # get sequences that look like gpa or g83i
+        gpa = dfData[dfData.iloc[:,0].str.contains('LIIFGVMAGVIG')]
+        g83i = dfData[dfData.iloc[:,0].str.contains('LIIFGVMAIVIG')]
+        # get the sequence total and rename first column
+        gpaCount, gpaPercent = gpa.iloc[:,1].sum(), gpa.iloc[:,2].sum()
+        g83iCount, g83iPercent = g83i.iloc[:,1].sum(), g83i.iloc[:,2].sum()
+        # insert the controls into the goodSequence_df as new rows using concat
+        gpa_df = pd.DataFrame([['LIIFGVMAGVIG', gpaCount, gpaPercent, 'GpA']], columns=[0,1,2,3])
+        g83i_df = pd.DataFrame([['LIIFGVMAIVIG', g83iCount, g83iPercent, 'G83I']], columns=[0,1,2,3])
+        goodSequence_df = pd.concat([goodSequence_df, gpa_df, g83i_df])
+        numColumns = len(goodSequence_df.columns)
+        goodSequence_df.insert(numColumns, "Replicate", colName)
+        # concat the goodSequence_df to the output_df
+        output_df = pd.concat([output_df, goodSequence_df])
+    #remove all empty columns
+    output_df = output_df.dropna(axis=1, how='all')
+    print(output_df)
+    # hardcoded set column names
+    output_df.columns = ['Sequence', 'Count', 'Percentage','Segment','Replicate']
+    output_df.to_csv(output_dir+'seqIdDf.csv', index=False)
+    # reset the index
+    output_df = output_df.reset_index(drop=True)
+    extractColumnDataFromDataframe(output_df, 'Count', output_dir)
+    extractColumnDataFromDataframe(output_df, 'Percentage', output_dir)
+
+# extracts data for counts and percentages for each replicate
+def extractColumnDataFromDataframe(input_df, col_name, output_dir):
+    # get the unique replicates
+    uniqueReps = pd.unique(input_df['Replicate']).tolist()
+    output_df = pd.DataFrame(columns=['Sequence'])
+    for rep in uniqueReps:
+        # get the sequences for this replicate
+        rep_df = input_df[input_df['Replicate'] == rep]
+        # get just the sequences and counts
+        rep_df = rep_df[['Sequence', col_name]]
+        # rename the count column to the replicate name
+        rep_df = rep_df.rename(columns={col_name: rep})
+        output_df = pd.merge(output_df, rep_df, on='Sequence', how='outer')
+    # make a copy of the input_df
+    input_copy = input_df.copy()
+    # keep only the unique sequences
+    input_copy = input_copy.drop_duplicates(subset='Sequence', keep='first')
+    # fill in the NaN values with 0
+    output_df = output_df.fillna(0)
+    # merge the segment column to the output_df into the second column
+    output_df = pd.merge(output_df, input_copy[['Sequence', 'Segment']], on='Sequence', how='outer')
+    # move the segment column to the second column
+    tmpCol = output_df.pop('Segment')
+    output_df.insert(1, 'Segment', tmpCol) 
+    # save the dataframe to a csv file
+    output_df.to_csv(f'{output_dir}/{col_name}.csv', index=False)
 
 # get the uniprot ids and add to a file
 def appendColumnFromInputFile(df, colName, file):
@@ -238,7 +296,7 @@ def convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, outputDir):
             execRunFastqTotxt = 'perl '+fastqTotxt+' --refFile '+refFile+' --seqFile '+dataFile+' --direction 1 > '+ outputFile 
             print(execRunFastqTotxt)
             os.system(execRunFastqTotxt)
-            exit(0)
+            #exit(0)
         print("Files successfully converted")
     else:
         print("Files already converted. If you would like to reconvert files, delete " + outputDir)

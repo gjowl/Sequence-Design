@@ -32,24 +32,55 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
     # loop through the lists of reconstruction dfs, dirs, and percent options (these should all be the same length)
     # list of dfs
     list_df = []
+    list_good = []
+    list_total = []
     for df, outputDir, usePercent in zip(dfToReconstruct, reconstructionDirList, usePercentOptionList):
         # if the dir is empty, continue
         if len(os.listdir(outputDir)) < 1:
-            dfBins = df.filter(like='C')
-            # reconstruct the fluorescence for both good and total sequence numbers
-            df_good, df_total = getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, dfFlow, usePercent)
-            outputAnalysisDfToCsv(df_good, seqs, segments, outputDir, 'avgFluorGoodSeqs.csv') 
-            outputAnalysisDfToCsv(df_total, seqs, segments, outputDir, 'avgFluorTotalSeqs.csv') 
-            list_df.append(df_good)
-            list_df.append(df_total)
+            dfBins = df.filter(like='H')
+            # remove the dfBins from the df
+            dfBins = df.drop(dfBins.columns, axis=1)
+            # remove the sequence and segment columns from the dfBins
+            dfBins = dfBins.drop(['Sequence', 'Segment'], axis=1)
+            # get the first letter of each column name (the sample identifier)
+            sample_ids = dfBins.columns.str[0].unique()
+            for sample in sample_ids:
+                # get the columns that have matching sample ids as the first letter
+                sample_cols = dfBins.columns[dfBins.columns.str.startswith(sample)]
+                # keep only the columns that have the sample id
+                dfSample = dfBins[sample_cols]
+                # reconstruct the fluorescence for both good and total sequence numbers
+                df_good, df_total = getReconstructedFluorescenceDf(dfSample, seqs, segments, inputDir, outputDir, dfFlow, sample, usePercent)
+                outputAnalysisDfToCsv(df_good, seqs, segments, outputDir, f'avgFluorGoodSeqs_{sample}.csv') 
+                outputAnalysisDfToCsv(df_total, seqs, segments, outputDir, f'avgFluorTotalSeqs_{sample}.csv') 
+                df_good = df_good[df_good['Average'] != 0]
+                df_total = df_total[df_total['Average'] != 0]
+                list_good.append(df_good)
+                list_total.append(df_total)
         else:
             print(outputDir, "files already made. If want to remake, make sure the directory is empty.\n")
             print("Loading files...\n")
-            df_good    = pd.read_csv(outputDir+'avgFluorGoodSeqs.csv')
-            df_total   = pd.read_csv(outputDir+'avgFluorTotalSeqs.csv')
-            list_df.append(df_good)
-            list_df.append(df_total)
+            # find files containing avg in the output directory
+            for file in os.listdir(outputDir):
+                if file.startswith('avgFluorGood'):
+                    df_good = pd.read_csv(f'{outputDir}/{file}')
+                    # remove all rows where the fluorescence is 0
+                    df_good = df_good[df_good['Average'] != 0]
+                    list_good.append(df_good)
+                if file.startswith('avgFluorTotal'):
+                    df_total = pd.read_csv(f'{outputDir}/{file}')
+                    # remove all rows where the fluorescence is 0
+                    df_total = df_total[df_total['Average'] != 0]
+                    list_total.append(df_total)
             print("Done loading fluorescence reconstruction files into dataframes!\n")
+        # compile the good and total dataframes into a single dataframe
+        df_good = pd.DataFrame()
+        df_total = pd.DataFrame()
+        for df_g, df_t in zip(list_good, list_total):
+           df_good = df_good.append(df_g)
+           df_total = df_total.append(df_t) 
+        list_df.append(df_good)
+        list_df.append(df_total)
     return list_df
 
 # gets the number of replicates
@@ -68,7 +99,7 @@ def getNumberReplicates(df):
 
 # use below functions to calculate the reconstructed fluorescence for
 # each sequence and add it to dataframes
-def getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, dfFlow, usePercents=False):
+def getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, dfFlow, sample, usePercents=False):
     # initialize dataframe for the calculations using the good and total seq counts
     dfAvgGood = pd.DataFrame()
     dfAvgTotal = pd.DataFrame()
@@ -83,6 +114,8 @@ def getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, 
         list_df = []
         # get replicate number
         replicate = 'Rep'+str(i)
+        # define sample id (sample_replicate number)
+        sample_id = sample+'_'+replicate
         # filter out anything that isn't the same replicate
         dfRep = dfBins.filter(like=replicate)
         # get all hour marks names for this replicate
@@ -94,12 +127,12 @@ def getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, 
         dfGoodNumDenom, dfTotalNumDenom = calculateNumeratorsAndDenominators(seqs, inputDir, colNames, dfRep, dfFlow, usePercents)
         # output a dataframe of a values for each sequence for each bin
         dfNormGood, dfNormTotal = calculateNormalizedSequenceContribution(colNames, dfGoodNumDenom, dfTotalNumDenom)
-        goodNorm = normalizationFile+replicate+'Good.csv'
-        totalNorm = normalizationFile+replicate+'Total.csv'
+        goodNorm = f'{normalizationFile}Good_{sample_id}.csv'
+        totalNorm = f'{normalizationFile}Total_{sample_id}.csv'
         # calculate the final reconstructed fluorescence
         dfFluorGood, dfFluorTotal = calculateReconstructedFluorescence(colNames, dfNormGood, dfNormTotal, dfFlow)
-        goodRawFile = rawFluorFile+replicate+'Good.csv'
-        totalRawFile = rawFluorFile+replicate+'Total.csv'
+        goodRawFile = f'{rawFluorFile}Good_{sample_id}.csv'
+        totalRawFile = f'{rawFluorFile}Total_{sample_id}.csv'
         # write to output file for each replicate
         outputAnalysisDfToCsv(dfNormGood, seqs, segments, outputDir, goodNorm)
         outputAnalysisDfToCsv(dfNormTotal, seqs, segments, outputDir, totalNorm)
@@ -107,9 +140,9 @@ def getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, 
         outputAnalysisDfToCsv(dfFluorTotal, seqs, segments, outputDir, totalRawFile)
         # add to dataframe that will be used to analyze fluorescence
         fluorGoodCol = dfFluorGood['Fluorescence']
-        dfAvgGood.insert(i-1, replicate+'-Fluor', fluorGoodCol)
+        dfAvgGood.insert(i-1, f'{sample_id}-Fluor', fluorGoodCol)
         fluorTotalCol = dfFluorTotal['Fluorescence']
-        dfAvgTotal.insert(i-1, replicate+'-Fluor', fluorTotalCol)
+        dfAvgTotal.insert(i-1, f'{sample_id}-Fluor', fluorTotalCol)
         i+=1
     # get average, stdev, etc. from reconstructed fluorescence
     dfAvgGood = getReconstructedFluorescenceStats(dfAvgGood)

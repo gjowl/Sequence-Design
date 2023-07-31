@@ -158,7 +158,7 @@ my $numSeqs = $numLines / 4;
 #Cutoff for the number of seqs that we will analyze 
 #Starter is 0.01%
 #my $cutOff = $numSeqs * 0.001;
-my $cutOff = 0;
+my $cutOff = 10;
 print "Number of Sequences: $numSeqs\tCutoff: $cutOff\n";
 
 #Group value is the line. Each entry has 4 lines:
@@ -198,15 +198,15 @@ for (my $i = 0; $i < $numLines; $i++){
 			$eIncorrect += $P;
 		}
 		$groupValue = 0;
-		#if ($eIncorrect > 1){
-		#	$poorSeq++;
-		#	next;
-		#}
-		my $mQ = $totalQ / length($lines[$i]);
-		if ($mQ < 30){
+		if ($eIncorrect > 1){
 			$poorSeq++;
 			next;
 		}
+		#my $mQ = $totalQ / length($lines[$i]);
+		#if ($mQ < 30){
+		#	$poorSeq++;
+		#	next;
+		#}
 		#print "$mQ\t$eIncorrect\n";
 		#exit(0)
 	} else {
@@ -217,10 +217,10 @@ for (my $i = 0; $i < $numLines; $i++){
 	my $k = index $sequence, $rPrimer;
 	#print "$j\t$k\n";	
 	#exit;
-	
+	# TODO: find a way to get the closest sequence to the primer, and see how many bases are off (then maybe cutoff at a x bases)	
 	#Crop good sequences to inbetween the primers
 	if ($j == -1){
-		$noStart++;
+		#$noStart++;
 		$j = $k - $offset - 63;
 		#next;
 	}

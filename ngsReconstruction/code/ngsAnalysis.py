@@ -25,8 +25,8 @@ reconstructionFile        = config["reconstructionFile"]
 maltoseCutoff       = float(config["maltoseCutoff"])
 
 # control sequences
-gpa = 'LIIFGVMAGVIGT'
-g83i = 'LIIFGVMAIVIGT'
+gpa = 'LIIFGVMAGVIG'
+g83i = 'LIIFGVMAIVIG'
 
 # make the output directories that these will all output to
 dirList = [outputDir, maltoseTestDir, countDir, percentDir]
@@ -58,8 +58,8 @@ usePercentOptionList = [False, True]
 list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList)
 
 # hardcoded hour lists for LB and M9
-LBhours = ['0H','12H','18H','30H']
-M9hours = ['36H']
+LBhours = ['0H','12H','24H','36H']
+M9hours = ['24H', '36H']
 list_of_hours = [LBhours, M9hours]
 
 # get the dataframes for LB and M9
@@ -70,7 +70,7 @@ df_percentDiff = getPercentDifference(list_df, list_of_hours, seqs, segments, in
 
 # combine the percentDiff and fluorescence
 list_dfFluorAndPercentDiff = [] 
-percentDiffCol = df_percentDiff['18H']
+percentDiffCol = df_percentDiff['36H']
 for df in list_dfReconstructedFluor:
     df = df.assign(MaltosePercentDiff=percentDiffCol)
     list_dfFluorAndPercentDiff.append(df)
@@ -78,6 +78,7 @@ for df in list_dfReconstructedFluor:
 # REORGANIZE THE COLUMNS OF THE DATAFRAME
 # for now, only going to output the df that uses total sequence percents (closest to SMA and JC data)
 df_fluorAndPercent = list_dfFluorAndPercentDiff[3]
+print(df_fluorAndPercent)
 # set the sequence column as the first column of the dataframe
 seq_column = df_fluorAndPercent.pop('Sequence')
 df_fluorAndPercent.insert(0, 'Sequence', seq_column)
