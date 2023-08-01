@@ -43,9 +43,6 @@ dfPercent = pd.read_csv(percentFile, index_col=None)
 seqs = df.iloc[:,0]
 segments = df.iloc[:,1]
 
-# filter out to only have the bins
-dfBins = df.filter(like='C')
-
 # get a dataframe for the file containing medians and percent population from flow csv
 # indices are the median and percent population values
 dfFlow = pd.read_csv(flowFile, index_col=0)
@@ -78,7 +75,6 @@ for df in list_dfReconstructedFluor:
 # REORGANIZE THE COLUMNS OF THE DATAFRAME
 # for now, only going to output the df that uses total sequence percents (closest to SMA and JC data)
 df_fluorAndPercent = list_dfFluorAndPercentDiff[3]
-print(df_fluorAndPercent)
 # set the sequence column as the first column of the dataframe
 seq_column = df_fluorAndPercent.pop('Sequence')
 df_fluorAndPercent.insert(0, 'Sequence', seq_column)
@@ -95,8 +91,8 @@ gpaFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == gpa, 
 g83IFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == g83i, 'Fluorescence'].values[0]
 print(gpaFluorescence)
 print(g83IFluorescence)
-#gpaFluorescence = float(config["gpaFluor"])
-#g83IFluorescence = float(config["g83iFluor"])
+gpaFluorescence = float(config["gpaFluor"])
+g83IFluorescence = float(config["g83iFluor"])
 # calculate percent GpA of fluorescence
 percentGpaCol = df_fluorAndPercent['Fluorescence']/gpaFluorescence*100
 percentGpaStdDevCol = df_fluorAndPercent['FluorStdDev']/gpaFluorescence*100

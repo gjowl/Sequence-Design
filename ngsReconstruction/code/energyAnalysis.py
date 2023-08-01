@@ -59,6 +59,8 @@ df_fluorFiltered = df_fluor[df_fluor['Sequence'].isin(finalSeqs)]
 df_fluorFiltered = df_fluorFiltered.sort_values(by='Sequence')
 df_fluorFiltered.reset_index(drop=True, inplace=True)
 
+# get rid of any rows where fluorescence is 0
+df_fluorFiltered = df_fluorFiltered[df_fluorFiltered[fluorCol] != 0]
 # I found an issue with this: my energy file sometimes has duplicate sequences:
 # mutants to some sequences end up being the same as a starting sequence
 # So instead of just adding columns, I'll need to add info for each sequence

@@ -53,8 +53,8 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
                 df_good, df_total = getReconstructedFluorescenceDf(dfSample, seqs, segments, inputDir, outputDir, dfFlow, sample, usePercent)
                 outputAnalysisDfToCsv(df_good, seqs, segments, outputDir, f'avgFluorGoodSeqs_{sample}.csv') 
                 outputAnalysisDfToCsv(df_total, seqs, segments, outputDir, f'avgFluorTotalSeqs_{sample}.csv') 
-                df_good = df_good[df_good['Average'] != 0]
-                df_total = df_total[df_total['Average'] != 0]
+                #df_good = df_good[df_good['Average'] != 0]
+                #df_total = df_total[df_total['Average'] != 0]
                 list_good.append(df_good)
                 list_total.append(df_total)
         else:
@@ -65,12 +65,12 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
                 if file.startswith('avgFluorGood'):
                     df_good = pd.read_csv(f'{outputDir}/{file}')
                     # remove all rows where the fluorescence is 0
-                    df_good = df_good[df_good['Average'] != 0]
+                    #df_good = df_good[df_good['Average'] != 0]
                     list_good.append(df_good)
                 if file.startswith('avgFluorTotal'):
                     df_total = pd.read_csv(f'{outputDir}/{file}')
                     # remove all rows where the fluorescence is 0
-                    df_total = df_total[df_total['Average'] != 0]
+                    #df_total = df_total[df_total['Average'] != 0]
                     list_total.append(df_total)
             print("Done loading fluorescence reconstruction files into dataframes!\n")
         # compile the good and total dataframes into a single dataframe
@@ -81,6 +81,8 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
            df_total = df_total.append(df_t) 
         list_df.append(df_good)
         list_df.append(df_total)
+        list_good = []
+        list_total = []
     return list_df
 
 # gets the number of replicates

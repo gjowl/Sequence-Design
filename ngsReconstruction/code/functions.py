@@ -194,7 +194,6 @@ def extractGoodSequenceDataframe(input_dir, output_dir):
         column_names = [i for i in range(0, largest_column_count)]
         # the above works, but if you run into an error for column mismatch then find the file that has too many and delete the extra columns
         dfData = pd.read_csv(dataFile, delimiter=delim, header=None, skiprows=4, names=column_names)
-        print(dataFile, dfData)
         goodSequence_df = dfData[dfData.iloc[:,3] != 'Unknown']
         # 2023-7-30: added below in for the noFwdPrimer files to get the GpA and G83I containing sequences 
         # get sequences that look like gpa or g83i
