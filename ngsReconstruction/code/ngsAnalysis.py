@@ -46,6 +46,11 @@ segments = df.iloc[:,1]
 # get a dataframe for the file containing medians and percent population from flow csv
 # indices are the median and percent population values
 dfFlow = pd.read_csv(flowFile, index_col=0)
+# normalize percentages to sum to 1 (for each replicate)
+dfFlow = normalizeFlowPercentages(dfFlow)
+# save the flow dataframe to a csv
+flowFile = outputDir + 'flowFile_normalized.csv'
+dfFlow.to_csv(flowFile)
 
 reconstructionDirList = [countDir, percentDir]
 dfToReconstruct = [df, dfPercent]
@@ -68,8 +73,9 @@ df_percentDiff = getPercentDifference(list_df, list_of_hours, seqs, segments, in
 # combine the percentDiff and fluorescence
 list_dfFluorAndPercentDiff = [] 
 for df in list_dfReconstructedFluor:
-    # add the percent difference columns to the dataframe from the df_percentDiff dataframe
-    df_fluorAndPercentDiff = pd.concat([df, df_percentDiff], axis=1)
+    # add the only percent difference columns to the dataframe from the df_percentDiff dataframe
+    df_fluorAndPercentDiff = pd.concat([df, df_percentDiff.iloc[:,2:]], axis=1)
+    list_dfFluorAndPercentDiff.append(df_fluorAndPercentDiff)
 
 # REORGANIZE THE COLUMNS OF THE DATAFRAME
 # for now, only going to output the df that uses total sequence percents (closest to SMA and JC data)
@@ -88,10 +94,10 @@ df_fluorAndPercent.insert(3, 'FluorStdDev', fluor_column)
 # extract the gpa and g83i fluorescence from the df_fluorAndPercent dataframe
 gpaFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == gpa, 'Fluorescence'].values[0]
 g83IFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == g83i, 'Fluorescence'].values[0]
-print(gpaFluorescence)
-print(g83IFluorescence)
 gpaFluorescence = float(config["gpaFluor"])
 g83IFluorescence = float(config["g83iFluor"])
+print(f'GpA Flourescence  = {gpaFluorescence}')
+print(f'G83I Flourescence = {g83IFluorescence}')
 # calculate percent GpA of fluorescence
 percentGpaCol = df_fluorAndPercent['Fluorescence']/gpaFluorescence*100
 percentGpaStdDevCol = df_fluorAndPercent['FluorStdDev']/gpaFluorescence*100

@@ -26,6 +26,27 @@ def outputAnalysisDfToCsv(df, seqs, segments, outputDir, name):
     filename = outputDir+name
     df.to_csv(filename, index=False)
 
+# normalize the flow percentages to sum to 1
+def normalizeFlowPercentages(dfFlow):
+    # loop through the replicate columns
+    prevReps = []
+    for col in dfFlow.columns:
+        # get the replicate number and data letter
+        repNum, dataLetter = col.split('-')[1], col[0]
+        currRep = dataLetter+repNum
+        # check to skip if already normalized
+        if currRep in prevReps:
+            continue
+        # get columns with matching data letter and replicate number
+        dfFlowRep = dfFlow.loc[:, dfFlow.columns.str.startswith(dataLetter)]
+        dfFlowRep = dfFlowRep.filter(like=repNum)
+        # normalize the percent row
+        dfFlowRep.loc['Percent'] = dfFlowRep.loc['Percent']/dfFlowRep.loc['Percent'].sum()
+        # replace the columns with the normalized columns
+        dfFlow[dfFlowRep.columns] = dfFlowRep
+        prevReps.append(currRep)
+    return dfFlow
+
 #FLUORESCENCE RECONSTRUCTION
 # main function for fluorescence reconstruction
 def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList):
@@ -77,9 +98,9 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
         df_good = pd.DataFrame()
         df_total = pd.DataFrame()
         for df_g, df_t in zip(list_good, list_total):
-            # add dataframes together using concat
-            df_good = pd.concat([df_good, df_g], axis=1)
-            df_total = pd.concat([df_total, df_t], axis=1)
+            # add dataframes together using append
+            df_good = pd.concat([df_good, df_g])
+            df_total = pd.concat([df_total, df_t])
         list_df.append(df_good)
         list_df.append(df_total)
         list_good = []

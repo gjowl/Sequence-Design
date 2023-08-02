@@ -212,7 +212,6 @@ def extractGoodSequenceDataframe(input_dir, output_dir):
         output_df = pd.concat([output_df, goodSequence_df])
     #remove all empty columns
     output_df = output_df.dropna(axis=1, how='all')
-    print(output_df)
     # hardcoded set column names
     output_df.columns = ['Sequence', 'Count', 'Percentage','Segment','Replicate']
     output_df.to_csv(output_dir+'seqIdDf.csv', index=False)
