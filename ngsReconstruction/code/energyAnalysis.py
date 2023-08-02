@@ -30,8 +30,9 @@ fluorCol = 'Fluorescence'
 stdDevCol = 'FluorStdDev'
 percentGpaCol = 'PercentGpa'
 percentGpaStdDevCol = 'PercentGpaStdDev'
-maltoseCol = 'MaltosePercentDiff'
-colsToAdd = [fluorCol, stdDevCol, percentGpaCol, percentGpaStdDevCol, maltoseCol]
+m1 = 'LB-12H_M9-36H'
+m2 = 'LB-36H_M9-36H'
+colsToAdd = [fluorCol, stdDevCol, percentGpaCol, percentGpaStdDevCol, m1, m2]
 
 # make the output directories that these will all output to
 dirList = [outputDir]
@@ -41,6 +42,8 @@ for dir in dirList:
 # read in the input files
 df_energyFile = pd.read_csv(energyFile)
 df_fluor = pd.read_csv(reconstructionFile)
+# rid of duplicates in the energy file
+df_energyFile = df_energyFile.drop_duplicates(subset=['Sequence'], keep='first')
 
 # initialize a new dataframe that will be used for analysis and output
 df_output = pd.DataFrame()
@@ -69,6 +72,7 @@ for colName in df_fluor.columns:
     if colName in colsToAdd:
         list_values = [] 
         for seq in df_energyAndFluor['Sequence']:
+            print(seq, colName)
             # get the sequence info for the given column
             value = df_fluorFiltered.loc[df_fluorFiltered['Sequence'] == seq, colName].item()
             list_values.append(value)

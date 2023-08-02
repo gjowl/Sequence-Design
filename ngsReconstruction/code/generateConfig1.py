@@ -12,8 +12,8 @@ currDir = os.getcwd()
 
 # main code config options
 programName = 'ngsAnalysis'
-analysisDir = currDir+'/CHIP2/'
-#analysisDir = currDir+'/JC_CHIP2/'
+#analysisDir = currDir+'/CHIP2/'
+analysisDir = currDir+'/JC_CHIP2/'
 codeDir = os.getcwd()+'/code/'
 #dataDir = '/data/NGS/'
 dataDir = '/home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2023_CHIP2_Data/NGS_fastq/'
@@ -75,7 +75,7 @@ gpaFluor = 109804.5
 g83iFluor = 39740
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
-    "inputDir":outputDir,
+    "inputDir":extractionDir,
     "outputDir":analyzedDataDir,
     "countFile":countFile,
     "percentFile":percentFile,

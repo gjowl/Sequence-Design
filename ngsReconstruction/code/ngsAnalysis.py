@@ -60,8 +60,8 @@ usePercentOptionList = [False, True]
 list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList)
 
 # hardcoded hour lists for LB and M9
-LBhours = ['12H','24H','36H']
-M9hours = ['24H', '36H']
+LBhours = ['12H', '36H']
+M9hours = ['36H']
 list_of_hours = [LBhours, M9hours]
 
 # get the dataframes for LB and M9
