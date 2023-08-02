@@ -77,8 +77,9 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
         df_good = pd.DataFrame()
         df_total = pd.DataFrame()
         for df_g, df_t in zip(list_good, list_total):
-           df_good = df_good.append(df_g)
-           df_total = df_total.append(df_t) 
+            # add dataframes together using concat
+            df_good = pd.concat([df_good, df_g], axis=1)
+            df_total = pd.concat([df_total, df_t], axis=1)
         list_df.append(df_good)
         list_df.append(df_total)
         list_good = []
@@ -353,7 +354,7 @@ def getMeanPercent(numReplicates, listHours, df, inputDir, outputDir):
     for hour in listHours:
         # loop through all replicates for this 
         dfHour = df.filter(like="-"+hour)
-        # set all 0 values to NaN
+        # set all 0 values to 1
         dfHour = dfHour.replace(0, np.nan)
         # get a dataframe with numerators and denominators
         mean = dfHour.mean(axis=1)
@@ -366,12 +367,17 @@ def getMeanPercent(numReplicates, listHours, df, inputDir, outputDir):
 def calculatePercentDifference(dfLB, dfM9):
     # initialize dataframe to hold the percent differences averages
     dfDiff = pd.DataFrame()
-    # iterate through columns in LB dataframe
-    for col in dfLB.columns:
-        LB = dfLB[col]
-        M9 = dfM9.iloc[:,0]
-        subtract = M9.subtract(LB)
-        percentDiff = subtract.divide(LB)*100
-        numColumns = len(dfDiff.columns)
-        dfDiff.insert(numColumns, col, percentDiff)
+    # loop through columns in LB dataframe
+    for LBcol in dfLB.columns:
+        LB = dfLB[LBcol]
+        # to prevent dividing by 0, replace all 0 values with 1
+        LB = LB.replace(0, 1)
+        # loop through the columns in the M9 dataframe
+        for M9col in dfM9.columns:
+            M9 = dfM9[M9col]
+            subtract = M9.subtract(LB)
+            percentDiff = subtract.divide(LB)*100
+            numColumns = len(dfDiff.columns)
+            dfDiff.insert(numColumns, f'LB-{LBcol}_M9-{M9col}', percentDiff)
+    #dfDiff = dfDiff.replace(np.nan, 0)
     return dfDiff

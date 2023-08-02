@@ -55,7 +55,7 @@ usePercentOptionList = [False, True]
 list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList)
 
 # hardcoded hour lists for LB and M9
-LBhours = ['0H','12H','24H','36H']
+LBhours = ['12H','24H','36H']
 M9hours = ['24H', '36H']
 list_of_hours = [LBhours, M9hours]
 
@@ -67,10 +67,9 @@ df_percentDiff = getPercentDifference(list_df, list_of_hours, seqs, segments, in
 
 # combine the percentDiff and fluorescence
 list_dfFluorAndPercentDiff = [] 
-percentDiffCol = df_percentDiff['36H']
 for df in list_dfReconstructedFluor:
-    df = df.assign(MaltosePercentDiff=percentDiffCol)
-    list_dfFluorAndPercentDiff.append(df)
+    # add the percent difference columns to the dataframe from the df_percentDiff dataframe
+    df_fluorAndPercentDiff = pd.concat([df, df_percentDiff], axis=1)
 
 # REORGANIZE THE COLUMNS OF THE DATAFRAME
 # for now, only going to output the df that uses total sequence percents (closest to SMA and JC data)
@@ -107,6 +106,8 @@ df_fluorAndPercent.to_csv(reconstructionFile, index=False)
 df_aboveG83I = df_fluorAndPercent[df_fluorAndPercent['Fluorescence'] > g83IFluorescence]
 g83iCutoffFile = outputDir + 'g83iCutoff.csv'
 df_aboveG83I.to_csv(g83iCutoffFile, index=False)
+
+print(df_fluorAndPercent)
 
 # MALTOSE CUTOFF
 df_cutoff = df_fluorAndPercent[df_fluorAndPercent['MaltosePercentDiff'] > maltoseCutoff]
