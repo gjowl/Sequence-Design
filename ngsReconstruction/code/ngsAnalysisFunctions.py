@@ -58,8 +58,9 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
     for df, outputDir, usePercent in zip(dfToReconstruct, reconstructionDirList, usePercentOptionList):
         # if the dir is empty, continue
         if len(os.listdir(outputDir)) < 1:
+            # remove the non-sorted data (H to distinguish LB and maltose data) from the df
             dfBins = df.filter(like='H')
-            # remove the dfBins from the df
+            # remove the those bins from the df
             dfBins = df.drop(dfBins.columns, axis=1)
             # remove the sequence and segment columns from the dfBins
             dfBins = dfBins.drop(['Sequence', 'Segment'], axis=1)
@@ -402,3 +403,41 @@ def calculatePercentDifference(dfLB, dfM9):
             dfDiff.insert(numColumns, f'LB-{LBcol}_M9-{M9col}', percentDiff)
     #dfDiff = dfDiff.replace(np.nan, 0)
     return dfDiff
+
+# calculate percent GpA of fluorescence
+def calculatePercentGpA(input_df, gpa, g83i, noTM_fluor, divider):
+    # extract out the binned fluorescence columns
+    df_fluor = input_df.filter(like=divider)
+    # remove the divider from the column names
+    cols = df_fluor.columns
+    cols = [col.split(divider)[0] for col in cols]
+    df_fluor.columns = cols
+    # input the sequence column into the dataframe
+    df_fluor.insert(0, 'Sequence', input_df['Sequence'])
+    df_percentGpa = pd.DataFrame()
+    df_percentGpa.insert(0, 'Sequence', input_df['Sequence'])
+    df_fluor.to_csv(outputDir+'fluor.csv', index=False)
+    for col in df_fluor.columns:
+        prevReps = []
+        if col != 'Sequence':
+            # find the gpa and g83i fluorescence for that bin
+            gpaFluorescence = df_fluor.loc[df_fluor['Sequence'] == gpa, col].values[0]
+            g83IFluorescence = df_fluor.loc[df_fluor['Sequence'] == g83i, col].values[0]
+            # if the gpa fluorescence is NA, get the next one that isn't NA
+            if np.isnan(gpaFluorescence):
+                # get the next fluorescence that isn't NA
+                gpaFluorescence = df_fluor.loc[df_fluor[col] > 0, col].values[0]
+                g83iFluorescence = df_fluor.loc[df_fluor[col] > 0, col].values[1]
+            # calculate percent GpA of fluorescence
+            percentGpaCol = df_fluor[col]/gpaFluorescence*100
+            # add the percent GpA column to the end of the dataframe
+            df_percentGpa.insert(len(df_percentGpa.columns), col+'-PercentGpa', percentGpaCol)
+            # calculate percent difference of GpA and G83I fluorescence
+            percentDiffCol = (gpaFluorescence - g83IFluorescence)/g83IFluorescence*100
+            # subtract the noTM fluorescence from GpA
+    # get the average percent gpa per row
+    df_percentGpa['Average Percent GpA'] = df_percentGpa.mean(axis=1)
+    df_percentGpa.to_csv(outputDir+'percentGpA.csv', index=False)
+    # add the average percent gpa to the input dataframe
+    input_df.insert(len(input_df.columns), 'Average Percent GpA', df_percentGpa['Average Percent GpA'])
+    return input_df

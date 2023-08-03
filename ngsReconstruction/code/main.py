@@ -15,7 +15,7 @@ import pandas as pd
 from functions import *
 
 # Use the utilityFunction to get the configFile
-configFile = getConfigFile(sys.argv[1])
+configFile = sys.argv[1]
 # gets the name of this file to access 
 programName = getFilename(__file__)
 

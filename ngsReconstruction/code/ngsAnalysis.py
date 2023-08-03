@@ -59,6 +59,21 @@ usePercentOptionList = [False, True]
 # This outputs the dataframes into a list by method of calculating fluorescence: goodSeqs, totalSeqs, goodPercent, totalPercent
 list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inputDir, dfFlow, seqs, segments, usePercentOptionList)
 
+#TODO: get average percent difference of percent GpA, depending on what the fluor of GpA is in the bin
+# Loop through the Fluors that actually have values and aren't NA
+# get the gpa fluor for that bin
+# get the g83i fluor for that bin
+# calculate the percent difference of gpa and g83i
+# get the percentGpA over g83i? and percent GpA? percent below? maybe this could be compared to some of Samantha's old data for something? or for comparison of designability per region?
+# or even designability
+df_fluor = list_dfReconstructedFluor[3]
+divider = '-Fluor'
+
+
+calculatePercentGpA(df_fluor, gpa, g83i, 10000, divider)
+
+exit(0)
+
 # hardcoded hour lists for LB and M9
 LBhours = ['12H', '36H']
 M9hours = ['36H']

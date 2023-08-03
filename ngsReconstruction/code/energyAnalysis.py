@@ -72,10 +72,15 @@ for colName in df_fluor.columns:
     if colName in colsToAdd:
         list_values = [] 
         for seq in df_energyAndFluor['Sequence']:
-            print(seq, colName)
             # get the sequence info for the given column
-            value = df_fluorFiltered.loc[df_fluorFiltered['Sequence'] == seq, colName].item()
-            list_values.append(value)
+            try:
+                value = df_fluorFiltered.loc[df_fluorFiltered['Sequence'] == seq, colName].item()
+                list_values.append(value)
+            except:
+                print('Sequence not found in reconstruction file: ', seq)
+                #remove the sequence from the energy dataframe
+                df_energyAndFluor = df_energyAndFluor[df_energyAndFluor['Sequence'] != seq]
+                continue
         df_energyAndFluor = insertAtEndOfDf(df_energyAndFluor, colName, list_values)
 
 # reverse columns to add them to the front of the dataframe in proper order
