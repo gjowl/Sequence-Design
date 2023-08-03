@@ -174,6 +174,7 @@ my $groupValue = 0;
 my $sequence;
 my %sequences;
 my %proteinSeqs;
+my %fprimers;
 my $poorSeq = 0;
 my $noStart = 0;
 my $noEnd = 0;
@@ -224,6 +225,7 @@ for (my $i = 0; $i < $numLines; $i++){
 		$j = $k - $offset - 63;
 		#next;
 	}
+	my $fwdPrimer = substr($sequence, $j, ($j + $offset));
 	$j = $j + $offset;	
 	if ($k != -1){
 		$tm = substr($sequence, $j, ($k-$j + 3)); # changed on 2022-8-9...same as Josh's code, but not sure what it does?
@@ -245,6 +247,7 @@ for (my $i = 0; $i < $numLines; $i++){
 	} else {
 		$protein = substr($protein, 2);
 		$protein = substr($protein, 0, -1);
+		$fprimers{$protein} = $fwdPrimer;
 	}
 	if (exists $proteinSeqs{$protein}){
 		$proteinSeqs{$protein}++;
@@ -263,7 +266,7 @@ for my $aa (sort {$proteinSeqs{$b} <=> $proteinSeqs{$a} }keys %proteinSeqs){
 	if ($proteinSeqs{$aa} > $cutOff){ #remove seqs less than cutoff
 		#percent of this seq in total
 		my $percentage = $proteinSeqs{$aa} / $numSeqs ;
-		print "$aa\t$proteinSeqs{$aa}\t$percentage\t";
+		print "$aa\t$proteinSeqs{$aa}\t$percentage\t$fprimers{$aa}\t";
 		#Find reference label
 		if (exists $reference{$aa}){
 			print "$reference{$aa}\n";

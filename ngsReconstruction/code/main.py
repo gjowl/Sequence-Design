@@ -35,6 +35,8 @@ countFile            = config["countFile"]
 percentFile          = config["percentFile"]
 refFile              = config["refFile"]
 namesFile              = config["namesFile"]
+gpaSeq              = config["gpa"]
+g83iSeq              = config["g83i"]
 
 # booleans
 analyzeEnergies          = config["analyzeEnergies"]
@@ -59,7 +61,7 @@ if __name__ == '__main__':
     # a bit of other code for matching with these sequences from the sequencing txt files it should work
     
     # get list of sequences and add to dataframe
-    seqIdDf = extractGoodSequenceDataframe(extractionDir, outputDir)
+    seqIdDf = extractGoodSequenceDataframe(extractionDir, gpaSeq, g83iSeq, outputDir)
     # save the dataframe to a csv file
     #seqIdDf.to_csv(outputDir+'seqIdDf.csv', index=False)
 

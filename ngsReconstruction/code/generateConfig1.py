@@ -41,6 +41,13 @@ fastqTotxt = codeDir + "fastqToTxt.pl"
 ngsAnalysis = codeDir + "ngsAnalysis.py"
 energyAnalysis = codeDir + "energyAnalysis.py"
 
+# control sequences and fluorescence values
+gpa = 'LIIFGVMAGVIGT'
+g83i = 'LIIFGVMAIVIGT'
+gpaFluor = 109804.5
+g83iFluor = 39740
+noTMfluor = 0
+
 # booleans
 analyzeEnergies = False
 
@@ -59,6 +66,8 @@ config_file["main"]={
     "countFile":countFile,
     "refFile":refFile,
     "namesFile":namesFile,
+    "gpa":gpa,
+    "g83i":g83i,
 }
 
 # ngsAnalysis config options
@@ -69,10 +78,8 @@ countDir = analyzedDataDir+"reconstruction_by_count/"
 percentDir = analyzedDataDir+"reconstruction_by_percent/"
 maltoseTestDir = analyzedDataDir+"maltoseTest/"
 maltoseCutoff = -95 #simple cutoff that we've used in the past; also can use negative control values
-gpa = 'LIIFGVMAGVIG'
-g83i = 'LIIFGVMAIVIG'
-gpaFluor = 109804.5
-g83iFluor = 39740
+
+
 # ngsAnalysis config
 config_file["ngsAnalysis"]={
     "inputDir":extractionDir,
@@ -83,6 +90,8 @@ config_file["ngsAnalysis"]={
     "reconstructionFile":reconstructionFile,
     "countDir":countDir,
     "percentDir":percentDir,
+    "gpa":gpa,
+    "g83i":g83i,
     "gpaFluor":gpaFluor,
     "g83iFluor":g83iFluor,
     "maltoseTestDir":maltoseTestDir,
