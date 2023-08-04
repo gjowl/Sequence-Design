@@ -195,18 +195,18 @@ def extractGoodSequenceDataframe(input_dir, gpaSeq, g83iSeq, output_dir):
         # the above works, but if you run into an error for column mismatch then find the file that has too many and delete the extra columns
         dfData = pd.read_csv(dataFile, delimiter=delim, header=None, skiprows=4, names=column_names)
         goodSequence_df = dfData[dfData.iloc[:,3] != 'Unknown']
-        # 2023-7-30: added below in for the noFwdPrimer files to get the GpA and G83I containing sequences 
-        # get sequences that look like gpa or g83i
-        gpa = dfData[dfData.iloc[:,0].str.contains(gpaSeq)]
-        g83i = dfData[dfData.iloc[:,0].str.contains(g83iSeq)]
-        # get the sequence total and rename first column
-        gpaCount, gpaPercent = gpa.iloc[:,1].sum(), gpa.iloc[:,2].sum()
-        g83iCount, g83iPercent = g83i.iloc[:,1].sum(), g83i.iloc[:,2].sum()
-        print(dataFile, gpaPercent, g83iPercent)
-        # insert the controls into the goodSequence_df as new rows using concat
-        gpa_df = pd.DataFrame([[gpaSeq, gpaCount, gpaPercent, 'GpA']], columns=[0,1,2,3])
-        g83i_df = pd.DataFrame([[g83iSeq, g83iCount, g83iPercent, 'G83I']], columns=[0,1,2,3])
-        goodSequence_df = pd.concat([goodSequence_df, gpa_df, g83i_df])
+        ## 2023-7-30: added below in for the noFwdPrimer files to get the GpA and G83I containing sequences 
+        ## get sequences that look like gpa or g83i
+        #gpa = dfData[dfData.iloc[:,0].str.contains(gpaSeq)]
+        #g83i = dfData[dfData.iloc[:,0].str.contains(g83iSeq)]
+        ## get the sequence total and rename first column
+        #gpaCount, gpaPercent = gpa.iloc[:,1].sum(), gpa.iloc[:,2].sum()
+        #g83iCount, g83iPercent = g83i.iloc[:,1].sum(), g83i.iloc[:,2].sum()
+        #print(dataFile, gpaPercent, g83iPercent)
+        ## insert the controls into the goodSequence_df as new rows using concat
+        #gpa_df = pd.DataFrame([[gpaSeq, gpaCount, gpaPercent, 'GpA']], columns=[0,1,2,3])
+        #g83i_df = pd.DataFrame([[g83iSeq, g83iCount, g83iPercent, 'G83I']], columns=[0,1,2,3])
+        #goodSequence_df = pd.concat([goodSequence_df, gpa_df, g83i_df])
         numColumns = len(goodSequence_df.columns)
         goodSequence_df.insert(numColumns, "Replicate", colName)
         # concat the goodSequence_df to the output_df
