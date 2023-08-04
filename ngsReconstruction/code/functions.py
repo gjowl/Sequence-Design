@@ -164,7 +164,7 @@ def getSequenceList(dir):
     return allSeqs
 
 # gets only sequences without unknown
-def extractGoodSequenceDataframe(input_dir, gpaSeq, g83iSeq, output_dir):
+def extractGoodSequenceDataframe(input_dir, output_dir):
     output_df = pd.DataFrame()
     for file in os.listdir(input_dir):
         dataFile = os.path.join(input_dir, file)
