@@ -72,7 +72,6 @@ divider = '-Fluor'
 
 calculatePercentGpA(df_fluor, gpa, g83i, noTMfluor, divider, outputDir)
 
-exit(0)
 
 # hardcoded hour lists for LB and M9
 LBhours = ['12H', '36H']
