@@ -45,7 +45,10 @@ df_sequence = df_sequence[df_sequence['Sequence'].isin(df_fluor_seqs['Sequence']
 df_mutant = df_mutant[df_mutant['Mutant'].isin(df_fluor_mutant['Sequence'])]
 print(df_mutant)
 
-df_mutant.to_csv(f'{outputDir}/mutant_fluor.csv', index=False)
-df_sequence.to_csv(f'{outputDir}/sequence_fluor.csv', index=False)
-print(f'Sequences: {df_sequence.shape[0]}')
-print(f'Mutants: {df_mutant.shape[0]}')
+# remove duplicate sequences
+df_sequence_no_duplicates = df_sequence.drop_duplicates(subset='Sequence')
+df_mutant_no_duplicates = df_mutant.drop_duplicates(subset='Sequence')
+df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor.csv', index=False)
+df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor.csv', index=False)
+print(f'Sequences: {df_sequence_no_duplicates.shape[0]}')
+print(f'Mutants: {df_mutant_no_duplicates.shape[0]}')
