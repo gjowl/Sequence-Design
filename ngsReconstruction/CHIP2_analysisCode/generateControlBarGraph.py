@@ -27,7 +27,7 @@ reconstructionFile = sys.argv[1]
 outputDir = sys.argv[2]
 df_reconstruction = pd.read_csv(reconstructionFile, index_col=0)
 
-# get the control sequences
+# get the non-control sequences
 df_nonControl = df_reconstruction[pd.to_numeric(df_reconstruction['Segments'], errors = 'coerce').notnull()]
 # get the control sequences by removing the non-control sequences from the reconstruction dataframe
 df_control = df_reconstruction.drop(df_nonControl.index)
