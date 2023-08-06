@@ -165,13 +165,16 @@ def getReconstructedFluorescenceDf(dfBins, seqs, segments, inputDir, outputDir, 
         outputAnalysisDfToCsv(dfFluorTotal, seqs, segments, outputDir, totalRawFile)
         # add to dataframe that will be used to analyze fluorescence
         fluorGoodCol = dfFluorGood['Fluorescence']
-        dfAvgGood.insert(i-1, f'{sample_id}-Fluor', fluorGoodCol)
+        dfAvgGood.insert(i-1, f'{replicate}-Fluor', fluorGoodCol)
         fluorTotalCol = dfFluorTotal['Fluorescence']
-        dfAvgTotal.insert(i-1, f'{sample_id}-Fluor', fluorTotalCol)
+        dfAvgTotal.insert(i-1, f'{replicate}-Fluor', fluorTotalCol)
         i+=1
     # get average, stdev, etc. from reconstructed fluorescence
     dfAvgGood = getReconstructedFluorescenceStats(dfAvgGood)
     dfAvgTotal = getReconstructedFluorescenceStats(dfAvgTotal)
+    # add the sample as a column to the dataframe
+    dfAvgGood['Sample'] = sample
+    dfAvgTotal['Sample'] = sample
     return dfAvgGood, dfAvgTotal
 
 # TODO: add in all of the math parts as descriptions below
