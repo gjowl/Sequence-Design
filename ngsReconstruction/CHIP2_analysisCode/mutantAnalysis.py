@@ -78,19 +78,54 @@ df_mutant_no_duplicates = df_mutant.drop_duplicates(subset='Mutant', keep='first
 # add the mean fluorescence to the sequence dataframe
 df_sequence_no_duplicates = df_sequence_no_duplicates.merge(df_fluor_seqs[['Sequence', 'mean', 'std', 'Sample']], on='Sequence', how='left')
 df_mutant_no_duplicates = df_mutant_no_duplicates.merge(df_fluor_mutant[['Sequence', 'mean', 'std', 'Sample']], left_on='Mutant', right_on='Sequence', how='left')
+# The above adds a additional column? get rid of the extra sequence column
+df_mutant_no_duplicates = df_mutant_no_duplicates.drop(columns=['Sequence_y'])
+# rename the sequence column
+df_mutant_no_duplicates = df_mutant_no_duplicates.rename(columns={'Sequence_x': 'Sequence'})
+
 df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor.csv', index=False)
 df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor.csv', index=False)
 df_test = df_fluor.copy()
+
 
 # check if all sequences are accounted for
 # keep sequences not found in df_sequence_no_duplicates
 df_test = df_test[~df_test['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
 df_test = df_test[~df_test['Sequence'].isin(df_mutant_no_duplicates['Mutant'])]
 
+# get the WT sequences that have mutants in the dataframe
+df_sequences_with_mutant = df_sequence_no_duplicates[df_sequence_no_duplicates['Sequence'].isin(df_mutant_no_duplicates['Sequence'])]
+df_mutants_with_WT = df_mutant_no_duplicates[df_mutant_no_duplicates['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
+print(df_sequences_with_mutant.shape)
+print(df_mutants_with_WT.shape)
+
+
 samples = df_sequence_no_duplicates['Sample'].unique()
-graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'Total', outputDir)
-graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'VDWDiff', outputDir)
-graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'HBONDDiff', outputDir)
-graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'IMM1Diff', outputDir)
-graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'SasaDiff', outputDir)
-graphWTVsFluorescence(df_mutant_no_duplicates, samples, 'SasaPercDifference', outputDir)
+
+
+
+
+    
+
+
+# all data figures
+#graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'Total', outputDir)
+#graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'VDWDiff', outputDir)
+#graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'HBONDDiff', outputDir)
+#graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'IMM1Diff', outputDir)
+#graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'SasaDiff', outputDir)
+#graphWTVsFluorescence(df_mutant_no_duplicates, samples, 'SasaPercDifference', outputDir)
+
+number_seq_in_mutant = len(df_mutant_no_duplicates['Sequence'].unique())
+# sequences with mutants data
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'Total', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'VDWDiff', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'HBONDDiff', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'IMM1Diff', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'SasaDiff', outputDir)
+graphWTVsFluorescence(df_mutants_with_WT, samples, 'SasaPercDifference', outputDir)
+#for sample in samples:
+#    df_sample = df_sequence_with_mutant.copy()
+#    df_sample = df_sample[df_sample['Sample'] == sample]
+
+print(f'Number of sequences in mutant file: {number_seq_in_mutant}')
