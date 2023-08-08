@@ -401,6 +401,8 @@ def calculatePercentDifference(dfLB, dfM9):
         # loop through the columns in the M9 dataframe
         for M9col in dfM9.columns:
             M9 = dfM9[M9col]
+            # to differentiate between LB having a sequence and M9 not having it
+            M9 = M9.replace(0, 1000000)
             subtract = M9.subtract(LB)
             percentDiff = subtract.divide(LB)*100
             numColumns = len(dfDiff.columns)
