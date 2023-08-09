@@ -58,14 +58,14 @@ os.makedirs(outputDir, exist_ok=True)
 
 gpa = 'LIIFGVMAGVIGT'
 g83i = 'LIIFGVMAIVIGT'
-g83iCutoff = 20000
+#g83iCutoff = 20000
 
 df_fluor = pd.read_csv(fluorescenceFile)
 df_sequence = pd.read_csv(sequenceFile)
 df_mutant = pd.read_csv(mutantFile)
 
 # remove any sequences below G83I
-df_fluor = df_fluor[df_fluor['mean'] > g83iCutoff]
+#df_fluor = df_fluor[df_fluor['mean'] > g83iCutoff]
 
 #df_controls = df_fluor[df_fluor['Segments'].str.contains('^[A-Z]+$')]
 #df_fluor = df_fluor.drop(df_controls.index)
@@ -147,7 +147,8 @@ for sample in output_df['Sample'].unique():
 #g_df = output_df[output_df['Sample'] == 'G']
 #d_df.to_csv(f'{outputDir}/D_df.csv', index=False)
 #g_df.to_csv(f'{outputDir}/G_df.csv', index=False)
-graphFluorescence(output_df, 'allData', 'Total', outputDir)
+#graphFluorescence(output_df, 'allData', 'Total', outputDir)
+graphFluorescence(df_sequences_with_mutant, 'allData', 'Total', outputDir)
 
 
 #graphWTVsFluorescence(output_df, samples, 'Total', outputDir)
@@ -157,21 +158,21 @@ graphFluorescence(output_df, 'allData', 'Total', outputDir)
 
 
 # all data figures
-graphWTVsFluorescence(output_df, samples, 'Total', outputDir)
-graphWTVsFluorescence(output_df, samples, 'VDWDiff', outputDir)
-graphWTVsFluorescence(output_df, samples, 'HBONDDiff', outputDir)
-graphWTVsFluorescence(output_df, samples, 'IMM1Diff', outputDir)
-graphWTVsFluorescence(output_df, samples, 'SasaDiff', outputDir)
-graphWTVsFluorescence(df_mutant_no_duplicates, samples, 'SasaPercDifference', outputDir)
+#graphWTVsFluorescence(output_df, samples, 'Total', outputDir)
+#graphWTVsFluorescence(output_df, samples, 'VDWDiff', outputDir)
+#graphWTVsFluorescence(output_df, samples, 'HBONDDiff', outputDir)
+#graphWTVsFluorescence(output_df, samples, 'IMM1Diff', outputDir)
+#graphWTVsFluorescence(output_df, samples, 'SasaDiff', outputDir)
+#graphWTVsFluorescence(df_mutant_no_duplicates, samples, 'SasaPercDifference', outputDir)
 
 number_seq_in_mutant = len(df_mutant_no_duplicates['Sequence'].unique())
 # sequences with mutants data
-#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'Total', outputDir)
-#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'VDWDiff', outputDir)
-#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'HBONDDiff', outputDir)
-#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'IMM1Diff', outputDir)
-#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'SasaDiff', outputDir)
-#graphWTVsFluorescence(df_mutants_with_WT, samples, 'SasaPercDifference', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'Total', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'VDWDiff', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'HBONDDiff', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'IMM1Diff', outputDir)
+graphWTVsFluorescence(df_sequences_with_mutant, samples, 'SasaDiff', outputDir)
+graphWTVsFluorescence(df_mutants_with_WT, samples, 'SasaPercDifference', outputDir)
 #for sample in samples:
 #    df_sample = df_sequence_with_mutant.copy()
 #    df_sample = df_sample[df_sample['Sample'] == sample]
