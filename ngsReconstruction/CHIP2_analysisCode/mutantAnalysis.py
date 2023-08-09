@@ -80,11 +80,16 @@ print("ili",len(df_fluor[df_fluor['Sample'] == 'G']['Sequence']))
 # get the data for sequences that successfully fluoresce
 df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])]
 df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])]
-print("fluor",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'G']['Sequence']))
+print("fluor G",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'G']['Sequence']))
+print("fluor L",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'L']['Sequence']))
+print("fluor R",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'R']['Sequence']))
+
+
 
 df_sequence = df_sequence[df_sequence['Sequence'].isin(df_fluor_seqs['Sequence'])]
 df_mutant = df_mutant[df_mutant['Mutant'].isin(df_fluor_mutant['Sequence'])]
 print("mut",len(df_sequence[df_sequence['Region'] == 'GAS']['Sequence']))
+
 #print(len(df_sequence[df_sequence['Design'] == 'GJL']['Sequence']))
 
 # remove duplicate sequences
@@ -99,6 +104,9 @@ df_mutant_no_duplicates = df_mutant_no_duplicates.merge(df_fluor_mutant[['Sequen
 df_mutant_no_duplicates = df_mutant_no_duplicates.drop(columns=['Sequence_y'])
 # rename the sequence column
 df_mutant_no_duplicates = df_mutant_no_duplicates.rename(columns={'Sequence_x': 'Sequence'})
+print("fluor G",len(df_sequence_no_duplicates[df_sequence_no_duplicates['Sample'] == 'G']['Sequence']))
+print("fluor L",len(df_sequence_no_duplicates[df_sequence_no_duplicates['Sample'] == 'L']['Sequence']))
+print("fluor R",len(df_sequence_no_duplicates[df_sequence_no_duplicates['Sample'] == 'R']['Sequence']))
 
 df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor.csv', index=False)
 df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor.csv', index=False)
@@ -121,7 +129,8 @@ print(df_mutants_with_WT.shape)
 
 
 samples = df_sequence_no_duplicates['Sample'].unique()
-
+graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'Total', outputDir)
+exit(0)
 # get the number of sequences with fluorescence higher than mutant
 successfulSeqs = 0
 output_df = pd.DataFrame()
