@@ -33,10 +33,12 @@ def graphFluorescence(input_df, output_file, energy_col, output_dir):
     m, b = np.polyfit(input_df[energy_col], input_df['mean'], 1)
     plt.plot(input_df[energy_col], m*input_df[energy_col] + b)
     # add the equation to the plot
-    plt.text(0.5, 0.5, f'y = {m:.2f}x + {b:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    plt.text(0.1, 1.12, f'y = {m:.2f}x + {b:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # calculate the correlation coefficient
     corr = np.corrcoef(input_df[energy_col], input_df['mean'])[0,1]
-    plt.text(0.5, 0.4, f'r = {corr:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    plt.text(0.1, 1.09, f'r = {corr:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    # add the total number of sequences to the plot
+    plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.savefig(f'{outputDir}/{output_file}.png')
     plt.clf()
 
@@ -45,7 +47,6 @@ def graphWTVsFluorescence(input_df, sample_names, energy_col, output_dir):
     for sample in sample_names:
         df_sample = input_df[input_df['Sample'] == sample]
         graphFluorescence(df_sample, f'{sample}_{energy_col}', energy_col, output_dir)
-
 
 # read in the reconstructed fluorescence dataframe
 fluorescenceFile = sys.argv[1]
@@ -57,10 +58,14 @@ os.makedirs(outputDir, exist_ok=True)
 
 gpa = 'LIIFGVMAGVIGT'
 g83i = 'LIIFGVMAIVIGT'
+g83iCutoff = 20000
 
 df_fluor = pd.read_csv(fluorescenceFile)
 df_sequence = pd.read_csv(sequenceFile)
 df_mutant = pd.read_csv(mutantFile)
+
+# remove any sequences below G83I
+df_fluor = df_fluor[df_fluor['mean'] > g83iCutoff]
 
 #df_controls = df_fluor[df_fluor['Segments'].str.contains('^[A-Z]+$')]
 #df_fluor = df_fluor.drop(df_controls.index)
@@ -124,20 +129,25 @@ for sequence in df_sequences_with_mutant['Sequence']:
     sequenceFluor = df_sequences_with_mutant.loc[df_sequences_with_mutant['Sequence'] == sequence, 'mean'].values[0]
     mutantFluor = df_mutants_with_WT.loc[df_mutants_with_WT['Sequence'] == sequence, 'mean']
     mutantFluor = mutantFluor.divide(sequenceFluor)*100
-    if any(mutantFluor.values < 90):
+    if any(mutantFluor.values < 100):
         successfulSeqs += 1
-        print(mutantFluor, sequenceFluor)
         # add that row to the dataframe
         output_df = pd.concat([output_df, df_sequences_with_mutant[df_sequences_with_mutant['Sequence'] == sequence]], axis=0)
-    
+
 print(f'Number of sequences with fluorescence higher than mutant: {successfulSeqs}')
-print(len(output_df[output_df['Sample'] == 'G']['Sequence']))
-print(len(output_df[output_df['Sample'] == 'D']['Sequence']))
-d_df = output_df[output_df['Sample'] == 'D']
-g_df = output_df[output_df['Sample'] == 'G']
-d_df.to_csv(f'{outputDir}/D_df.csv', index=False)
-g_df.to_csv(f'{outputDir}/G_df.csv', index=False)
-graphFluorescence(output_df, 'allGasRight', 'Total', outputDir)
+for sample in output_df['Sample'].unique():
+    sample_df = output_df[output_df['Sample'] == sample]
+    print(f'Number of sequences with fluorescence higher than mutant in {sample}: {len(sample_df)}')
+    #graphFluorescence(sample_df, f'{sample}_higherThanMutant', 'Total', outputDir)
+    sample_df.to_csv(f'{outputDir}/{sample}_higherThanMutant.csv', index=False)
+
+#print(len(output_df[output_df['Sample'] == 'G']['Sequence']))
+#print(len(output_df[output_df['Sample'] == 'D']['Sequence']))
+#d_df = output_df[output_df['Sample'] == 'D']
+#g_df = output_df[output_df['Sample'] == 'G']
+#d_df.to_csv(f'{outputDir}/D_df.csv', index=False)
+#g_df.to_csv(f'{outputDir}/G_df.csv', index=False)
+graphFluorescence(output_df, 'allData', 'Total', outputDir)
 
 
 #graphWTVsFluorescence(output_df, samples, 'Total', outputDir)
@@ -156,12 +166,12 @@ graphWTVsFluorescence(df_mutant_no_duplicates, samples, 'SasaPercDifference', ou
 
 number_seq_in_mutant = len(df_mutant_no_duplicates['Sequence'].unique())
 # sequences with mutants data
-graphWTVsFluorescence(df_sequences_with_mutant, samples, 'Total', outputDir)
-graphWTVsFluorescence(df_sequences_with_mutant, samples, 'VDWDiff', outputDir)
-graphWTVsFluorescence(df_sequences_with_mutant, samples, 'HBONDDiff', outputDir)
-graphWTVsFluorescence(df_sequences_with_mutant, samples, 'IMM1Diff', outputDir)
-graphWTVsFluorescence(df_sequences_with_mutant, samples, 'SasaDiff', outputDir)
-graphWTVsFluorescence(df_mutants_with_WT, samples, 'SasaPercDifference', outputDir)
+#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'Total', outputDir)
+#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'VDWDiff', outputDir)
+#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'HBONDDiff', outputDir)
+#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'IMM1Diff', outputDir)
+#graphWTVsFluorescence(df_sequences_with_mutant, samples, 'SasaDiff', outputDir)
+#graphWTVsFluorescence(df_mutants_with_WT, samples, 'SasaPercDifference', outputDir)
 #for sample in samples:
 #    df_sample = df_sequence_with_mutant.copy()
 #    df_sample = df_sample[df_sample['Sample'] == sample]
