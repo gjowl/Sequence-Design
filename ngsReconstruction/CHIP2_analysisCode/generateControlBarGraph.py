@@ -44,7 +44,7 @@ for sample in samples:
     # remove any rows that with a 0 value
     #df_control_sample = df_control_sample.loc[(df_control_sample != 0).any(axis=1)]
     df_zeros = df_control_sample[(df_control_sample == 0).any(axis=1)]
-    df_control_sample = df_control_sample.drop(df_zeros.index)
+    #df_control_sample = df_control_sample.drop(df_zeros.index)
     # remove rep1 for GasRight and RightHanded
     if sample == 'G' or sample == 'R':
         df_control_sample = df_control_sample.drop(columns=['Rep1-Fluor'])
@@ -61,14 +61,22 @@ for sample in samples:
     # adjust the x axis labels
     plt.savefig(f'{outputDir}/{sample}_controlHistogram.png')
     plt.clf() 
+    df_control_sample.to_csv(f'{outputDir}/{sample}_controlHistogram.csv')
 
 ax = plt.subplot(111)
-y = [4, 9, 2]
-print(y)
-ind = np.arange(len(sample_list[0]))
-print(sample_list[0])
-ax.bar(ind-0.2, sample_list[0], width=0.2, color='b', align='center')
-ax.bar(ind, sample_list[1], width=0.2, color='g', align='center')
+# keep only the sequences that are in both samples
+#s1 = sample_list[0]
+#s2 = sample_list[1]
+#s2 = s2[s2.index.isin(s1.index)]
+ind = np.arange(len(sample_list[0]))  # the x locations for the groups
+#ind2 = np.arange(len(sample_list[1]))
+### sort by sequence
+#s1 = s1.sort_index()
+#s2 = s2.sort_index()
+#ax.bar(ind-0.2, s1, width=0.2, color='blue', align='center')
+#ax.bar(ind, s2, width=0.2, color='green', align='center')
+ax.bar(ind-0.2, sample_list[0], width=0.2, color='blue', align='center')
+ax.bar(ind, sample_list[1], width=0.2, color='green', align='center')
 ax.bar(ind+0.2, sample_list[2], width=0.2, color='r', align='center')
 # set the x ticks to be the sequence names
 ax.set_xticks(ind)
@@ -79,10 +87,19 @@ plt.xlabel('Sequence')
 plt.ylabel('Fluorescence')
 plt.title('Average fluorescence of control sequences separated by sample')
 # set the legend
+#ax.legend(('JC', 'GJL'))
 ax.legend(('GAS', 'Left', 'Right'))
 #ax.autoscale(tight=True)
 plt.savefig(f'{outputDir}/controlHistogram.png')
     
+# print the percent difference between the two samples as a dataframe
+#df_diff = pd.DataFrame({'Percent Difference': (s2-s1)/s1*100})
+df_diff = pd.DataFrame({'Difference': (sample_list[1]-sample_list[0])})
+df_diff_2 = pd.DataFrame({'Difference': (sample_list[2]-sample_list[0])})
+df_diff = pd.concat([df_diff, df_diff_2], axis=1)
+
+df_diff.to_csv(f'{outputDir}/controlHistogramDiff.csv')
+
 
 
 
