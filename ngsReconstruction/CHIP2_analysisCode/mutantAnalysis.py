@@ -98,8 +98,8 @@ df_mutant_no_duplicates = df_mutant.drop_duplicates(subset='Mutant', keep='first
 # TODO: I may be getting rid of mutants that come from multiple sequences; check and fix above if necessary
 
 # add the mean fluorescence to the sequence dataframe
-df_sequence_no_duplicates = df_sequence_no_duplicates.merge(df_fluor_seqs[['Sequence', 'mean', 'std', 'Sample']], on='Sequence', how='left')
-df_mutant_no_duplicates = df_mutant_no_duplicates.merge(df_fluor_mutant[['Sequence', 'mean', 'std', 'Sample']], left_on='Mutant', right_on='Sequence', how='left')
+df_sequence_no_duplicates = df_sequence_no_duplicates.merge(df_fluor_seqs[['Sequence', 'mean', 'std', 'Sample', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor']], on='Sequence', how='left')
+df_mutant_no_duplicates = df_mutant_no_duplicates.merge(df_fluor_mutant[['Sequence', 'mean', 'std', 'Sample', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor']], left_on='Mutant', right_on='Sequence', how='left')
 # The above adds a additional column? get rid of the extra sequence column
 df_mutant_no_duplicates = df_mutant_no_duplicates.drop(columns=['Sequence_y'])
 # rename the sequence column
@@ -130,7 +130,6 @@ print(df_mutants_with_WT.shape)
 
 samples = df_sequence_no_duplicates['Sample'].unique()
 graphWTVsFluorescence(df_sequence_no_duplicates, samples, 'Total', outputDir)
-exit(0)
 # get the number of sequences with fluorescence higher than mutant
 successfulSeqs = 0
 output_df = pd.DataFrame()
@@ -150,6 +149,7 @@ for sample in output_df['Sample'].unique():
     #graphFluorescence(sample_df, f'{sample}_higherThanMutant', 'Total', outputDir)
     sample_df.to_csv(f'{outputDir}/{sample}_higherThanMutant.csv', index=False)
 
+exit(0)
 #print(len(output_df[output_df['Sample'] == 'G']['Sequence']))
 #print(len(output_df[output_df['Sample'] == 'D']['Sequence']))
 #d_df = output_df[output_df['Sample'] == 'D']
