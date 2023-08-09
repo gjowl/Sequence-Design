@@ -54,6 +54,21 @@ def filterReconstructionData(input_df, std_dev_cutoff, maltose_cutoff, maltose_l
     output_df = output_df[output_df[maltose_col] < maltose_limit]
     return output_df
 
+# TODO: the below isn't properly outputting the filter_df, fix it
+def getFilteringSummary(input_df, sample, std_dev_cutoffs, maltose_cutoff, maltose_limit, outputDir):
+    output_df = input_df.copy()
+    output_df = output_df[output_df[maltose_col] > maltose_cutoff]
+    output_df = output_df[output_df[maltose_col] < maltose_limit]
+    print(f'Number of sequences with maltose between {maltose_cutoff} and {maltose_limit}: {len(output_df)}')
+    filter_df = pd.DataFrame()
+    filter_df[f'{sample} Maltose'] = len(output_df)
+    for cutoff in std_dev_cutoffs:
+        cutoff_df = output_df[output_df['std'] < cutoff]
+        print(f'Number of sequences with a standard deviation less than {cutoff}: {len(cutoff_df)}')
+        # add the number of sequences with a standard deviation less than the cutoff to the filter_df
+        filter_df[f'{sample} std < {cutoff}'] = len(cutoff_df)
+    return filter_df
+
 def plotPieChart(input_df, sample, output_dir):
     labels = input_df.columns
     sizes = input_df.values[0]
@@ -68,7 +83,8 @@ def plotPieChart(input_df, sample, output_dir):
     plt.title(f'{sample} design sequences')
     plt.savefig(f'{output_dir}/{sample}_designPieChart.png')
     # add the total number of sequences to the pie chart
-    #plt.text(-1.5, 1.5, f'Total Sequences: {totalSeqs}', fontsize=42)
+    totalSeqs = sum(sizes)
+    plt.text(0.5, 0.5, f'Total Sequences: {totalSeqs}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.tight_layout()
     plt.clf()
 
@@ -86,7 +102,7 @@ std_dev_cutoff = 5000
 maltose_cutoff = -97
 maltose_limit = 10000000
 maltose_col = 'LB-12H_M9-36H'
-
+std_dev_cutoffs = [1000, 2500, 3000, 5000, 7500, 10000]
 # read in the reconstructed fluorescence dataframe
 df_fluor = pd.read_csv(reconstructionFile)
 df_fluor = calculateMeanFluorescence(df_fluor)
@@ -96,6 +112,7 @@ df_fluor = calculateMeanFluorescence(df_fluor)
 samples = df_fluor['Sample'].unique()
 sample_list = []
 output_df = pd.DataFrame()
+filter_output_df = pd.DataFrame()
 for sample in samples:
     df_sample = df_fluor[df_fluor['Sample'] == sample]
     # remove rep1 for GasRight and RightHanded
@@ -105,7 +122,9 @@ for sample in samples:
     gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
     # get the fluorescence from the index
     gpaFluor, g83iFluor = gpaIndex['mean'].values[0], g83iIndex['mean'].values[0]
+    print(f'{sample} has {len(df_sample)} sequences prior to filtering')
     df_sample = filterReconstructionData(df_sample, std_dev_cutoff, maltose_cutoff, maltose_limit, outputDir)
+    filter_df = getFilteringSummary(df_sample, sample, std_dev_cutoffs, maltose_cutoff, maltose_limit, outputDir)
     totalSeqs = len(df_sample.index)
     lessThanG83i = len(df_sample[df_sample['mean'] < g83iFluor].index)
     moreThanGpa = len(df_sample[df_sample['mean'] > gpaFluor].index)
@@ -119,6 +138,8 @@ for sample in samples:
     # create a pie chart
     plotPieChart(df_pie, sample, outputDir)
     output_df = pd.concat([output_df, df_sample], axis=0)
+    filter_output_df = pd.concat([filter_output_df, filter_df], axis=0)
 output_df.to_csv(f'{outputDir}/filteredFluorescence.csv', index=False)
+filter_output_df.to_csv(f'{outputDir}/filteringSummary.csv', index=False)
 
 # next figure: mutant stuff with SASA; compare the SASA scores against the fluorescence
