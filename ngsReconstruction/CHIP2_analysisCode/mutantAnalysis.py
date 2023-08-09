@@ -122,14 +122,21 @@ successfulSeqs = 0
 output_df = pd.DataFrame()
 for sequence in df_sequences_with_mutant['Sequence']:
     sequenceFluor = df_sequences_with_mutant.loc[df_sequences_with_mutant['Sequence'] == sequence, 'mean'].values[0]
-    mutantFluor = df_mutants_with_WT.loc[df_mutants_with_WT['Sequence'] == sequence, 'mean'].values[0]
-    if sequenceFluor > mutantFluor:
+    mutantFluor = df_mutants_with_WT.loc[df_mutants_with_WT['Sequence'] == sequence, 'mean']
+    mutantFluor = mutantFluor.divide(sequenceFluor)*100
+    if any(mutantFluor.values < 100):
         successfulSeqs += 1
-    # add that row to the dataframe
-    output_df = pd.concat([output_df, df_sequences_with_mutant[df_sequences_with_mutant['Sequence'] == sequence]], axis=0)
+        print(mutantFluor, sequenceFluor)
+        # add that row to the dataframe
+        output_df = pd.concat([output_df, df_sequences_with_mutant[df_sequences_with_mutant['Sequence'] == sequence]], axis=0)
     
 print(f'Number of sequences with fluorescence higher than mutant: {successfulSeqs}')
 print(len(output_df[output_df['Sample'] == 'G']['Sequence']))
+print(len(output_df[output_df['Sample'] == 'D']['Sequence']))
+d_df = output_df[output_df['Sample'] == 'D']
+g_df = output_df[output_df['Sample'] == 'G']
+d_df.to_csv(f'{outputDir}/D_df.csv', index=False)
+g_df.to_csv(f'{outputDir}/G_df.csv', index=False)
 graphFluorescence(output_df, 'allGasRight', 'Total', outputDir)
 
 
