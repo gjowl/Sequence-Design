@@ -124,7 +124,7 @@ for sequence in df_sequences_with_mutant['Sequence']:
     sequenceFluor = df_sequences_with_mutant.loc[df_sequences_with_mutant['Sequence'] == sequence, 'mean'].values[0]
     mutantFluor = df_mutants_with_WT.loc[df_mutants_with_WT['Sequence'] == sequence, 'mean']
     mutantFluor = mutantFluor.divide(sequenceFluor)*100
-    if any(mutantFluor.values < 100):
+    if any(mutantFluor.values < 90):
         successfulSeqs += 1
         print(mutantFluor, sequenceFluor)
         # add that row to the dataframe
