@@ -83,6 +83,10 @@ df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])]
 print("fluor G",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'G']['Sequence']))
 print("fluor L",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'L']['Sequence']))
 print("fluor R",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'R']['Sequence']))
+df_fluor_seqs = df_fluor_seqs.merge(df_sequence[['Sequence', 'Total']], on='Sequence')
+samples = df_fluor_seqs['Sample'].unique()
+graphWTVsFluorescence(df_fluor_seqs, samples, 'Total', outputDir)
+
 
 
 

@@ -123,7 +123,7 @@ for sample in samples:
     # get the fluorescence from the index
     gpaFluor, g83iFluor = gpaIndex['mean'].values[0], g83iIndex['mean'].values[0]
     print(f'{sample} has {len(df_sample)} sequences prior to filtering')
-    df_sample = filterReconstructionData(df_sample, std_dev_cutoff, maltose_cutoff, maltose_limit, outputDir)
+    #df_sample = filterReconstructionData(df_sample, std_dev_cutoff, maltose_cutoff, maltose_limit, outputDir)
     filter_df = getFilteringSummary(df_sample, sample, std_dev_cutoffs, maltose_cutoff, maltose_limit, outputDir)
     totalSeqs = len(df_sample.index)
     lessThanG83i = len(df_sample[df_sample['mean'] < g83iFluor].index)
