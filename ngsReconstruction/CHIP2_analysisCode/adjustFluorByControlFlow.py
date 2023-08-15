@@ -86,7 +86,8 @@ gpa = 'LIIFGVMAGVIGT'
 g83i = 'LIIFGVMAIVIGT'
 noTM_fluor = 17870
 flow_noTM_fluor = 28563
-subtract_noTM = True
+#subtract_noTM = True
+subtract_noTM = False 
 #TODO: the subtraction of the noTM fluor works, but it leads to some negative values. Maybe I should just add it to the fitting line as a control fluor?
 
 os.makedirs(outputDir, exist_ok=True)

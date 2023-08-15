@@ -35,7 +35,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     # add the equation to the plot
     plt.text(0.5, 0.5, f'y = {m:.2f}x + {b:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # calculate the correlation coefficient
-    corr = np.corrcoef(input_df[energy_col], input_df['mean'])[0,1]
+    corr = np.corrcoef(input_df[energy_col], input_df[fluor_col])[0,1]
     plt.text(0.5, 0.4, f'r = {corr:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.savefig(f'{outputDir}/{output_file}.png')
     plt.clf()
@@ -111,28 +111,31 @@ if use_maltose:
     df_fluor = df_fluor[df_fluor[maltose_col] > maltose_cutoff]
     df_fluor = df_fluor[df_fluor[maltose_col] < maltose_limit]
 
-# get the data for sequences that successfully fluoresce
-df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])]
-df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])]
-print("fluor",len(df_fluor_seqs[df_fluor_seqs['Sample'] == 'G']['Sequence']))
+# std cutoff
+#percent_error_cutoff = 10
+#df_fluor = df_fluor[df_fluor['Percent Error'] < percent_error_cutoff]
+df_fluor['std_adjusted'] = df_fluor['mean_transformed'] * df_fluor['Percent Error'] / 100
+#
+## filter out by percent GpA
+#percent_GpA_cutoff = 120
+#df_fluor = df_fluor[df_fluor['Percent GpA'] < percent_GpA_cutoff]
+print(df_fluor)
+# filter the dataframes
+df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
+df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor_energy_data.csv', index=False)
+df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor_energy_data.csv', index=False)
+df_fluor_labeled.to_csv(f'{outputDir}/fluor_WT_mutant_labeled.csv', index=False)
+print(len(df_sequence_no_duplicates))
+print(len(df_mutant_no_duplicates))
 
-df_sequence = df_sequence[df_sequence['Sequence'].isin(df_fluor_seqs['Sequence'])]
-df_mutant = df_mutant[df_mutant['Mutant'].isin(df_fluor_mutant['Sequence'])]
-print("mut",len(df_sequence[df_sequence['Region'] == 'GAS']['Sequence']))
-#print(len(df_sequence[df_sequence['Design'] == 'GJL']['Sequence']))
-
-# remove duplicate sequences
-df_sequence_no_duplicates = df_sequence.drop_duplicates(subset='Sequence', keep='first')
-df_mutant_no_duplicates = df_mutant.drop_duplicates(subset='Mutant', keep='first')
-# TODO: I may be getting rid of mutants that come from multiple sequences; check and fix above if necessary
-
-# add the mean fluorescence to the sequence dataframe
-df_sequence_no_duplicates = df_sequence_no_duplicates.merge(df_fluor_seqs[['Sequence', 'mean', 'std', 'Sample']], on='Sequence', how='left')
-df_mutant_no_duplicates = df_mutant_no_duplicates.merge(df_fluor_mutant[['Sequence', 'mean', 'std', 'Sample']], left_on='Mutant', right_on='Sequence', how='left')
-# The above adds a additional column? get rid of the extra sequence column
-df_mutant_no_duplicates = df_mutant_no_duplicates.drop(columns=['Sequence_y'])
-# rename the sequence column
-df_mutant_no_duplicates = df_mutant_no_duplicates.rename(columns={'Sequence_x': 'Sequence'})
+cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
+#fluor_col = 'Percent GpA'
+#error_col = 'Percent Error'
+fluor_col = 'mean_transformed'
+error_col = 'std_adjusted'
+samples = df_sequence_no_duplicates['Sample'].unique()
+graphVsFluorescence(df_sequence_no_duplicates, samples, cols_to_graph, fluor_col, error_col, outputDir)
+exit(0)
 
 df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor.csv', index=False)
 df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor.csv', index=False)
@@ -146,37 +149,16 @@ print(len(df_mutants_with_WT))
 exit(0)
 
 
-samples = df_sequence_no_duplicates['Sample'].unique()
 
-# get the number of sequences with fluorescence higher than mutant
-successfulSeqs = 0
-output_df = pd.DataFrame()
-for sequence in df_sequences_with_mutant['Sequence']:
-    sequenceFluor = df_sequences_with_mutant.loc[df_sequences_with_mutant['Sequence'] == sequence, 'mean'].values[0]
-    mutantFluor = df_mutants_with_WT.loc[df_mutants_with_WT['Sequence'] == sequence, 'mean'].values[0]
-    if sequenceFluor > mutantFluor:
-        successfulSeqs += 1
-    # add that row to the dataframe
-    output_df = pd.concat([output_df, df_sequences_with_mutant[df_sequences_with_mutant['Sequence'] == sequence]], axis=0)
-    
-print(f'Number of sequences with fluorescence higher than mutant: {successfulSeqs}')
+output_df = getSequencesWithFluorescenceHigherThanMutant(df_sequences_with_mutant, df_mutants_with_WT, fluor_col) 
+print(f'Number of sequences with fluorescence higher than mutant: {len(output_df)}')
 print(len(output_df[output_df['Sample'] == 'G']['Sequence']))
-graphFluorescence(output_df, 'allGasRight', 'Total', outputDir)
-
-
-#graphWTVsFluorescence(output_df, samples, 'Total', outputDir)
-#exit(0)
-
-    
-
+cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
+#graphFluorescence(output_df, 'allGasRight', 'Total', outputDir)
+graphVsFluorescence(output_df, samples, cols_to_graph, fluor_col, error_col, outputDir)
 
 # all data figures
-graphWTVsFluorescence(output_df, samples, 'Total', outputDir)
-graphWTVsFluorescence(output_df, samples, 'VDWDiff', outputDir)
-graphWTVsFluorescence(output_df, samples, 'HBONDDiff', outputDir)
-graphWTVsFluorescence(output_df, samples, 'IMM1Diff', outputDir)
-graphWTVsFluorescence(output_df, samples, 'SasaDiff', outputDir)
-graphWTVsFluorescence(df_mutant_no_duplicates, samples, 'SasaPercDifference', outputDir)
+#graphVsFluorescence(df_mutant_no_duplicates, samples, 'SasaPercDifference', outputDir)
 
 number_seq_in_mutant = len(df_mutant_no_duplicates['Sequence'].unique())
 # sequences with mutants data
@@ -187,4 +169,4 @@ number_seq_in_mutant = len(df_mutant_no_duplicates['Sequence'].unique())
 
 print(f'Number of sequences in mutant file: {number_seq_in_mutant}')
 # I think the next thing to do is to figure out how I can keep more of these sequences instead of just filtering by all mutants. Is there some metric I can use?
-# then after that I think I want to start comparing sequences and mutations more thoroughly
+# then after that I think I want to start comparing sequences and mutations 
