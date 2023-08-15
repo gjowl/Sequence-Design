@@ -10,6 +10,7 @@ use Getopt::Long;
 my $refFile;
 my $seqFile;
 my $direction;
+print "start\n";
  
 GetOptions(
     "refFile=s" => \$refFile,
@@ -115,7 +116,6 @@ my %basePairs = (
 
 #Print Info
 print "$seqFile\t$direction\n";
-
 #Load reference sequences
 open (FILE, $refFile) or die "Can't open file\n";
 my @ref = <FILE>;
@@ -155,8 +155,11 @@ if ($direction == 1){
 open (FILE, $seqFile) or die "Can't open $seqFile\n";
 my @lines = <FILE>;
 close(FILE);
+print("File closed\n");
+exit(0);
 my $numLines = scalar @lines;
 my $numSeqs = $numLines / 4;
+
 
 #Cutoff for the number of seqs that we will analyze 
 #Starter is 0.01%
