@@ -57,9 +57,9 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
     max_val = np.max(fluor)
     # flip the data so that the min is at the top of the colorbar
     #norm = matplotlib.colors.Normalize(vmin=40, vmax=100) # TODO: change this to the min and max of the data
-    norm = matplotlib.colors.Normalize(vmin=-50, vmax=-5) # TODO: change this to the min and max of the data
+    norm = matplotlib.colors.Normalize(vmin=min_val, vmax=max_val) # TODO: change this to the min and max of the data
     print(norm(fluor))
-    ax.scatter(xAxis, yAxis, c=cmap(norm(fluor)), s=30, alpha=0.5)
+    ax.scatter(xAxis, yAxis, c=cmap(norm(fluor)), s=10, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
     sm.set_array([])  # only needed for matplotlib < 3.1
@@ -81,7 +81,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, fluor, filename, outputDir):
     plt.close()
 
 # read in kde file from command line, or default to 2020_09_23_kdeData.csv
-projectDir = os.getcwd()+'/'
+projectDir = os.getcwd()+'/inputAnalysisCsv/'
 kdeFile = projectDir + '2020_09_23_kdeData.csv'
 inputFile = sys.argv[1]
 
@@ -90,11 +90,11 @@ df_kde = pd.read_csv(kdeFile)
 df_data = pd.read_csv(inputFile)
 
 # set xAxis and yAxis variables
-xAxis = 'xShift'
-yAxis = 'crossingAngle'
-data = 'EnergyScore'
+xAxis = 'endXShift'
+yAxis = 'endCrossingAngle'
+data = 'Total'
 
-df_data = df_data[df_data['StartSequence'] == df_data['Sequence']]
+#df_data = df_data[df_data['StartSequence'] == df_data['Sequence']]
 
 # get the x and y axes data to be plotted from the dataframe
 x = df_data.loc[:, xAxis]
@@ -105,4 +105,4 @@ fluor = df_data[data].values
 kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
 
 # plot the kde plot with an overlay of the input dataset   
-plotKdeOverlay(kdeZScores, x, y, fluor, "GxxxG_-40to-5_"+data, projectDir)
+plotKdeOverlay(kdeZScores, x, y, fluor, data, projectDir)

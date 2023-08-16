@@ -124,6 +124,10 @@ print(df_fluor)
 df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
 df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor_energy_data.csv', index=False)
 df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor_energy_data.csv', index=False)
+df_sequence_no_fluor = df_sequence[~df_sequence['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
+df_mutant_no_fluor = df_mutant[~df_mutant['Mutant'].isin(df_mutant_no_duplicates['Mutant'])]
+df_sequence_no_fluor.to_csv(f'{outputDir}/sequence_no_fluor.csv', index=False)
+df_mutant_no_fluor.to_csv(f'{outputDir}/mutant_no_fluor.csv', index=False)
 df_fluor_labeled.to_csv(f'{outputDir}/fluor_WT_mutant_labeled.csv', index=False)
 print(len(df_sequence_no_duplicates))
 print(len(df_mutant_no_duplicates))

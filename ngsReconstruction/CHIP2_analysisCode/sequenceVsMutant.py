@@ -8,30 +8,76 @@ def match(s1, s2):
             num_diff += 1
     return num_diff 
 
+#def calculatePercentDifference(df_match, seq_fluor): 
+#    output_df = df_match.copy()
+#    # calculate the percent difference between the sequence and the mutant
+#    output_df['percent_difference'] = output_df[fluor_col].apply(lambda x: (x - seq_fluor) / seq_fluor * 100)
+#    return output_df
+
+def calculatePercentWt(df_match, seq_fluor): 
+    output_df = df_match.copy()
+    # calculate the percent difference between the sequence and the mutant
+    output_df['percent_wt'] = output_df[fluor_col].apply(lambda x: x / seq_fluor * 100)
+    return output_df
+
 # read in the input files
-sequenceFile = sys.argv[1]
-mutantFile = sys.argv[2]
+fluorFile = sys.argv[1]
+output_dir = sys.argv[2]
+
+os.makedirs(output_dir, exist_ok=True)
+#sequenceFile = sys.argv[1]
+#mutantFile = sys.argv[2]
 
 # read in the dataframes
-df_sequence = pd.read_csv(sequenceFile)
-df_mutant = pd.read_csv(mutantFile)
+df_fluor = pd.read_csv(fluorFile)
+fluor_col = 'mean_transformed'
+percent_cutoff = 75
+nonmatching_aa_min = 2
+matching_seq_min = 3
+#df_sequence = pd.read_csv(sequenceFile)
+#df_mutant = pd.read_csv(mutantFile)
 
-samples = df_sequence['Sample'].unique()
+samples = df_fluor['Sample'].unique()
+output_lowPerc = pd.DataFrame()
+output_highPerc = pd.DataFrame()
+output_other = pd.DataFrame()
 for sample in samples:
-    df_sample = df_sequence[df_sequence['Sample'] == sample]
-    df_sample_mutant = df_mutant[df_mutant['Sample'] == sample]
+    numSeqs = 0
+    highSeqs = 0
+    usableSeqs = 0
+    df_sample = df_fluor[df_fluor['Sample'] == sample]
     # loop through all of the sequences
-    for seq in df_sample['Sequence'].unique():
+    for seq in df_sample[df_sample['Type'] == 'WT']['Sequence'].unique():
         matching_sequences = [seq]
-        for seq2  in df_sample['Sequence'].unique():
-            if match(seq, seq2) < 2:
+        for seq2 in df_sample['Sequence'].unique():
+            if match(seq, seq2) < nonmatching_aa_min:
                 matching_sequences.append(seq2)
-        for mut in df_sample_mutant['Mutant'].unique():
-            if match(seq, mut) < 2:
-                matching_sequences.append(mut)
         # keep only the unique sequences
         matching_sequences = list(set(matching_sequences))
-        print(matching_sequences)
+        if len(matching_sequences) > matching_seq_min:
+            numSeqs += 1
+        else:
+            continue
+        df_match = df_sample[df_sample['Sequence'].isin(matching_sequences)]
+        # get the sequence with the highest fluorescence
+        seq_fluor = df_match[df_match['Sequence'] == seq][fluor_col].values[0]
+        df_percDiff = calculatePercentWt(df_match, seq_fluor)
+        df_percDiff['wt_seq'] = seq
+        df_otherSeqs = df_percDiff[df_percDiff['Sequence'] != seq]
+        # check if all percent wt are greater than the percent difference cutoff
+        if df_otherSeqs['percent_wt'].max() < percent_cutoff:
+            usableSeqs += 1
+            output_lowPerc = pd.concat([output_lowPerc, df_percDiff])
+        elif df_otherSeqs['percent_wt'].min() > percent_cutoff:
+            highSeqs += 1
+            output_highPerc = pd.concat([output_highPerc, df_percDiff])
+        else:
+            output_other = pd.concat([output_other, df_percDiff])
         # think of a way to keep the mutants that also don't fluoresce here? Maybe if I just label each sequence as a mutant or not?
+        # also could output a dataframe of seqs that aren't present in mutant or sequence file? or just not in refseqs?
         # also, should I keep the maltose cutoff too? that way, if something with like a G83i like mutation is gone, that can be the justification?
-        exit(0)
+        #exit(0)
+    print(sample, numSeqs, usableSeqs, highSeqs)
+output_lowPerc.to_csv(f'{output_dir}/below_{percent_cutoff}.csv', index=False)
+output_highPerc.to_csv(f'{output_dir}/above_{percent_cutoff}.csv', index=False)
+output_other.to_csv(f'{output_dir}/other.csv', index=False)
