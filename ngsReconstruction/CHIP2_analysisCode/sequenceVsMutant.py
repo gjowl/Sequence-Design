@@ -8,6 +8,11 @@ def match(s1, s2):
             num_diff += 1
     return num_diff 
 
+def getMismatchedPosition(s1, s2):
+    for i, (c1, c2) in enumerate(zip(s1, s2)):
+        if c1 != c2:
+            return i, c1, c2
+    return -1, -1, -1
 #def calculatePercentDifference(df_match, seq_fluor): 
 #    output_df = df_match.copy()
 #    # calculate the percent difference between the sequence and the mutant
@@ -81,3 +86,51 @@ for sample in samples:
 output_lowPerc.to_csv(f'{output_dir}/below_{percent_cutoff}.csv', index=False)
 output_highPerc.to_csv(f'{output_dir}/above_{percent_cutoff}.csv', index=False)
 output_other.to_csv(f'{output_dir}/other.csv', index=False)
+
+output_df = pd.concat([output_lowPerc, output_highPerc, output_other])
+for sample in samples:
+    df_sample = output_df[output_df['Sample'] == sample]
+    for seq in output_df['wt_seq'].unique():
+        # get only a set of sequences that differ by the nonmatching_aa_min
+        df_seq = output_df[output_df['wt_seq'] == seq]
+        aa_pos_list = []
+        for seq2 in df_seq['Sequence'].unique():
+            position, aa1, aa2 = getMismatchedPosition(seq, seq2)
+            aa_pos = f'{aa1}{position}{aa2}'
+            aa_pos_list.append(aa_pos)
+        print(len(aa_pos_list))
+        print(len(df_seq))
+        df_seq['position'] = aa_pos_list
+        # plot bar graph
+        xaxis = 'position'
+        xaxis_labels = df_seq[xaxis]
+        # replace the first label with seq
+        xaxis_labels.iloc[0] = seq
+        yaxis = 'percent_wt'
+        ax = plt.subplot(111)
+        increment = 0.2
+        plt.bar(df_seq[xaxis], df_seq[yaxis], width=0.4, color='g')
+        # set the x ticks to be the sequence names
+        ax.set_xticklabels(xaxis_labels)
+        # rotate the x ticks
+        #plt.xticks(rotation=90)
+        plt.xlabel('Sequence')
+        plt.ylabel('Fluorescence')
+        plt.title('Average fluorescence of design sequences separated by sample')
+        # set the legend
+        #ax.legend()
+        ax.autoscale(tight=False)
+        plt.savefig(f'{output_dir}/test_out.png')
+        plt.clf()
+        exit(0)
+        # Currently works for individual sequences; next, run on all similar positions, naming them by something else? Or could I do like a multi bar graph plot, with
+        # multiple positions at the labels and minibar graphs for each? Like a histogram of each; can also do frequency of each in the sequences that succeed and that fail
+        # https://stackoverflow.com/questions/6871201/plot-two-histograms-on-single-chart-with-matplotlib
+        # https://stackoverflow.com/questions/47467077/python-plot-multiple-histograms
+        # int(df_seq)
+        exit(0)
+            
+            
+
+
+
