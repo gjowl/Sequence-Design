@@ -66,7 +66,7 @@ list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, re
 # calculate the percent difference of gpa and g83i
 # get the percentGpA over g83i? and percent GpA? percent below? maybe this could be compared to some of Samantha's old data for something? or for comparison of designability per region?
 # or even designability
-df_fluor = list_dfReconstructedFluor[3]
+df_fluor = list_dfReconstructedFluor[0]
 divider = '-Fluor'
 calculatePercentGpA(df_fluor, gpa, g83i, noTMfluor, divider, outputDir)
 
@@ -90,8 +90,11 @@ for df in list_dfReconstructedFluor:
     list_dfFluorAndPercentDiff.append(df_fluorAndPercentDiff)
 
 # REORGANIZE THE COLUMNS OF THE DATAFRAME
-# for now, only going to output the df that uses total sequence percents (closest to SMA and JC data)
-df_fluorAndPercent = list_dfFluorAndPercentDiff[3]
+# for now, only going to output the df that uses total sequence percents (closest to SMA and JC data); JC CHIP2 data analyzed in this way
+# was using that, but had to resend sequencing for R2-1 and G2-1. So now using goodSeqs, since the ratios should be preserved
+# These two have much higher percentages of good sequences and total sequences, so goodSeqs seems to give a better
+# representation of the data (and the fluorescences are closer for all)
+df_fluorAndPercent = list_dfFluorAndPercentDiff[0]
 # set the sequence column as the first column of the dataframe
 seq_column = df_fluorAndPercent.pop('Sequence')
 df_fluorAndPercent.insert(0, 'Sequence', seq_column)

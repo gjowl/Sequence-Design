@@ -10,7 +10,6 @@ use Getopt::Long;
 my $refFile;
 my $seqFile;
 my $direction;
-print "start\n";
  
 GetOptions(
     "refFile=s" => \$refFile,
@@ -143,7 +142,8 @@ if ($direction == 1){
 	#$fPrimer = "GGCTCCAAACTTGGGGAATCG";
 	# seems like the primer they used this time is different a bit? Or sequencing poor 
 	# in that region because that previous primer is found a few times
-	$fPrimer = "ATTTGGGGAATCG";
+	#$fPrimer = "ATTTGGGGAATCG";
+	$fPrimer = "ACTTGGGGAATCG"; 
 	$rPrimer = "CCTGATCAACCCAAGCCAATCC";
 	$offset = 13;
 } else {
@@ -155,8 +155,6 @@ if ($direction == 1){
 open (FILE, $seqFile) or die "Can't open $seqFile\n";
 my @lines = <FILE>;
 close(FILE);
-print("File closed\n");
-exit(0);
 my $numLines = scalar @lines;
 my $numSeqs = $numLines / 4;
 
