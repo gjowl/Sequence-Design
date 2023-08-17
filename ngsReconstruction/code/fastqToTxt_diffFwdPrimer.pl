@@ -143,9 +143,9 @@ if ($direction == 1){
 	# seems like the primer they used this time is different a bit? Or sequencing poor 
 	# in that region because that previous primer is found a few times
 	#$fPrimer = "ATTTGGGGAATCG";
-	$fPrimer = "ACTTGGGGAATCG"; 
+	$fPrimer = "TTGGGGAATCG"; 
 	$rPrimer = "CCTGATCAACCCAAGCCAATCC";
-	$offset = 13;
+	$offset = 11;
 } else {
 	$fPrimer = "GGATTGGCTTGGGTTGATCAGG";
 	$rPrimer = "CGATTCCCCAAGTTTGGAGCC";
