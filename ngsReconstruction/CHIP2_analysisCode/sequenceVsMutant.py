@@ -135,14 +135,16 @@ for sample in samples:
             x = df_pos['percent_wt']
             # maybe this works? Still too many around 0, maybe find a way to get rid of anything without a certain y value?
             # also run this on the sequences that don't fluoresce as well and compare to see if there are any things that are significantly different
-            if len(x) < 10:
+            # get highest percent wt
+            high = df_pos['percent_wt'].max()
+            if len(x) < 30:
                 continue
             else:
                 plt.hist(x, bins=len(x), alpha=0.5, label=pos)
     plt.legend(loc='upper right')
     plt.tight_layout()
     plt.savefig(f'{output_dir}/{sample}_{pos}.png')
-    exit(0)
+    plt.clf()
 
 ## plot bar graph
 #xaxis = 'position'
