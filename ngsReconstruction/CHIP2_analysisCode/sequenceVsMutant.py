@@ -42,14 +42,14 @@ def plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, output_dir):
     plt.savefig(f'{output_dir}/{seq}.png')
     plt.clf()
 
-def addMismatchedPositions(input_df, wt_seq_col, position_col):
+def addMismatchedPositions(df, wt_seq_col, position_col):
     input_df = df.copy()
     output_df = pd.DataFrame()
     for sample in samples:
         df_sample = input_df[input_df['Sample'] == sample]
         for seq in input_df[wt_seq_col].unique():
             # get only a set of sequences that differ by the nonmatching_aa_min
-            df_seq = input_df[input_df[wt_seq_col] == seq]
+            df_seq = df_sample[df_sample[wt_seq_col] == seq]
             aa_pos_list = []
             for seq2 in df_seq['Sequence'].unique():
                 position, aa1, aa2 = getMismatchedPosition(seq, seq2)
@@ -103,7 +103,7 @@ for sample in samples:
         # get the sequence with the highest fluorescence
         seq_fluor = df_match[df_match['Sequence'] == seq][fluor_col].values[0]
         df_percDiff = calculatePercentWt(df_match, seq_fluor)
-        df_percDiff['wt_seq'] = seq
+        df_percDiff[wt_seq_col] = seq
         df_otherSeqs = df_percDiff[df_percDiff['Sequence'] != seq]
         # check if all percent wt are greater than the percent difference cutoff
         if df_otherSeqs['percent_wt'].max() < percent_cutoff:
@@ -125,7 +125,24 @@ output_other.to_csv(f'{output_dir}/other.csv', index=False)
 
 output_df = pd.concat([output_lowPerc, output_highPerc, output_other])
 # add mismatched position to dataframe
-output_df = addMismatchedPositions(output_df)
+output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)
+
+for sample in samples:
+    df_sample = output_df[output_df['Sample'] == sample]
+    for pos in df_sample[position_col].unique():
+        if pos != '-1-1-1':
+            df_pos = df_sample[df_sample[position_col] == pos]
+            x = df_pos['percent_wt']
+            # maybe this works? Still too many around 0, maybe find a way to get rid of anything without a certain y value?
+            # also run this on the sequences that don't fluoresce as well and compare to see if there are any things that are significantly different
+            if len(x) < 10:
+                continue
+            else:
+                plt.hist(x, bins=len(x), alpha=0.5, label=pos)
+    plt.legend(loc='upper right')
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/{sample}_{pos}.png')
+    exit(0)
 
 ## plot bar graph
 #xaxis = 'position'

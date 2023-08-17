@@ -65,6 +65,7 @@ def filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     # get the data for sequences that successfully fluoresce
     df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])]
     df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])]
+    df_fluor_mutant = df_fluor_mutant[~df_fluor_mutant['Sequence'].isin(df_fluor_seqs['Sequence'])]
     df_fluor_seqs['Type'] = 'WT'
     df_fluor_mutant['Type'] = 'Mutant'
     #print(len(df_fluor))
@@ -75,6 +76,7 @@ def filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     # keep the data for sequences that fluoresce
     df_sequence = df_sequence[df_sequence['Sequence'].isin(df_fluor_seqs['Sequence'])]
     df_mutant = df_mutant[df_mutant['Mutant'].isin(df_fluor_mutant['Sequence'])]
+    df_mutant = df_mutant[~df_mutant['Mutant'].isin(df_sequence['Sequence'])]
     # remove duplicate sequences
     df_sequence_no_duplicates = df_sequence.drop_duplicates(subset='Sequence', keep='first')
     df_mutant_no_duplicates = df_mutant.drop_duplicates(subset='Mutant', keep='first')
