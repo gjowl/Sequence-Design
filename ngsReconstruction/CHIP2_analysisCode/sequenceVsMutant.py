@@ -49,7 +49,7 @@ def addMismatchedPositions(df, wt_seq_col, position_col):
         df_sample = input_df[input_df['Sample'] == sample]
         for seq in input_df[wt_seq_col].unique():
             # get only a set of sequences that differ by the nonmatching_aa_min
-            df_seq = df_sample[df_sample[wt_seq_col] == seq]
+            df_seq = df_sample[df_sample[wt_seq_col] == seq].copy()
             aa_pos_list = []
             for seq2 in df_seq['Sequence'].unique():
                 position, aa1, aa2 = getMismatchedPosition(seq, seq2)
@@ -127,8 +127,14 @@ output_df = pd.concat([output_lowPerc, output_highPerc, output_other])
 # add mismatched position to dataframe
 output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)
 
+output_df = output_df[output_df[position_col] != '-1-1-1']
+output_df = output_df[output_df['percent_wt'] < 200]
 for sample in samples:
     df_sample = output_df[output_df['Sample'] == sample]
+    count = 0
+    graph_count = 0
+    sample_dir = f'{output_dir}/{sample}'
+    os.makedirs(sample_dir, exist_ok=True)
     for pos in df_sample[position_col].unique():
         if pos != '-1-1-1':
             df_pos = df_sample[df_sample[position_col] == pos]
@@ -137,14 +143,27 @@ for sample in samples:
             # also run this on the sequences that don't fluoresce as well and compare to see if there are any things that are significantly different
             # get highest percent wt
             high = df_pos['percent_wt'].max()
-            if len(x) < 30:
+            if len(x) < 10:
                 continue
+            #elif count < 4:
+            #    plt.hist(x, bins=len(x), alpha=0.5, label=pos, edgecolor='black', linewidth=1.2)
+            #    count += 1
             else:
-                plt.hist(x, bins=len(x), alpha=0.5, label=pos)
-    plt.legend(loc='upper right')
-    plt.tight_layout()
-    plt.savefig(f'{output_dir}/{sample}_{pos}.png')
-    plt.clf()
+                #count = 0
+                #graph_count += 1
+                plt.hist(x, bins=5, alpha=0.5, label=pos, edgecolor='black', linewidth=1.2)
+                plt.xlabel('Percent WT')
+                plt.ylabel('Frequency') 
+                plt.legend(loc='upper right')
+                plt.tight_layout()
+                plt.savefig(f'{sample_dir}/{pos}.png')
+                plt.clf()
+    #plt.legend(loc='upper right')
+    #plt.tight_layout()
+    #plt.savefig(f'{output_dir}/{sample}_{pos}.png')
+    #plt.clf()
+
+# maybe analyze sequences that have percent wt < 100?
 
 ## plot bar graph
 #xaxis = 'position'

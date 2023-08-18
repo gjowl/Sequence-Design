@@ -128,9 +128,24 @@ df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor_energy_data.csv', 
 df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor_energy_data.csv', index=False)
 df_sequence_no_fluor = df_sequence[~df_sequence['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
 df_mutant_no_fluor = df_mutant[~df_mutant['Mutant'].isin(df_mutant_no_duplicates['Mutant'])]
+df_mutant_no_fluor = df_mutant_no_fluor[~df_mutant_no_fluor['Mutant'].isin(df_sequence_no_fluor['Sequence'])]
+df_sequence_no_fluor['Type'] = 'WT'
+df_mutant_no_fluor['Type'] = 'Mutant'
+df_no_fluor = pd.concat([df_sequence_no_fluor, df_mutant_no_fluor])
+df_no_fluor['Sample'] = 'none'
+# if Region is GAS, then Sample = G
+df_no_fluor.loc[df_no_fluor['Region'] == 'GAS', 'Sample'] = 'G'
+df_no_fluor.loc[df_no_fluor['Region'] == 'Left', 'Sample'] = 'L'
+df_no_fluor.loc[df_no_fluor['Region'] == 'Right', 'Sample'] = 'R'
+df_no_fluor = df_no_fluor[~df_no_fluor['Sequence'].isin(df_fluor_labeled['Sequence'])]
+df_no_fluor = df_no_fluor.drop_duplicates(subset='Sequence', keep='first')
+df_no_fluor['mean_transformed'] = 0
 df_sequence_no_fluor.to_csv(f'{outputDir}/sequence_no_fluor.csv', index=False)
 df_mutant_no_fluor.to_csv(f'{outputDir}/mutant_no_fluor.csv', index=False)
 df_fluor_labeled.to_csv(f'{outputDir}/fluor_WT_mutant_labeled.csv', index=False)
+df_no_fluor.to_csv(f'{outputDir}/no_fluor.csv', index=False)
+df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample', 'mean_transformed']]])
+df_all.to_csv(f'{outputDir}/all.csv', index=False)
 print(len(df_sequence_no_duplicates))
 print(len(df_mutant_no_duplicates))
 
