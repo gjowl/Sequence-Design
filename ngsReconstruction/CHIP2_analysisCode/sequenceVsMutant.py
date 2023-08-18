@@ -23,6 +23,8 @@ def calculatePercentWt(df_match, seq_fluor):
     output_df = df_match.copy()
     # calculate the percent difference between the sequence and the mutant
     output_df['percent_wt'] = output_df[fluor_col].apply(lambda x: x / seq_fluor * 100)
+    # if percent_wt is NA, set it to 0
+    output_df['percent_wt'] = output_df['percent_wt'].fillna(0)
     return output_df
 
 def plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, output_dir):  
@@ -89,6 +91,8 @@ for sample in samples:
     df_sample = df_fluor[df_fluor['Sample'] == sample]
     # loop through all of the sequences
     for seq in df_sample[df_sample['Type'] == 'WT']['Sequence'].unique():
+        if df_sample[df_sample['Sequence'] == seq][fluor_col].values[0] == 0:
+            continue
         matching_sequences = [seq]
         for seq2 in df_sample['Sequence'].unique():
             if match(seq, seq2) < nonmatching_aa_min:
@@ -119,51 +123,64 @@ for sample in samples:
         # also, should I keep the maltose cutoff too? that way, if something with like a G83i like mutation is gone, that can be the justification?
         #exit(0)
     print(sample, numSeqs, usableSeqs, highSeqs)
-output_lowPerc.to_csv(f'{output_dir}/below_{percent_cutoff}.csv', index=False)
-output_highPerc.to_csv(f'{output_dir}/above_{percent_cutoff}.csv', index=False)
-output_other.to_csv(f'{output_dir}/other.csv', index=False)
+
+
 
 output_df = pd.concat([output_lowPerc, output_highPerc, output_other])
 # add mismatched position to dataframe
 output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)
-
-output_df = output_df[output_df[position_col] != '-1-1-1']
 output_df = output_df[output_df['percent_wt'] < 200]
-for sample in samples:
-    df_sample = output_df[output_df['Sample'] == sample]
-    count = 0
-    graph_count = 0
-    sample_dir = f'{output_dir}/{sample}'
-    os.makedirs(sample_dir, exist_ok=True)
-    for pos in df_sample[position_col].unique():
-        if pos != '-1-1-1':
-            df_pos = df_sample[df_sample[position_col] == pos]
-            x = df_pos['percent_wt']
-            # maybe this works? Still too many around 0, maybe find a way to get rid of anything without a certain y value?
-            # also run this on the sequences that don't fluoresce as well and compare to see if there are any things that are significantly different
-            # get highest percent wt
-            high = df_pos['percent_wt'].max()
-            if len(x) < 10:
-                continue
-            #elif count < 4:
-            #    plt.hist(x, bins=len(x), alpha=0.5, label=pos, edgecolor='black', linewidth=1.2)
-            #    count += 1
-            else:
-                #count = 0
-                #graph_count += 1
-                plt.hist(x, bins=5, alpha=0.5, label=pos, edgecolor='black', linewidth=1.2)
-                plt.xlabel('Percent WT')
-                plt.ylabel('Frequency') 
-                plt.legend(loc='upper right')
-                plt.tight_layout()
-                plt.savefig(f'{sample_dir}/{pos}.png')
-                plt.clf()
+output_lowPerc = output_df[output_df['percent_wt'] < percent_cutoff]
+output_highPerc = output_df[output_df['percent_wt'] > 125]
+output_other = output_df[(output_df['percent_wt'] >= percent_cutoff) & (output_df['percent_wt'] <= 125)]
+output_df = output_df[output_df[position_col] != '-1-1-1']
+output_lowPerc.to_csv(f'{output_dir}/below_{percent_cutoff}.csv', index=False)
+output_highPerc.to_csv(f'{output_dir}/above_{percent_cutoff}.csv', index=False)
+output_other.to_csv(f'{output_dir}/other.csv', index=False)
+output_zero = output_df[output_df['percent_wt'] == 0]
+dfs = [output_lowPerc, output_highPerc, output_other]
+output_names = ['less75', 'more125', 'wt_like']
+for df,name in zip(dfs, output_names): 
+    for sample in samples:
+        df_sample = df[df['Sample'] == sample]
+        count = 0
+        graph_count = 0
+        sample_dir = f'{output_dir}/{sample}/{name}'
+        os.makedirs(sample_dir, exist_ok=True)
+        for pos in df_sample[position_col].unique():
+            if pos != '-1-1-1':
+                df_pos = df_sample[df_sample[position_col] == pos]
+                x = df_pos['percent_wt']
+                # maybe this works? Still too many around 0, maybe find a way to get rid of anything without a certain y value?
+                # also run this on the sequences that don't fluoresce as well and compare to see if there are any things that are significantly different
+                # get highest percent wt
+                high = df_pos['percent_wt'].max()
+                if len(x) < 10:
+                    continue
+                #elif count < 4:
+                #    plt.hist(x, bins=len(x), alpha=0.5, label=pos, edgecolor='black', linewidth=1.2)
+                #    count += 1
+                else:
+                    #count = 0
+                    #graph_count += 1
+                    plt.hist(x, bins=5, alpha=0.5, label=pos, edgecolor='black', linewidth=1.2)
+                    plt.xlabel('Percent WT')
+                    plt.ylabel('Frequency') 
+                    plt.legend(loc='upper right')
+                    plt.tight_layout()
+                    plt.savefig(f'{sample_dir}/{pos}.png')
+                    plt.clf()
     #plt.legend(loc='upper right')
     #plt.tight_layout()
     #plt.savefig(f'{output_dir}/{sample}_{pos}.png')
     #plt.clf()
 
 # maybe analyze sequences that have percent wt < 100?
+for sample in samples:
+    df_sample = output_zero[output_zero['Sample'] == sample]
+    # get the frequency of each position
+    df_freq = df_sample[position_col].value_counts()
+    print(df_freq)
 
 ## plot bar graph
 #xaxis = 'position'
