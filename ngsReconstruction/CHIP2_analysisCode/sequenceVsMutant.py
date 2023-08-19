@@ -182,6 +182,7 @@ for sample in samples:
     df_freq = df_sample[position_col].value_counts()
     print(df_freq)
 
+graphVsFluorescence(df_sequence_no_duplicates, samples, cols_to_graph, fluor_col, error_col, outputDir)
 ## plot bar graph
 #xaxis = 'position'
 #xaxis_labels = df_seq[xaxis]
