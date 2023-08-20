@@ -148,4 +148,5 @@ for sample in sample_names:
 
     # I think I can at the very least transform the standard deviation and then do percent GpA of that error?
     # I think the standard error formula is standard deviation / sqrt(n)
+    # TODO: get G to I mutants for GASrights and evaluate those sequence
 output_df.to_csv(f'{outputDir}/all_transformed.csv', index=False)

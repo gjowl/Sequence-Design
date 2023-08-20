@@ -37,7 +37,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     # calculate the correlation coefficient
     corr = np.corrcoef(input_df[energy_col], input_df[fluor_col])[0,1]
     plt.text(0.5, 0.4, f'r = {corr:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
-    plt.savefig(f'{outputDir}/{output_file}.png')
+    plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
 
 def graphVsFluorescence(input_df, sample_names, cols_to_graph, fluor_col, error_col, output_dir):
@@ -60,7 +60,8 @@ def mergeDataframes(df_fluor_seqs, df_fluor_mutant, df_sequence_no_duplicates, d
 def filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     # rid of any segments that are not numerical (removes control sequences)
     df_fluor = df_fluor[pd.to_numeric(df_fluor['Segments'], errors='coerce').notnull()]
-    # add 'ILI' to the end of each sequence so that it matches the sequences in the mutant and WT dataframes
+    # check if ILI is at the end of the sequence; if not, add it
+    df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
     #df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x + 'ILI')
     # get the data for sequences that successfully fluoresce
     df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])]
@@ -68,6 +69,11 @@ def filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     df_fluor_mutant = df_fluor_mutant[~df_fluor_mutant['Sequence'].isin(df_fluor_seqs['Sequence'])]
     df_fluor_seqs['Type'] = 'WT'
     df_fluor_mutant['Type'] = 'Mutant'
+    df_mut = df_mutant.copy()
+    df_mut.drop(columns=['Sequence'], inplace=True)
+    df_mut.rename(columns={'Mutant': 'Sequence'}, inplace=True)
+    df_fluor_mutant = df_fluor_mutant.merge(df_mut[['Sequence', 'Mutant Type']], on='Sequence', how='left')
+    df_fluor_mutant = df_fluor_mutant.drop_duplicates(subset='Sequence', keep='first')
     #print(len(df_fluor))
     #print(len(df_fluor_seqs))
     #print(len(df_fluor_mutant))
@@ -90,6 +96,10 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
     df_mutant_no_fluor = df_mutant_no_fluor[~df_mutant_no_fluor['Mutant'].isin(df_sequence_no_fluor['Sequence'])]
     df_sequence_no_fluor['Type'] = 'WT'
     df_mutant_no_fluor['Type'] = 'Mutant'
+    # get mutant type from the mutant dataframe
+    df_mutant_no_fluor = df_mutant_no_fluor.merge(df_mutant[['Mutant', 'Mutant Type']], on='Mutant', how='left')
+    df_mutant_no_fluor = df_mutant_no_fluor.rename(columns={'Mutant Type': 'Type'})
+    df_mutant_no_fluor = df_mutant_no_fluor.drop_duplicates(subset='Mutant', keep='first')
     df_no_fluor = pd.concat([df_sequence_no_fluor, df_mutant_no_fluor])
     df_no_fluor['Sample'] = 'none'
     # if Region is GAS, then Sample = G
@@ -101,6 +111,7 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
     df_no_fluor['mean_transformed'] = 0
     return df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor
 
+# TODO: currently comparing energies between L designs and A designs; fix
 # read in the reconstructed fluorescence dataframe
 fluorescenceFile = sys.argv[1]
 sequenceFile = sys.argv[2]
@@ -141,6 +152,11 @@ df_fluor = df_fluor[df_fluor['Percent Error'] < 15]
 # filter the dataframes
 df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
 
+#df_mut = df_mutant.copy()
+#df_mut.drop(columns=['Sequence'], inplace=True)
+#df_mut.rename(columns={'Mutant': 'Sequence'}, inplace=True)
+#df_fluor_labeled = df_fluor_labeled.merge(df_mut[['Sequence', 'Mutant Type']], on='Sequence', how='left')
+
 # get sequences that don't fluoresce
 df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor = getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled)
 
@@ -162,7 +178,12 @@ cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
 fluor_col = 'mean_transformed'
 error_col = 'std_adjusted'
 samples = df_sequence_no_duplicates['Sample'].unique()
-graphVsFluorescence(df_sequence_no_duplicates, samples, cols_to_graph, fluor_col, error_col, outputDir)
+for design in df_sequence_no_duplicates['Design'].unique():
+    df_design = df_sequence_no_duplicates[df_sequence_no_duplicates['Design'] == design]
+    output = outputDir + '/' + design
+    os.makedirs(output, exist_ok=True)
+    graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, output)
+#graphVsFluorescence(df_sequence_no_duplicates, samples, cols_to_graph, fluor_col, error_col, outputDir)
 exit(0)
 
 # get the WT sequences that have mutants in the dataframe

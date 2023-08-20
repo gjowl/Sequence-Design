@@ -129,6 +129,9 @@ for sample in samples:
 output_df = pd.concat([output_lowPerc, output_highPerc, output_other])
 # add mismatched position to dataframe
 output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)
+output_df['wt_aa'] = output_df[position_col].apply(lambda x: x[0])
+output_df['mut_aa'] = output_df[position_col].apply(lambda x: x[-1])
+output_df['position'] = output_df[position_col].apply(lambda x: x[1:-1])
 output_df = output_df[output_df['percent_wt'] < 200]
 output_lowPerc = output_df[output_df['percent_wt'] < percent_cutoff]
 output_highPerc = output_df[output_df['percent_wt'] > 125]
@@ -174,15 +177,26 @@ for df,name in zip(dfs, output_names):
     #plt.tight_layout()
     #plt.savefig(f'{output_dir}/{sample}_{pos}.png')
     #plt.clf()
-
+clash_df = output_df[output_df['Mutant Type'] == 'clash']
+void_df = output_df[output_df['Mutant Type'] == 'void']
+wt_clash = output_df[output_df['Sequence'].isin(clash_df['wt_seq'])]
+wt_clash = wt_clash.drop_duplicates(subset=['Sequence'])
+clash_df = pd.concat([clash_df, wt_clash])
+wt_void = output_df[output_df['Sequence'].isin(void_df['wt_seq'])]
+wt_void = wt_void.drop_duplicates(subset=['Sequence'])
+void_df = pd.concat([void_df, wt_void])
+clash_df.to_csv(f'{output_dir}/clash.csv', index=False)
+void_df.to_csv(f'{output_dir}/void.csv', index=False)
+gtoi_df = output_df[output_df['wt_aa'] == 'G']
+gtoi_df = gtoi_df[gtoi_df['mut_aa'] == 'I']
+gtoi_df = gtoi_df[gtoi_df['percent_wt'] < 75]
+# append the wt sequence to the dataframe
+wt_gtoi = output_df[output_df['Sequence'].isin(gtoi_df['wt_seq'])]
+wt_gtoi = wt_gtoi.drop_duplicates(subset=['Sequence'])
+gtoi_df = pd.concat([gtoi_df, wt_gtoi])
+gtoi_df.to_csv(f'{output_dir}/g_to_i_mutants.csv', index=False)
+# get the wt and mutant aas and positions in separate columns
 # maybe analyze sequences that have percent wt < 100?
-for sample in samples:
-    df_sample = output_zero[output_zero['Sample'] == sample]
-    # get the frequency of each position
-    df_freq = df_sample[position_col].value_counts()
-    print(df_freq)
-
-graphVsFluorescence(df_sequence_no_duplicates, samples, cols_to_graph, fluor_col, error_col, outputDir)
 ## plot bar graph
 #xaxis = 'position'
 #xaxis_labels = df_seq[xaxis]
