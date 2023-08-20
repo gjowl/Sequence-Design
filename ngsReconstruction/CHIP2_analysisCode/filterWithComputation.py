@@ -40,14 +40,16 @@ def filterExperimentDataframes(input_df, maltose_col, maltose_cutoff, maltose_li
 
 
 def mergeDataframes(df_fluor_seqs, df_fluor_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, cols_to_add):
+    output_df_sequence = df_sequence_no_duplicates.copy()
+    output_df_mutant = df_mutant_no_duplicates.copy()
     # add the mean fluorescence to the sequence dataframe
-    df_sequence_no_duplicates = df_sequence_no_duplicates.merge(df_fluor_seqs[cols_to_add], on='Sequence', how='left')
-    df_mutant_no_duplicates = df_mutant_no_duplicates.merge(df_fluor_mutant[cols_to_add], left_on='Mutant', right_on='Sequence', how='left')
+    output_df_sequence = output_df_sequence.merge(df_fluor_seqs[cols_to_add], on='Sequence', how='left')
+    output_df_mutant = output_df_mutant.merge(df_fluor_mutant[cols_to_add], left_on='Mutant', right_on='Sequence', how='left')
     # The above adds a additional column? get rid of the extra sequence column
-    df_mutant_no_duplicates = df_mutant_no_duplicates.drop(columns=['Sequence_y'])
+    output_df_mutant = output_df_mutant.drop(columns=['Sequence_y'])
     # rename the sequence column
-    df_mutant_no_duplicates = df_mutant_no_duplicates.rename(columns={'Sequence_x': 'Sequence'})
-    return df_sequence_no_duplicates, df_mutant_no_duplicates
+    output_df_mutant = output_df_mutant.rename(columns={'Sequence_x': 'Sequence'})
+    return output_df_sequence, output_df_mutant
 
 def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     # rid of any segments that are not numerical (removes control sequences)
@@ -121,7 +123,7 @@ df_sequence = pd.read_csv(sequenceFile)
 df_mutant = pd.read_csv(mutantFile)
 
 # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
-cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
+cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq']
 #cols_to_add = ['Sequence', 'Percent GpA', 'Percent Error', 'Sample']
 
 # filtering variables

@@ -57,12 +57,15 @@ adjustFluorByControlFlow = f'{scriptDir}/{config["adjustFluorScript"]}'
 filteringScript         = f'{scriptDir}/{config["filteringScript"]}'
 sequenceVsMutantScript  = f'{scriptDir}/{config["sequenceVsMutantScript"]}'
 graphScript             = f'{scriptDir}/{config["graphScript"]}'
+graphScript2            = f'{scriptDir}/{config["graphScript2"]}'
 seqDir                  = f'{outputDir}/{config["seqDir"]}'
 filteringDir            = f'{outputDir}/{config["filteringDir"]}'
 finalOutputDir          = f'{outputDir}/{config["finalOutputDir"]}'
+graphingDir            = f'{outputDir}/{config["graphingDir"]}'
 # booleans if you only want to rerun partial
 runAdjustFluor           = config["runAdjustFluor"].lower() == 'true'
 runfilterWithComputation = config["runFilterWithComputation"].lower() == 'true'
+runfilterBeforeGraphing  = config["runFilterBeforeGraphing"].lower() == 'true'
 runSequenceVsMutant      = config["runSequenceVsMutant"].lower() == 'true'
 runGraphing              = config["runGraphing"].lower() == 'true'
 
@@ -94,16 +97,31 @@ if __name__ == '__main__':
         execSequenceVsMutant = f'python3 {sequenceVsMutantScript} {fluorFile} {seqDir}'
         os.system(execSequenceVsMutant)
 
-    # mutant analysis
-    if runfilterWithComputation:
-        fluorFile = f'{seqDir}/clash.csv'
-        execMutantAnalysis = f'python3 {filteringScript} {fluorFile} {wtSequenceFile} {mutantSequenceFile} {finalOutputDir}'
-        os.system(execMutantAnalysis)
-
     # graphing code
     # TODO: probably loop this through whatever outputs you want to graph from the previous two scripts 
+    # loop through the files in the final output directory and graph them
     if runGraphing:
-        outDir = f'{finalOutputDir}/{config["graphingDir"]}'
-        inputFile = f'{finalOutputDir}/sequence_fluor_energy_data.csv'
-        execGraphing = f'python3 {graphScript} {inputFile} {outDir}'
-        os.system(execGraphing)
+        file_list = os.listdir(seqDir)
+        for file in file_list:
+            if file.endswith('.csv'):
+                # get filename separate from type and directory
+                programPath = os.path.realpath(file)
+                programDir, programFile = os.path.split(programPath)
+                file_name, programExt = os.path.splitext(programFile)
+                inputFile = f'{seqDir}/{file}'
+                fluorDir = f'{seqDir}/{file_name}'
+                #if runfilterBeforeGraphing:
+                #    execMutantAnalysis = f'python3 {filteringScript} {inputFile} {wtSequenceFile} {mutantSequenceFile} {fluorDir}'
+                #    os.system(execMutantAnalysis)
+                outDir = f'{graphingDir}/{file_name}'
+                fluorFile = f'{fluorDir}/sequence_fluor_energy_data.csv'
+                #execGraphing = f'python3 {graphScript} {fluorFile} {outDir}'
+                #os.system(execGraphing)
+                individualOutDir = f'{outDir}/individual_graphs'
+                execIndividualGraphing = f'python3 {graphScript2} {fluorFile} {individualOutDir}'
+                os.system(execIndividualGraphing)
+    
+    # will now output graphs for anything that gets output from the sequenceVsMutant script
+    # continue to use that to trim data and see if I can split some clash/void data there
+    # TODO: anyway to rationalize voids and clashes with reasonable and unreasonable data? Maybe
+    #       just try a bunch of different cutoffs and see what works best?

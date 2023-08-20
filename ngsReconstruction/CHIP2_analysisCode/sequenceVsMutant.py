@@ -32,15 +32,22 @@ def plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, output_dir):
     increment = 0.2
     plt.bar(df_seq[xaxis], df_seq[yaxis], width=0.4, color='g')
     # set the x ticks to be the sequence names
-    ax.set_xticklabels(xaxis_labels)
+    #ax.set_xticklabels(xaxis_labels)
     # rotate the x ticks
-    #plt.xticks(rotation=90)
+    plt.xticks(rotation=45)
     plt.xlabel(xaxis)
     plt.ylabel(yaxis)
-    plt.title('Average fluorescence of design sequences separated by sample')
+    plt.title('Percent WT per Mutant')
     # set the legend
     #ax.legend()
+    # bold the first and last letter in the each xaxis label
+    for label in ax.get_xticklabels():
+        label.set_fontweight('bold')
+    # add the number with first two decimals to the top of each bar
+    for i, v in enumerate(df_seq[yaxis]):
+        ax.text(i-increment, v+0.25, f'{v:.2f}%', color='black', fontweight='bold')
     ax.autoscale(tight=False)
+    plt.tight_layout()
     plt.savefig(f'{output_dir}/{seq}.png')
     plt.clf()
 
@@ -63,9 +70,9 @@ def addMismatchedPositions(df, wt_seq_col, position_col):
 
 # read in the input files
 fluorFile = sys.argv[1]
-output_dir = sys.argv[2]
+outputDir = sys.argv[2]
 
-os.makedirs(output_dir, exist_ok=True)
+os.makedirs(outputDir, exist_ok=True)
 #sequenceFile = sys.argv[1]
 #mutantFile = sys.argv[2]
 
@@ -73,6 +80,7 @@ os.makedirs(output_dir, exist_ok=True)
 df_fluor = pd.read_csv(fluorFile)
 fluor_col = 'mean_transformed'
 percent_cutoff = 75
+high_cutoff = 125
 nonmatching_aa_min = 2
 matching_seq_min = 3
 wt_seq_col = 'wt_seq'
@@ -125,21 +133,20 @@ for sample in samples:
     print(sample, numSeqs, usableSeqs, highSeqs)
 
 
-
 output_df = pd.concat([output_lowPerc, output_highPerc, output_other])
 # add mismatched position to dataframe
 output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)
 output_df['wt_aa'] = output_df[position_col].apply(lambda x: x[0])
 output_df['mut_aa'] = output_df[position_col].apply(lambda x: x[-1])
-output_df['position'] = output_df[position_col].apply(lambda x: x[1:-1])
+output_df['mut_position'] = output_df[position_col].apply(lambda x: x[1:-1])
 output_df = output_df[output_df['percent_wt'] < 200]
 output_lowPerc = output_df[output_df['percent_wt'] < percent_cutoff]
-output_highPerc = output_df[output_df['percent_wt'] > 125]
+output_highPerc = output_df[output_df['percent_wt'] > high_cutoff]
 output_other = output_df[(output_df['percent_wt'] >= percent_cutoff) & (output_df['percent_wt'] <= 125)]
-output_df = output_df[output_df[position_col] != '-1-1-1']
-output_lowPerc.to_csv(f'{output_dir}/below_{percent_cutoff}.csv', index=False)
-output_highPerc.to_csv(f'{output_dir}/above_{percent_cutoff}.csv', index=False)
-output_other.to_csv(f'{output_dir}/other.csv', index=False)
+#output_df = output_df[output_df[position_col] != '-1-1-1']
+output_lowPerc.to_csv(f'{outputDir}/below_{percent_cutoff}.csv', index=False)
+output_highPerc.to_csv(f'{outputDir}/above_{high_cutoff}.csv', index=False)
+output_other.to_csv(f'{outputDir}/other.csv', index=False)
 output_zero = output_df[output_df['percent_wt'] == 0]
 dfs = [output_lowPerc, output_highPerc, output_other]
 output_names = ['less75', 'more125', 'wt_like']
@@ -148,7 +155,7 @@ for df,name in zip(dfs, output_names):
         df_sample = df[df['Sample'] == sample]
         count = 0
         graph_count = 0
-        sample_dir = f'{output_dir}/{sample}/{name}'
+        sample_dir = f'{outputDir}/{sample}/{name}'
         os.makedirs(sample_dir, exist_ok=True)
         for pos in df_sample[position_col].unique():
             if pos != '-1-1-1':
@@ -175,7 +182,7 @@ for df,name in zip(dfs, output_names):
                     plt.clf()
     #plt.legend(loc='upper right')
     #plt.tight_layout()
-    #plt.savefig(f'{output_dir}/{sample}_{pos}.png')
+    #plt.savefig(f'{outputDir}/{sample}_{pos}.png')
     #plt.clf()
 clash_df = output_df[output_df['Mutant Type'] == 'clash']
 void_df = output_df[output_df['Mutant Type'] == 'void']
@@ -185,8 +192,8 @@ clash_df = pd.concat([clash_df, wt_clash])
 wt_void = output_df[output_df['Sequence'].isin(void_df['wt_seq'])]
 wt_void = wt_void.drop_duplicates(subset=['Sequence'])
 void_df = pd.concat([void_df, wt_void])
-clash_df.to_csv(f'{output_dir}/clash.csv', index=False)
-void_df.to_csv(f'{output_dir}/void.csv', index=False)
+clash_df.to_csv(f'{outputDir}/clash.csv', index=False)
+void_df.to_csv(f'{outputDir}/void.csv', index=False)
 gtoi_df = output_df[output_df['wt_aa'] == 'G']
 gtoi_df = gtoi_df[gtoi_df['mut_aa'] == 'I']
 gtoi_df = gtoi_df[gtoi_df['percent_wt'] < 75]
@@ -194,7 +201,36 @@ gtoi_df = gtoi_df[gtoi_df['percent_wt'] < 75]
 wt_gtoi = output_df[output_df['Sequence'].isin(gtoi_df['wt_seq'])]
 wt_gtoi = wt_gtoi.drop_duplicates(subset=['Sequence'])
 gtoi_df = pd.concat([gtoi_df, wt_gtoi])
-gtoi_df.to_csv(f'{output_dir}/g_to_i_mutants.csv', index=False)
+gtoi_df.to_csv(f'{outputDir}/g_to_i_mutants.csv', index=False)
+
+# get sequences that have a successful g83i mutation
+gtoi_df_allWts = output_df[output_df['wt_seq'].isin(gtoi_df['wt_seq'])]
+gtoi_df_allWts.to_csv(f'{outputDir}/g_to_i_test.csv', index=False)
+
+for seq in gtoi_df_allWts['wt_seq'].unique():
+    df_seq = gtoi_df_allWts[gtoi_df_allWts['wt_seq'] == seq]
+    #df_seq = df_seq[df_seq['percent_wt'] < 75]
+    #df_seq = df_seq[df_seq['percent_wt'] > 0]
+    #df_seq = df_seq[df_seq['position'] != '-1-1-1']
+    #df_seq = df_seq.drop_duplicates(subset=['position'])
+    #df_seq = df_seq.sort_values(by=['position'])
+    # sort df by percent wt after the percent wt that is 100
+    df_seq = df_seq.sort_values(by=['percent_wt'], ascending=False)
+    # move the percent wt that is 100 to the top
+    df_seq = pd.concat([df_seq[df_seq['percent_wt'] == 100], df_seq[df_seq['percent_wt'] != 100]])
+    #df_seq['position'] = df_seq['position'].apply(lambda x: int(x))
+    # get the wt and mutant aas and positions in separate columns
+    # maybe analyze sequences that have percent wt < 100?
+    # plot bar graph
+    xaxis = 'position'
+    xaxis_labels = df_seq[xaxis].copy()
+    # replace position '-1-1-1' with seq
+    df_seq['position'] = df_seq['position'].replace('-1-1-1', seq)
+    # replace the first label with seq
+    xaxis_labels.iloc[0] = seq
+    yaxis = 'percent_wt'
+    outDir = f'{outputDir}/g_to_i_mutants'
+    plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, outDir) 
 # get the wt and mutant aas and positions in separate columns
 # maybe analyze sequences that have percent wt < 100?
 ## plot bar graph
@@ -203,8 +239,10 @@ gtoi_df.to_csv(f'{output_dir}/g_to_i_mutants.csv', index=False)
 ## replace the first label with seq
 #xaxis_labels.iloc[0] = seq
 #yaxis = 'percent_wt'
-#plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, output_dir)
-    
+#plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, outputDir)
+
+# look at individual mutations?
+# Plot bar graphs of any sequences that have a successful g83i mutation? That way I can see all of the mutants 
 # Currently works for individual sequences; next, run on all similar positions, naming them by something else? Or could I do like a multi bar graph plot, with
 # multiple positions at the labels and minibar graphs for each? Like a histogram of each; can also do frequency of each in the sequences that succeed and that fail
 # https://stackoverflow.com/questions/6871201/plot-two-histograms-on-single-chart-with-matplotlib
