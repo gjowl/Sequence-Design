@@ -21,31 +21,23 @@ Date      	By	Comments
 
 import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
 
-def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, output_dir):
-    # plot the WT sequence fluorescence vs the energy
-    plt.scatter(input_df[energy_col], input_df[fluor_col])
-    # plot the standard deviation
-    plt.errorbar(input_df[energy_col], input_df[fluor_col], yerr=input_df[error_col], fmt='o', color='black', ecolor='lightgray', elinewidth=3, capsize=0)
-    plt.ylabel(fluor_col)
-    plt.xlabel(energy_col)
-    plt.title(f'{energy_col} vs {fluor_col}')
-    # draw a line of best fit
-    m, b = np.polyfit(input_df[energy_col], input_df[fluor_col], 1)
-    plt.plot(input_df[energy_col], m*input_df[energy_col] + b)
-    # add the equation to the plot
-    plt.text(0.5, 0.5, f'y = {m:.2f}x + {b:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
-    # calculate the correlation coefficient
-    corr = np.corrcoef(input_df[energy_col], input_df[fluor_col])[0,1]
-    plt.text(0.5, 0.4, f'r = {corr:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
-    plt.savefig(f'{output_dir}/{output_file}.png')
-    plt.clf()
+def filterExperimentDataframes(input_df, maltose_col, maltose_cutoff, maltose_limit, 
+ filter_maltose, filter_percent_error, filter_fluor):
+    output_df = input_df.copy()
+    ## filter out by maltose
+    if filter_maltose:
+        output_df = output_df[output_df[maltose_col] > maltose_cutoff]
+        output_df = output_df[output_df[maltose_col] < maltose_limit]
+    ## filter out by percent error
+    if filter_percent_error:
+        percent_error_cutoff = 15
+        output_df = output_df[output_df['Percent Error'] < percent_error_cutoff]
+    ## filter out by percent GpA
+    if filter_fluor:
+        percent_GpA_cutoff = 120
+        output_df = output_df[output_df['Percent GpA'] < percent_GpA_cutoff]
+    return output_df
 
-def graphVsFluorescence(input_df, sample_names, cols_to_graph, fluor_col, error_col, output_dir):
-    # loop through each sample
-    for sample in sample_names:
-        df_sample = input_df[input_df['Sample'] == sample]
-        for col in cols_to_graph:
-            graphFluorescence(df_sample, f'{sample}_{col}', col, fluor_col, error_col, output_dir)
 
 def mergeDataframes(df_fluor_seqs, df_fluor_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, cols_to_add):
     # add the mean fluorescence to the sequence dataframe
@@ -57,7 +49,7 @@ def mergeDataframes(df_fluor_seqs, df_fluor_mutant, df_sequence_no_duplicates, d
     df_mutant_no_duplicates = df_mutant_no_duplicates.rename(columns={'Sequence_x': 'Sequence'})
     return df_sequence_no_duplicates, df_mutant_no_duplicates
 
-def filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
+def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     # rid of any segments that are not numerical (removes control sequences)
     df_fluor = df_fluor[pd.to_numeric(df_fluor['Segments'], errors='coerce').notnull()]
     # check if ILI is at the end of the sequence; if not, add it
@@ -132,30 +124,24 @@ df_mutant = pd.read_csv(mutantFile)
 cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
 #cols_to_add = ['Sequence', 'Percent GpA', 'Percent Error', 'Sample']
 
+# filtering variables
 maltose_col = 'LB-12H_M9-36H'
 maltose_cutoff = -97
 maltose_limit = 10000000
-use_maltose = False
-if use_maltose:
-    df_fluor = df_fluor[df_fluor[maltose_col] > maltose_cutoff]
-    df_fluor = df_fluor[df_fluor[maltose_col] < maltose_limit]
+percent_error_cutoff = 15
+fluor_cutoff = 120 # percent GpA
+filter_maltose = False
+filter_percent_error= True
+filter_fluor = False 
 
-# std cutoff
-#percent_error_cutoff = 10
-#df_fluor = df_fluor[df_fluor['Percent Error'] < percent_error_cutoff]
+# Filtering
+df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, filter_maltose, filter_percent_error, filter_fluor)
+
+# get the error for each sequence
 df_fluor['std_adjusted'] = df_fluor['mean_transformed'] * df_fluor['Percent Error'] / 100
-df_fluor = df_fluor[df_fluor['Percent Error'] < 15]
-#
-## filter out by percent GpA
-#percent_GpA_cutoff = 120
-#df_fluor = df_fluor[df_fluor['Percent GpA'] < percent_GpA_cutoff]
-# filter the dataframes
-df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
 
-#df_mut = df_mutant.copy()
-#df_mut.drop(columns=['Sequence'], inplace=True)
-#df_mut.rename(columns={'Mutant': 'Sequence'}, inplace=True)
-#df_fluor_labeled = df_fluor_labeled.merge(df_mut[['Sequence', 'Mutant Type']], on='Sequence', how='left')
+# filter the dataframes
+df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
 
 # get sequences that don't fluoresce
 df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor = getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled)
@@ -171,22 +157,9 @@ df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample',
 df_all.to_csv(f'{outputDir}/all.csv', index=False)
 print(f'Sequences: {len(df_sequence_no_duplicates)}')
 print(f'Mutants: {len(df_mutant_no_duplicates)}')
+#exit(0)
 
-cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
-#fluor_col = 'Percent GpA'
-#error_col = 'Percent Error'
-fluor_col = 'mean_transformed'
-error_col = 'std_adjusted'
-samples = df_sequence_no_duplicates['Sample'].unique()
-for design in df_sequence_no_duplicates['Design'].unique():
-    df_design = df_sequence_no_duplicates[df_sequence_no_duplicates['Design'] == design]
-    output = outputDir + '/' + design
-    os.makedirs(output, exist_ok=True)
-    graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, output)
-#graphVsFluorescence(df_sequence_no_duplicates, samples, cols_to_graph, fluor_col, error_col, outputDir)
-exit(0)
-
-# get the WT sequences that have mutants in the dataframe
-df_sequences_with_mutant = df_sequence_no_duplicates[df_sequence_no_duplicates['Sequence'].isin(df_mutant_no_duplicates['Sequence'])]
-df_mutants_with_WT = df_mutant_no_duplicates[df_mutant_no_duplicates['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
-exit(0)
+## get the WT sequences that have mutants in the dataframe
+#df_sequences_with_mutant = df_sequence_no_duplicates[df_sequence_no_duplicates['Sequence'].isin(df_mutant_no_duplicates['Sequence'])]
+#df_mutants_with_WT = df_mutant_no_duplicates[df_mutant_no_duplicates['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
+#exit(0)

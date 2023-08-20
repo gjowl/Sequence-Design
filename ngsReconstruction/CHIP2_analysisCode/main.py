@@ -61,9 +61,10 @@ seqDir                  = f'{outputDir}/{config["seqDir"]}'
 filteringDir            = f'{outputDir}/{config["filteringDir"]}'
 finalOutputDir          = f'{outputDir}/{config["finalOutputDir"]}'
 # booleans if you only want to rerun partial
-runMutantAnalysis       = bool(config["runMutantAnalysis"])
-runSequenceVsMutant     = bool(config["runSequenceVsMutant"])
-runGraphing             = bool(config["runGraphing"])
+runAdjustFluor           = config["runAdjustFluor"].lower() == 'true'
+runfilterWithComputation = config["runFilterWithComputation"].lower() == 'true'
+runSequenceVsMutant      = config["runSequenceVsMutant"].lower() == 'true'
+runGraphing              = config["runGraphing"].lower() == 'true'
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
@@ -77,25 +78,32 @@ if __name__ == '__main__':
     #os.system(execInstallRequirements)
 
     # adjust fluorescence by control flow
-    execAdjustFluor = f'python3 {adjustFluorByControlFlow} {reconstructionFile} {controlFlowFile} {outputDir}'
-    os.system(execAdjustFluor)
+    if runAdjustFluor:
+        execAdjustFluor = f'python3 {adjustFluorByControlFlow} {reconstructionFile} {controlFlowFile} {outputDir}'
+        os.system(execAdjustFluor)
 
     # mutant analysis
-    fluorFile = f'{outputDir}/all_transformed.csv'
-    execMutantAnalysis = f'python3 {filteringScript} {fluorFile} {wtSequenceFile} {mutantSequenceFile} {filteringDir}'
-    os.system(execMutantAnalysis)
+    if runfilterWithComputation:
+        fluorFile = f'{outputDir}/all_transformed.csv'
+        execMutantAnalysis = f'python3 {filteringScript} {fluorFile} {wtSequenceFile} {mutantSequenceFile} {filteringDir}'
+        os.system(execMutantAnalysis)
 
     # sequence vs mutant
-    fluorFile = f'{filteringDir}/all.csv'
-    execSequenceVsMutant = f'python3 {sequenceVsMutantScript} {fluorFile} {seqDir}'
-    os.system(execSequenceVsMutant)
+    if runSequenceVsMutant:
+        fluorFile = f'{filteringDir}/all.csv'
+        execSequenceVsMutant = f'python3 {sequenceVsMutantScript} {fluorFile} {seqDir}'
+        os.system(execSequenceVsMutant)
 
     # mutant analysis
-    fluorFile = f'{seqDir}/clash.csv'
-    execMutantAnalysis = f'python3 {filteringScript} {fluorFile} {wtSequenceFile} {mutantSequenceFile} {finalOutputDir}'
-    os.system(execMutantAnalysis)
+    if runfilterWithComputation:
+        fluorFile = f'{seqDir}/clash.csv'
+        execMutantAnalysis = f'python3 {filteringScript} {fluorFile} {wtSequenceFile} {mutantSequenceFile} {finalOutputDir}'
+        os.system(execMutantAnalysis)
 
     # graphing code
     # TODO: probably loop this through whatever outputs you want to graph from the previous two scripts 
-    #execGraphing = f'python3 {graphScript} {configFile}'
-    #os.system(execGraphing)
+    if runGraphing:
+        outDir = f'{finalOutputDir}/{config["graphingDir"]}'
+        inputFile = f'{finalOutputDir}/sequence_fluor_energy_data.csv'
+        execGraphing = f'python3 {graphScript} {inputFile} {outDir}'
+        os.system(execGraphing)
