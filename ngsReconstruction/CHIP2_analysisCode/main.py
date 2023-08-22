@@ -110,13 +110,13 @@ if __name__ == '__main__':
                 file_name, programExt = os.path.splitext(programFile)
                 inputFile = f'{seqDir}/{file}'
                 fluorDir = f'{seqDir}/{file_name}'
-                #if runfilterBeforeGraphing:
-                #    execMutantAnalysis = f'python3 {filteringScript} {inputFile} {wtSequenceFile} {mutantSequenceFile} {fluorDir}'
-                #    os.system(execMutantAnalysis)
+                if runfilterBeforeGraphing:
+                    execMutantAnalysis = f'python3 {filteringScript} {inputFile} {wtSequenceFile} {mutantSequenceFile} {fluorDir}'
+                    os.system(execMutantAnalysis)
                 outDir = f'{graphingDir}/{file_name}'
                 fluorFile = f'{fluorDir}/sequence_fluor_energy_data.csv'
-                #execGraphing = f'python3 {graphScript} {fluorFile} {outDir}'
-                #os.system(execGraphing)
+                execGraphing = f'python3 {graphScript} {fluorFile} {outDir}'
+                os.system(execGraphing)
                 individualOutDir = f'{outDir}/individual_graphs'
                 execIndividualGraphing = f'python3 {graphScript2} {fluorFile} {individualOutDir}'
                 os.system(execIndividualGraphing)

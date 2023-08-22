@@ -140,12 +140,17 @@ output_df['wt_aa'] = output_df[position_col].apply(lambda x: x[0])
 output_df['mut_aa'] = output_df[position_col].apply(lambda x: x[-1])
 output_df['mut_position'] = output_df[position_col].apply(lambda x: x[1:-1])
 output_df = output_df[output_df['percent_wt'] < 200]
+output_df = output_df[output_df['Percent GpA'] < 150]
+output_df = output_df[output_df['Percent Error'] < 10]
 output_lowPerc = output_df[output_df['percent_wt'] < percent_cutoff]
 output_highPerc = output_df[output_df['percent_wt'] > high_cutoff]
-output_other = output_df[(output_df['percent_wt'] >= percent_cutoff) & (output_df['percent_wt'] <= 125)]
+output_other = output_df[(output_df['percent_wt'] >= percent_cutoff) & (output_df['percent_wt'] <= high_cutoff)]
 #output_df = output_df[output_df[position_col] != '-1-1-1']
 output_lowPerc.to_csv(f'{outputDir}/below_{percent_cutoff}.csv', index=False)
 output_highPerc.to_csv(f'{outputDir}/above_{high_cutoff}.csv', index=False)
+wt_cutoff = 105
+output_wtLike = output_df[output_df['percent_wt'] <= wt_cutoff]
+output_wtLike.to_csv(f'{outputDir}/wt_like.csv', index=False)
 output_other.to_csv(f'{outputDir}/other.csv', index=False)
 output_zero = output_df[output_df['percent_wt'] == 0]
 dfs = [output_lowPerc, output_highPerc, output_other]
@@ -202,6 +207,26 @@ wt_gtoi = output_df[output_df['Sequence'].isin(gtoi_df['wt_seq'])]
 wt_gtoi = wt_gtoi.drop_duplicates(subset=['Sequence'])
 gtoi_df = pd.concat([gtoi_df, wt_gtoi])
 gtoi_df.to_csv(f'{outputDir}/g_to_i_mutants.csv', index=False)
+clash_df_wt = clash_df[clash_df['percent_wt'] < wt_cutoff]
+clash_df_less = clash_df[clash_df['percent_wt'] < percent_cutoff]
+clash_df_wt.to_csv(f'{outputDir}/clash_wt.csv', index=False)
+clash_df_less.to_csv(f'{outputDir}/clash_less.csv', index=False)
+void_df_wt = void_df[void_df['percent_wt'] < wt_cutoff]
+void_df_less = void_df[void_df['percent_wt'] < percent_cutoff]
+void_df_wt.to_csv(f'{outputDir}/void_wt.csv', index=False)
+void_df_less.to_csv(f'{outputDir}/void_less.csv', index=False)
+
+# mut_aa A mutants
+aa_df = output_df[output_df['mut_aa'] == 'A']
+aa_df_less = aa_df[aa_df['percent_wt'] < 75]
+aa_df_more = aa_df[aa_df['percent_wt'] > 125]
+aa_df_less.to_csv(f'{outputDir}/aa_less.csv', index=False)
+aa_df_more.to_csv(f'{outputDir}/aa_more.csv', index=False)
+aa_df_wt = aa_df[aa_df['percent_wt'] < wt_cutoff]
+aa_df_wt.to_csv(f'{outputDir}/aa_wt.csv', index=False)
+gtoi_aa_df = gtoi_df[gtoi_df['wt_seq'].isin(aa_df_less['wt_seq'])]
+gtoi_aa_df.to_csv(f'{outputDir}/g_to_i_AND_x_to_a.csv', index=False)
+
 
 # get sequences that have a successful g83i mutation
 gtoi_df_allWts = output_df[output_df['wt_seq'].isin(gtoi_df['wt_seq'])]
@@ -230,6 +255,7 @@ for seq in gtoi_df_allWts['wt_seq'].unique():
     xaxis_labels.iloc[0] = seq
     yaxis = 'percent_wt'
     outDir = f'{outputDir}/g_to_i_mutants'
+    os.makedirs(outDir, exist_ok=True)
     plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, outDir) 
 # get the wt and mutant aas and positions in separate columns
 # maybe analyze sequences that have percent wt < 100?

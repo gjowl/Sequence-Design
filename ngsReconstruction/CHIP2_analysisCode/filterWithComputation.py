@@ -53,13 +53,13 @@ def mergeDataframes(df_fluor_seqs, df_fluor_mutant, df_sequence_no_duplicates, d
 
 def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     # rid of any segments that are not numerical (removes control sequences)
-    df_fluor = df_fluor[pd.to_numeric(df_fluor['Segments'], errors='coerce').notnull()]
+    df_fluor = df_fluor[pd.to_numeric(df_fluor['Segments'], errors='coerce').notnull()].copy()
     # check if ILI is at the end of the sequence; if not, add it
     df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
     #df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x + 'ILI')
     # get the data for sequences that successfully fluoresce
-    df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])]
-    df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])]
+    df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])].copy()
+    df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])].copy()
     df_fluor_mutant = df_fluor_mutant[~df_fluor_mutant['Sequence'].isin(df_fluor_seqs['Sequence'])]
     df_fluor_seqs['Type'] = 'WT'
     df_fluor_mutant['Type'] = 'Mutant'
@@ -85,8 +85,8 @@ def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     return df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled
 
 def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled):
-    df_sequence_no_fluor = df_sequence[~df_sequence['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
-    df_mutant_no_fluor = df_mutant[~df_mutant['Mutant'].isin(df_mutant_no_duplicates['Mutant'])]
+    df_sequence_no_fluor = df_sequence[~df_sequence['Sequence'].isin(df_sequence_no_duplicates['Sequence'])].copy()
+    df_mutant_no_fluor = df_mutant[~df_mutant['Mutant'].isin(df_mutant_no_duplicates['Mutant'])].copy()
     df_mutant_no_fluor = df_mutant_no_fluor[~df_mutant_no_fluor['Mutant'].isin(df_sequence_no_fluor['Sequence'])]
     df_sequence_no_fluor['Type'] = 'WT'
     df_mutant_no_fluor['Type'] = 'Mutant'
@@ -123,7 +123,11 @@ df_sequence = pd.read_csv(sequenceFile)
 df_mutant = pd.read_csv(mutantFile)
 
 # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
-cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq']
+# check if wt_seq is a column in the dataframe
+cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
+if 'wt_seq' in df_fluor.columns:
+    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq']
+#cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
 #cols_to_add = ['Sequence', 'Percent GpA', 'Percent Error', 'Sample']
 
 # filtering variables
