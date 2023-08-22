@@ -45,12 +45,17 @@ def plot_and_transform(df_control_plot, df_sample, xaxis, cols, sample, outputDi
     # get the mean of the transformed data
     output_df['Fluor_transformed'] = output_df[[f'{col}_transformed' for col in cols]].mean(axis=1)
 
-def plot_and_get_regression(df_control_plot, df_sample, xaxis, yaxis, sample):
-    output_df = df_sample.copy()
+def plot_and_get_regression(df_control_plot, xaxis_col, yaxis_col, sample):
+    xaxis = df_control_plot[xaxis_col]
+    yaxis = df_control_plot[yaxis_col]
     plt.scatter(xaxis, yaxis)
     # plot the line of best fit
     m, b = np.polyfit(xaxis, yaxis, 1)
     plt.plot(xaxis, m*xaxis + b)
+    # plot the standard deviation for each point
+    std_x = df_control_plot['Mean Std']
+    std_y = df_control_plot['std']
+    plt.errorbar(xaxis, yaxis, yerr=std_y, xerr=std_x, fmt='none', ecolor='black')
     plt.xlabel('Flow Mean')
     plt.ylabel('Reconstruction Mean')
     plt.title(sample)
@@ -60,7 +65,7 @@ def plot_and_get_regression(df_control_plot, df_sample, xaxis, yaxis, sample):
     plt.text(0.05, 0.90, f'r^2 = {np.corrcoef(xaxis, yaxis)[0,1]**2:.2f}', transform=plt.gca().transAxes)
     plt.savefig(f'{outputDir}/{sample}_fit.png')
     plt.clf()
-    return output_df, m, b
+    return m, b
 
 def transform_col(df_sample, sample, slope, y_intercept, col, output_df):
     output_df = df_sample.copy()
@@ -70,7 +75,7 @@ def transform_col(df_sample, sample, slope, y_intercept, col, output_df):
     output_df[f'{col}_transformed'] = tmp_col
     return output_df
     
-def calculateStandardDeviation(df_sample, cols, sample, output_df):
+def calculateStandardDeviation(df_sample, cols, sample):
     output_df = df_sample.copy()
     output_df['std'] = df_sample[cols].std(axis=1)
     mean = output_df[cols].mean(axis=1)
@@ -84,10 +89,12 @@ outputDir = sys.argv[3]
 
 gpa = 'LIIFGVMAGVIGT'
 g83i = 'LIIFGVMAIVIGT'
-noTM_fluor = 17870
-flow_noTM_fluor = 28563
-#subtract_noTM = True
+#noTM_fluor = 17870
+#flow_noTM_fluor = 28563
+# noTM from flow reruns
+noTM_fluor = 12429.6644
 subtract_noTM = False 
+#subtract_noTM = False 
 #TODO: the subtraction of the noTM fluor works, but it leads to some negative values. Maybe I should just add it to the fitting line as a control fluor?
 
 os.makedirs(outputDir, exist_ok=True)
@@ -106,28 +113,29 @@ for sample in sample_names:
     df_sample = reconstruction_df[reconstruction_df['Sample'] == sample]
     # get the matching sequence from the control flow dataframe
     df_sample_controls = df_sample[df_sample['Sequence'].isin(controlFlow_df['Sequence'])]
-    df_control_plot = controlFlow_df
+    df_control_plot = controlFlow_df.copy()
     # get the columns that contain rep
     df_control_plot = df_control_plot.merge(df_sample_controls[['Sequence', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor', 'Sample']], on='Sequence')
-    # remove rep1 for GasRight and RightHanded
-    if sample == 'G' or sample == 'R':
-        df_control_plot = df_control_plot.drop(columns=['Rep1-Fluor'])
-    xaxis = df_control_plot['Flow Mean']
     # get the columns that contain rep
-    cols = df_control_plot.columns[df_control_plot.columns.str.contains('Rep')]
+    cols = [col for col in df_control_plot.columns if 'Rep' in col]
+    if sample == 'G' or sample == 'R':
+        cols = [col for col in cols if 'Rep1' not in col]
     # only keep the rows where the value is not 0
-    df_control_plot = df_control_plot[df_control_plot[cols] != 0]
-    # get the standard deviation of the rep columns
-    df_sample = calculateStandardDeviation(df_sample, cols, sample, output_df)
+    df_control_plot = df_control_plot[df_control_plot[cols].sum(axis=1) != 0]
     if subtract_noTM:
-        df_control_plot[cols] = df_control_plot[cols] - flow_noTM_fluor
+        #df_control_plot[cols] = df_control_plot[cols] - flow_noTM_fluor
+        df_control_plot[cols] = df_control_plot[cols] - noTM_fluor
         df_sample[cols] = df_sample[cols] - noTM_fluor
+    # get the standard deviation of the rep columns
+    df_sample = calculateStandardDeviation(df_sample, cols, sample)
     # get the mean of the rep columns
     df_control_plot['mean'] = df_control_plot[cols].mean(axis=1)
+    # add the standard deviation of the mean to the dataframe
+    df_control_plot['std'] = df_control_plot[cols].std(axis=1)
     df_sample['mean'] = df_sample[cols].mean(axis=1)
-    yaxis = df_control_plot['mean']
-    #plot_and_transform(df_control_plot, df_sample, xaxis, cols, sample, outputDir)
-    df_sample, slope, yint = plot_and_get_regression(df_control_plot, df_sample, xaxis, yaxis, sample)
+    xaxis = 'Flow Mean'
+    yaxis = 'mean'
+    slope, yint = plot_and_get_regression(df_control_plot, xaxis, yaxis, sample)
     # transform the reconstruction data 
     df_sample = transform_col(df_sample, sample, slope, yint, 'mean', output_df)
     # get the index of GpA and G83I from the sequence column 

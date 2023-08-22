@@ -68,6 +68,13 @@ def addMismatchedPositions(df, wt_seq_col, position_col):
             output_df = pd.concat([output_df, df_seq])
     return output_df
 
+def mutantTrimmingFunction(wt_df, mutant_df, trimming_col, seq_col, percent_cutoff, fraction_sequence_cutoff):
+    output_df = wt_df.copy()
+    input_df = mutant_df.copy()
+    input_df = input_df.groupby(seq_col).filter(lambda x: len(x[x[trimming_col] < percent_cutoff]) > fraction_sequence_cutoff*len(x))
+    output_df = output_df[output_df[seq_col].isin(input_df[seq_col])]
+    return output_df
+
 # read in the input files
 fluorFile = sys.argv[1]
 outputDir = sys.argv[2]
@@ -141,7 +148,12 @@ output_df['mut_aa'] = output_df[position_col].apply(lambda x: x[-1])
 output_df['mut_position'] = output_df[position_col].apply(lambda x: x[1:-1])
 output_df = output_df[output_df['percent_wt'] < 200]
 output_df = output_df[output_df['Percent GpA'] < 150]
-output_df = output_df[output_df['Percent Error'] < 10]
+#output_df = output_df[output_df['Percent Error'] < 10]
+maltose_col = 'LB-12H_M9-36H'
+maltose_cutoff = -100
+maltose_limit = 99999900 
+output_df = output_df[output_df[maltose_col] < maltose_limit]
+output_df = output_df[output_df[maltose_col] > maltose_cutoff]
 output_lowPerc = output_df[output_df['percent_wt'] < percent_cutoff]
 output_highPerc = output_df[output_df['percent_wt'] > high_cutoff]
 output_other = output_df[(output_df['percent_wt'] >= percent_cutoff) & (output_df['percent_wt'] <= high_cutoff)]
@@ -150,6 +162,26 @@ output_lowPerc.to_csv(f'{outputDir}/below_{percent_cutoff}.csv', index=False)
 output_highPerc.to_csv(f'{outputDir}/above_{high_cutoff}.csv', index=False)
 wt_cutoff = 105
 output_wtLike = output_df[output_df['percent_wt'] <= wt_cutoff]
+# check that the type is not WT
+output_df_mut = output_df[output_df['Type'] != 'WT']
+output_df_wt = output_df[output_df['Type'] == 'WT']
+output_df_mut_less = output_df_mut[output_df_mut['percent_wt'] < wt_cutoff].copy()
+output_df_wtlike = output_df_wt[output_df_wt['wt_seq'].isin(output_df_mut_less['wt_seq'])]
+#output_df_wtlike.to_csv(f'{outputDir}/wt_like_any_mutants_lessThan_{percent_cutoff}.csv', index=False)
+# check to see if 80% of the sequences per each wt_seq are less than 75% wt
+trim_col = 'percent_wt'
+seq_col = 'wt_seq'
+output_wtLike_all = mutantTrimmingFunction(output_df_wtlike, output_df_mut_less, trim_col, seq_col, percent_cutoff, 1)
+output_wtLike_75 = mutantTrimmingFunction(output_df_wtlike, output_df_mut_less, trim_col, seq_col, percent_cutoff, 0.75)
+output_wtLike_50 = mutantTrimmingFunction(output_df_wtlike, output_df_mut_less, trim_col, seq_col, percent_cutoff, 0.5)
+output_wtLike_25 = mutantTrimmingFunction(output_df_wtlike, output_df_mut_less, trim_col, seq_col, percent_cutoff, 0.25)
+output_wtLike_any = mutantTrimmingFunction(output_df_wtlike, output_df_mut_less, trim_col, seq_col, percent_cutoff, 0)
+output_wtLike_all.to_csv(f'{outputDir}/wt_like_all_mutants_lessThan_{percent_cutoff}.csv', index=False)
+output_wtLike_75.to_csv(f'{outputDir}/wt_like_75_percent_mutants_lessThan_{percent_cutoff}.csv', index=False)
+output_wtLike_50.to_csv(f'{outputDir}/wt_like_50_percent_mutants_lessThan_{percent_cutoff}.csv', index=False)
+output_wtLike_25.to_csv(f'{outputDir}/wt_like_25_percent_mutants_lessThan_{percent_cutoff}.csv', index=False)
+output_wtLike_any.to_csv(f'{outputDir}/wt_like_any_mutants_lessThan_{percent_cutoff}.csv', index=False)
+
 output_wtLike.to_csv(f'{outputDir}/wt_like.csv', index=False)
 output_other.to_csv(f'{outputDir}/other.csv', index=False)
 output_zero = output_df[output_df['percent_wt'] == 0]
