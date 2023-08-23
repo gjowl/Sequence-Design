@@ -127,6 +127,9 @@ df_mutant = pd.read_csv(mutantFile)
 cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
 if 'wt_seq' in df_fluor.columns:
     cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq']
+#cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
+#if 'wt_seq' in df_fluor.columns:
+#    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
 #cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
 #cols_to_add = ['Sequence', 'Percent GpA', 'Percent Error', 'Sample']
 

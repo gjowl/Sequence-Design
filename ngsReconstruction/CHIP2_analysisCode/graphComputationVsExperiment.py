@@ -15,7 +15,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     plt.text(0.1, 1.12, f'y = {m:.2f}x + {b:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # calculate the correlation coefficient
     corr = np.corrcoef(input_df[energy_col], input_df[fluor_col])[0,1]
-    plt.text(0.1, 1.09, f'r = {corr:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    plt.text(0.1, 1.09, f'r^2 = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()

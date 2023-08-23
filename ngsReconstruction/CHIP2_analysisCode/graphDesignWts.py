@@ -15,7 +15,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     plt.text(0.1, 1.12, f'y = {m:.2f}x + {b:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # calculate the correlation coefficient
     corr = np.corrcoef(input_df[energy_col], input_df[fluor_col])[0,1]
-    plt.text(0.1, 1.09, f'r = {corr:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    plt.text(0.1, 1.09, f'r = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
@@ -51,6 +51,7 @@ for col in cols_to_graph:
     os.makedirs(output_dir, exist_ok=True)
     for seq in df_fluorAndEnergy['wt_seq'].unique():
         df_seq = df_fluorAndEnergy[df_fluorAndEnergy['wt_seq'] == seq]
+        df_seq = df_seq.drop_duplicates(subset=['Sequence'])
         if len(df_seq) < 5:
             continue
         #graphFluorescence(df_seq, f'{sample}_{col}', col, fluor_col, error_col, output_dir)
