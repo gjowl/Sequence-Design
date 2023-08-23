@@ -44,6 +44,7 @@ error_col = 'std_adjusted'
 samples = df_fluorAndEnergy['Sample'].unique()
 for design in df_fluorAndEnergy['Design'].unique():
     df_design = df_fluorAndEnergy[df_fluorAndEnergy['Design'] == design]
+    df_design.drop_duplicates(subset='Sequence', keep='first', inplace=True)
     design_dir = outputDir + '/' + design
     os.makedirs(design_dir, exist_ok=True)
     graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, design_dir)

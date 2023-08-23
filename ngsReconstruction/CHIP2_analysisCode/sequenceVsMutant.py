@@ -324,7 +324,13 @@ for seq in gtoi_df_allWts['wt_seq'].unique():
 #yaxis = 'percent_wt'
 #plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, outputDir)
 
-# look at individual mutations?
+# TODO: take the all data dataframe, read it, and plot the energy score for each sequence that is WT and 1 amino acid off, then 2, then 3, etc.
+# look at sequences that are mutants of a single sequence
+for wt_seq in output_df['wt_seq'].unique():
+    df_seq = output_df[output_df['wt_seq'] == wt_seq]
+    df_seq = df_seq[df_seq['Type'] == 'WT']
+    df_seq.to_csv(f'{outputDir}/{wt_seq}.csv', index=False)
+# TODO: look at individual mutations of each sequence
 # Plot bar graphs of any sequences that have a successful g83i mutation? That way I can see all of the mutants 
 # Currently works for individual sequences; next, run on all similar positions, naming them by something else? Or could I do like a multi bar graph plot, with
 # multiple positions at the labels and minibar graphs for each? Like a histogram of each; can also do frequency of each in the sequences that succeed and that fail
