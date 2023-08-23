@@ -86,8 +86,8 @@ os.makedirs(outputDir, exist_ok=True)
 # read in the dataframes
 df_fluor = pd.read_csv(fluorFile)
 fluor_col = 'mean_transformed'
-percent_cutoff = 95
-high_cutoff = 105
+percent_cutoff = 75
+high_cutoff = 125
 nonmatching_aa_min = 2
 matching_seq_min = 3
 wt_seq_col = 'wt_seq'
