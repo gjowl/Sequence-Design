@@ -115,7 +115,6 @@ my %basePairs = (
 
 #Print Info
 print "$seqFile\t$direction\n";
-
 #Load reference sequences
 open (FILE, $refFile) or die "Can't open file\n";
 my @ref = <FILE>;
@@ -143,9 +142,10 @@ if ($direction == 1){
 	#$fPrimer = "GGCTCCAAACTTGGGGAATCG";
 	# seems like the primer they used this time is different a bit? Or sequencing poor 
 	# in that region because that previous primer is found a few times
-	$fPrimer = "ATTTGGGGAATCG";
+	#$fPrimer = "ATTTGGGGAATCG";
+	$fPrimer = "TTGGGGAATCG"; 
 	$rPrimer = "CCTGATCAACCCAAGCCAATCC";
-	$offset = 13;
+	$offset = 11;
 } else {
 	$fPrimer = "GGATTGGCTTGGGTTGATCAGG";
 	$rPrimer = "CGATTCCCCAAGTTTGGAGCC";
@@ -157,6 +157,7 @@ my @lines = <FILE>;
 close(FILE);
 my $numLines = scalar @lines;
 my $numSeqs = $numLines / 4;
+
 
 #Cutoff for the number of seqs that we will analyze 
 #Starter is 0.01%

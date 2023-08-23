@@ -66,7 +66,7 @@ list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, re
 # calculate the percent difference of gpa and g83i
 # get the percentGpA over g83i? and percent GpA? percent below? maybe this could be compared to some of Samantha's old data for something? or for comparison of designability per region?
 # or even designability
-df_fluor = list_dfReconstructedFluor[3]
+df_fluor = list_dfReconstructedFluor[0]
 divider = '-Fluor'
 calculatePercentGpA(df_fluor, gpa, g83i, noTMfluor, divider, outputDir)
 
@@ -90,8 +90,11 @@ for df in list_dfReconstructedFluor:
     list_dfFluorAndPercentDiff.append(df_fluorAndPercentDiff)
 
 # REORGANIZE THE COLUMNS OF THE DATAFRAME
-# for now, only going to output the df that uses total sequence percents (closest to SMA and JC data)
-df_fluorAndPercent = list_dfFluorAndPercentDiff[3]
+# for now, only going to output the df that uses total sequence percents (closest to SMA and JC data); JC CHIP2 data analyzed in this way
+# was using that, but had to resend sequencing for R2-1 and G2-1. So now using goodSeqs, since the ratios should be preserved
+# These two have much higher percentages of good sequences and total sequences, so goodSeqs seems to give a better
+# representation of the data (and the fluorescences are closer for all)
+df_fluorAndPercent = list_dfFluorAndPercentDiff[0]
 # set the sequence column as the first column of the dataframe
 seq_column = df_fluorAndPercent.pop('Sequence')
 df_fluorAndPercent.insert(0, 'Sequence', seq_column)
@@ -106,29 +109,29 @@ df_fluorAndPercent.insert(3, 'FluorStdDev', fluor_column)
 # extract the gpa and g83i fluorescence from the df_fluorAndPercent dataframe
 #gpaFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == gpa, 'Fluorescence'].values[0]
 #g83IFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == g83i, 'Fluorescence'].values[0]
-print(f'GpA Flourescence  = {gpaFluorescence}')
-print(f'G83I Flourescence = {g83IFluorescence}')
-# calculate percent GpA of fluorescence
-percentGpaCol = df_fluorAndPercent['Fluorescence']/gpaFluorescence*100
-percentGpaStdDevCol = df_fluorAndPercent['FluorStdDev']/gpaFluorescence*100
-# add the percent GpA column to the dataframe
-df_fluorAndPercent.insert(4, 'PercentGpa', percentGpaCol)
-df_fluorAndPercent.insert(5, 'PercentGpaStdDev', percentGpaStdDevCol)
+#print(f'GpA Flourescence  = {gpaFluorescence}')
+#print(f'G83I Flourescence = {g83IFluorescence}')
+## calculate percent GpA of fluorescence
+#percentGpaCol = df_fluorAndPercent['Fluorescence']/gpaFluorescence*100
+#percentGpaStdDevCol = df_fluorAndPercent['FluorStdDev']/gpaFluorescence*100
+## add the percent GpA column to the dataframe
+#df_fluorAndPercent.insert(4, 'PercentGpa', percentGpaCol)
+#df_fluorAndPercent.insert(5, 'PercentGpaStdDev', percentGpaStdDevCol)
 
 # WRITE THE DATAFRAMES TO A CSV
 df_fluorAndPercent.to_csv(reconstructionFile, index=False)
 
 # RID OF ANYTHING BELOW G83I FLUORESCENCE (MORE STABLE THAN MONOMER G83I)
-df_aboveG83I = df_fluorAndPercent[df_fluorAndPercent['Fluorescence'] > g83IFluorescence]
-g83iCutoffFile = outputDir + 'g83iCutoff.csv'
-df_aboveG83I.to_csv(g83iCutoffFile, index=False)
-
-print(df_fluorAndPercent)
+#df_aboveG83I = df_fluorAndPercent[df_fluorAndPercent['Fluorescence'] > g83IFluorescence]
+#g83iCutoffFile = outputDir + 'g83iCutoff.csv'
+#df_aboveG83I.to_csv(g83iCutoffFile, index=False)
+#
+#print(df_fluorAndPercent)
 
 # MALTOSE CUTOFF
-df_cutoff = df_fluorAndPercent[df_fluorAndPercent['MaltosePercentDiff'] > maltoseCutoff]
-df_belowCutoff = df_fluorAndPercent[df_fluorAndPercent['MaltosePercentDiff'] < maltoseCutoff]
-aboveCutoffFile = outputDir +'aboveCutoff.csv'
-belowCutoffFile = outputDir +'belowCutoff.csv'
-df_cutoff.to_csv(aboveCutoffFile, index=False)
-df_belowCutoff.to_csv(belowCutoffFile, index=False)
+#df_cutoff = df_fluorAndPercent[df_fluorAndPercent['MaltosePercentDiff'] > maltoseCutoff]
+#df_belowCutoff = df_fluorAndPercent[df_fluorAndPercent['MaltosePercentDiff'] < maltoseCutoff]
+#aboveCutoffFile = outputDir +'aboveCutoff.csv'
+#belowCutoffFile = outputDir +'belowCutoff.csv'
+#df_cutoff.to_csv(aboveCutoffFile, index=False)
+#df_belowCutoff.to_csv(belowCutoffFile, index=False)
