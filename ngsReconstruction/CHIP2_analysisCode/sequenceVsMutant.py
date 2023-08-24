@@ -75,6 +75,43 @@ def mutantTrimmingFunction(wt_df, mutant_df, trimming_col, seq_col, percent_cuto
     output_df = output_df[output_df[seq_col].isin(input_df[seq_col])]
     return output_df
 
+def getSimilarSequences(df, seq, nonmatching_aa_min):
+    input_df = df.copy()
+    output_df = pd.DataFrame()
+    samples = input_df['Sample'].unique()
+    for sample in samples:
+        df_sample = input_df[input_df['Sample'] == sample]
+        # loop through all of the sequences
+        for seq in df_sample[df_sample['Type'] == 'WT']['Sequence'].unique():
+            if df_sample[df_sample['Sequence'] == seq][fluor_col].values[0] == 0:
+                continue
+            matching_sequences = [seq]
+            for seq2 in df_sample['Sequence'].unique():
+                if match(seq, seq2) < nonmatching_aa_min:
+                    matching_sequences.append(seq2)
+            # keep only the unique sequences
+            matching_sequences = list(set(matching_sequences))
+            if len(matching_sequences) < matching_seq_min:
+                continue
+            df_match = df_sample[df_sample['Sequence'].isin(matching_sequences)]
+            # get the sequence with the highest fluorescence
+            seq_fluor = df_match[df_match['Sequence'] == seq][fluor_col].values[0]
+            df_percDiff = calculatePercentWt(df_match, seq_fluor)
+            df_percDiff[wt_seq_col] = seq
+            df_otherSeqs = df_percDiff[df_percDiff['Sequence'] != seq]
+            output_df = pd.concat([output_df, df_percDiff])
+            # check if all percent wt are greater than the percent difference cutoff
+            #if df_otherSeqs['percent_wt'].max() < percent_cutoff:
+            #    usableSeqs += 1
+            #    output_lowPerc = pd.concat([output_lowPerc, df_percDiff])
+            #elif df_otherSeqs['percent_wt'].min() > percent_cutoff:
+            #    highSeqs += 1
+            #    output_highPerc = pd.concat([output_highPerc, df_percDiff])
+            #else:
+            #    output_other = pd.concat([output_other, df_percDiff])
+        #print(sample, numSeqs, usableSeqs, highSeqs)
+    return output_df
+
 # read in the input files
 fluorFile = sys.argv[1]
 outputDir = sys.argv[2]
@@ -99,49 +136,18 @@ samples = df_fluor['Sample'].unique()
 output_lowPerc = pd.DataFrame()
 output_highPerc = pd.DataFrame()
 output_other = pd.DataFrame()
-for sample in samples:
-    numSeqs = 0
-    highSeqs = 0
-    usableSeqs = 0
-    df_sample = df_fluor[df_fluor['Sample'] == sample]
-    # loop through all of the sequences
-    for seq in df_sample[df_sample['Type'] == 'WT']['Sequence'].unique():
-        if df_sample[df_sample['Sequence'] == seq][fluor_col].values[0] == 0:
-            continue
-        matching_sequences = [seq]
-        for seq2 in df_sample['Sequence'].unique():
-            if match(seq, seq2) < nonmatching_aa_min:
-                matching_sequences.append(seq2)
-        # keep only the unique sequences
-        matching_sequences = list(set(matching_sequences))
-        if len(matching_sequences) > matching_seq_min:
-            numSeqs += 1
-        else:
-            continue
-        df_match = df_sample[df_sample['Sequence'].isin(matching_sequences)]
-        # get the sequence with the highest fluorescence
-        seq_fluor = df_match[df_match['Sequence'] == seq][fluor_col].values[0]
-        df_percDiff = calculatePercentWt(df_match, seq_fluor)
-        df_percDiff[wt_seq_col] = seq
-        df_otherSeqs = df_percDiff[df_percDiff['Sequence'] != seq]
-        # check if all percent wt are greater than the percent difference cutoff
-        if df_otherSeqs['percent_wt'].max() < percent_cutoff:
-            usableSeqs += 1
-            output_lowPerc = pd.concat([output_lowPerc, df_percDiff])
-        elif df_otherSeqs['percent_wt'].min() > percent_cutoff:
-            highSeqs += 1
-            output_highPerc = pd.concat([output_highPerc, df_percDiff])
-        else:
-            output_other = pd.concat([output_other, df_percDiff])
-        # think of a way to keep the mutants that also don't fluoresce here? Maybe if I just label each sequence as a mutant or not?
-        # also could output a dataframe of seqs that aren't present in mutant or sequence file? or just not in refseqs?
-        # also, should I keep the maltose cutoff too? that way, if something with like a G83i like mutation is gone, that can be the justification?
-        #exit(0)
-    print(sample, numSeqs, usableSeqs, highSeqs)
 
-
-output_df = pd.concat([output_lowPerc, output_highPerc, output_other])
+output_df = getSimilarSequences(df_fluor, wt_seq_col, nonmatching_aa_min)
 output_df.to_csv(f'{outputDir}/all.csv', index=False)
+output_df_2 = getSimilarSequences(df_fluor, wt_seq_col, 3)
+output_df_2.to_csv(f'{outputDir}/all_seqDiff_2.csv', index=False)
+output_df_3 = getSimilarSequences(df_fluor, wt_seq_col, 4)
+output_df_3.to_csv(f'{outputDir}/all_seqDiff_3.csv', index=False)
+output_df_4 = getSimilarSequences(df_fluor, wt_seq_col, 5)
+output_df_4.to_csv(f'{outputDir}/all_seqDiff_4.csv', index=False)
+output_df_5 = getSimilarSequences(df_fluor, wt_seq_col, 6)
+output_df_5.to_csv(f'{outputDir}/all_seqDiff_5.csv', index=False)
+
 # add mismatched position to dataframe
 output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)
 output_df['wt_aa'] = output_df[position_col].apply(lambda x: x[0])
@@ -326,16 +332,16 @@ for seq in gtoi_df_allWts['wt_seq'].unique():
 
 # TODO: take the all data dataframe, read it, and plot the energy score for each sequence that is WT and 1 amino acid off, then 2, then 3, etc.
 # look at sequences that are mutants of a single sequence
-for wt_seq in output_df['wt_seq'].unique():
-    df_seq = output_df[output_df['wt_seq'] == wt_seq]
-    df_seq = df_seq[df_seq['Type'] == 'WT']
-    df_seq.to_csv(f'{outputDir}/{wt_seq}.csv', index=False)
-# TODO: look at individual mutations of each sequence
-# Plot bar graphs of any sequences that have a successful g83i mutation? That way I can see all of the mutants 
-# Currently works for individual sequences; next, run on all similar positions, naming them by something else? Or could I do like a multi bar graph plot, with
-# multiple positions at the labels and minibar graphs for each? Like a histogram of each; can also do frequency of each in the sequences that succeed and that fail
-# https://stackoverflow.com/questions/6871201/plot-two-histograms-on-single-chart-with-matplotlib
-# https://stackoverflow.com/questions/47467077/python-plot-multiple-histograms
-# int(df_seq)
-exit(0)
-            
+#for wt_seq in output_df['wt_seq'].unique():
+#    df_seq = output_df[output_df['wt_seq'] == wt_seq]
+#    df_seq = df_seq[df_seq['Type'] == 'WT']
+#    df_seq.to_csv(f'{outputDir}/{wt_seq}.csv', index=False)
+## TODO: look at individual mutations of each sequence
+## Plot bar graphs of any sequences that have a successful g83i mutation? That way I can see all of the mutants 
+## Currently works for individual sequences; next, run on all similar positions, naming them by something else? Or could I do like a multi bar graph plot, with
+## multiple positions at the labels and minibar graphs for each? Like a histogram of each; can also do frequency of each in the sequences that succeed and that fail
+## https://stackoverflow.com/questions/6871201/plot-two-histograms-on-single-chart-with-matplotlib
+## https://stackoverflow.com/questions/47467077/python-plot-multiple-histograms
+## int(df_seq)
+#exit(0)
+#            
