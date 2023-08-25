@@ -162,9 +162,9 @@ maltose_col = 'LB-12H_M9-36H'
 maltose_cutoff = -100
 maltose_limit = 99999900 
 wt_cutoff = 110
-output_df = output_df[output_df[maltose_col] < maltose_limit]
-output_df = output_df[output_df[maltose_col] > maltose_cutoff]
-output_df.to_csv(f'{outputDir}/maltose_passing.csv', index=False)
+#output_df = output_df[output_df[maltose_col] < maltose_limit]
+#output_df = output_df[output_df[maltose_col] > maltose_cutoff]
+#output_df.to_csv(f'{outputDir}/maltose_passing.csv', index=False)
 output_lowPerc = output_df[output_df['percent_wt'] < percent_cutoff]
 output_highPerc = output_df[output_df['percent_wt'] > high_cutoff]
 output_other = output_df[(output_df['percent_wt'] >= percent_cutoff) & (output_df['percent_wt'] <= high_cutoff)]
