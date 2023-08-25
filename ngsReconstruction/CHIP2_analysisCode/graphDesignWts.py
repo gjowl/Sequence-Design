@@ -15,7 +15,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     plt.text(0.1, 1.12, f'y = {m:.2f}x + {b:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # calculate the correlation coefficient
     corr = np.corrcoef(input_df[energy_col], input_df[fluor_col])[0,1]
-    plt.text(0.1, 1.09, f'r = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    plt.text(0.1, 1.09, f'r^2 = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
@@ -44,11 +44,10 @@ error_col = 'std_adjusted'
 samples = df_fluorAndEnergy['Sample'].unique()
 
 for col in cols_to_graph:
-    output_dir = f'{outputDir}/{col}'
     #for design in df_fluorAndEnergy['Design'].unique():
     #    df_design = df_fluorAndEnergy[df_fluorAndEnergy['Design'] == design]
     #    output_dir = f'{outputDir}/{design}'
-    os.makedirs(output_dir, exist_ok=True)
+    #os.makedirs(output_dir, exist_ok=True)
     for seq in df_fluorAndEnergy['wt_seq'].unique():
         df_seq = df_fluorAndEnergy[df_fluorAndEnergy['wt_seq'] == seq]
         df_seq = df_seq.drop_duplicates(subset=['Sequence'])
@@ -56,9 +55,14 @@ for col in cols_to_graph:
             continue
         #graphFluorescence(df_seq, f'{sample}_{col}', col, fluor_col, error_col, output_dir)
         output_file = f'{seq}'
-        corr = np.corrcoef(df_seq[col], df_seq[fluor_col])[0,1]
-        if abs(corr) < 0.4:
+        corr = np.corrcoef(df_seq[col], df_seq[fluor_col])[0,1]**2
+        if abs(corr) < 0.5:
             continue
+        # get the design 
+        design = df_seq['Sample'].unique()[0]
+        output_dir = f'{outputDir}/{design}'
+        output_dir = f'{output_dir}/{col}'
+        os.makedirs(output_dir, exist_ok=True)
         graphFluorescence(df_seq, output_file, col, fluor_col, error_col, output_dir)
         # add in a limit for r^2 value
     #    os.makedirs(design_dir, exist_ok=True)

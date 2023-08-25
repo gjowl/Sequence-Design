@@ -124,12 +124,12 @@ df_mutant = pd.read_csv(mutantFile)
 
 # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
 # check if wt_seq is a column in the dataframe
-#cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
-#if 'wt_seq' in df_fluor.columns:
-#    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq']
-cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'Fluorescence', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
+cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
 if 'wt_seq' in df_fluor.columns:
-    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
+    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq']
+#cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'Fluorescence', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
+#if 'wt_seq' in df_fluor.columns:
+#    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
 #cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
 #cols_to_add = ['Sequence', 'Percent GpA', 'Percent Error', 'Sample']
 
