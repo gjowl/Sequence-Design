@@ -11,7 +11,7 @@ os.makedirs(outputDir, exist_ok=True)
 # read in the 
 df_wt = pd.read_csv(sequenceFile)
 df_mut = pd.read_csv(mutantFile)
-clash = False
+clash = True
 sortAscending = False 
 
 numSeqs = 0
@@ -24,7 +24,7 @@ for sequence in df_wt['Sequence'].unique():
         continue
     # get the mutant with the largest SasaPercentDifference
     if clash:
-        df_seq = df_seq.sort_values(by=['SasaPercDifference'], ascending=sortAscending)
+        df_seq = df_seq.sort_values(by=['CHARMM_VDW'], ascending=sortAscending)
     else:
         df_seq = df_seq.sort_values(by=['DimerSasaDifference'], ascending=sortAscending)
     bestSequence = df_seq['Mutant'].values[0]
@@ -32,7 +32,8 @@ for sequence in df_wt['Sequence'].unique():
     # check if the fluorescence of the WT is greater than the mutant
     wt_fluor = tmp_wt['mean_transformed'].values[0]
     mutant_fluor = df_seq['mean_transformed'].values[0]
-    if wt_fluor > mutant_fluor:
+    percentWT = mutant_fluor / wt_fluor * 100
+    if percentWT < 40:
         numSeqs += 1
         # add the sequence to the output dataframe
         output_df = pd.concat([output_df, tmp_wt], axis=0)
