@@ -75,7 +75,7 @@ def mutantTrimmingFunction(wt_df, mutant_df, trimming_col, seq_col, percent_cuto
     output_df = output_df[output_df[seq_col].isin(input_df[seq_col])]
     return output_df
 
-def getSimilarSequences(df, seq, nonmatching_aa_min):
+def getSimilarSequences(df, seq, fluor_col, nonmatching_aa_min):
     input_df = df.copy()
     output_df = pd.DataFrame()
     samples = input_df['Sample'].unique()
@@ -122,7 +122,9 @@ os.makedirs(outputDir, exist_ok=True)
 
 # read in the dataframes
 df_fluor = pd.read_csv(fluorFile)
-fluor_col = 'mean_transformed'
+#fluor_col = 'mean_transformed'
+# get the column that contains transformed data
+fluor_col = [col for col in df_fluor.columns if 'transformed' in col][0]
 percent_cutoff = 75
 high_cutoff = 125
 nonmatching_aa_min = 2
@@ -137,15 +139,15 @@ output_lowPerc = pd.DataFrame()
 output_highPerc = pd.DataFrame()
 output_other = pd.DataFrame()
 
-output_df = getSimilarSequences(df_fluor, wt_seq_col, nonmatching_aa_min)
+output_df = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, nonmatching_aa_min)
 output_df.to_csv(f'{outputDir}/all.csv', index=False)
-output_df_2 = getSimilarSequences(df_fluor, wt_seq_col, 3)
+output_df_2 = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, 3)
 output_df_2.to_csv(f'{outputDir}/all_seqDiff_2.csv', index=False)
-output_df_3 = getSimilarSequences(df_fluor, wt_seq_col, 4)
+output_df_3 = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, 4)
 output_df_3.to_csv(f'{outputDir}/all_seqDiff_3.csv', index=False)
-output_df_4 = getSimilarSequences(df_fluor, wt_seq_col, 5)
+output_df_4 = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, 5)
 output_df_4.to_csv(f'{outputDir}/all_seqDiff_4.csv', index=False)
-output_df_5 = getSimilarSequences(df_fluor, wt_seq_col, 6)
+output_df_5 = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, 6)
 output_df_5.to_csv(f'{outputDir}/all_seqDiff_5.csv', index=False)
 
 # add mismatched position to dataframe
@@ -153,8 +155,8 @@ output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)
 output_df['wt_aa'] = output_df[position_col].apply(lambda x: x[0])
 output_df['mut_aa'] = output_df[position_col].apply(lambda x: x[-1])
 output_df['mut_position'] = output_df[position_col].apply(lambda x: x[1:-1])
-output_df = output_df[output_df['percent_wt'] < 200]
-output_df.to_csv(f'{outputDir}/less_than_200_percentWT.csv', index=False)
+output_df_percentWt = output_df[output_df['percent_wt'] < 200]
+output_df_percentWt.to_csv(f'{outputDir}/less_than_200_percentWT.csv', index=False)
 output_df = output_df[output_df['Percent GpA'] < 150]
 output_df.to_csv(f'{outputDir}/less_than_150_percentGpA.csv', index=False)
 #output_df = output_df[output_df['Percent Error'] < 10]

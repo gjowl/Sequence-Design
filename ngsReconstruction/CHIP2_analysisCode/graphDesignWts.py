@@ -17,6 +17,10 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     corr = np.corrcoef(input_df[energy_col], input_df[fluor_col])[0,1]
     plt.text(0.1, 1.09, f'r^2 = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    # make sure the minimum y value is 0, and set the ylim top to 100 if it is less than 100
+    plt.ylim(bottom=0)
+    if plt.ylim()[1] < 100:
+        plt.ylim(top=100)
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
 
@@ -35,11 +39,13 @@ outputDir = sys.argv[2]
 df_fluorAndEnergy = pd.read_csv(inputFile)
 
 # graph the data
-cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
+#cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
+cols_to_graph = ['CHARMM_IMM1', 'CHARMM_IMM1REF', 'CHARMM_VDW', 'Dimer']
 #cols_to_graph = ['Total']
 #fluor_col = 'Percent GpA'
 #error_col = 'Percent Error'
-fluor_col = 'mean_transformed'
+#fluor_col = 'mean_transformed'
+fluor_col = [col for col in df_fluorAndEnergy.columns if 'transformed' in col][0]
 error_col = 'std_adjusted'
 samples = df_fluorAndEnergy['Sample'].unique()
 
@@ -68,6 +74,17 @@ for col in cols_to_graph:
     #    os.makedirs(design_dir, exist_ok=True)
     #    graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, design_dir)
         
+for col in cols_to_graph:
+    for sample in df_fluorAndEnergy['Sample'].unique():
+        df_sample = df_fluorAndEnergy[df_fluorAndEnergy['Sample'] == sample]
+        output_dir = f'{outputDir}/{sample}'
+        # get max value in the col
+        max_value = df_sample[col].max()
+        limit = 10000000
+        if max_value > limit:
+            # set all values over that to 100000
+            df_sample[col] = df_sample[col].apply(lambda x: limit if x > limit else x)
+        graphFluorescence(df_sample, f'all_{col}', col, fluor_col, error_col, outputDir)
 
 # TODO: print the energy graphs for sequences based on the categories I give them
 # example: some mutants higher than WT, some lower than WT, some similar to WT

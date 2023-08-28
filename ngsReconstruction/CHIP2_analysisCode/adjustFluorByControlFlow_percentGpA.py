@@ -71,12 +71,12 @@ def plot_and_get_regression(df_control_plot, xaxis_col, yaxis_col, sample):
     plt.clf()
     return m, b
 
-def transform_col(df_sample, sample, slope, y_intercept, col, output_df):
+def transform_data(df_sample, transform_col, sample, slope, y_intercept, col, output_df):
     output_df = df_sample.copy()
     # transform the reconstruction data
     tmp_col = ((output_df[col] - y_intercept) / slope)
     # add col to a new column in the reconstruction dataframe
-    output_df[f'{col}_transformed'] = tmp_col
+    output_df[transform_col] = tmp_col
     return output_df
     
 def calculateStandardDeviation(df_sample, cols, sample):
@@ -107,6 +107,7 @@ os.makedirs(outputDir, exist_ok=True)
 yaxis = 'mean'
 xaxis = 'Percent GpA'
 #yaxis = 'mean_transformed'
+transform_col = f'PercentGpA_transformed'
 
 # read in the dataframes
 reconstruction_df = pd.read_csv(reconstructionFile)
@@ -139,24 +140,23 @@ for sample in sample_names:
     # get the standard deviation of the rep columns
     df_sample = calculateStandardDeviation(df_sample, cols, sample)
     # get the mean of the rep columns
-    df_control_plot['mean'] = df_control_plot[cols].mean(axis=1)
+    df_control_plot[yaxis] = df_control_plot[cols].mean(axis=1)
     # add the standard deviation of the mean to the dataframe
     df_control_plot['std'] = df_control_plot[cols].std(axis=1)
-    df_sample['mean'] = df_sample[cols].mean(axis=1)
+    df_sample[yaxis] = df_sample[cols].mean(axis=1)
     slope, yint = plot_and_get_regression(df_control_plot, xaxis, yaxis, sample)
     # transform the reconstruction data 
-    df_sample = transform_col(df_sample, sample, slope, yint, 'mean', output_df)
+    df_sample = transform_data(df_sample, transform_col, sample, slope, yint, yaxis, output_df)
     # get the index of GpA and G83I from the sequence column 
     gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
     # get the fluorescence from the index
-    fluor_transform_col = f'mean_transformed'
-    gpaFluor, g83iFluor = gpaIndex[fluor_transform_col].values[0], g83iIndex[fluor_transform_col].values[0]
-    df_sample['Percent GpA'] = df_sample[fluor_transform_col]/gpaFluor*100 
+    gpaFluor, g83iFluor = gpaIndex[transform_col].values[0], g83iIndex[transform_col].values[0]
+    df_sample['Percent GpA'] = df_sample[transform_col]/gpaFluor*100 
     # save the transformed data
     df_sample.to_csv(f'{outputDir}/{sample}_transformed.csv', index=False)
-    df_sample = df_sample[df_sample['mean_transformed'] > 0]
+    df_sample = df_sample[df_sample[transform_col] > 0]
     # keep sequences with a higher fluorescence than G83I
-    df_sample_g83i = df_sample[df_sample[fluor_transform_col] > g83iFluor]
+    df_sample_g83i = df_sample[df_sample[transform_col] > g83iFluor]
     # save the filtered data
     df_sample_g83i.to_csv(f'{outputDir}/{sample}_g83i_filtered.csv', index=False)
     # add the sample to the output dataframe

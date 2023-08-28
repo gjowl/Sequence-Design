@@ -13,6 +13,7 @@ df_wt = pd.read_csv(sequenceFile)
 df_mut = pd.read_csv(mutantFile)
 clash = True
 sortAscending = False 
+yAxis = [col for col in df_wt.columns if 'transformed' in col][0]
 
 numSeqs = 0
 output_df = pd.DataFrame()
@@ -20,7 +21,7 @@ output_mutant_df = pd.DataFrame()
 for sequence in df_wt['Sequence'].unique():
     tmp_wt = df_wt[df_wt['Sequence'] == sequence]
     df_seq = df_mut[df_mut['Sequence'] == sequence]
-    if len(df_seq) == 0:
+    if len(df_seq) < 2:
         continue
     # get the mutant with the largest SasaPercentDifference
     if clash:
@@ -30,10 +31,12 @@ for sequence in df_wt['Sequence'].unique():
     bestSequence = df_seq['Mutant'].values[0]
     df_seq = df_seq[df_seq['Mutant'] == bestSequence]
     # check if the fluorescence of the WT is greater than the mutant
-    wt_fluor = tmp_wt['mean_transformed'].values[0]
-    mutant_fluor = df_seq['mean_transformed'].values[0]
+    wt_fluor = tmp_wt[yAxis].values[0]
+    if wt_fluor < 0.3:
+        continue
+    mutant_fluor = df_seq[yAxis].values[0]
     percentWT = mutant_fluor / wt_fluor * 100
-    if percentWT < 40:
+    if percentWT < 75:
         numSeqs += 1
         # add the sequence to the output dataframe
         output_df = pd.concat([output_df, tmp_wt], axis=0)
@@ -41,5 +44,6 @@ for sequence in df_wt['Sequence'].unique():
 output_df.to_csv(f'{outputDir}/wtGreaterThanMutant.csv', index=False)
 output_mutant_df.to_csv(f'{outputDir}/wtGreaterThanMutant_mutant.csv', index=False)
 
-# 
+
+# TODO: make a main code of this and the graphing code so that it's streamlined a bit quicker; define some variables to make it easier to change in a config and run multiple times
 print(numSeqs)

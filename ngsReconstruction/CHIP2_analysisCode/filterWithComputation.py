@@ -84,7 +84,7 @@ def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     df_sequence_no_duplicates, df_mutant_no_duplicates = mergeDataframes(df_fluor_seqs, df_fluor_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, cols_to_add)
     return df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled
 
-def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled):
+def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled, fluor_col):
     df_sequence_no_fluor = df_sequence[~df_sequence['Sequence'].isin(df_sequence_no_duplicates['Sequence'])].copy()
     df_mutant_no_fluor = df_mutant[~df_mutant['Mutant'].isin(df_mutant_no_duplicates['Mutant'])].copy()
     df_mutant_no_fluor = df_mutant_no_fluor[~df_mutant_no_fluor['Mutant'].isin(df_sequence_no_fluor['Sequence'])]
@@ -102,7 +102,7 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
     df_no_fluor.loc[df_no_fluor['Region'] == 'Right', 'Sample'] = 'R'
     df_no_fluor = df_no_fluor[~df_no_fluor['Sequence'].isin(df_fluor_labeled['Sequence'])]
     df_no_fluor = df_no_fluor.drop_duplicates(subset='Sequence', keep='first')
-    df_no_fluor['mean_transformed'] = 0
+    df_no_fluor[fluor_col] = 0
     return df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor
 
 # TODO: currently comparing energies between L designs and A designs; fix
@@ -124,14 +124,10 @@ df_mutant = pd.read_csv(mutantFile)
 
 # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
 # check if wt_seq is a column in the dataframe
-cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
+fluor_col = [col for col in df_fluor.columns if 'transformed' in col][0]
+cols_to_add = ['Sequence', fluor_col, 'std_adjusted', 'Sample']
 if 'wt_seq' in df_fluor.columns:
-    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq']
-#cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'Fluorescence', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
-#if 'wt_seq' in df_fluor.columns:
-#    cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample', 'wt_seq', 'Percent GpA Post Conversion', 'mean_transformed Pre Conversion']
-#cols_to_add = ['Sequence', 'mean_transformed', 'std_adjusted', 'Sample']
-#cols_to_add = ['Sequence', 'Percent GpA', 'Percent Error', 'Sample']
+    cols_to_add = ['Sequence', fluor_col, 'std_adjusted', 'Sample', 'wt_seq']
 
 # filtering variables
 maltose_col = 'LB-12H_M9-36H'
@@ -147,13 +143,13 @@ filter_fluor = False
 df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, filter_maltose, filter_percent_error, filter_fluor)
 
 # get the error for each sequence
-df_fluor['std_adjusted'] = df_fluor['mean_transformed'] * df_fluor['Percent Error'] / 100
+df_fluor['std_adjusted'] = df_fluor[fluor_col] * df_fluor['Percent Error'] / 100
 
 # filter the dataframes
 df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
 
 # get sequences that don't fluoresce
-df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor = getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled)
+df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor = getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled, fluor_col)
 
 # output dataframes
 df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor_energy_data.csv', index=False)
@@ -162,7 +158,7 @@ df_sequence_no_fluor.to_csv(f'{outputDir}/sequence_no_fluor.csv', index=False)
 df_mutant_no_fluor.to_csv(f'{outputDir}/mutant_no_fluor.csv', index=False)
 df_fluor_labeled.to_csv(f'{outputDir}/fluor_WT_mutant_labeled.csv', index=False)
 df_no_fluor.to_csv(f'{outputDir}/no_fluor.csv', index=False)
-df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample', 'mean_transformed']]])
+df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample', fluor_col]]])
 df_all.to_csv(f'{outputDir}/all.csv', index=False)
 print(f'Sequences: {len(df_sequence_no_duplicates)}')
 print(f'Mutants: {len(df_mutant_no_duplicates)}')
