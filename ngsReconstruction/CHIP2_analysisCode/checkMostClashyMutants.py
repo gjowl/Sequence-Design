@@ -14,7 +14,7 @@ df_mut = pd.read_csv(mutantFile)
 clash = True
 sortAscending = False 
 yAxis = [col for col in df_wt.columns if 'transformed' in col][0]
-fluor_cutoff = 0.3
+fluor_cutoff = 0.35
 numSeqs = 0
 output_df = pd.DataFrame()
 output_mutant_df = pd.DataFrame()
@@ -38,7 +38,7 @@ for sequence in df_wt['Sequence'].unique():
     if mutant_fluor > fluor_cutoff:
         continue
     percentWT = mutant_fluor / wt_fluor * 100
-    if percentWT < 100:
+    if percentWT < 50:
         numSeqs += 1
         # add the sequence to the output dataframe
         output_df = pd.concat([output_df, tmp_wt], axis=0)
