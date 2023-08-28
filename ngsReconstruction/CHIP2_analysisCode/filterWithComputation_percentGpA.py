@@ -124,18 +124,18 @@ df_mutant = pd.read_csv(mutantFile)
 
 # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
 # check if wt_seq is a column in the dataframe
-cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'Fluorescence', 'Percent GpA']
+cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'Fluorescence', 'FluorStdDev', 'Percent GpA']
 if 'wt_seq' in df_fluor.columns:
-    cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'wt_seq', 'Percent GpA']
+    cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'wt_seq', 'Fluorescence', 'FluorStdDev', 'Percent GpA']
 
 # filtering variables
 maltose_col = 'LB-12H_M9-36H'
 maltose_cutoff = -97
 maltose_limit = 10000000
-percent_error_cutoff = 15
+percent_error_cutoff = 0.15
 fluor_cutoff = 120 # percent GpA
 filter_maltose = False
-filter_percent_error= True
+filter_percent_error = True
 filter_fluor = False 
 transform_col = [col for col in df_fluor.columns if 'transformed' in col][0]
 
@@ -143,7 +143,7 @@ transform_col = [col for col in df_fluor.columns if 'transformed' in col][0]
 df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, filter_maltose, filter_percent_error, filter_fluor)
 
 # get the error for each sequence
-df_fluor['std_adjusted'] = df_fluor[transform_col] * df_fluor['Percent Error'] / 100
+df_fluor['std_adjusted'] = df_fluor[transform_col] * df_fluor['Percent Error']
 
 # filter the dataframes
 df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)

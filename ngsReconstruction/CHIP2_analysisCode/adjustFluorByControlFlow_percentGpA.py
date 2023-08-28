@@ -83,7 +83,7 @@ def calculateStandardDeviation(df_sample, cols, sample):
     output_df = df_sample.copy()
     output_df['std'] = df_sample[cols].std(axis=1)
     mean = output_df[cols].mean(axis=1)
-    output_df['Percent Error'] = output_df['std']/mean*100
+    output_df['Percent Error'] = output_df['std']/mean
     return output_df
 
 # read in the reconstructed fluorescence dataframe

@@ -1,4 +1,5 @@
 import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt
+from scipy.stats import linregress
 
 def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, output_dir):
     # plot the WT sequence fluorescence vs the energy
@@ -18,9 +19,11 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     plt.text(0.1, 1.09, f'r^2 = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # make sure the minimum y value is 0, and set the ylim top to 100 if it is less than 100
-    plt.ylim(bottom=0)
-    if plt.ylim()[1] < 100:
-        plt.ylim(top=100)
+    #plt.ylim(bottom=0)
+    #if plt.ylim()[1] < 1:
+    #    plt.ylim(top=1)
+    #slope, intercept, r_value, p_value, std_err = linregress(input_df[energy_col], input_df[fluor_col])
+    #plt.text(0.1, 1.03, f'p = {p_value:.5f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
 
@@ -48,6 +51,8 @@ cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
 #fluor_col = 'mean_transformed'
 fluor_col = [col for col in df_fluorAndEnergy.columns if 'transformed' in col][0]
 error_col = 'std_adjusted'
+#fluor_col = 'Fluorescence'
+#error_col = 'FluorStdDev'
 samples = df_fluorAndEnergy['Sample'].unique()
 for design in df_fluorAndEnergy['Design'].unique():
     df_design = df_fluorAndEnergy[df_fluorAndEnergy['Design'] == design].copy()
