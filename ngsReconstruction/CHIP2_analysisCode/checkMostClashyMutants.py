@@ -46,6 +46,8 @@ for sequence in df_wt['Sequence'].unique():
 output_df.to_csv(f'{outputDir}/wtGreaterThanMutant.csv', index=False)
 output_mutant_df.to_csv(f'{outputDir}/wtGreaterThanMutant_mutant.csv', index=False)
 
+#TODO: readjust the toxgreen percentages by GpA toxgreen fluorescence for % GpA; that way the transformation is standardized
+#TODO: color each of the points by type of design (GAS, Left, Right)
 
 # TODO: make a main code of this and the graphing code so that it's streamlined a bit quicker; define some variables to make it easier to change in a config and run multiple times
 print(numSeqs)
