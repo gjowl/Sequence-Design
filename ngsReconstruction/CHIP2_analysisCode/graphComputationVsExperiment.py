@@ -1,11 +1,17 @@
 import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt
 from scipy.stats import linregress
 
+colors = ['mediumseagreen', 'navajowhite', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, output_dir):
-    # plot the WT sequence fluorescence vs the energy
-    plt.scatter(input_df[energy_col], input_df[fluor_col])
-    # plot the standard deviation
-    plt.errorbar(input_df[energy_col], input_df[fluor_col], yerr=input_df[error_col], fmt='o', color='black', ecolor='lightgray', elinewidth=3, capsize=0)
+    # loop through the samples of the input_df
+    for sample, i in zip(input_df['Sample'].unique(), range(len(input_df['Sample'].unique()))):
+        df_sample = input_df[input_df['Sample'] == sample]
+        # plot the WT sequence fluorescence vs the energy
+        plt.scatter(df_sample[energy_col], df_sample[fluor_col], color=colors[i], label=sample)
+        # plot the standard deviation
+        plt.errorbar(df_sample[energy_col], df_sample[fluor_col], yerr=df_sample[error_col], fmt='o', color=colors[i], ecolor='lightgray', elinewidth=3, capsize=0)
+    ## plot the standard deviation
+    #plt.errorbar(input_df[energy_col], input_df[fluor_col], yerr=input_df[error_col], fmt='o', color='black', ecolor='lightgray', elinewidth=3, capsize=0)
     plt.ylabel(fluor_col)
     plt.xlabel(energy_col)
     plt.title(f'{energy_col} vs {fluor_col}')
@@ -24,6 +30,9 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     #    plt.ylim(top=1)
     #slope, intercept, r_value, p_value, std_err = linregress(input_df[energy_col], input_df[fluor_col])
     #plt.text(0.1, 1.03, f'p = {p_value:.5f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    # add a legend
+    plt.legend(loc='upper left', bbox_to_anchor=(1,1))
+    plt.tight_layout()
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
 
