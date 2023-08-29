@@ -21,7 +21,7 @@ df = pd.read_csv(dataFile)
 toxgreenDf = pd.read_csv(toxgreenFile)
 
 # get the columns of interest
-toxgreenDf = toxgreenDf[['Sequence','PercentGpA','PercentStd']]
+toxgreenDf = toxgreenDf[['Sequence','PercentGpA','PercentStd','Sample','LB-12H_M9-36H']]
 
 # define the sequence column for the datafile
 df['Sequence'] = df['Geometry'].str[3:-5] # removes the first 3 and last 5 characters from the geometry column
