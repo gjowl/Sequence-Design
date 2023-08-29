@@ -63,13 +63,15 @@ error_col = 'std_adjusted'
 #fluor_col = 'Fluorescence'
 #error_col = 'FluorStdDev'
 samples = df_fluorAndEnergy['Sample'].unique()
-for design in df_fluorAndEnergy['Design'].unique():
-    df_design = df_fluorAndEnergy[df_fluorAndEnergy['Design'] == design].copy()
-    df_design.drop_duplicates(subset='Sequence', keep='first', inplace=True)
-    design_dir = outputDir + '/' + design
-    os.makedirs(design_dir, exist_ok=True)
-    graphFluorescence(df_design, f'all_{design}', 'Total', fluor_col, error_col, design_dir)
-    graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, design_dir)
+# check if there is a design column
+if 'Design' in df_fluorAndEnergy.columns:
+    for design in df_fluorAndEnergy['Design'].unique():
+        df_design = df_fluorAndEnergy[df_fluorAndEnergy['Design'] == design].copy()
+        df_design.drop_duplicates(subset='Sequence', keep='first', inplace=True)
+        design_dir = outputDir + '/' + design
+        os.makedirs(design_dir, exist_ok=True)
+        graphFluorescence(df_design, f'all_{design}', 'Total', fluor_col, error_col, design_dir)
+        graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, design_dir)
 
 for col in cols_to_graph:
     df_fluorAndEnergy.drop_duplicates(subset='Sequence', keep='first', inplace=True)

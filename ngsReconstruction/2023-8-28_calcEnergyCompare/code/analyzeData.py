@@ -13,10 +13,13 @@ def plotScatterplot(df, xAxis, yAxis, yStd, outputTitle, addColors):
             plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=3)
             # plot the standard deviation
             plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='lightgray', elinewidth=3, capsize=0, markersize=3)
+        plt.legend(loc='upper left', bbox_to_anchor=(1,1))
     else:
         # make a scatter plot of the total energy vs the percent gpa
         plt.scatter(df[xAxis], df[yAxis], s=3)
         plt.errorbar(df[xAxis], df[yAxis], yerr=df[yStd], fmt='o', ecolor='lightgray', elinewidth=3, capsize=0, markersize=3)
+    plt.xlabel(xAxis)
+    plt.ylabel(yAxis)
     # set the yAxis lower limit to 0
     #plt.ylim(bottom=0)
     #plt.ylim(top=160)
@@ -34,7 +37,7 @@ def plotScatterplot(df, xAxis, yAxis, yStd, outputTitle, addColors):
     # add the r^2 value to the top left of the plot
     r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
     plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
-    plt.legend(loc='upper left', bbox_to_anchor=(1,1))
+    
     plt.tight_layout()
     plt.savefig(f'{outputDir}/scatterRegression_{outputTitle}.png')
     plt.clf()
@@ -60,7 +63,7 @@ df = df.drop_duplicates(subset=['Sequence'], keep='first')
 # rid of any sequences where the PercentStd > 10
 df = df[df['PercentStd'] < percentStdCutoff]
 df = df[df['PercentGpA'] < 3]
-df = df[df['Total'] < 0]
+df = df[df['Total'] < 100]
 
 # TESTS
 #df = df[df['PercentGpA'] > 0.50]

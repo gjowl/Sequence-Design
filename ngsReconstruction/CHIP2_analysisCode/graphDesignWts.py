@@ -40,7 +40,7 @@ os.makedirs(name=outputDir, exist_ok=True)
 
 # read in the data
 df_fluorAndEnergy = pd.read_csv(inputFile)
-
+#TODO: make an alternate version of this for the new bbRepack data
 # graph the data
 cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
 #cols_to_graph = ['CHARMM_IMM1', 'CHARMM_IMM1REF', 'CHARMM_VDW', 'Dimer']
@@ -59,13 +59,15 @@ for col in cols_to_graph:
     # loop through the sequences
     for seq in df_fluorAndEnergy['wt_seq'].unique():
         df_seq = df_fluorAndEnergy[df_fluorAndEnergy['wt_seq'] == seq]
-        df_seq = df_seq.drop_duplicates(subset=['Sequence'])
+        # remove any duplicates
+        df_seq = df_seq.sort_values(by=['Total'])
+        df_seq = df_seq.drop_duplicates(subset=['Sequence'], keep='first')
         if len(df_seq) < 5:
             continue
         #graphFluorescence(df_seq, f'{sample}_{col}', col, fluor_col, error_col, output_dir)
         output_file = f'{seq}'
         corr = np.corrcoef(df_seq[col], df_seq[fluor_col])[0,1]**2
-        if abs(corr) < 0.5:
+        if abs(corr) < 0.4:
             continue
         # get the design 
         design = df_seq['Sample'].unique()[0]
