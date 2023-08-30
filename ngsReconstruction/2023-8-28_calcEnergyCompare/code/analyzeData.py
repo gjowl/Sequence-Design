@@ -10,9 +10,9 @@ def plotScatterplot(df, xAxis, yAxis, yStd, outputTitle, addColors):
         for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
             df_sample = df[df['Sample'] == sample]
             # plot the WT sequence fluorescence vs the energy
-            plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=3)
+            plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
             # plot the standard deviation
-            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='lightgray', elinewidth=3, capsize=0, markersize=3)
+            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='lightgray', elinewidth=3, capsize=0, markersize=5)
         plt.legend(loc='upper left', bbox_to_anchor=(1,1))
     else:
         # make a scatter plot of the total energy vs the percent gpa
