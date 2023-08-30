@@ -19,7 +19,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     plt.text(0.1, 1.09, f'r^2 = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # make sure the minimum y value is 0, and set the ylim top to 100 if it is less than 100
-    #plt.ylim(bottom=0)
+    plt.ylim(bottom=0)
     #if plt.ylim()[1] < 100:
     #    plt.ylim(top=100)
     # get a p-value for the correlation
@@ -29,6 +29,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     #    plt.text(0.1, 1.03, f'p < {p_limit:.5f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     #else:
     #    plt.text(0.1, 1.03, f'p = {p_value:.5f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
+    plt.tight_layout()
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
 
@@ -40,7 +41,7 @@ os.makedirs(name=outputDir, exist_ok=True)
 
 # read in the data
 df_fluorAndEnergy = pd.read_csv(inputFile)
-#TODO: make an alternate version of this for the new bbRepack data
+
 # graph the data
 cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
 #cols_to_graph = ['CHARMM_IMM1', 'CHARMM_IMM1REF', 'CHARMM_VDW', 'Dimer']

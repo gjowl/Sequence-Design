@@ -2,14 +2,22 @@ import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt
 from scipy.stats import linregress
 
 colors = ['mediumseagreen', 'navajowhite', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
-def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, output_dir):
+def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, output_dir, useColors=False):
     # loop through the samples of the input_df
-    for sample, i in zip(input_df['Sample'].unique(), range(len(input_df['Sample'].unique()))):
-        df_sample = input_df[input_df['Sample'] == sample]
+    if useColors:
+        for sample, i in zip(input_df['Sample'].unique(), range(len(input_df['Sample'].unique()))):
+            df_sample = input_df[input_df['Sample'] == sample]
+            # plot the WT sequence fluorescence vs the energy
+            plt.scatter(df_sample[energy_col], df_sample[fluor_col], color=colors[i], label=sample)
+            # plot the standard deviation
+            plt.errorbar(df_sample[energy_col], df_sample[fluor_col], yerr=df_sample[error_col], fmt='o', color=colors[i], ecolor='lightgray', elinewidth=3, capsize=0)
+            # add a legend
+            plt.legend(loc='upper left', bbox_to_anchor=(1,1))
+    else:
         # plot the WT sequence fluorescence vs the energy
-        plt.scatter(df_sample[energy_col], df_sample[fluor_col], color=colors[i], label=sample)
+        plt.scatter(input_df[energy_col], input_df[fluor_col])
         # plot the standard deviation
-        plt.errorbar(df_sample[energy_col], df_sample[fluor_col], yerr=df_sample[error_col], fmt='o', color=colors[i], ecolor='lightgray', elinewidth=3, capsize=0)
+        plt.errorbar(input_df[energy_col], input_df[fluor_col], yerr=input_df[error_col], fmt='o', color='black', ecolor='lightgray', elinewidth=3, capsize=0)
     ## plot the standard deviation
     #plt.errorbar(input_df[energy_col], input_df[fluor_col], yerr=input_df[error_col], fmt='o', color='black', ecolor='lightgray', elinewidth=3, capsize=0)
     plt.ylabel(fluor_col)
@@ -25,13 +33,11 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     plt.text(0.1, 1.09, f'r^2 = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     # make sure the minimum y value is 0, and set the ylim top to 100 if it is less than 100
-    #plt.ylim(bottom=0)
+    plt.ylim(bottom=0)
     #if plt.ylim()[1] < 1:
     #    plt.ylim(top=1)
     #slope, intercept, r_value, p_value, std_err = linregress(input_df[energy_col], input_df[fluor_col])
     #plt.text(0.1, 1.03, f'p = {p_value:.5f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
-    # add a legend
-    plt.legend(loc='upper left', bbox_to_anchor=(1,1))
     plt.tight_layout()
     plt.savefig(f'{output_dir}/{output_file}.png')
     plt.clf()
@@ -70,11 +76,11 @@ if 'Design' in df_fluorAndEnergy.columns:
         df_design.drop_duplicates(subset='Sequence', keep='first', inplace=True)
         design_dir = outputDir + '/' + design
         os.makedirs(design_dir, exist_ok=True)
-        graphFluorescence(df_design, f'all_{design}', 'Total', fluor_col, error_col, design_dir)
+        graphFluorescence(df_design, f'all_{design}', 'Total', fluor_col, error_col, design_dir, True)
         graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, design_dir)
 
 for col in cols_to_graph:
     df_fluorAndEnergy.drop_duplicates(subset='Sequence', keep='first', inplace=True)
-    graphFluorescence(df_fluorAndEnergy, f'all_{col}', col, fluor_col, error_col, outputDir)
+    graphFluorescence(df_fluorAndEnergy, f'all_{col}', col, fluor_col, error_col, outputDir, True)
 
 

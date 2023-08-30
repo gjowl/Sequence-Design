@@ -21,7 +21,7 @@ Date      	By	Comments
 
 import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
 
-def filterExperimentDataframes(input_df, maltose_col, maltose_cutoff, maltose_limit, 
+def filterExperimentDataframes(input_df, maltose_col, maltose_cutoff, maltose_limit, percent_error_cutoff, fluor_cutoff,
  filter_maltose, filter_percent_error, filter_fluor):
     output_df = input_df.copy()
     ## filter out by maltose
@@ -30,12 +30,10 @@ def filterExperimentDataframes(input_df, maltose_col, maltose_cutoff, maltose_li
         output_df = output_df[output_df[maltose_col] < maltose_limit]
     ## filter out by percent error
     if filter_percent_error:
-        percent_error_cutoff = 15
         output_df = output_df[output_df['Percent Error'] < percent_error_cutoff]
     ## filter out by percent GpA
     if filter_fluor:
-        percent_GpA_cutoff = 120
-        output_df = output_df[output_df['Percent GpA'] < percent_GpA_cutoff]
+        output_df = output_df[output_df['Percent GpA'] < fluor_cutoff]
     return output_df
 
 
@@ -126,7 +124,7 @@ df_mutant = pd.read_csv(mutantFile)
 # check if wt_seq is a column in the dataframe
 cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'Fluorescence', 'FluorStdDev', 'Percent GpA']
 if 'wt_seq' in df_fluor.columns:
-    cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'wt_seq', 'Fluorescence', 'FluorStdDev', 'Percent GpA']
+    cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'wt_seq', 'Fluorescence', 'FluorStdDev', 'Percent GpA']
 
 # filtering variables
 maltose_col = 'LB-12H_M9-36H'
@@ -140,7 +138,7 @@ filter_fluor = False
 transform_col = [col for col in df_fluor.columns if 'transformed' in col][0]
 
 # Filtering
-df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, filter_maltose, filter_percent_error, filter_fluor)
+df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, percent_error_cutoff, fluor_cutoff, filter_maltose, filter_percent_error, filter_fluor)
 
 # get the error for each sequence
 df_fluor['std_adjusted'] = df_fluor[transform_col] * df_fluor['Percent Error']
