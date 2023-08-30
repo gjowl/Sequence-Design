@@ -21,7 +21,7 @@ def plotScatterplot(df, xAxis, yAxis, yStd, outputTitle, addColors):
     plt.xlabel(xAxis)
     plt.ylabel(yAxis)
     # set the yAxis lower limit to 0
-    #plt.ylim(bottom=0)
+    plt.ylim(bottom=0)
     #plt.ylim(top=160)
     # set size of the points
     # add in the standard deviation
