@@ -30,13 +30,9 @@ output_mutant_df = pd.DataFrame()
 for sequence in df_wt['Sequence'].unique():
     tmp_wt = df_wt[df_wt['Sequence'] == sequence]
     df_seq = df_mut[df_mut['Sequence'] == sequence]
-    if len(df_seq) < 2:
+    if len(df_seq) < 1:
         continue
-    # get the mutant with the largest SasaPercentDifference
-    if clash:
-        df_seq = df_seq.sort_values(by=['CHARMM_VDW'], ascending=sortAscending)
-    else:
-        df_seq = df_seq.sort_values(by=['DimerSasaDifference'], ascending=sortAscending)
+    df_seq = df_seq.sort_values(by=['CHARMM_VDW'], ascending=sortAscending)
     bestSequence = df_seq['Mutant'].values[0]
     df_seq = df_seq[df_seq['Mutant'] == bestSequence]
     # check if the fluorescence of the WT is greater than the mutant

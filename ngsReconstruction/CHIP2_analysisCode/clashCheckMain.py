@@ -35,7 +35,7 @@ for index, row in df.iterrows():
     wt_cutoff = row['WT Fluor Cutoff']
     mutant_cutoff = row['Mutant Fluor Cutoff']
     percent_cutoff = row['Percent WT Cutoff']
-    outputDir = f'{cwd}/clash/wt_{wt_cutoff}_mutant_{mutant_cutoff}_percent_{percent_cutoff}'
+    outputDir = f'{cwd}/clash_atLeastOneMutant/wt_{wt_cutoff}_mutant_{mutant_cutoff}_percent_{percent_cutoff}'
 
     execClashCheck = f'python3 {codeDir}/checkMostClashyMutants.py {sequenceFile} {mutantFile} {outputDir} {wt_cutoff} {mutant_cutoff} {percent_cutoff}'
     os.system(execClashCheck)
