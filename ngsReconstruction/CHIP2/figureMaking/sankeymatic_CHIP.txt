@@ -1,0 +1,15 @@
+https://www.sankeymatic.com/build/
+Paste the below into the inputs in the link above to generate the sankey diagram.
+// Enter Flows between Nodes, like this:
+//         Source [AMOUNT] Target
+
+CHIP [4264] Mutant
+CHIP [1039] Design
+
+Mutant [1412] Right Mutant
+Mutant [1445] Left Mutant
+Mutant [1407] GAS Mutant
+
+Design [344] Right Design
+Design [352] Left Design
+Design [343] GAS Design

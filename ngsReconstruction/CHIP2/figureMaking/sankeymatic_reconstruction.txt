@@ -1,0 +1,18 @@
+https://www.sankeymatic.com/build/
+Paste the below into the inputs in the link above to generate the sankey diagram.
+// Enter Flows between Nodes, like this:
+//         Source [AMOUNT] Target
+
+All Sequences [4517] Successfully Sequenced
+All Sequences [786] Not found in Sequencing
+
+Successfully Sequenced [3026] Reconstructed
+Reconstructed [2060] Above G83I Monomer
+Reconstructed [966] Below G83I Monomer
+
+Below G83I Monomer [451] Monomer Clash Mutants
+Below G83I Monomer [137] Monomer Designs
+Below G83I Monomer [377] Monomer Void Mutants
+Above G83I Monomer [458] Dimer Designs
+Above G83I Monomer [1042] Dimer Void Mutants
+Above G83I Monomer [560] Dimer Clash Mutants

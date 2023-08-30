@@ -1,0 +1,25 @@
+https://www.sankeymatic.com/build/
+Paste the below into the inputs in the link above to generate the sankey diagram.
+// Enter Flows between Nodes, like this:
+//         Source [AMOUNT] Target
+Total [5303]
+
+GAS [344] WT
+Right [352] WT
+Left [343] WT
+
+WT [247] Fluorescent WT GAS
+WT [170] Fluorescent WT Left
+WT [201] Fluorescent WT Right
+
+GAS [1460] Mutant
+Right [1460] Mutant
+Left [1460] Mutant
+
+Mutant [700] Fluorescent GAS
+Mutant [943] Fluorescent Left
+Mutant [877] Fluorescent Right
+
+Fluorescent WT GAS [] Maltose
+Fluorescent WT Left [] Maltose
+Fluorescent WT Right [] Maltose
