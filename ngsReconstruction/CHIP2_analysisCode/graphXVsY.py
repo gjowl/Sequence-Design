@@ -32,7 +32,7 @@ df_input = pd.read_csv(inputFile)
 
 # graph the data
 xaxis = 'Total'
-yaxis = 'Predicted Delta G'
-error_col = 'std GREEN'
+yaxis = 'deltaG'
+error_col = 'std_deltaG'
 
 graphXVsY(df_input, outputFile, xaxis, yaxis, error_col, outputDir)

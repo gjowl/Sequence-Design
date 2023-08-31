@@ -21,9 +21,9 @@ os.makedirs(outputDir, exist_ok=True)
 # read in the 
 df_wt = pd.read_csv(sequenceFile)
 df_mut = pd.read_csv(mutantFile)
-clash = True
-sortAscending = False 
 yAxis = [col for col in df_wt.columns if 'transformed' in col][0]
+sort_col = yAxis
+sortAscending = True 
 numSeqs = 0
 output_df = pd.DataFrame()
 output_mutant_df = pd.DataFrame()
@@ -32,9 +32,9 @@ for sequence in df_wt['Sequence'].unique():
     df_seq = df_mut[df_mut['Sequence'] == sequence]
     if len(df_seq) < 1:
         continue
-    df_seq = df_seq.sort_values(by=['CHARMM_VDW'], ascending=sortAscending)
+    df_seq = df_seq.sort_values(by=[sort_col], ascending=sortAscending)
     bestSequence = df_seq['Mutant'].values[0]
-    df_seq = df_seq[df_seq['Mutant'] == bestSequence]
+    #df_seq = df_seq[df_seq['Mutant'] == bestSequence]
     # check if the fluorescence of the WT is greater than the mutant
     wt_fluor = tmp_wt[yAxis].values[0]
     if wt_fluor < wt_fluor_cutoff:

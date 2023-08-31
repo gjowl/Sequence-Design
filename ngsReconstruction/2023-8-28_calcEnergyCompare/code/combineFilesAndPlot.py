@@ -11,6 +11,11 @@ sequence_df = pd.read_csv(sequenceFile)
 energy_df = pd.read_csv(energyFile)
 
 # merge the dataframes by sequence
+maltose_col = 'LB-12H_M9-36H'
+maltose_cutoff = -99.9
+maltose_limit = 99999900
+sequence_df = sequence_df[sequence_df[maltose_col] > maltose_cutoff]
+sequence_df = sequence_df[sequence_df[maltose_col] < maltose_limit]
 sequence_df = sequence_df[['Sequence','PercentGpA_transformed','std_adjusted','Sample']]
 sequence_df['Sequence'] = sequence_df['Sequence'].apply(lambda x: x[3:-3])
 energy_df['Sequence'] = energy_df['Directory'].apply(lambda x: x[3:-3])

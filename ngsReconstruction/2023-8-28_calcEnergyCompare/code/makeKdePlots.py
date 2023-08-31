@@ -21,7 +21,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
     plt.grid(False)
     plt.xlabel("Distance (Å)")
     plt.ylabel("Angle (°)")
-    plt.title("test")
+    plt.title("")
     # Setup for plotting output
     plt.rc('font', size=10)
     plt.rc('xtick', labelsize=10)
@@ -41,19 +41,20 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
     maxData = int(np.ceil(np.max(data)/5)*5)
     # flip the data so that the min is at the top of the colorbar
     norm = matplotlib.colors.Normalize(vmin=minData, vmax=maxData) 
-    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=30, alpha=0.5)
+    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=10, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
     sm.set_array([])  # only needed for matplotlib < 3.1
     fig.colorbar(sm)
     # add the number of datapoints to the plot
-    plt.text(xmin-1, ymax+7, "# Sequences = " + str(len(xAxis)), fontsize=10)
+    plt.text(xmin-1, ymax+12, "# Sequences = " + str(len(xAxis)), fontsize=10)
     ax.set_xlim([xmin, xmax])
     ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
 
     # output the number of sequences in the dataset onto plot
+    plt.tight_layout()
     plt.savefig(f'{outputDir}/kdeOverlay_{dataColumn}.png', bbox_inches='tight', dpi=150)
     plt.close()
 
@@ -91,7 +92,8 @@ cwd = os.getcwd()
 df = dataDf.sort_values(by=['Total'], ascending=True)
 # keep only unique sequences, and the unique sequence with the lowest total energy
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
-df = df[df['PercentStd'] < 15]
+df = df[df['Total'] < 0]
+#df = df[df['PercentStd'] < 15]
 
 # plot the kde data
 plotGeomKde(kdeDf, df, 'Total', cwd, 'endXShift', 'endCrossingAngle')
