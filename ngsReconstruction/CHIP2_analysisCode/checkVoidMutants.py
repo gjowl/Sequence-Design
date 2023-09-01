@@ -39,14 +39,14 @@ for sequence in df_wt['Sequence'].unique():
     if wt_fluor < wt_fluor_cutoff:
         continue
     mutant_fluor = df_seq[yAxis].values[0]
-    if mutant_fluor > mutant_fluor_cutoff:
-        continue
     percentWT = mutant_fluor / wt_fluor * 100
-    if percentWT < percent_wt_cutoff:
-        numSeqs += 1
-        # add the sequence to the output dataframe
-        output_df = pd.concat([output_df, tmp_wt], axis=0)
-        output_mutant_df = pd.concat([output_mutant_df, df_seq], axis=0)
+    if mutant_fluor > mutant_fluor_cutoff:
+        if percentWT > percent_wt_cutoff:
+            continue
+    numSeqs += 1
+    # add the sequence to the output dataframe
+    output_df = pd.concat([output_df, tmp_wt], axis=0)
+    output_mutant_df = pd.concat([output_mutant_df, df_seq], axis=0)
 output_df.to_csv(f'{outputDir}/wtGreaterThanMutant.csv', index=False)
 output_mutant_df.to_csv(f'{outputDir}/wtGreaterThanMutant_mutant.csv', index=False)
 output_mutant_df['Sequence'] = output_mutant_df['Mutant']
