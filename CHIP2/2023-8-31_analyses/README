@@ -1,0 +1,12 @@
+This directory contains all of the analysis that I did for my committee meeting. I have a copy of the reconstructionAllData.csv files
+from the ngsReconstruction of CHIP2 as an input file, which is then used to analyze the fluorescence data. I also have analysis of 
+the clashing mutants, GASrights, and a rerun of pdbBBRepack (backbone optimization code) for my structures.
+
+I moved these directories around on 2023-9-5, so if they stop working for some reason, go back to a couple of commits on github 
+before that to figure out why.
+
+Directories:
+ - fluorescenceAnalysis: contains all of the analysis of the fluorescence data
+ - clashingAnalysis: contains all of the analysis of the clashing mutants
+ - GASrights: contains all of the analysis of the GASrights
+ - 2023-8-28_calcEnergyCompare: contains all of the analysis of the pdbBBRepack rerun
