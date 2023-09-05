@@ -1,0 +1,21 @@
+2023-8-31
+Committee expects me to finish and graduate next spring, and below are some of the things I need to do to graduate:
+ - Begin writing the paper
+    - Figures
+    - Intro
+    - Methods
+    - Results
+    - Compile References
+ - Have another computational form of structure validation
+ - Fix maltose test 
+ - Run Western Blots to determine if protein expression is similar
+
+So from here on, it's planning how to approach things next. I searched for some ways of verifying membrane protein structures
+yesterday and have a couple ideas in my labarchives notebook. Any results from this I'll add in here once finalized. Ideally, 
+I would like to be able to check the RMSD between my structures and the structures from other methods. If none of the things I
+find are promising, TMDOCK is still a viable option (and it did have good agreement with my gblock structures before).
+
+I was able to organize all of the CHIP2 analysis I've done so far into github/Sequence-Design/CHIP2/2023-8-31_analyses, but
+still need to organize things for writing the paper. I think I'm going to write an outline of the paper soon and then organize
+whatever figures, data, and old writings/posters into this directory. But for now going to make sure I'm also planning some 
+experiments. Likely will start with Maltose and westerns.
