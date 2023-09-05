@@ -25,8 +25,8 @@ cwd = os.getcwd()
 
 # read in the input file as a dataframe
 df = pd.read_csv(configFile)
-codeDir = f'/mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_analysisCode'
-#codeDir = f'/home/loiseau@ad.wisc.edu/github/Sequence-Design/ngsReconstruction/CHIP2_analysisCode'
+#codeDir = f'/mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_analysisCode'
+codeDir = f'/home/loiseau@ad.wisc.edu/github/Sequence-Design/ngsReconstruction/CHIP2_analysisCode'
 
 # loop through all rows in the dataframe
 for index, row in df.iterrows():

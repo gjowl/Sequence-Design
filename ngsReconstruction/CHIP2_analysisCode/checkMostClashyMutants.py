@@ -29,6 +29,9 @@ output_df = pd.DataFrame()
 output_mutant_df = pd.DataFrame()
 for sequence in df_wt['Sequence'].unique():
     tmp_wt = df_wt[df_wt['Sequence'] == sequence]
+    if len(tmp_wt) > 1:
+        tmp_wt = tmp_wt.sort_values(by=[sort_col], ascending=False)
+        tmp_wt = tmp_wt.drop_duplicates(subset='Sequence', keep='first')
     df_seq = df_mut[df_mut['Sequence'] == sequence]
     if len(df_seq) < 1:
         continue

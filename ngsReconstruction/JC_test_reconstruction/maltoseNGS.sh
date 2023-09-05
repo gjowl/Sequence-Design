@@ -1,5 +1,0 @@
-#perl ../../AllSeqNgsAnalysis_CHIP.pl --refFile CheatRefSeqs.csv --seqFile CHIP4-LB-Rep1_S25_L001_R1_001.fastq --direction 1 > ../Cheat\ Processed\ Data/AllSeqCHIP4-LB-Rep1_S25_L001_R1_001.txt
-#perl ../../AllSeqNgsAnalysis_CHIP.pl --refFile CheatRefSeqs.csv --seqFile CHIP4-LB-Rep2_S33_L001_R1_001.fastq --direction 1 > ../Cheat\ Processed\ Data/AllSeqCHIP4-LB-Rep2_S33_L001_R1_001.txt
-#perl ../../AllSeqNgsAnalysis_CHIP.pl --refFile CheatRefSeqs.csv --seqFile CHIP4-LB-Rep3_S40_L001_R1_001.fastq --direction 1 > ../Cheat\ Processed\ Data/AllSeqCHIP4-LB-Rep3_S40_L001_R1_001.txt
-perl AllSeqNgsAnalysis_CHIP.pl --refFile CheatRefSeqs.csv --seqFile /data/NGS/Bin-4-April-1-2022_S223_L003_R1_001.fastq --direction 1 
-#perl ../../AllSeqNgsAnalysis_CHIP.pl --refFile CheatRefSeqs.csv --seqFile CHIP4-M9-Rep3_S41_L001_R1_001.fastq --direction 1 > ../Cheat\ Processed\ Data/AllSeqCHIP4-M9-Rep3_S41_L001_R1_001.txt
