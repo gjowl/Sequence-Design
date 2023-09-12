@@ -12,6 +12,8 @@ rawDataDir = sys.argv[1]
 outputFile = sys.argv[2]
 outputDir = sys.argv[3]
 
+os.makedirs(outputDir, exist_ok=True)
+
 # check if dataFile exists
 if os.path.isfile(f'{outputDir}/{outputFile}.csv'):
     # quit
