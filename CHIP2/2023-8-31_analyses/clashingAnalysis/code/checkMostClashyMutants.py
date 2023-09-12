@@ -52,11 +52,11 @@ for sequence in df_wt['Sequence'].unique():
     # add the sequence to the output dataframe
     output_df = pd.concat([output_df, tmp_wt], axis=0)
     output_mutant_df = pd.concat([output_mutant_df, df_seq], axis=0)
-output_df.to_csv(f'{outputDir}/wtGreaterThanMutant.csv', index=False)
-output_mutant_df.to_csv(f'{outputDir}/wtGreaterThanMutant_mutant.csv', index=False)
+output_df.to_csv(f'{outputDir}/wt.csv', index=False)
+output_mutant_df.to_csv(f'{outputDir}/mutant.csv', index=False)
 output_mutant_df['Sequence'] = output_mutant_df['Mutant']
 output_df_all = pd.concat([output_df, output_mutant_df], axis=0)
-output_df_all.to_csv(f'{outputDir}/wt_and_mutant.csv', index=False)
+output_df_all.to_csv(f'{outputDir}/all.csv', index=False)
 print(numSeqs)
 
 # TODO: add in a way to make multiple types of regression curves
