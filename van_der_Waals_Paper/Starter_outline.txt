@@ -1,0 +1,33 @@
+Van der Waals packing facilitates membrane protein association
+
+Abstract
+    - Take from previously written stuff for now
+
+Graphical Abstract
+    - Have a nice figure of how my design algorithm works, maybe tie it into the figure 1 (extracted geometries),
+      finally output the protein and show fluorescence
+
+Intro
+    - Look at other vdW and design papers to see how they structure this; Mravic et al. in particular
+    - See how other papers pitch their work and if I can do that same
+    - protein design as a tool to study protein-protein interactions
+    - membrane proteins are difficult to study
+
+Figure 1
+    - Geometric landscape of membrane proteins (update this?)
+    - Show how the protein is designed (maybe a nicer version of the flow chart, with a more detailed method in supplement?)
+        - Can also add in the parts about confirming the structures with Rosetta or something else
+
+Figure 2
+    - Fluorescence from reconstruction explanation/cite the sort-seq paper
+    - Distribution of all proteins just fluorescence (histogram/pie chart)
+
+Figure 3
+    - Energy score vs fluorescence data
+        - correlation doesn't look good for all, but can I say something about the trends with the energy scores?
+    - Unsure if I need all of the data, but maybe the clashing mutants at least
+    - If I can get void mutant data, could also add that here
+
+Figure 4
+    - Converted fluorescence to biophysical deltaG vs total energy
+    - If it looks okay, maybe the predicted vdW vs deltaG and other metrics?
