@@ -1,11 +1,13 @@
 import os, sys, pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 
 colors = ['mediumseagreen', 'navajowhite', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 # plot scatterplot function
 #TODO: could get a standard deviation for the x axis energies now that I have multiple repack energies
-def plotScatterplot(df, xAxis, yAxis, yStd, output_title, output_dir, addColors):
+def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, output_dir, addColors):
     if addColors:
         for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
             df_sample = df[df['Sample'] == sample]
@@ -20,6 +22,7 @@ def plotScatterplot(df, xAxis, yAxis, yStd, output_title, output_dir, addColors)
         plt.errorbar(df[xAxis], df[yAxis], yerr=df[yStd], fmt='o', ecolor='lightgray', elinewidth=3, capsize=0, markersize=3)
     plt.xlabel(xAxis)
     plt.ylabel(yAxis)
+
     # set the yAxis lower limit to 0
     #plt.ylim(bottom=0)
     #plt.ylim(top=160)
@@ -31,8 +34,13 @@ def plotScatterplot(df, xAxis, yAxis, yStd, output_title, output_dir, addColors)
     plt.savefig(f'{output_dir}/scatter_{output_title}.png')
 
     # add a line of best fit and an r^2 value
-    m, b = np.polyfit(df[xAxis], df[yAxis], 1)
+    m, b = np.polyfit(df[xAxis], df[yAxis], regression_degree)
     plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
+    # TODO: try the below code for sklearn regressions
+    #    model = np.polyfit(df[xAxis], df[yAxis], regression_degree)
+    #    predict = np.poly1d(model)
+    #    x_lin_reg = np.linspace(df[xAxis].min(), df[xAxis].max(), 100)
+    #    plt.plot(x_lin_reg, predict(x_lin_reg), color='red')
 
     # add the r^2 value to the top left of the plot
     r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
@@ -92,6 +100,7 @@ if __name__ == '__main__':
 
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
-        plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', f'{sample}_Total', outputDir, False)
+        for degree in range(1, 5):
+            plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', degree, f'{sample}_Total', outputDir, False)
 
     #TODO: write a script that will take in the energy file, combine it with the clashing file, and then use this script to plot the data
