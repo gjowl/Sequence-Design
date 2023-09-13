@@ -6,6 +6,7 @@ Abstract
 Graphical Abstract
     - Have a nice figure of how my design algorithm works, maybe tie it into the figure 1 (extracted geometries),
       finally output the protein and show fluorescence
+        -I also think visually for my presentation, having some sort of pymol driven video would be nice
 
 Intro
     - Look at other vdW and design papers to see how they structure this; Mravic et al. in particular
@@ -31,3 +32,28 @@ Figure 3
 Figure 4
     - Converted fluorescence to biophysical deltaG vs total energy
     - If it looks okay, maybe the predicted vdW vs deltaG and other metrics?
+
+Discussion
+    - What does this mean for membrane protein design? Or membrane proteins in general?
+
+Methods
+    - Membrane protein pdb search
+        - Download pdbs from OPM (date)
+        - Extract geometries from pdbs for any two helices in the membrane
+            - sequences, angle, distance, etc. using MSL
+        - Graph the geometries and run kde plot
+    - Design algorithm
+        - MSL design input the geometry
+        - Search for sequences (subset of AAs, based on membrane proteins like Rosetta, etc.)
+        - Move backbone for sequence and calculate energy
+            - Do I need to describe the energy function in more detail here?
+            - Explain the membrane sequence energy function that we made
+    - Westerns
+    - Sort Seq and Fluorescence reconstruction
+    - Maltose test
+    - Details that I have to deal with: 
+        - designing with different ends
+        - choosing mutations:
+            - clash: energy; are there backbone movements?
+                - is there any way to justify this for membrane proteins? Could we compare to natural sequences with similar geometries?
+            - void: SASA; are there backbone movements? (if this data gets used)
