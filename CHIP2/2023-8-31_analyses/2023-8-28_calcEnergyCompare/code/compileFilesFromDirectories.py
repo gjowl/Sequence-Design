@@ -30,15 +30,17 @@ parentDirName = os.path.basename(parentDir)
 
 # for each directory in the search directory
 for dir in os.listdir(rawDataDir):
-    for innerDir in os.listdir(rawDataDir+dir):
-        # check if the directory is a directory
-        if os.path.isdir(rawDataDir+dir+'/'+innerDir):
-            # loop through the files in the directory
-            for file in os.listdir(rawDataDir+dir+'/'+innerDir):
-                currDir = rawDataDir+dir+'/'+innerDir+'/'
+    innerDir = f'{rawDataDir}/{dir}'
+    # check if the directory is a directory
+    if os.path.isdir(innerDir):
+        # loop through the files in the directory
+        for dir in os.listdir(innerDir):
+            currDir = f'{innerDir}/{dir}/'
+            for file in os.listdir(currDir):
                 # check filename
                 if file == "energyFile.csv":
                     filename = currDir+file
+                    #print(filename)
                     # read the csv file into a dataframe
                     header = pd.read_csv(filename,sep=',',header=None, nrows=1)
                     # read csv with interface column as string 

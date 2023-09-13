@@ -32,8 +32,8 @@ if clashData:
     clashInputDir = config['clashInputDir']
     clashScript = config['clashScript']
     clashOutputDir = f'{outputDir}/{config["clashOutputDir"]}'
-    wt_cutoff = config['wt_fluor_cutoff']
-    mutant_cutoff = config['mut_fluor_cutoff']
+    wt_cutoff = config['wt_cutoff']
+    mutant_cutoff = config['mutant_cutoff']
     percent_cutoff = config['percent_wt_cutoff'] # as of 2023-9-11 unused; but expect to use in the future
     # below are hardcoded output names from the fluorescenceAnalysis code that as of 2023-9-11 gets used for clashing
     sequenceFile = f'{clashInputDir}/sequence_fluor_energy_data.csv'
@@ -65,8 +65,11 @@ if __name__ == "__main__":
         os.system(execClashCheck)
         # loop through the files in the clashOutputDir
         for filename in os.listdir(clashOutputDir):
+            # check if the file is a csv
+            if not filename.endswith('.csv'):
+                continue
             file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-            execAnalyzeClash = f'python3 {codeDir}/analyzeData.py {clashOutputDir}/{filename} {file_outputDir}' 
+            execAnalyzeClash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir}'
             os.system(execAnalyzeClash)
 
     # analyze the data

@@ -47,7 +47,7 @@ def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, out
     plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
     
     plt.tight_layout()
-    plt.savefig(f'{output_dir}/scatterRegression_{output_title}.png')
+    plt.savefig(f'{output_dir}/scatterRegression_{output_title}_{regression_degree}.png')
     plt.clf()
 
 def addEnergyDifferencesToDataframe(df, cols):
@@ -96,11 +96,13 @@ if __name__ == '__main__':
     outputTitle_list = ['TotalEnergy', 'LowHbond']
 
     for df_tmp,title in zip(df_list, outputTitle_list):
-        plotScatterplot(df_tmp, 'Total', 'PercentGpA', 'PercentStd', title, outputDir, True)
+        plotScatterplot(df_tmp, 'Total', 'PercentGpA', 'PercentStd', 1, title, outputDir, True)
 
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
-        for degree in range(1, 5):
-            plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', degree, f'{sample}_Total', outputDir, False)
+        #for degree in [1,5]:
+        #    print(degree)
+        #    exit(0)
+        plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, False)
 
     #TODO: write a script that will take in the energy file, combine it with the clashing file, and then use this script to plot the data
