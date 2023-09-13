@@ -86,6 +86,16 @@ def calculateStandardDeviation(df_sample, cols, sample):
     output_df['Percent Error'] = output_df['std']/mean
     return output_df
 
+def calculateUncertainty(df_sample, transform_col, gpaFluor):
+    output_df = df_sample.copy()
+    output_df['Error Top'] = output_df[transform_col] + output_df['std']
+    output_df['Error Bottom'] = output_df[transform_col] - output_df['std']
+    output_df['Uncertainty Top'] = output_df['Error Top']/gpaFluor*100
+    output_df['Uncertainty Bottom'] = output_df['Error Bottom']/gpaFluor*100
+    # get the uncertainty by averaging the top and bottom values
+    output_df['Uncertainty'] = (output_df['Uncertainty Top'] + output_df['Uncertainty Bottom'])/2
+    return output_df 
+
 # read in the reconstructed fluorescence dataframe
 reconstructionFile = sys.argv[1]
 controlFlowFile = sys.argv[2]
@@ -152,6 +162,7 @@ for sample in sample_names:
     # get the fluorescence from the index
     gpaFluor, g83iFluor = gpaIndex[transform_col].values[0], g83iIndex[transform_col].values[0]
     df_sample['Percent GpA'] = df_sample[transform_col]/gpaFluor*100 
+    df_sample = calculateUncertainty(df_sample, transform_col, gpaFluor)
     # save the transformed data
     df_sample.to_csv(f'{outputDir}/{sample}_transformed.csv', index=False)
     df_sample = df_sample[df_sample[transform_col] > 0]
