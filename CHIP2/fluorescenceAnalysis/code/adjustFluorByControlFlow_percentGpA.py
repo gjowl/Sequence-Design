@@ -86,14 +86,10 @@ def calculateStandardDeviation(df_sample, cols, sample):
     output_df['Percent Error'] = output_df['std']/mean
     return output_df
 
-def calculateUncertainty(df_sample, transform_col, gpaFluor):
+def calculateUncertainty(df_sample, gpa_error, transform_col, gpaFluor):
     output_df = df_sample.copy()
-    output_df['Error Top'] = output_df[transform_col] + output_df['std']
-    output_df['Error Bottom'] = output_df[transform_col] - output_df['std']
-    output_df['Uncertainty Top'] = output_df['Error Top']/gpaFluor*100
-    output_df['Uncertainty Bottom'] = output_df['Error Bottom']/gpaFluor*100
-    # get the uncertainty by averaging the top and bottom values
-    output_df['Uncertainty'] = (output_df['Uncertainty Top'] + output_df['Uncertainty Bottom'])/2
+    output_df['Uncertainty'] = output_df['Percent Error'] + gpa_error 
+    output_df['std_adjusted'] = output_df['Uncertainty'] * output_df[transform_col]
     return output_df 
 
 # read in the reconstructed fluorescence dataframe
@@ -162,7 +158,10 @@ for sample in sample_names:
     # get the fluorescence from the index
     gpaFluor, g83iFluor = gpaIndex[transform_col].values[0], g83iIndex[transform_col].values[0]
     df_sample['Percent GpA'] = df_sample[transform_col]/gpaFluor*100 
-    df_sample = calculateUncertainty(df_sample, transform_col, gpaFluor)
+    # TODO: fix the calculation of uncertainty; still can't figure out the way to do error propagation with a regression line
+    #gpa_sd = controlFlow_df[controlFlow_df['Sequence'] == gpa]['Sd'].values[0]
+    #gpa_error = gpa_sd/gpaFluor*100
+    #df_sample = calculateUncertainty(df_sample, gpa_error, transform_col, gpaFluor)
     # save the transformed data
     df_sample.to_csv(f'{outputDir}/{sample}_transformed.csv', index=False)
     df_sample = df_sample[df_sample[transform_col] > 0]
