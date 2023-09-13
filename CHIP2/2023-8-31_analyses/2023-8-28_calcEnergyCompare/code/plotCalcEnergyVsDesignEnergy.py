@@ -14,12 +14,14 @@ def plotScatterplot(df, xAxis, yAxis, outputTitle):
     plt.savefig(f'{outputDir}/scatter_{outputTitle}.png')
 
     # add a line of best fit and an r^2 value
-    m, b = np.polyfit(df[xAxis], df[yAxis], 1)
-    plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
+    #m, b = np.polyfit(df[xAxis], df[yAxis], 1)
+    #plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
+    # plot the 1:1 line
+    plt.plot(df[xAxis], df[xAxis], color='black')
 
     # add the r^2 value to the top left of the plot
-    r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
-    plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+    #r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
+    #plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
     plt.savefig(f'{outputDir}/scatterRegression_{outputTitle}.png')
     plt.clf()
 
@@ -32,7 +34,12 @@ os.makedirs(outputDir, exist_ok=True)
 
 # read in the data files
 calcEnergy_df = pd.read_csv(calcEnergyFile)
+calcEnergy_df.rename(columns={'Geometry': 'Sequence'}, inplace=True)
+calcEnergy_df['Sequence'] = calcEnergy_df['Sequence'].apply(lambda x: x[3:-5])
 designEnergy_df = pd.read_csv(designEnergyFile)
+designEnergy_df = designEnergy_df[['Sequence','Total']]
+designEnergy_df['Sequence'] = designEnergy_df['Sequence'].apply(lambda x: x[3:-3])
+designEnergy_df.rename(columns={'Total': 'Design_Total'}, inplace=True)
 
 # merge the dataframes
 df = calcEnergy_df.merge(designEnergy_df, on='Sequence', how='left')
@@ -42,6 +49,8 @@ df = df.sort_values(by=['Total'], ascending=False)
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
 # drop nan values
 df = df.dropna(subset=['Design_Total'])
+df = df[df['Total'] < 0]
+print(df)
 
 xAxis = 'Total'
 yAxis = 'Design_Total'
