@@ -22,8 +22,8 @@ Date      	By	Comments
 import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
 from scipy import stats
 
-def plot_and_transform(df_control_plot, df_sample, xaxis, cols, sample, outputDir):
-    output_df = df_sample.copy()
+def plot_and_transform(df_control_plot, input_df, xaxis, cols, sample, outputDir):
+    output_df = input_df.copy()
     for col in cols:
         yaxis = df_control_plot[col]
         plt.scatter(xaxis, yaxis)
@@ -73,23 +73,23 @@ def plot_and_get_regression(df_control_plot, xaxis_col, yaxis_col, sample):
     plt.clf()
     return m, b
 
-def transform_data(df_sample, transform_col, sample, slope, y_intercept, col, output_df):
-    output_df = df_sample.copy()
+def transform_data(input_df, transform_col, sample, slope, y_intercept, col, output_df):
+    output_df = input_df.copy()
     # transform the reconstruction data
     tmp_col = ((output_df[col] - y_intercept) / slope)
     # add col to a new column in the reconstruction dataframe
     output_df[transform_col] = tmp_col
     return output_df
     
-def calculateStandardDeviation(df_sample, cols, sample):
-    output_df = df_sample.copy()
-    output_df['std'] = df_sample[cols].std(axis=1)
+def calculateStandardDeviation(input_df, cols, sample):
+    output_df = input_df.copy()
+    output_df['std'] = input_df[cols].std(axis=1)
     mean = output_df[cols].mean(axis=1)
     output_df['Percent Error'] = output_df['std']/mean
     return output_df
 
-def calculateUncertainty(df_sample, gpa_error, transform_col, gpaFluor):
-    output_df = df_sample.copy()
+def calculateUncertainty(input_df, gpa_error, transform_col, gpaFluor):
+    output_df = input_df.copy()
     output_df['Uncertainty'] = output_df['Percent Error'] + gpa_error 
     output_df['std_adjusted'] = output_df['Uncertainty'] * output_df[transform_col]
     return output_df 
@@ -177,6 +177,15 @@ for sample in sample_names:
     df_sample_g83i = df_sample[df_sample[transform_col] > g83iFluor]
     # save the filtered data
     df_sample_g83i.to_csv(f'{outputDir}/{sample}_g83i_filtered.csv', index=False)
+    # transform each column by the slope and y-intercept
+    df_test = df_sample[cols].copy()
+    print(df_test)
+    # TODO: Do I have to transform each replicate individually? I think I likely do, as some of the values I'm getting are negative/very different for many proteins
+    for col in df_test.columns:
+        print(col)
+        test_col = f'{col}_transformed'
+        df_test = transform_data(df_test, test_col, sample, slope, yint, col, output_df)
+    print(df_test)
     # calculate percent error using error propagation
     # https://stats.stackexchange.com/questions/186844/error-propagation-in-a-linear-model
     slope_err, intercept_err = get_regression_stats(df_sample[xaxis], df_sample[yaxis])
