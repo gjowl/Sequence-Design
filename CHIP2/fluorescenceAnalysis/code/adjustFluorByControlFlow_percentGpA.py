@@ -180,7 +180,8 @@ for sample in sample_names:
     # transform each column by the slope and y-intercept
     df_test = df_sample[cols].copy()
     print(df_test)
-    # TODO: Do I have to transform each replicate individually? I think I likely do, as some of the values I'm getting are negative/very different for many proteins
+    # TODO: Do I have to transform each replicate individually? I think I likely do, as some of the values 
+    # I'm getting are negative/very different for many proteins, despite fluorescence being within 2000
     for col in df_test.columns:
         print(col)
         test_col = f'{col}_transformed'
