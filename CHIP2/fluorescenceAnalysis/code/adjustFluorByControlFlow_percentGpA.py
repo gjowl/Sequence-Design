@@ -20,6 +20,7 @@ Date      	By	Comments
 '''
 
 import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
+from scipy import stats
 
 def plot_and_transform(df_control_plot, df_sample, xaxis, cols, sample, outputDir):
     output_df = df_sample.copy()
@@ -52,6 +53,7 @@ def plot_and_get_regression(df_control_plot, xaxis_col, yaxis_col, sample):
     # plot the line of best fit
     m, b = np.polyfit(xaxis, yaxis, 1)
     plt.plot(xaxis, m*xaxis + b)
+    
     # plot the standard deviation for each point
     std_x = df_control_plot['Sd']
     std_y = df_control_plot['std']
@@ -92,6 +94,13 @@ def calculateUncertainty(df_sample, gpa_error, transform_col, gpaFluor):
     output_df['std_adjusted'] = output_df['Uncertainty'] * output_df[transform_col]
     return output_df 
 
+# get the err of the slope and intercept
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.linregress.html
+def get_regression_stats(xaxis, yaxis):
+    result = stats.linregress(xaxis, yaxis)
+    slope, intercept, r_value, p_value, slope_err, intercept_err = result.slope, result.intercept, result.rvalue, result.pvalue, result.stderr, result.intercept_stderr
+    return slope_err, intercept_err
+
 # read in the reconstructed fluorescence dataframe
 reconstructionFile = sys.argv[1]
 controlFlowFile = sys.argv[2]
@@ -106,7 +115,6 @@ noTM_fluor = 12429.6644
 subtract_noTM = False 
 #subtract_noTM = False 
 #TODO: the subtraction of the noTM fluor works, but it leads to some negative values. Maybe I should just add it to the fitting line as a control fluor?
-
 os.makedirs(outputDir, exist_ok=True)
 
 #xaxis = 'Flow Mean'
@@ -159,8 +167,8 @@ for sample in sample_names:
     gpaFluor, g83iFluor = gpaIndex[transform_col].values[0], g83iIndex[transform_col].values[0]
     df_sample['Percent GpA'] = df_sample[transform_col]/gpaFluor*100 
     # TODO: fix the calculation of uncertainty; still can't figure out the way to do error propagation with a regression line
-    #gpa_sd = controlFlow_df[controlFlow_df['Sequence'] == gpa]['Sd'].values[0]
-    #gpa_error = gpa_sd/gpaFluor*100
+    gpa_sd = controlFlow_df[controlFlow_df['Sequence'] == gpa]['Sd'].values[0]
+    gpa_error = gpa_sd/gpaFluor
     #df_sample = calculateUncertainty(df_sample, gpa_error, transform_col, gpaFluor)
     # save the transformed data
     df_sample.to_csv(f'{outputDir}/{sample}_transformed.csv', index=False)
@@ -169,6 +177,13 @@ for sample in sample_names:
     df_sample_g83i = df_sample[df_sample[transform_col] > g83iFluor]
     # save the filtered data
     df_sample_g83i.to_csv(f'{outputDir}/{sample}_g83i_filtered.csv', index=False)
+    # calculate percent error using error propagation
+    # https://stats.stackexchange.com/questions/186844/error-propagation-in-a-linear-model
+    slope_err, intercept_err = get_regression_stats(df_sample[xaxis], df_sample[yaxis])
+    slope_err = slope_err/gpaFluor
+    intercept_err = intercept_err/gpaFluor
+    x_err = slope_err + intercept_err + gpa_error
+    df_sample['Percent Error'] = df_sample['Percent Error'] + x_err
     # add the sample to the output dataframe
     output_df = pd.concat([output_df, df_sample])
     # add in a way to add a standard error? Should I try to calculate standard error for each sequence by using the count of sequences from the flow data? Would that give my values more weight?
