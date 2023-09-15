@@ -45,9 +45,13 @@ Methods
     - Design algorithm
         - MSL design input the geometry
         - Search for sequences (subset of AAs, based on membrane proteins like Rosetta, etc.)
+        - define the sequence entropy term (membrane sequence similarity score)
+        - monomeric baseline for monte carlo: can't recalculate energy of new sequence everytime, so estimate it
+            - add in the details here; baseline vs monomer graph; I have baseline terms for my current designs that compare well to monomer
         - Move backbone for sequence and calculate energy
             - Do I need to describe the energy function in more detail here?
             - Explain the membrane sequence energy function that we made
+        - maybe a dataset of how energy was improved by backbone optimization (both in design algorithm, then in pdbBBRepack script)
     - Westerns
     - Sort Seq and Fluorescence reconstruction
     - Maltose test
@@ -57,3 +61,8 @@ Methods
             - clash: energy; are there backbone movements?
                 - is there any way to justify this for membrane proteins? Could we compare to natural sequences with similar geometries?
             - void: SASA; are there backbone movements? (if this data gets used)
+    - TODOs:
+        - for any bar graphs, show the raw data points and the median
+        - some sort of video of how the design algorithm works
+        - look at how optimization affected each energy term as a whole (did vdW in particular get better?)
+        - if going to post this raw data anywhere, make sure to describe what each of the columns is
