@@ -21,4 +21,17 @@ for design in df['Sample'].unique():
     # TODO: below train the model on the x and y axis
     model = LinearRegression().fit(x, y)
 
+    # the below I got from: https://www.geeksforgeeks.org/python-linear-regression-using-sklearn/#
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=0)
 
+    regr = LinearRegression()
+
+    regr.fit(X_train, y_train)
+    print(regr.score(X_test, y_test))
+
+    y_pred = regr.predict(X_test)
+    plt.scatter(X_test, y_test, color='black')
+    plt.plot(X_test, y_pred, color='blue', linewidth=3)
+
+    # TODO: I also have a script from a year ago in clusterAnalysis/code/linearRegression.py; could look at that for more detail and can't remember if it worked?
+    # that same directory also has some clustering code, and now with actual experimental data, could be used to cluster for meaningful data?
