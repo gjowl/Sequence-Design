@@ -9,7 +9,7 @@ outputDir = sys.argv[2]
 df = pd.read_csv(dataFile)
 
 # hardcoded: choose which columns to use for the regression
-xAxis = 'Percent GpA'
+xAxis = 'PercentGpA'
 yAxis = 'Total'
 
 # loop through the design types
@@ -33,5 +33,7 @@ for design in df['Sample'].unique():
     plt.scatter(X_test, y_test, color='black')
     plt.plot(X_test, y_pred, color='blue', linewidth=3)
 
+    # save the plot
+    plt.savefig(f'{outputDir}/{design}.png')
     # TODO: I also have a script from a year ago in clusterAnalysis/code/linearRegression.py; could look at that for more detail and can't remember if it worked?
     # that same directory also has some clustering code, and now with actual experimental data, could be used to cluster for meaningful data?
