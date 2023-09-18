@@ -48,7 +48,7 @@ for design in df['Sample'].unique():
         model = LinearRegression().fit(x, y)
 
         # the below I got from: https://www.geeksforgeeks.org/python-linear-regression-using-sklearn/#
-        X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.75, random_state=0)
+        X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=0)
 
         regr = LinearRegression()
 
@@ -58,6 +58,9 @@ for design in df['Sample'].unique():
         y_pred = regr.predict(X_test)
         plt.scatter(X_test, y_test, color='black')
         plt.plot(X_test, y_pred, color='blue', linewidth=3)
+        plt.xlabel(xAx)
+        plt.ylabel(yAxis)
+        plt.title(label=f'{design} {xAx} vs {yAxis}')
 
         # save the plot
         plt.savefig(f'{outputDir}/{design}_{xAx}.png')
@@ -76,6 +79,7 @@ for design in df['Sample'].unique():
     x = input_df[xAxis]
     y = input_df[yAxis]
 
+    # with sklearn
     regr = LinearRegression()
     regr.fit(x, y)
 
@@ -90,3 +94,7 @@ for design in df['Sample'].unique():
     
     print_model = model.summary()
     print(print_model)
+
+    # TODO: the above works for a single model, but I think I would want to train multiple models and then compare them?
+    # This might allow me to start to do that: https://www.techwithtim.net/tutorials/machine-learning-python/saving-models
+    # And this has some code to visualize predicted vs actual: https://www.kdnuggets.com/2019/03/beginners-guide-linear-regression-python-scikit-learn.html
