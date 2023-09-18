@@ -57,3 +57,4 @@ for design in df['Sample'].unique():
     print("MAE:",mae)
     print("MSE:",mse)
     print("RMSE:",rmse)
+    # TODO: use this to get weights: https://datatofish.com/multiple-linear-regression-python/
