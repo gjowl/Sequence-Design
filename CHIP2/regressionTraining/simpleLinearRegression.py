@@ -5,78 +5,44 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error,mean_squared_error
 import statsmodels.api as sm
  
+def singleRegressionTraining(df, design, xAxis, yAxis):
+    input_df = df[df['Sample'] == design]
+    # get the x and y values
+    x = input_df[xAxis].values.reshape(-1,1)
+    y = input_df[yAxis].values.reshape(-1,1)
 
-# read in command line arguments
-dataFile = sys.argv[1]
-outputDir = sys.argv[2]
+    # train the model
+    model = LinearRegression().fit(x, y)
 
-os.makedirs(name=outputDir, exist_ok=True)
-# read in the data file
-df = pd.read_csv(dataFile)
+    # the below I got from: https://www.geeksforgeeks.org/python-linear-regression-using-sklearn/#
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=0)
+    regr = LinearRegression()
+    regr.fit(X_train, y_train)
+    print("Regression Score:", regr.score(X_test, y_test))
 
-# get the differences in energy
-cols = ['HBOND', 'VDW', 'IMM1']
-for col in cols:
-    df[f'{col}Diff'] = df[f'{col}DimerOptimize'] - df[f'{col}Monomer']
+    # plot the data
+    y_pred = regr.predict(X_test)
+    plt.scatter(X_test, y_test, color='black')
+    plt.plot(X_test, y_pred, color='blue', linewidth=3)
+    plt.xlabel(xAxis)
+    plt.ylabel(yAxis)
+    plt.title(label=f'{design} {xAxis} vs {yAxis}')
 
-#TODO: I think that this script is getting complex; simplify it
-# hardcoded: getting rid of outliers in vdw
-df = df[df['VDWDiff'] < 0]
-df = df[df['VDWDiff'] > -60]
+    # save the plot and close
+    plt.savefig(f'{outputDir}/{design}_{xAxis}.png')
+    plt.clf()
 
-# hardcoded: choose which columns to use for the regression
-xAxis = ['HBONDDiff', 'VDWDiff', 'IMM1Diff']
-yAxis = 'PercentGpA'
+    #squared True returns MSE value, False returns RMSE value.
+    mae = mean_absolute_error(y_true=y_test,y_pred=y_pred)
+    mse = mean_squared_error(y_true=y_test,y_pred=y_pred) #default=True
+    rmse = mean_squared_error(y_true=y_test,y_pred=y_pred,squared=False)
+    print("MAE:",mae)
+    print("MSE:",mse)
+    print("RMSE:",rmse)
 
-# remove any rows where sample is NA
-df = df[df['Sample'].notna()]
-df = df[df[yAxis] < 1.4]
-#df = df[df[xAxis] < 2]
-#df = df[df[yAxis] > 0.35]
-df.to_csv(f'{outputDir}/data.csv', index=False)
-
-# loop through the design types
-for design in df['Sample'].unique():
-    for xAx in xAxis:
-        input_df = df[df['Sample'] == design]
-        # get the x and y values
-        #x = input_df[xAxis].values.reshape(-1,1)
-        #y = input_df[yAxis].values.reshape(-1,1)
-        x = input_df[xAx].values.reshape(-1,1)
-        y = input_df[yAxis].values.reshape(-1,1)
-        # TODO: below train the model on the x and y axis
-        model = LinearRegression().fit(x, y)
-
-        # the below I got from: https://www.geeksforgeeks.org/python-linear-regression-using-sklearn/#
-        X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.30, random_state=0)
-
-        regr = LinearRegression()
-
-        regr.fit(X_train, y_train)
-        print(regr.score(X_test, y_test))
-
-        y_pred = regr.predict(X_test)
-        plt.scatter(X_test, y_test, color='black')
-        plt.plot(X_test, y_pred, color='blue', linewidth=3)
-        plt.xlabel(xAx)
-        plt.ylabel(yAxis)
-        plt.title(label=f'{design} {xAx} vs {yAxis}')
-
-        # save the plot
-        plt.savefig(f'{outputDir}/{design}_{xAx}.png')
-        plt.clf()
-        # TODO: I also have a script from a year ago in clusterAnalysis/code/linearRegression.py; could look at that for more detail and can't remember if it worked?
-        # that same directory also has some clustering code, and now with actual experimental data, could be used to cluster for meaningful data?
-
-        #squared True returns MSE value, False returns RMSE value.
-        mae = mean_absolute_error(y_true=y_test,y_pred=y_pred)
-        mse = mean_squared_error(y_true=y_test,y_pred=y_pred) #default=True
-        rmse = mean_squared_error(y_true=y_test,y_pred=y_pred,squared=False)
-        print("MAE:",mae)
-        print("MSE:",mse)
-        print("RMSE:",rmse)
-    # TODO: use this to get weights: https://datatofish.com/multiple-linear-regression-python/
-    x = input_df[xAxis]
+# from https://datatofish.com/multiple-linear-regression-python/ as a way to get weights for the regression on multiple variables
+def weightedRegressionTraining(df, design, xAxes, yAxis):
+    x = input_df[xAxes]
     y = input_df[yAxis]
 
     # with sklearn
@@ -94,7 +60,39 @@ for design in df['Sample'].unique():
     
     print_model = model.summary()
     print(print_model)
+# read in command line arguments
+dataFile = sys.argv[1]
+outputDir = sys.argv[2]
+
+os.makedirs(name=outputDir, exist_ok=True)
+
+# read in the data file
+df = pd.read_csv(dataFile)
+
+
+
+# hardcoded: choose which columns to use for the regression
+xAxes = ['HBONDDiff', 'VDWDiff', 'IMM1Diff']
+yAxis = 'PercentGpA'
+
+# remove any rows where sample is NA
+df = df[df['Sample'].notna()]
+# hardcoded: getting rid of possible outliers
+df = df[df[yAxis] < 1.4]
+df.to_csv(f'{outputDir}/data.csv', index=False)
+df = df[df['VDWDiff'] < 0]
+df = df[df['VDWDiff'] > -60]
+
+# loop through the design types
+for design in df['Sample'].unique():
+    for xAxis in xAxes:
+        singleRegressionTraining(df, design, xAxis, yAxis)
+    weightedRegressionTraining(df, design, xAxes, yAxis)
 
     # TODO: the above works for a single model, but I think I would want to train multiple models and then compare them?
     # This might allow me to start to do that: https://www.techwithtim.net/tutorials/machine-learning-python/saving-models
     # And this has some code to visualize predicted vs actual: https://www.kdnuggets.com/2019/03/beginners-guide-linear-regression-python-scikit-learn.html
+    # also if wanting to test multiple regressions, the lower root mean squared error is better so could use that to evaluate
+    # TODO: it seems that people return models; possibly to do something with them after? or to call their scores?:
+    # https://saturncloud.io/blog/how-to-train-a-model-twice-multiple-times-in-scikitlearn-using-fit/
+    # TODO: these graphs look helpful: https://www.scribbr.com/statistics/simple-linear-regression/
