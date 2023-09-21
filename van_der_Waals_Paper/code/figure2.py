@@ -45,18 +45,19 @@ def plotPieChart(input_df, sample, output_dir):
     plt.tight_layout()
     plt.clf()
 
-def plotPercentSeqs(df_wt, df_mutant, col, output_dir):
+def plotPercentSeqs(input_df, col, output_dir):
     sns.set_style("whitegrid")
-    sns.barplot(x="Sample", y=col, hue="Type",data=df_wt, color='green')
-    sns.swarmplot(x="Sample", y=col, hue="Type", data=df_wt, color='0')
+    sns.boxplot(x="Sample", y=col, hue="Type",data=input_df, color='green')
+    sns.swarmplot(x="Sample", y=col, hue="Type", data=input_df, color='0', dodge=True, size=1)
+    plt.xlabel('Sample')
+    plt.ylabel('Percent GpA')
     plt.tight_layout()
     plt.savefig(f'{output_dir}/percentSeqs.png')
     plt.clf()
 
 # read in the command line arguments
-wtFile = sys.argv[1]
-mutantFile = sys.argv[2]
-kdeFile = sys.argv[3]
+inputFile = sys.argv[1]
+kdeFile = sys.argv[2]
 outputDir = "figure2"
 os.makedirs(outputDir, exist_ok=True)
 # TODO: combine the wt and mutant dataframes into one dataframe before running this script; makes it easier to plot the data
@@ -66,15 +67,13 @@ monomerPercentGpA = 0.40
 col = "PercentGpA_transformed"
 
 # read in the data
-df_wt = pd.read_csv(wtFile, sep=',')
-df_mutant = pd.read_csv(mutantFile, sep=',')
-df_wt = df_wt[df_wt[col] < 2]
-df_mutant = df_mutant[df_mutant[col] < 2]
+df = pd.read_csv(inputFile, sep=',')
+df = df[df[col] < 2]
 
 # loop through the different samples
-for sample in df_wt['Sample'].unique():
+for sample in df['Sample'].unique():
     # get the data for the sample
-    df_sample = df_wt[df_wt['Sample'] == sample]
+    df_sample = df[df['Sample'] == sample]
     # make the pie chart
     pieDir = f'{outputDir}/pieCharts'
     os.makedirs(pieDir, exist_ok=True)
@@ -83,5 +82,8 @@ for sample in df_wt['Sample'].unique():
 # make the percentage seqs plot
 percentSeqsDir = f'{outputDir}/percentSeqs'
 os.makedirs(percentSeqsDir, exist_ok=True)
-plotPercentSeqs(df_wt, df_mutant, col, percentSeqsDir)
+plotPercentSeqs(df, col, percentSeqsDir)
 # make the fluor vs Geometry plot
+fluorVsGeometryDir = f'{outputDir}/fluorVsGeometry'
+os.makedirs(fluorVsGeometryDir, exist_ok=True)
+plotFluorVsGeometry(df, col, fluorVsGeometryDir)
