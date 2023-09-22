@@ -35,7 +35,7 @@ def plotPieChart(input_df, sample, output_dir):
     fig, ax = plt.subplots()
     ax.pie(sizes, colors=pieColors, autopct='%1.1f%%', startangle=90)
     patches, texts, auto = ax.pie(sizes, colors=pieColors, autopct='%1.1f%%', startangle=90)
-    plt.legend(patches, labels, loc="best")
+    #plt.legend(patches, labels, loc="best")
     plt.axis('equal')
     plt.title(f'{sample} design sequences')
     plt.savefig(f'{output_dir}/{sample}_designPieChart.png')
@@ -49,21 +49,34 @@ def plotPercentSeqs(input_df, col, output_dir):
     sns.set_style("whitegrid")
     sns.boxplot(x="Sample", y=col, hue="Type",data=input_df, color='green')
     sns.swarmplot(x="Sample", y=col, hue="Type", data=input_df, color='0', dodge=True, size=1)
+    # remove the legend
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
     plt.xlabel('Sample')
     plt.ylabel('Percent GpA')
     plt.tight_layout()
     plt.savefig(f'{output_dir}/percentSeqs.png')
     plt.clf()
 
+#def plotFluorBarGraph(input_df, col, output_dir):
+#    sns.set_style("whitegrid")
+#    sns.barplot(x="Sample", y=col, hue="Type", data=input_df, color='green')
+#    # remove the legend
+#    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+#    plt.xlabel('Sample')
+#    plt.ylabel('Percent GpA')
+#    plt.tight_layout()
+#    plt.savefig(f'{output_dir}/percentSeqs.png')
+#    plt.clf()
+
 # read in the command line arguments
 inputFile = sys.argv[1]
-kdeFile = sys.argv[2]
+#kdeFile = sys.argv[2]
 outputDir = "figure2"
 os.makedirs(outputDir, exist_ok=True)
 # TODO: combine the wt and mutant dataframes into one dataframe before running this script; makes it easier to plot the data
 
 # hardcoded monomer percent GpA (TOXGREEN G83I is 25%) 
-monomerPercentGpA = 0.40
+monomerPercentGpA = 0.35
 col = "PercentGpA_transformed"
 
 # read in the data
@@ -79,11 +92,17 @@ for sample in df['Sample'].unique():
     os.makedirs(pieDir, exist_ok=True)
     makePieChart(df_sample, col, pieDir)
 
+# make bar graph for number of sequences with fluorescence
+fluorDir = f'{outputDir}/fluorBarGraphs'
+os.makedirs(fluorDir, exist_ok=True)
+plotFluorBarGraph(df, col, fluorDir)
+
 # make the percentage seqs plot
 percentSeqsDir = f'{outputDir}/percentSeqs'
 os.makedirs(percentSeqsDir, exist_ok=True)
 plotPercentSeqs(df, col, percentSeqsDir)
-# make the fluor vs Geometry plot
-fluorVsGeometryDir = f'{outputDir}/fluorVsGeometry'
-os.makedirs(fluorVsGeometryDir, exist_ok=True)
-plotFluorVsGeometry(df, col, fluorVsGeometryDir)
+
+## make the fluor vs Geometry plot
+#fluorVsGeometryDir = f'{outputDir}/fluorVsGeometry'
+#os.makedirs(fluorVsGeometryDir, exist_ok=True)
+#plotFluorVsGeometry(df, col, fluorVsGeometryDir)

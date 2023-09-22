@@ -68,6 +68,10 @@ if __name__ == '__main__':
     # only keep sequences with the lowest total energy
     df = df.sort_values(by=['Total'], ascending=True)
     df = df.drop_duplicates(subset=['Sequence'], keep='first')
+    # move the sequence column to the front of the dataframe
+    cols = df.columns.tolist()
+    cols.insert(0, cols.pop(cols.index('Sequence')))
+    df.to_csv(f'{outputDir}/lowestEnergySequences.csv', index=False)
 
     # rid of any sequences where the PercentStd > 10
     df = df[df['PercentStd'] < percentStdCutoff]
