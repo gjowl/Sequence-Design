@@ -40,11 +40,16 @@ cwd = os.getcwd()
 # get the csv file from the command line
 inputFile = sys.argv[1]
 
+# get the input file name without the extension or path
+inputFilename = os.path.splitext(os.path.basename(inputFile))[0]
+
 # read in csv as a dataframe
 df = pd.read_csv(inputFile, sep=',', header=0)
 
 # convert toxgreen to toxcat
-df['toxcat'] = greenToCatFunction(df['PercentGpA']*100)
+col = 'PercentGpA_transformed'
+std_col = 'std_adjusted'
+df['toxcat'] = greenToCatFunction(df[col]*100)
 print(df)
 
 # convert toxcat to fraction dimer
@@ -63,7 +68,7 @@ T = 310 # K
 df['deltaG'] = np.log(df['Kd']) * R * T
 
 # get the standard deviation of the deltaG
-df['PercentError'] = df['PercentStd'] / df['PercentGpA']
+df['PercentError'] = df[std_col] / df[col]
 df['std_deltaG'] = abs(df['deltaG'] * df['PercentError'])
 
 # only keep the best energy sequence for each sequence
@@ -74,4 +79,4 @@ df = df.drop_duplicates(subset=['Sequence'], keep='first')
 df = df.dropna()
 
 # output the df to a csv file
-df.to_csv(cwd+'/test.csv', sep=',')
+df.to_csv(f'{cwd}/{inputFilename}.csv', sep=',')

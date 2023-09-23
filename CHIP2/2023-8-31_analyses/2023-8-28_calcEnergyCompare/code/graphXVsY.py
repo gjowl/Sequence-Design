@@ -23,8 +23,7 @@ def graphXVsY(input_df, output_file, x_col, y_col, error_col, output_dir):
 
 # get command line arguments
 inputFile = sys.argv[1]
-outputFile = sys.argv[2]
-outputDir = sys.argv[3]
+outputDir = sys.argv[2]
 
 os.makedirs(name=outputDir, exist_ok=True)
 
@@ -32,11 +31,14 @@ os.makedirs(name=outputDir, exist_ok=True)
 df_input = pd.read_csv(inputFile)
 
 # graph the data
-xaxis = 'Total'
+xaxes = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff']
 #yaxis = 'PercentGpA'
 #error_col = 'PercentStd'
 yaxis = 'deltaG'
 error_col = 'std_deltaG'
+regression_degree = 1
 
 #graphXVsY(df_input, outputFile, xaxis, yaxis, error_col, outputDir)
-plotScatterplot(df_input, xaxis, yaxis, error_col, outputFile, outputDir, True)
+for xaxis in xaxes:
+    outputFile = f'{xaxis}_vs_{yaxis}'
+    plotScatterplot(df_input, xaxis, yaxis, error_col, regression_degree, outputFile, outputDir, True)

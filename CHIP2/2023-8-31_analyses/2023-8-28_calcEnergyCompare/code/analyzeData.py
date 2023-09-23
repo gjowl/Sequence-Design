@@ -62,7 +62,6 @@ if __name__ == '__main__':
 
     # get the output directory
     outputDir = sys.argv[2]
-
     percentStdCutoff = 15
 
     # only keep sequences with the lowest total energy
@@ -77,6 +76,7 @@ if __name__ == '__main__':
     df = df[df['PercentStd'] < percentStdCutoff]
     df = df[df['PercentGpA'] < 3]
     df = df[df['Total'] < 0]
+    df.to_csv(f'{outputDir}/lowestEnergySequences_filtered.csv', index=False)
 
     # TESTS
     #df = df[df['PercentGpA'] > 0.50]
