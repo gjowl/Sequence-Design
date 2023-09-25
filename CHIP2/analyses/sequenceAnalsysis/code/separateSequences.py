@@ -1,4 +1,6 @@
 import os, sys, pandas as pd, matplotlib.pyplot as plt, numpy as np
+import seaborn as sns
+from scipy.stats import pearsonr
 
 def getAADistances(input_df, aas):
     output_df = pd.DataFrame()
@@ -42,71 +44,119 @@ def printPercentGpA(df):
     minGpA = df_short['PercentGpA'].min()
     print(f'Min percent GpA: {minGpA}')
 
+def splitByAAs(df, aas, aa_type):
+    df_aas = df[df['Sequence'].str.contains('|'.join(aas))]
+    df_nonaas = df[~df['Sequence'].str.contains('|'.join(aas))]
+    df_aas['NumTypeAAs'] = df_aas['Sequence'].apply(lambda x: len([aa for aa in x if aa in aas]))
+    df_nonaas['NumTypeAAs'] = 0
+    df_distance = getAADistances(df_aas, aas)
+    print('ShortestDistance')
+    df = pd.DataFrame()
+    for dist in df_distance['ShortestDistance'].unique():
+        df_tmp = df_distance[df_distance['ShortestDistance'] == dist]
+        df = pd.concat([df, df_tmp])
+    print(aa_type)
+    printPercentGpA(df)
+    #pval = calculate_pvalues(df_distance[['NumTypeAAs', 'PercentGpA']])
+    #print(pval)
+    # plot the average percent GpA for each number of hbond aas
+    for num in df_distance['NumTypeAAs'].unique():
+        print(num, len(df_distance[df_distance['NumTypeAAs'] == num]))
+    plt.figure()
+    sns.set_style("whitegrid")
+    sns.boxplot(x="NumTypeAAs", y="PercentGpA", hue="Type", data=df_distance, color='green')
+    sns.swarmplot(x="NumTypeAAs", y="PercentGpA", hue="Type", data=df_distance, color='0', dodge=True, size=1)
+    plt.xlabel('Number of amino acids')
+    plt.ylabel('Percent GpA')
+    plt.tight_layout()
+    plt.savefig(f'{outputDir}/{aa_type}_percentGpA.png')
+    plt.clf()
+
+def calculate_pvalues(df):
+    dfcols = pd.DataFrame(columns=df.columns)
+    pvalues = dfcols.transpose().join(dfcols, how='outer')
+    for r in df.columns:
+        for c in df.columns:
+            tmp = df[df[r].notnull() & df[c].notnull()]
+            pvalues[r][c] = round(pearsonr(tmp[r], tmp[c])[1], 4)
+    return pvalues
+
 # read command line arguments
 sequenceFile = sys.argv[1]
 outputDir = sys.argv[2]
 os.makedirs(outputDir, exist_ok=True)
 
-# read in the data files
-df_sequence = pd.read_csv(sequenceFile)
+# read in the data file
+df = pd.read_csv(sequenceFile)
+df = df[df['PercentGpA'] < 2]
+df = df[df['Sample'] != 'G']
 
 # sequence division
-hbond_aas = ['S', 'T', 'G']
+hbond_aas = ['S', 'T']
 ring_aas = ['W', 'Y', 'F']
 
-# keep only the sequences with the desired amino acids
-df_hbond = df_sequence[df_sequence['Sequence'].str.contains('|'.join(hbond_aas))]
-df_ring = df_sequence[df_sequence['Sequence'].str.contains('|'.join(ring_aas))]
-df_nonhbond = df_sequence[~df_sequence['Sequence'].str.contains('|'.join(hbond_aas))]
-df_nonring = df_sequence[~df_sequence['Sequence'].str.contains('|'.join(ring_aas))]
+# split the data by hbond aas
+df_hbond = splitByAAs(df, hbond_aas, 'HBond')
+df_ring = splitByAAs(df, ring_aas, 'Ring')
 
-# add labels
-df_hbond['Type'] = 'HBond'
-df_ring['Type'] = 'Ring'
-df_nonhbond['Type'] = 'Rest'
-df_nonring['Type'] = 'Rest'
+## keep only the sequences with the desired amino acids
+#df_hbond = df_sequence[df_sequence['Sequence'].str.contains('|'.join(hbond_aas))]
+#df_ring = df_sequence[df_sequence['Sequence'].str.contains('|'.join(ring_aas))]
+#df_nonhbond = df_sequence[~df_sequence['Sequence'].str.contains('|'.join(hbond_aas))]
+#df_nonring = df_sequence[~df_sequence['Sequence'].str.contains('|'.join(ring_aas))]
+#print('hbond:', len(df_hbond))
+#print('ring:', len(df_ring))
+#print('nonhbond:', len(df_nonhbond))
+#print('nonring:', len(df_nonring))
+#print(df_nonhbond)
+#
+## add labels
+#df_hbond['Type'] = 'HBond'
+#df_ring['Type'] = 'Ring'
+#df_nonhbond['Type'] = 'Rest'
+#df_nonring['Type'] = 'Rest'
+#
+## separate sequences by number of hbond aas
+#df_hbond['NumTypeAAs'] = df_hbond['Sequence'].apply(lambda x: len([aa for aa in x if aa in hbond_aas]))
+#df_ring['NumTypeAAs'] = df_ring['Sequence'].apply(lambda x: len([aa for aa in x if aa in ring_aas]))
+#
+#output_df = getAADistances(df_hbond, hbond_aas)
+#print('ShortestDistance')
+#df = pd.DataFrame()
+#for dist in output_df['ShortestDistance'].unique():
+#    df_tmp = output_df[output_df['ShortestDistance'] == dist]
+#    #print(dist, len(df_tmp))
+#    #outputFile = f'numHBondAAs{dist}'
+#    #df_tmp.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
+#    df = pd.concat([df, df_tmp])
+#
+## remove all sequences with G
+#df = df[~df['Sequence'].str.contains('G')]
+#print('HBond')
+#printPercentGpA(df)
+#for num in df_hbond['NumTypeAAs'].unique():
+#    df_tmp = df_hbond[df_hbond['NumTypeAAs'] == num]
+#    # get the average percent GpA
+#    averageGpA = df_tmp['PercentGpA'].mean()
+#    print(num, len(df_tmp), averageGpA)
 
-# separate sequences by number of hbond aas
-df_hbond['NumTypeAAs'] = df_hbond['Sequence'].apply(lambda x: len([aa for aa in x if aa in hbond_aas]))
-df_ring['NumTypeAAs'] = df_ring['Sequence'].apply(lambda x: len([aa for aa in x if aa in ring_aas]))
-
-output_df = getAADistances(df_hbond, hbond_aas)
-print('ShortestDistance')
-df = pd.DataFrame()
-for dist in output_df['ShortestDistance'].unique():
-    df_tmp = output_df[output_df['ShortestDistance'] == dist]
-    #print(dist, len(df_tmp))
-    #outputFile = f'numHBondAAs{dist}'
-    #df_tmp.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
-    df = pd.concat([df, df_tmp])
-
-# remove all sequences with G
-df = df[~df['Sequence'].str.contains('G')]
-print('HBond')
-printPercentGpA(df)
-for num in df_hbond['NumTypeAAs'].unique():
-    df_tmp = df_hbond[df_hbond['NumTypeAAs'] == num]
-    # get the average percent GpA
-    averageGpA = df_tmp['PercentGpA'].mean()
-    print(num, len(df_tmp), averageGpA)
-
-output_df = getAADistances(df_ring, ring_aas)
-df = pd.DataFrame()
-for dist in output_df['ShortestDistance'].unique():
-    df_tmp = output_df[output_df['ShortestDistance'] == dist]
-    #print(dist, len(df_tmp))
-    #outputFile = f'numHBondAAs{dist}'
-    #df_tmp.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
-    df = pd.concat([df, df_tmp])
-df = df[~df['Sequence'].str.contains('G')]
-print('Ring')
-printPercentGpA(df)
-
-for num in df_ring['NumTypeAAs'].unique():
-    df_tmp = df_ring[df_ring['NumTypeAAs'] == num]
-    # get the average percent GpA
-    averageGpA = df_tmp['PercentGpA'].mean()
-    print(num, len(df_tmp), averageGpA)
+#output_df = getAADistances(df_ring, ring_aas)
+#df = pd.DataFrame()
+#for dist in output_df['ShortestDistance'].unique():
+#    df_tmp = output_df[output_df['ShortestDistance'] == dist]
+#    #print(dist, len(df_tmp))
+#    #outputFile = f'numHBondAAs{dist}'
+#    #df_tmp.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
+#    df = pd.concat([df, df_tmp])
+#df = df[~df['Sequence'].str.contains('G')]
+#print('Ring')
+#printPercentGpA(df)
+#
+#for num in df_ring['NumTypeAAs'].unique():
+#    df_tmp = df_ring[df_ring['NumTypeAAs'] == num]
+#    # get the average percent GpA
+#    averageGpA = df_tmp['PercentGpA'].mean()
+#    print(num, len(df_tmp), averageGpA)
 
 # TODO: look at individual numbers of hbond aas percent gpa averages; if they are all similar, then it's likely that the hbond aas are not actually hbonding
 
