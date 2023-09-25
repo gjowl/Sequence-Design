@@ -89,16 +89,16 @@ os.makedirs(outputDir, exist_ok=True)
 # read in the data file
 df = pd.read_csv(sequenceFile)
 df = df[df['PercentGpA'] < 2]
-df = df[df['Sample'] != 'G']
+df = df[df['Sample'] == 'G']
 
 # sequence division
-hbond_aas = ['S', 'T']
+hbond_aas = ['S', 'G']
 ring_aas = ['W', 'Y', 'F']
 
 # split the data by hbond aas
 df_hbond = splitByAAs(df, hbond_aas, 'HBond')
 df_ring = splitByAAs(df, ring_aas, 'Ring')
-
+exit(0)
 ## keep only the sequences with the desired amino acids
 #df_hbond = df_sequence[df_sequence['Sequence'].str.contains('|'.join(hbond_aas))]
 #df_ring = df_sequence[df_sequence['Sequence'].str.contains('|'.join(ring_aas))]
