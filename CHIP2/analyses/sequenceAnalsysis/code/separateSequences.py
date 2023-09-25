@@ -89,10 +89,10 @@ os.makedirs(outputDir, exist_ok=True)
 # read in the data file
 df = pd.read_csv(sequenceFile)
 df = df[df['PercentGpA'] < 2]
-df = df[df['Sample'] == 'G']
+df = df[df['Sample'] != 'G']
 
 # sequence division
-hbond_aas = ['S', 'G']
+hbond_aas = ['S', 'T']
 ring_aas = ['W', 'Y', 'F']
 
 # split the data by hbond aas
