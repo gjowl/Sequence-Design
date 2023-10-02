@@ -1,12 +1,12 @@
 Van der Waals packing facilitates membrane protein association
 
 Abstract
-    - Take from previously written stuff for now
+    - TBD
 
 Graphical Abstract
     - Have a nice figure of how my design algorithm works, maybe tie it into the figure 1 (extracted geometries),
       finally output the protein and show fluorescence
-        -I also think visually for my presentation, having some sort of pymol driven video would be nice
+        - I also think visually for my presentation, having some sort of pymol driven video would be nice
 
 Premise/Intro
     - packing contribution to folding and association in membrane proteins is not well understood
@@ -15,39 +15,39 @@ Premise/Intro
     - protein design as a tool to study dimeric protein-protein interactions in a variety of systems
 
 Figure 1
+    - Story: by using the membrane protein geometric landscape, we can design proteins that have a high probability of folding
+      and associating in the membrane
     - Geometric landscape of membrane proteins (update this?)
     - Show how the protein is designed (maybe a nicer version of the flow chart, with a more detailed method in supplement?)
         - Can also add in the parts about confirming the structures with something else
-    - Story: by using the membrane protein geometric landscape, we can design proteins that have a high probability of folding
-      and associating in the membrane
 
 Figure 2
+    - Story: designing with polyleucine and a limited set of amino acids allows us to study the effects of solely vdW packing
+      on membrane protein association
     - explanation of the design strategy using polyleucine and the different design regions
     - subset of amino acids for design
     - benefits of polyleucine for both design and our experiments (TOXGREEN)
-    - Story: designing with polyleucine and a limited set of amino acids allows us to study the effects of solely vdW packing
-      on membrane protein association
 
 Figure 3
+    - Story: fluorescence of WT designs on average have higher fluorescence than mutants, suggesting that the mutants are
+      not associating as well as the WT designs
     - Fluorescence from reconstruction explanation/cite the sort-seq paper
     - Distribution of all proteins just fluorescence (histogram/pie chart)
     - boxplot of wt designs in each region fluorescence vs mutants
-    - Story: fluorescence of WT designs on average have higher fluorescence than mutants, suggesting that the mutants are
-      not associating as well as the WT designs
 
 Figure 4
-    - Energy score vs fluorescence data for clashing mutants
-    - address the potential for hydrogen bonding from sequences (currently using boxplots)
-    - If I can get void mutant data, could also add that here
     - Story: by using data from clashing mutants to filter our designs, we are able to look at sequences that we expect to have
       our designed geometry. GASrights fluoresce the most with the combination of hydrogen bonding and vdW packing. The other two
       regions fluoresce less but many structures (percentage) have appreciable association compared to strong dimer GpA, suggesting
       that vdW packing can facilitate membrane protein association.
+    - Energy score vs fluorescence data for clashing mutants
+    - address the potential for hydrogen bonding from sequences (currently using boxplots)
+    - If I can get void mutant data, could also add that here
 
 Figure 5
+    - Story: comparison to biophysical data suggests overall strength of vdW is x% GASright strength
     - Converted fluorescence to biophysical deltaG vs total energy
     - If it looks okay, maybe the predicted vdW vs deltaG and other metrics?
-    - Story: comparison to biophysical data suggests overall strength of vdW is x% GASright strength
 
 Discussion
     - What does this mean for membrane protein design? Or membrane proteins in general?
