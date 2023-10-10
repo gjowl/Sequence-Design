@@ -66,11 +66,22 @@ def splitByAAs(df, aas, aa_type):
     sns.set_style("whitegrid")
     sns.boxplot(x="NumTypeAAs", y="PercentGpA", hue="Type", data=df_distance, color='green')
     sns.swarmplot(x="NumTypeAAs", y="PercentGpA", hue="Type", data=df_distance, color='0', dodge=True, size=1)
+    # add the number of sequences for each number of aas under the x axis
+    # sort by number of aas
+    df_distance = df_distance.sort_values(by=['NumTypeAAs'])
+    for i, num in enumerate(df_distance['NumTypeAAs'].unique()):
+        # separate the dataframe by mutant and wt
+        df_wt, df_mutant = df_distance[df_distance['Type'] == 'WT'], df_distance[df_distance['Type'] == 'Mutant']
+        plt.text(i-.25, -.07, len(df_wt[df_wt['NumTypeAAs'] == num]), ha='left')
+        plt.text(i+.25, -.07, len(df_mutant[df_mutant['NumTypeAAs'] == num]), ha='right')
+    # remove the legend
+    plt.legend([],[], frameon=False)
     plt.xlabel('Number of amino acids')
     plt.ylabel('Percent GpA')
     plt.tight_layout()
     plt.savefig(f'{outputDir}/{aa_type}_percentGpA.png')
     plt.clf()
+    return df_distance
 
 def calculate_pvalues(df):
     dfcols = pd.DataFrame(columns=df.columns)
@@ -98,7 +109,9 @@ ring_aas = ['W', 'Y', 'F']
 # split the data by hbond aas
 df_hbond = splitByAAs(df, hbond_aas, 'HBond')
 df_ring = splitByAAs(df, ring_aas, 'Ring')
-exit(0)
+
+df_hbond.to_csv(f'{outputDir}/hbond.csv', index=False)
+df_ring.to_csv(f'{outputDir}/ring.csv', index=False)
 ## keep only the sequences with the desired amino acids
 #df_hbond = df_sequence[df_sequence['Sequence'].str.contains('|'.join(hbond_aas))]
 #df_ring = df_sequence[df_sequence['Sequence'].str.contains('|'.join(ring_aas))]
@@ -139,7 +152,7 @@ exit(0)
 #    # get the average percent GpA
 #    averageGpA = df_tmp['PercentGpA'].mean()
 #    print(num, len(df_tmp), averageGpA)
-
+#
 #output_df = getAADistances(df_ring, ring_aas)
 #df = pd.DataFrame()
 #for dist in output_df['ShortestDistance'].unique():
