@@ -34,8 +34,8 @@ os.makedirs(outputDir, exist_ok=True)
 
 # read in the data files
 calcEnergy_df = pd.read_csv(calcEnergyFile)
-calcEnergy_df.rename(columns={'Geometry': 'Sequence'}, inplace=True)
-calcEnergy_df['Sequence'] = calcEnergy_df['Sequence'].apply(lambda x: x[3:-5])
+# save the geometry column as a new column
+calcEnergy_df['Sequence'] = calcEnergy_df['Geometry'].apply(lambda x: x[3:-5])
 designEnergy_df = pd.read_csv(designEnergyFile)
 designEnergy_df = designEnergy_df[['Sequence','Total']]
 designEnergy_df['Sequence'] = designEnergy_df['Sequence'].apply(lambda x: x[3:-3])

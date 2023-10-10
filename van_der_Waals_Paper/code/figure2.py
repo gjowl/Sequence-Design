@@ -49,8 +49,15 @@ def plotPercentSeqs(input_df, col, output_dir):
     sns.set_style("whitegrid")
     sns.boxplot(x="Sample", y=col, hue="Type",data=input_df, color='green')
     sns.swarmplot(x="Sample", y=col, hue="Type", data=input_df, color='0', dodge=True, size=1)
+    # sort by sample
+    input_df = input_df.sort_values(by=['Sample'])
+    for i, sample in enumerate(input_df['Sample'].unique()):
+        # separate the dataframe by mutant and wt
+        df_wt, df_mutant = input_df[input_df['Type'] == 'WT'], input_df[input_df['Type'] == 'Mutant']
+        plt.text(i-.25, -.07, len(df_wt[df_wt['Sample'] == sample]), ha='left')
+        plt.text(i+.25, -.07, len(df_mutant[df_mutant['Sample'] == sample]), ha='right')
     # remove the legend
-    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+    plt.legend([],[], frameon=False)
     plt.xlabel('Sample')
     plt.ylabel('Percent GpA')
     plt.tight_layout()
@@ -93,9 +100,9 @@ for sample in df['Sample'].unique():
     makePieChart(df_sample, col, pieDir)
 
 # make bar graph for number of sequences with fluorescence
-fluorDir = f'{outputDir}/fluorBarGraphs'
-os.makedirs(fluorDir, exist_ok=True)
-plotFluorBarGraph(df, col, fluorDir)
+#fluorDir = f'{outputDir}/fluorBarGraphs'
+#os.makedirs(fluorDir, exist_ok=True)
+#plotFluorBarGraph(df, col, fluorDir)
 
 # make the percentage seqs plot
 percentSeqsDir = f'{outputDir}/percentSeqs'

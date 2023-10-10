@@ -47,10 +47,10 @@ inputFilename = os.path.splitext(os.path.basename(inputFile))[0]
 df = pd.read_csv(inputFile, sep=',', header=0)
 
 # convert toxgreen to toxcat
-#col = 'PercentGpA_transformed'
-#std_col = 'std_adjusted'
-col = 'PercentGpA'
-std_col = 'PercentStd'
+col = 'PercentGpA_transformed'
+std_col = 'std_adjusted'
+#col = 'PercentGpA'
+#std_col = 'PercentStd'
 df['toxcat'] = greenToCatFunction(df[col]*100)
 print(df)
 
@@ -78,7 +78,7 @@ df = df.sort_values(by=['Total'], ascending=True)
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
 
 # drop any sequences with NA values
-df = df.dropna()
+#df = df.dropna()
 
 # output the df to a csv file
 df.to_csv(f'{cwd}/{inputFilename}.csv', sep=',')

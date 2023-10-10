@@ -1,0 +1,4 @@
+This directory is used for making figures from the pdbs for designed sequences. It does the following:
+1. Takes an input csv file of designed sequences of interest (example: mutant sequence clashing data fom pdbOptimizationAnalysis/leu_all/clashData/mutant.csv)
+2. Merges that data with a data file that has the information for the pdb files (example: pdbOptimizationAnalysis/leu_all/leu_data_percentGpA.csv)
+3. Executes a script that creates png files for the designed sequences of their interfaces, potential hydrogen bonding positions, and ring aa positions.
