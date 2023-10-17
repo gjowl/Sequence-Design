@@ -12,9 +12,21 @@ os.makedirs(name=output_dir, exist_ok=True)
 df = pd.read_csv(input_file, sep=',', dtype={'Interface': str})
 df_to_merge = pd.read_csv(file_to_merge, sep=',', dtype={'Interface': str, 'replicateNumber': str})
 
+# remove the Directory and replicateNumber columns
+df = df.drop(columns=['Directory', 'replicateNumber'])
+
+# keep only the 3 to 17 str in the Sequence column
+df_to_merge['Sequence'] = df_to_merge['Sequence'].str[3:18]
+cols_to_keep = ['Sequence', 'Design', 'replicateNumber', 'Directory', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
 # merge that data with the data to merge
-df = pd.merge(df, df_to_merge[['Sequence', 'replicateNumber', 'Directory']], on='Sequence', how='left')
+df = pd.merge(df, df_to_merge[['Sequence', 'Design', 'replicateNumber', 'Directory']], on='Sequence', how='left')
 df = df[df['PercentGpA'] > 0.5]
+
+# keep only the rows where the replicateNumber is not null
+df = df[df['replicateNumber'].notnull()]
+
+# add LLL to the beginning of the sequence and ILI to the end of the sequence
+df['Sequence'] = 'LLL' + df['Sequence'] + 'ILI'
 
 # output the dataframe to a csv file without the index
 df.to_csv(f'{output_dir}/{output_file}.csv', index=False)
