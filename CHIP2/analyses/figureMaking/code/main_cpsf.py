@@ -35,6 +35,7 @@ config = globalConfig['main']
 codeDir = config['codeDir']
 rawDataDirAla = config['rawDataDirAla'] # where the pdbs for the sequences are located
 rawDataDirLeu = config['rawDataDirLeu'] # where the pdbs for the sequences are located
+optimizedPdbDir = config['optimizedPdbDir'] # where the pdbs for the sequences are located
 outputDir = config['outputDir']
 outputFile = config['outputFile']
 dataFile = config['dataFile'] # file with the raw data information, including the directory of the pdb files for each sequence
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     os.system(execSplitDesigns)
 
     # make the interface pdbs figures
-    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirAla} {outputDir}/{outputFile}_ala.csv {outputDir}/interfacePdbs'
+    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirAla} {optimizedPdbDir} {outputDir}/{outputFile}_ala.csv {outputDir}/interfacePdbs'
     os.system(execCreatePses)
-    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirLeu} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs'
+    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirLeu} {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs'
     os.system(execCreatePses)

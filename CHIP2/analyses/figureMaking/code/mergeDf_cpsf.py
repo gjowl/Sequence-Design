@@ -12,8 +12,8 @@ os.makedirs(name=output_dir, exist_ok=True)
 df = pd.read_csv(input_file, sep=',', dtype={'Interface': str})
 df_to_merge = pd.read_csv(file_to_merge, sep=',', dtype={'Interface': str, 'replicateNumber': str})
 
-# remove the Directory and replicateNumber columns
-df = df.drop(columns=['Directory', 'replicateNumber'])
+# rename the Directory and replicateNumber columns
+df.rename(columns={'Directory': 'Optimized_Directory', 'replicateNumber': 'Optimized_replicateNumber'}, inplace=True)
 
 # keep only the 3 to 17 str in the Sequence column
 df_to_merge['Sequence'] = df_to_merge['Sequence'].str[3:18]

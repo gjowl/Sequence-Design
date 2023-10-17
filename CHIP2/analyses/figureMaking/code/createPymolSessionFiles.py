@@ -1,15 +1,31 @@
 import os, sys, pandas as pd
 from pymol import cmd
 
+def loadAlternatePdbs(df_sequence, pdbOptimizedDir):
+    for sequence in df_sequence['Sequence'].unique():
+        # get the directory name
+        dirName, inner_dirName = df_sequence['Optimized_Directory'][i], df_sequence['Geometry'][i]
+        # get the design number by splitting the directory name by _
+        designNum, repNum = inner_dirName.split('_')[1], df_sequence['Optimized_replicateNumber'][i]
+        # pdbName
+        pdbName = str(repNum)
+        # put together the filename
+        filename = f'{raw_data_dir}/{dirName}/{pdbName}.pdb'
+        print(filename)
+        # load the pdb file
+        cmd.load(filename)
+
 # read in the config arguments
 rawDataDir = sys.argv[1]
-dataFile = sys.argv[2]
-outputDir = sys.argv[3]
+pdbOptimizedDir = sys.argv[2]
+dataFile = sys.argv[3]
+outputDir = sys.argv[4]
 
 os.makedirs(name=outputDir, exist_ok=True)
 
 # read into a dataframe
 df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str})
+
 # loop through the entire dataframe
 for sample in df['Sample'].unique():
     df_sample = df[df['Sample'] == sample]
@@ -27,6 +43,8 @@ for sample in df['Sample'].unique():
         print(filename)
         # load the pdb file
         cmd.load(filename)
+        # TODO: load through the alternate pdbs made by the pdbOptimization script
+        loadAlternatePdbs(df_sequence, pdbOptimizedDir)
         # this is fast, but kind of redundant: I should get a list of all of the interface pos and then loop through that
         for j in range(0, len(df_sequence['Interface'].unique()[0])):
             # if the interface is 1
