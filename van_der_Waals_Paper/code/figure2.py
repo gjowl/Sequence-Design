@@ -16,6 +16,8 @@ Input:
 '''
 
 import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt, seaborn as sns
+import statsmodels.formula.api as sfa
+import statsmodels.api as sa
 
 pieColors = ['red', 'green']
 
@@ -51,6 +53,7 @@ def plotPercentSeqs(input_df, col, output_dir):
     sns.swarmplot(x="Sample", y=col, hue="Type", data=input_df, color='0', dodge=True, size=2)
     # sort by sample
     input_df = input_df.sort_values(by=['Sample'])
+    calculate_pvalues(input_df)
     for i, sample in enumerate(input_df['Sample'].unique()):
         # separate the dataframe by mutant and wt
         df_wt, df_mutant = input_df[input_df['Type'] == 'WT'], input_df[input_df['Type'] == 'Mutant']
@@ -61,10 +64,21 @@ def plotPercentSeqs(input_df, col, output_dir):
     plt.xlabel('Sample')
     plt.ylabel('Percent GpA')
     # set the y axis limits
+    # TODO: add the pvalue to the plot
     plt.ylim(bottom=0)
     plt.tight_layout()
     plt.savefig(f'{output_dir}/percentSeqs.png')
     plt.clf()
+
+# function for calculating the pvalues
+def calculate_pvalues(df):
+    for sample in df['Sample'].unique():
+        df_sample = df[df['Sample'] == sample]
+        #df_sample = df_sample[['Type', 'PercentGpA_transformed']]
+        lm = sfa.ols('PercentGpA_transformed ~ Type', data=df_sample).fit()
+        anova = sa.stats.anova_lm(lm)
+        # print the pvalue
+        print(sample, anova['PR(>F)'][0])
 
 #def plotFluorBarGraph(input_df, col, output_dir):
 #    sns.set_style("whitegrid")
