@@ -47,8 +47,8 @@ def plotPieChart(input_df, sample, output_dir):
 
 def plotPercentSeqs(input_df, col, output_dir):
     sns.set_style("whitegrid")
-    sns.boxplot(x="Sample", y=col, hue="Type",data=input_df, color='green')
-    sns.swarmplot(x="Sample", y=col, hue="Type", data=input_df, color='0', dodge=True, size=1)
+    sns.boxplot(x="Sample", y=col, hue="Type",data=input_df, color='green', fliersize=2)
+    sns.swarmplot(x="Sample", y=col, hue="Type", data=input_df, color='0', dodge=True, size=2)
     # sort by sample
     input_df = input_df.sort_values(by=['Sample'])
     for i, sample in enumerate(input_df['Sample'].unique()):
@@ -60,6 +60,8 @@ def plotPercentSeqs(input_df, col, output_dir):
     plt.legend([],[], frameon=False)
     plt.xlabel('Sample')
     plt.ylabel('Percent GpA')
+    # set the y axis limits
+    plt.ylim(bottom=0)
     plt.tight_layout()
     plt.savefig(f'{output_dir}/percentSeqs.png')
     plt.clf()
