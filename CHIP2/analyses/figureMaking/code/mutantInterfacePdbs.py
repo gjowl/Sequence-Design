@@ -103,58 +103,37 @@ def saveInterfacePseBothChains(input_df, output_file, output_dir):
     os.makedirs(name=output_dir, exist_ok=True)
     cmd.save(f'{output_dir}/{output_file}.pse')
 
-if __name__ == '__main__':
-    # read the command line arguments
-    raw_data_dir = sys.argv[1]
-    data_file = sys.argv[2]
-    output_dir = sys.argv[3]
-
-    # make the output directory if it doesn't exist
-    os.makedirs(name=output_dir, exist_ok=True)
-
-    # read in the data file
-    df = pd.read_csv(data_file, sep=',', dtype={'Interface': str})
-
-    df = df[df['PercentGpA'] > 0.5]
-
-    # setup lists of aas to evaluate
-    hbondAAs = ['S', 'T', 'G']
-    ringAAs = ['W', 'Y', 'F']
-    AAs = ['S', 'T', 'G', 'W', 'Y', 'F']
-
-    # loop through the entire dataframe
-    #for sample in df['Sample'].unique():
-    #    df_sample = df[df['Sample'] == sample]
-    #    png_dir, pse_dir = f'{output_dir}/png/{sample}', f'{output_dir}/pse/{sample}'
-    #    os.makedirs(name=png_dir, exist_ok=True)
-    #    os.makedirs(name=pse_dir, exist_ok=True)
-    #    df_sample.reset_index(inplace=True)
-    #    # loop through the dataframe
-    #    for i in range(len(df_sample)):
-    #        # get the directory name
-    #        dirName = df_sample['Directory'][i]
-    #        inner_dirName = df_sample['Geometry'][i]
-    #        # get the design number by splitting the directory name by _
-    #        designNum, repNum = inner_dirName.split('_')[1], df_sample['replicateNumber'][i]
-    #        # pdbName
-    #        pdbName = str(repNum)
-    #        # put together the filename
-    #        filename = f'{raw_data_dir}/{dirName}/{pdbName}.pdb'
-    #        # load the pdb file
-    #        cmd.load(filename)
-    #        # setup the pymol session for output
-    #        setupPymol()
-    #        interfaceDir = f'{png_dir}/interface'
-    #        saveInterfacePngs(df_sample, i, interfaceDir)
-    #        hbondDir = f'{png_dir}/hbond'
-    #        saveInterfacePngs(df_sample, i, hbondDir, hbondAAs)
-    #        ringDir = f'{png_dir}/ring'
-    #        saveInterfacePngs(df_sample, i, ringDir, ringAAs)
-    #        # reset the pymol session
-    #        cmd.reinitialize()
-    
+def outputPngs(input_df, output_dir, hbondAAs, ringAAs):
+# loop through the entire dataframe
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
+        png_dir = f'{output_dir}/png/{sample}'
+        os.makedirs(name=png_dir, exist_ok=True)
+        df_sample.reset_index(inplace=True)
+        # loop through the dataframe
+        for i in range(len(df_sample)):
+            # get the directory name
+            dirName, inner_dirName = df_sample['Directory'][i], df_sample['Geometry'][i]
+            # get the design number by splitting the directory name by _
+            designNum, repNum = inner_dirName.split('_')[1], df_sample['replicateNumber'][i]
+            # pdbName of the optimized pdb
+            pdbName = str(repNum)
+            # put together the filename
+            filename = f'{raw_data_dir}/{dirName}/{pdbName}.pdb'
+            # load the pdb file
+            cmd.load(filename)
+            # setup the pymol session for output
+            setupPymol()
+            interfaceDir, hbondDir, ringDir = f'{png_dir}/interface', f'{png_dir}/hbond', f'{png_dir}/ring'
+            saveInterfacePngs(df_sample, i, interfaceDir)
+            saveInterfacePngs(df_sample, i, hbondDir, hbondAAs)
+            saveInterfacePngs(df_sample, i, ringDir, ringAAs)
+            # reset the pymol session
+            cmd.reinitialize()
+
+def outputPses(input_df, output_dir):
+    for sample in input_df['Sample'].unique():
+        df_sample = input_df[input_df['Sample'] == sample]
         for sequence in df_sample['Directory'].unique():
             df_sequence = df_sample[df_sample['Directory'] == sequence]
             pse_dir = f'{output_dir}/pse/{sample}'
@@ -176,3 +155,25 @@ if __name__ == '__main__':
             saveInterfacePse(df_sequence, sequence, pse_dir, bothChains=True)
             # reset the pymol session
             cmd.reinitialize()
+
+if __name__ == '__main__':
+    # read the command line arguments
+    raw_data_dir = sys.argv[1]
+    data_file = sys.argv[2]
+    output_dir = sys.argv[3]
+
+    # make the output directory if it doesn't exist
+    os.makedirs(name=output_dir, exist_ok=True)
+
+    # read in the data file
+    df = pd.read_csv(data_file, sep=',', dtype={'Interface': str})
+
+    df = df[df['PercentGpA'] > 0.5]
+
+    # setup lists of aas to evaluate
+    hbondAAs = ['S', 'T', 'G']
+    ringAAs = ['W', 'Y', 'F']
+    AAs = ['S', 'T', 'G', 'W', 'Y', 'F']
+
+    outputPngs(df, output_dir, hbondAAs, ringAAs)
+    outputPses(df, output_dir)
