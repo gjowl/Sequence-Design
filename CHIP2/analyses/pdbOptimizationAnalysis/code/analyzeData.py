@@ -62,7 +62,7 @@ if __name__ == '__main__':
 
     # get the output directory
     outputDir = sys.argv[2]
-    percentStdCutoff = 15
+    #percentStdCutoff = 15
 
     # only keep sequences with the lowest total energy
     df = df.sort_values(by=['Total'], ascending=True)
@@ -72,9 +72,8 @@ if __name__ == '__main__':
     cols.insert(0, cols.pop(cols.index('Sequence')))
 
     # rid of any sequences where the PercentStd > 10
-    df = df[df['PercentStd'] < percentStdCutoff]
-    df = df[df['PercentGpA'] < 3]
-    df = df[df['Total'] < 0]
+    #df = df[df['PercentStd'] < percentStdCutoff]
+    #df = df[df['PercentGpA'] < 3]
 
     # TESTS
     #df = df[df['PercentGpA'] > 0.50]
@@ -93,6 +92,7 @@ if __name__ == '__main__':
     lowHbond_df = df[df['HBONDDiff'] > -5]
     # save the lowHbond_df to a csv file
     lowHbond_df.to_csv(f'{outputDir}/lowHbond_df.csv', index=False)
+    df = df[df['Total'] < 0]
 
     # make list of dfs to plot
     df_list = [df, lowHbond_df]
