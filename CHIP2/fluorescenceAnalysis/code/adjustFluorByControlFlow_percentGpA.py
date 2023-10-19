@@ -14,9 +14,6 @@ This script takes the following inputs:
     - output directory
 For every replicate, it adjusts the fluorescence of the reconstruction by the fluorescence of the flow controls.
 -----
-HISTORY:
-Date      	By	Comments
-----------	---	---------------------------------------------------------
 '''
 
 import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt

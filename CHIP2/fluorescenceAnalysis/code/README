@@ -1,0 +1,8 @@
+adjustFluorByControlFlow: converts the reconstructed fluorescence to the same scale as the experimental data from the experiment
+    - percentGpA: from sequences run in TOXGREEN
+    - percentGpA_stdFix: from sequences run in TOXGREEN. Converts each reconstruction individually to get the correct stdDev
+filterWithComputation: filters the data and adds in computation (as of 2023-10-18, it only adds in the computation)
+    - percentGpA and percentGpA_stdFix: slightly different column names, should fix this so I can only have one
+sequenceVsMutant: extremely poorly written; fills a variety of different directories w/ data comparing wts vs mutants
+graphComputationVsExperiment: graphs data from those directories from sequenceVsMutant
+graphDesignWts: graphs wt data

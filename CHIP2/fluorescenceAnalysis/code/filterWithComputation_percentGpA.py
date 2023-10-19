@@ -14,9 +14,6 @@ This file uses the following as inputs:
 It compares the fluorescence of the mutants to the WT sequence and outputs a dataframe with the 
 percent difference of the mutant to the WT sequence. 
 -----
-HISTORY:
-Date      	By	Comments
-----------	---	---------------------------------------------------------
 '''
 
 import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
@@ -160,9 +157,3 @@ df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample',
 df_all.to_csv(f'{outputDir}/all.csv', index=False)
 print(f'Sequences: {len(df_sequence_no_duplicates)}')
 print(f'Mutants: {len(df_mutant_no_duplicates)}')
-#exit(0)
-
-## get the WT sequences that have mutants in the dataframe
-#df_sequences_with_mutant = df_sequence_no_duplicates[df_sequence_no_duplicates['Sequence'].isin(df_mutant_no_duplicates['Sequence'])]
-#df_mutants_with_WT = df_mutant_no_duplicates[df_mutant_no_duplicates['Sequence'].isin(df_sequence_no_duplicates['Sequence'])]
-#exit(0)
