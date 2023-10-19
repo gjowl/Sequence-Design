@@ -11,8 +11,8 @@ mutant_fluor_cutoff = float(sys.argv[5])
 # input variables
 if len(sys.argv) < 6:
     # set defaults
-    wt_fluor_cutoff = 0.25
-    mutant_fluor_cutoff = 0.40
+    wt_fluor_cutoff = 0.35
+    mutant_fluor_cutoff = 0.35
     #percent_wt_cutoff = 50
 
 # make the output directory
