@@ -34,11 +34,9 @@ def fractionDimerToKd(fractionDimer):
     Kd = 2*chiT*((1+fractionDimer**2-2*fractionDimer)/fractionDimer)
     return Kd
 
-# get the current directory
-cwd = os.getcwd()
-
 # get the csv file from the command line
 inputFile = sys.argv[1]
+outputDir = sys.argv[2]
 
 # get the input file name without the extension or path
 inputFilename = os.path.splitext(os.path.basename(inputFile))[0]
@@ -81,4 +79,4 @@ df = df.drop_duplicates(subset=['Sequence'], keep='first')
 #df = df.dropna()
 
 # output the df to a csv file
-df.to_csv(f'{cwd}/{inputFilename}.csv', sep=',')
+df.to_csv(f'{outputDir}/{inputFilename}_deltaG.csv', sep=',')

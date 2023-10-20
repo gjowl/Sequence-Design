@@ -72,7 +72,7 @@ def outputPseFiles(input_df, output_dir, pdbOptimizedDir):
             cmd.reinitialize()
 
 def outputPngs(input_df, output_dir):
-# loop through the entire dataframe
+    # loop through the entire dataframe
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
         png_dir = f'{output_dir}/png/{sample}'

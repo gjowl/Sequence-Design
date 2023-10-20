@@ -32,8 +32,6 @@ df_input = pd.read_csv(inputFile)
 
 # graph the data
 xaxes = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff']
-#yaxis = 'PercentGpA'
-#error_col = 'PercentStd'
 yaxis = 'deltaG'
 error_col = 'std_deltaG'
 regression_degree = 1
