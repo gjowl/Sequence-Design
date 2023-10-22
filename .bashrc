@@ -1,0 +1,1 @@
+export PYTHONPATH="$PYTHONPATH:/mnt/d/github/Sequence-Design/helperScripts"
