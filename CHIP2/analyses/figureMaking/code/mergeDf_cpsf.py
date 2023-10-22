@@ -20,7 +20,7 @@ df_to_merge['Sequence'] = df_to_merge['Sequence'].str[3:18]
 cols_to_keep = ['Sequence', 'Design', 'replicateNumber', 'Directory', 'Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
 # merge that data with the data to merge
 df = pd.merge(df, df_to_merge[cols_to_keep], on='Sequence', how='left')
-df = df[df['PercentGpA'] > 0.5]
+#df = df[df['PercentGpA'] > 0.5]
 
 # keep only the rows where the replicateNumber is not null
 df = df[df['replicateNumber'].notnull()]
