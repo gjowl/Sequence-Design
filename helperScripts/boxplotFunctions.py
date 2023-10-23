@@ -5,11 +5,11 @@ def plotBoxplot(input_df, xaxis, yaxis, output_dir, output_filename=f"boxplot", 
     xlabel = xaxis if xlabel is _sentinel else xlabel
     ylabel = yaxis if ylabel is _sentinel else ylabel
     output_filename = f"{output_filename}_{xaxis}_vs_{yaxis}"
+    # sort by the xaxis
+    input_df = input_df.sort_values(by=[xaxis])
     sns.set_style("whitegrid")
     sns.boxplot(x=xaxis, y=yaxis,data=input_df, color='green', fliersize=2)
     sns.swarmplot(x=xaxis, y=yaxis, data=input_df, color='0', dodge=True, size=2)
-    # sort by sample
-    input_df = input_df.sort_values(by=[xaxis])
     #calculate_pvalues(input_df)
     for i, sample in enumerate(input_df[xaxis].unique()):
         plt.text(i, 1.65, len(input_df[input_df[xaxis] == sample]), ha='left')
