@@ -77,9 +77,9 @@ if __name__ == "__main__":
     os.system(execAnalyzeData)
 
     # convert to delta G
-    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {outputDir}/{outputFile}.csv {outputDir}'
+    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {outputDir}/{dataFile}.csv {outputDir}'
     os.system(execConvertToDeltaG)
 
     # graph the delta G
-    execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {outputDir}/{outputFile}_deltaG.csv {outputDir}'
+    execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {outputDir}/{dataFile}_deltaG.csv {outputDir}'
     os.system(execGraphDeltaG)

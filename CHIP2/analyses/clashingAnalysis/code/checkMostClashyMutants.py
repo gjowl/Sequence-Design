@@ -37,7 +37,7 @@ for sequence in df_wt['Sequence'].unique():
         tmp_wt = tmp_wt.drop_duplicates(subset='Sequence', keep='first')
     # get the mutants for this sequence and get the lowest energy mutant
     tmp_mut = df_mut[df_mut['Sequence'] == sequence]
-    if len(df_seq) < 1:
+    if len(tmp_mut) < 1:
         continue # skip if there are no mutants
     tmp_mut = tmp_mut.sort_values(by=[sort_col], ascending=sortAscending)
     # check if the fluorescence of the WT is greater than the mutant
