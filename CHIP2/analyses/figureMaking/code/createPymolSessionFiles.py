@@ -54,6 +54,8 @@ def outputPseFiles(input_df, output_dir, pdbOptimizedDir):
             print(filename)
             # load the designed pdb file
             cmd.load(filename)
+            # rename the loaded pdb file to the sequence name
+            cmd.set_name(pdbName, sequence)
             # load through the alternate pdbs made by the pdbOptimization script
             loadAlternatePdbs(df_sequence, pdbOptimizedDir)
             # this is fast, but kind of redundant: I should get a list of all of the interface pos and then loop through that
@@ -61,7 +63,7 @@ def outputPseFiles(input_df, output_dir, pdbOptimizedDir):
                 # if the interface is 1
                 if df_sequence['Interface'].unique()[0][j] == '1':
                     # select the current pdb
-                    cmd.select('interface', pdbName)
+                    cmd.select('interface', sequence)
                     # color the residue for the current pdb
                     cmd.color('red', 'interface and resi '+str(j+23))
             # show spheres
@@ -72,7 +74,7 @@ def outputPseFiles(input_df, output_dir, pdbOptimizedDir):
             cmd.reinitialize()
 
 def outputPngs(input_df, output_dir):
-# loop through the entire dataframe
+    # loop through the entire dataframe
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
         png_dir = f'{output_dir}/png/{sample}'
@@ -137,3 +139,4 @@ df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str})
 
 #outputPseFiles(df, outputDir, pdbOptimizedDir)
 outputPngs(df, outputDir)
+outputPseFiles(df, outputDir, pdbOptimizedDir)

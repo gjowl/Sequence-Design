@@ -16,7 +16,14 @@ maltose_col = 'LB-12H_M9-36H'
 #maltose_limit = 99999900
 #sequence_df = sequence_df[sequence_df[maltose_col] > maltose_cutoff]
 #sequence_df = sequence_df[sequence_df[maltose_col] < maltose_limit]
-sequence_df = sequence_df[['Sequence','PercentGpA_transformed','std_adjusted','Type']] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?
+cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Type', 'Clash Mutant'] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?
+# check if all the columns are present, otherwise only keep the ones that are present
+if all(col in sequence_df.columns for col in cols):
+    sequence_df = sequence_df[cols]
+else:
+    # get the columns that are present
+    cols = [col for col in cols if col in sequence_df.columns]
+    sequence_df = sequence_df[cols]
 sequence_df['Sequence'] = sequence_df['Sequence'].apply(lambda x: x[3:-3])
 energy_df['Sequence'] = energy_df['Directory'].apply(lambda x: x[3:-3])
 df = sequence_df.merge(energy_df, on='Sequence', how='left')
