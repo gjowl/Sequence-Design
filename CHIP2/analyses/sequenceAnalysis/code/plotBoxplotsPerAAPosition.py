@@ -62,6 +62,14 @@ for sample in df_mut['Sample'].unique():
     tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > 10).copy()
     plotBoxplot(tmp_df1, 'pos_wtAA', 'wt_percentGpA', sample_outputDir, mut_filename)
     plotBoxplot(tmp_df, 'Position', 'wt_percentGpA', sample_outputDir, mut_filename)
+    # calculate the difference between the wt and mutant
+    tmp_df['diff'] = tmp_df['wt_percentGpA'] - tmp_df['PercentGpA_transformed']
+    tmp_df1 = tmp_df.groupby('pos_mutAA').filter(lambda x: len(x) > 10).copy()
+    plotBoxplot(tmp_df1, 'pos_mutAA', 'diff', sample_outputDir, mut_filename, ybottom=-0.5, ytop=0.5)
+    tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > 10).copy()
+    plotBoxplot(tmp_df1, 'pos_wtAA', 'diff', sample_outputDir, mut_filename, ybottom=-0.5, ytop=0.5)
+    tmp_df1 = tmp_df.groupby('Position').filter(lambda x: len(x) > 10).copy()
+    plotBoxplot(tmp_df1, 'Position', 'diff', sample_outputDir, mut_filename)
     #for position in tmp_df['Position'].unique():
     #    tmp_df_pos = tmp_df[tmp_df['Position'] == position]
     #    tmp_df_pos = tmp_df_pos.groupby('pos_mutAA').filter(lambda x: len(x) > 10).copy()
