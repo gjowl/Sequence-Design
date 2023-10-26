@@ -48,6 +48,10 @@ for sequence in df_wt['Sequence'].unique():
     percentWT = mutant_fluor / wt_fluor * 100
     if mutant_fluor > mutant_fluor_cutoff:
         continue # skip if the mutant fluorescence is too high
+    # get the mutant sequence
+    mutant_seq = tmp_mut['Mutant'].values[0]
+    # add it to the tmp_wt dataframe
+    tmp_wt['Clash Mutant'] = mutant_seq
     # add the sequence to the output dataframe
     output_df = pd.concat([output_df, tmp_wt], axis=0)
     output_mutant_df = pd.concat([output_mutant_df, tmp_mut], axis=0)
