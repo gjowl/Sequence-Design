@@ -64,6 +64,16 @@ for sample in df_mut['Sample'].unique():
     plotBoxplot(tmp_df, 'Position', 'wt_percentGpA', sample_outputDir, mut_filename)
     # calculate the difference between the wt and mutant
     tmp_df['diff'] = tmp_df['wt_percentGpA'] - tmp_df['PercentGpA_transformed']
+    # get the average difference for each position
+    tmp_df['Average_diff'] = tmp_df.groupby('pos_wtAA')['diff'].transform('mean')
+    # get the percent difference for each position by dividing the average difference by the top wt_percentGpA
+    tmp_df['Percent_diff'] = tmp_df['Average_diff'] / tmp_df.groupby('pos_wtAA')['wt_percentGpA'].transform('max')
+    tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > 10).copy()
+    # print the top 5 highest and lowest average difference and position_wtAA
+    print(sample)
+    print(tmp_df1.groupby('pos_wtAA')['Percent_diff'].mean().sort_values(ascending=False).head(5))
+    print(tmp_df1.groupby('pos_wtAA')['Percent_diff'].mean().sort_values(ascending=True).head(5))
+
     tmp_df1 = tmp_df.groupby('pos_mutAA').filter(lambda x: len(x) > 10).copy()
     plotBoxplot(tmp_df1, 'pos_mutAA', 'diff', sample_outputDir, mut_filename, ybottom=-0.5, ytop=0.5)
     tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > 10).copy()
