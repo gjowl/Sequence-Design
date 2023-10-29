@@ -16,7 +16,7 @@ maltose_col = 'LB-12H_M9-36H'
 #maltose_limit = 99999900
 #sequence_df = sequence_df[sequence_df[maltose_col] > maltose_cutoff]
 #sequence_df = sequence_df[sequence_df[maltose_col] < maltose_limit]
-cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Type', 'Clash Mutant', 'Mutant Type', 'Disruptive Mutant', 'PercentGpA_mutant', 'Fluor Difference'] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?
+cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Type', 'Clash Mutant', 'Mutant Type', 'Position', 'Disruptive Mutant', 'PercentGpA_mutant', 'WT Sequence', 'Fluor Difference'] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?
 # check if all the columns are present, otherwise only keep the ones that are present
 if all(col in sequence_df.columns for col in cols):
     sequence_df = sequence_df[cols]

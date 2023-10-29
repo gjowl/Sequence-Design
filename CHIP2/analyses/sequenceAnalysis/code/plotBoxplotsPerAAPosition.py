@@ -26,7 +26,8 @@ df_mut = pd.read_csv(mutantFile) # mutant data file
 # make the output directory
 os.makedirs(outputDir, exist_ok=True)
 
-yaxis = 'PercentGpA_transformed'
+#yaxis = 'PercentGpA_transformed'
+yaxis = 'PercentGpA'
 xaxis = 'Sample'
 
 # plot the boxplots
@@ -55,7 +56,7 @@ for sample in df_mut['Sample'].unique():
     df_wt_sample = df_wt[df_wt['Sequence'].isin(df_sample['Sequence'])]
     tmp_df = df_sample[df_sample['Sequence'].isin(df_wt_sample['Sequence'])].copy()
     # make a column for wt_percentGpA that gets the vale from the df_wt_sample for matching sequences
-    tmp_df['wt_percentGpA'] = tmp_df.apply(lambda row: df_wt_sample[df_wt_sample['Sequence'] == row['Sequence']]['PercentGpA_transformed'].values[0], axis=1)
+    tmp_df['wt_percentGpA'] = tmp_df.apply(lambda row: df_wt_sample[df_wt_sample['Sequence'] == row['Sequence']][yaxis].values[0], axis=1)
     # keep only unique sequences
     tmp_df1 = tmp_df.groupby('pos_mutAA').filter(lambda x: len(x) > 10).copy()
     plotBoxplot(tmp_df1, 'pos_mutAA', 'wt_percentGpA', sample_outputDir, mut_filename)
@@ -63,23 +64,23 @@ for sample in df_mut['Sample'].unique():
     plotBoxplot(tmp_df1, 'pos_wtAA', 'wt_percentGpA', sample_outputDir, mut_filename)
     plotBoxplot(tmp_df, 'Position', 'wt_percentGpA', sample_outputDir, mut_filename)
     # calculate the difference between the wt and mutant
-    tmp_df['diff'] = tmp_df['wt_percentGpA'] - tmp_df['PercentGpA_transformed']
+    tmp_df['diff'] = tmp_df['wt_percentGpA'] - tmp_df[yaxis]
     # get the average difference for each position
     tmp_df['Average_diff'] = tmp_df.groupby('pos_wtAA')['diff'].transform('mean')
     # get the percent difference for each position by dividing the average difference by the top wt_percentGpA
     tmp_df['Percent_diff'] = tmp_df['Average_diff'] / tmp_df.groupby('pos_wtAA')['wt_percentGpA'].transform('max')
     tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > 10).copy()
     # print the top 5 highest and lowest average difference and position_wtAA
-    print(sample)
-    print(tmp_df1.groupby('pos_wtAA')['Percent_diff'].mean().sort_values(ascending=False).head(5))
-    print(tmp_df1.groupby('pos_wtAA')['Percent_diff'].mean().sort_values(ascending=True).head(5))
+    #print(sample)
+    #print(tmp_df1.groupby('pos_wtAA')['Percent_diff'].mean().sort_values(ascending=False).head(5))
+    #print(tmp_df1.groupby('pos_wtAA')['Percent_diff'].mean().sort_values(ascending=True).head(5))
 
-    tmp_df1 = tmp_df.groupby('pos_mutAA').filter(lambda x: len(x) > 10).copy()
-    plotBoxplot(tmp_df1, 'pos_mutAA', 'diff', sample_outputDir, mut_filename, ybottom=-0.5, ytop=0.5)
-    tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > 10).copy()
-    plotBoxplot(tmp_df1, 'pos_wtAA', 'diff', sample_outputDir, mut_filename, ybottom=-0.5, ytop=0.5)
-    tmp_df1 = tmp_df.groupby('Position').filter(lambda x: len(x) > 10).copy()
-    plotBoxplot(tmp_df1, 'Position', 'diff', sample_outputDir, mut_filename)
+    #tmp_df1 = tmp_df.groupby('pos_mutAA').filter(lambda x: len(x) > 10).copy()
+    #plotBoxplot(tmp_df1, 'pos_mutAA', 'diff', sample_outputDir, mut_filename, ybottom=-0.5, ytop=0.5)
+    #tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > 10).copy()
+    #plotBoxplot(tmp_df1, 'pos_wtAA', 'diff', sample_outputDir, mut_filename, ybottom=-0.5, ytop=0.5)
+    #tmp_df1 = tmp_df.groupby('Position').filter(lambda x: len(x) > 10).copy()
+    #plotBoxplot(tmp_df1, 'Position', 'diff', sample_outputDir, mut_filename)
     #for position in tmp_df['Position'].unique():
     #    tmp_df_pos = tmp_df[tmp_df['Position'] == position]
     #    tmp_df_pos = tmp_df_pos.groupby('pos_mutAA').filter(lambda x: len(x) > 10).copy()

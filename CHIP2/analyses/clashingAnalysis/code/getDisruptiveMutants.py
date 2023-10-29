@@ -6,7 +6,8 @@ mutantFile = sys.argv[2]
 outputDir = sys.argv[3]
 wt_fluor_cutoff = float(sys.argv[4])
 mutant_fluor_cutoff = float(sys.argv[5])
-disruptive_mutant_cutoff = 0.5
+percent_wt_cutoff = float(sys.argv[6])
+number_of_mutants = int(sys.argv[7])
 
 # input variables
 # check if the 4th argument is empty
@@ -46,17 +47,27 @@ for sequence in df_wt['Sequence'].unique():
     wt_fluor = tmp_wt[yAxis].values[0]
     if wt_fluor < wt_fluor_cutoff:
         continue # skip if the WT fluorescence is too low
-    mutant_fluor = tmp_mut[yAxis].values[0]
-    wt_mutant_diff = wt_fluor - mutant_fluor
-    if mutant_fluor > mutant_fluor_cutoff:
-        if wt_mutant_diff < disruptive_mutant_cutoff:
-            continue # skip if the mutant fluorescence is too high
+    # check if there is are at least two mutants with a lower fluorescence than the WT
+    tmp_mut['Fluor Difference'] = wt_fluor - tmp_mut[yAxis]
+    # get all the mutants with mutant fluorescence less than the cutoff or the fluor difference less than the cutoff
+    tmp_mut_less = tmp_mut[(tmp_mut[yAxis] < mutant_fluor_cutoff) | (tmp_mut['Fluor Difference'] < percent_wt_cutoff)]
+    # rid of duplicates
+    tmp_mut_less = tmp_mut_less.drop_duplicates(subset='Mutant', keep='first')
+    if len(tmp_mut_less) < number_of_mutants:
+        continue # skip if there are not enough mutants
+    #mutant_fluor = tmp_mut[yAxis].values[0]
+    #wt_mutant_diff = wt_fluor - mutant_fluor
+    #if mutant_fluor > mutant_fluor_cutoff:
+    #    if wt_mutant_diff < disruptive_mutant_cutoff:
+    #        continue # skip if the mutant fluorescence is too high
     # get the mutant sequence
     mutant_seq = tmp_mut['Mutant'].values[0]
     # add it to the tmp_wt dataframe
-    tmp_wt['PercentGpA_mutant'] = mutant_fluor 
-    tmp_wt['Fluor Difference'] = wt_mutant_diff
+    #tmp_wt['PercentGpA_mutant'] = mutant_fluor 
+    #tmp_wt['Fluor Difference'] = wt_mutant_diff
     tmp_wt['Disruptive Mutant'] = mutant_seq
+    wt_seq = tmp_wt['Sequence'].values[0]
+    tmp_mut['WT Sequence'] =  wt_seq
     tmp_wt['Mutant Type'] = tmp_mut['Mutant Type'].values[0]
     # add the sequence to the output dataframe
     output_df = pd.concat([output_df, tmp_wt], axis=0)
@@ -73,4 +84,4 @@ output_df_all = pd.concat([output_df, output_mutant_df], axis=0)
 output_df.to_csv(f'{outputDir}/wt.csv', index=False)
 output_mutant_df.to_csv(f'{outputDir}/mutant.csv', index=False)
 output_df_all.to_csv(f'{outputDir}/all.csv', index=False)
-print(f'Number of WT sequences with mutants less than {mutant_fluor_cutoff}: {len(output_df)}')
+print(f'Number of WT sequences: {len(output_df)}')
