@@ -42,3 +42,7 @@ if __name__ == "__main__":
     # run the voiding script if the voiding data is found in the config file
     execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outputDir}/wt.csv {outputDir}/mutant.csv {outputDir}'
     os.system(execplotBoxplot)
+
+    # run boxplot script for all of the data
+    execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py {outputDir}/all.csv {outputDir}/combined'
+    os.system(execplotBoxplotCombined)
