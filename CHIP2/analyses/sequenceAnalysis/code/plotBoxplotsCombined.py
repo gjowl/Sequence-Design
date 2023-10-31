@@ -22,8 +22,9 @@ def filterDf(input_df, col1, col2):
         for t in tmp_df_val[col2].unique():
             tmp_df_val_type = tmp_df_val[tmp_df_val[col2] == t]
             if len(tmp_df_val_type) < 1:
-                # remove the mutAA from the tmp_df
+                # remove the val from the tmp_df
                 tmp_df = tmp_df[tmp_df[col1] != val]
+                continue
     return tmp_df
 
 # read in the command line arguments
