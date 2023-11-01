@@ -60,18 +60,18 @@ for sample in df_seq['Sample'].unique():
     sample_outputDir = f'{outputDir}/{sample}'
     os.makedirs(sample_outputDir, exist_ok=True)
     df_sample.sort_values(by='Type', inplace=True)
-    plotMultiBoxplot(df_sample, xaxis, yaxis, 'Type', outputDir, filename)
+    plotMultiBoxplot(df_sample, xaxis, yaxis, 'Type', sample_outputDir, filename)
     tmp_df = df_sample.groupby('mut_AA').filter(lambda x: len(x) > number_sequence_cutoff).copy()
     # only keep the mut_AA that have more than 1 sequence for both wt and mut
     # remove any mut_AA that have less than 1 sequence for either wt or mut
-    plotBoxplot(tmp_df, 'mut_AA', yaxis, sample_outputDir, filename)
+    plotMultiBoxplot(tmp_df, 'mut_AA', yaxis, 'Type', sample_outputDir, filename)
     # only keep rows that have > number_sequence_cutoff posMutAA
     tmp_df = df_sample.groupby('pos_mutAA').filter(lambda x: len(x) > number_sequence_cutoff).copy()
-    plotBoxplot(tmp_df, 'pos_mutAA', yaxis, sample_outputDir, filename)
+    plotMultiBoxplot(tmp_df, 'pos_mutAA', yaxis, 'Type', sample_outputDir, filename)
     # make a column for wt_percentGpA that gets the vale from the df_wt_sample for matching sequences
     #tmp_df['wt_percentGpA'] = tmp_df.apply(lambda row: df_wt_sample[df_wt_sample['Sequence'] == row['Sequence']][yaxis].values[0], axis=1)
     tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > number_sequence_cutoff).copy()
-    plotBoxplot(tmp_df1, 'Position', yaxis, sample_outputDir, filename)
+    plotMultiBoxplot(tmp_df1, 'Position', yaxis, 'Type', sample_outputDir, filename)
     for mutant_type in df_sample['Mutant Type'].unique():
         df_mutant_type = df_sample[df_sample['Mutant Type'] == mutant_type]
         mut_outputDir = f'{sample_outputDir}/{mutant_type}'
