@@ -51,7 +51,10 @@ for sequence in df_wt['Sequence'].unique():
     # get the mutant sequence
     mutant_seq = tmp_mut['Mutant'].values[0]
     # add it to the tmp_wt dataframe
-    tmp_wt['Clash Mutant'] = mutant_seq
+    tmp_wt['Disruptive Mutant'] = mutant_seq
+    wt_seq = tmp_wt['Sequence'].values[0]
+    tmp_mut['WT Sequence'] =  wt_seq
+    tmp_wt['Mutant Type'] = tmp_mut['Mutant Type'].values[0]
     # add the sequence to the output dataframe
     output_df = pd.concat([output_df, tmp_wt], axis=0)
     output_mutant_df = pd.concat([output_mutant_df, tmp_mut], axis=0)

@@ -40,6 +40,14 @@ df_wt['mut_AA'] = df_wt.apply(lambda row: row['Disruptive Mutant'][row['Position
 df_wt.to_csv(f'{outputDir}/wt.csv', index=False)
 df_mut.to_csv(f'{outputDir}/mutant.csv', index=False)
 
+# check if PercentGpA is a column
+if 'PercentGpA' not in df_wt.columns:
+    df_wt['PercentGpA'] = df_wt['PercentGpA_transformed']
+    df_mut['PercentGpA'] = df_mut['PercentGpA_transformed']
+if 'PercentStd' not in df_wt.columns:
+    df_wt['PercentStd'] = df_wt['std_adjusted']
+    df_mut['PercentStd'] = df_mut['std_adjusted']
+
 # combine the files with the given columns
 cols = ['Sample', 'Sequence', 'Position', 'Type', 'Mutant Type', 'WT_AA', 'mut_AA', 'PercentGpA', 'PercentStd']
 df_wt = df_wt[cols] 
