@@ -12,7 +12,6 @@ os.makedirs(outputDir, exist_ok=True)
 df_wt = pd.read_csv(sequenceFile) # wt data file
 df_mut = pd.read_csv(mutantFile) # mutant data file
 
-# columns
 # check the length of sequence
 sequenceLength = len(df_wt['Sequence'].values[0])
 if sequenceLength < 21:
@@ -50,7 +49,19 @@ if 'PercentStd' not in df_wt.columns:
 
 # combine the files with the given columns
 cols = ['Sample', 'Sequence', 'Position', 'Type', 'Mutant Type', 'WT_AA', 'mut_AA', 'PercentGpA', 'PercentStd']
-df_wt = df_wt[cols] 
-df_mut = df_mut[cols]
-df_all = pd.concat([df_wt, df_mut])
+# output the wt and mutant dataframes
+df_all = pd.concat([df_wt[cols], df_mut[cols]])
 df_all.to_csv(f'{outputDir}/all.csv', index=False)
+
+# check if each sequence has at least 1 void and 1 clash in the Mutant Type column
+df_mut['Void'] = df_mut['Mutant Type'].apply(lambda x: 'void' in x)
+df_mut['Clash'] = df_mut['Mutant Type'].apply(lambda x: 'clash' in x)
+df_void = df_mut[df_mut['Void'] == True]
+df_clash = df_mut[df_mut['Clash'] == True]
+
+# keep only sequences that are present in both the void and clash dataframes (at least 1 void and 1 clash mutant per sequence)
+df_c_v = df_void[df_void['Sequence'].isin(df_clash['Sequence'].unique())]
+df_wt_cv = df_wt[df_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
+df_mut_cv = df_mut[df_mut['Sequence'].isin(df_c_v['Sequence'].unique())]
+output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols]])
+output_df.to_csv(f'{outputDir}/clash_void.csv', index=False)

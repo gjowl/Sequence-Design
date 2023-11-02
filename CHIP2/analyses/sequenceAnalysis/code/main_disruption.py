@@ -44,5 +44,5 @@ if __name__ == "__main__":
     os.system(execplotBoxplot)
 
     # run boxplot script for all of the data
-    execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py {outputDir}/all.csv {outputDir}/combined'
+    execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py {outputDir}/clash_void.csv {outputDir}/combined'
     os.system(execplotBoxplotCombined)
