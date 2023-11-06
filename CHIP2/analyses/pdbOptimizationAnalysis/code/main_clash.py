@@ -95,18 +95,20 @@ if __name__ == "__main__":
                 file_outputDir = f'{disruptionOutputDir}/{os.path.splitext(filename)[0]}'
                 execAnalyzeDisruption = f'python3 {codeDir}/combineFilesAndPlot.py {disruptionOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir}'
                 os.system(execAnalyzeDisruption)
+                file_to_analyze = 'lowestEnergySequences'
                 # plot kde plots of geometries
-                execPlotKde = f'python3 {codeDir}/makeKdePlots.py {kdeFile} {file_outputDir}/lowestEnergySequences.csv {file_outputDir}'
+                execPlotKde = f'python3 {codeDir}/makeKdePlots.py {kdeFile} {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
                 os.system(execPlotKde)
+            # convert to delta G
+            execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
+            os.system(execConvertToDeltaG)
+
+            # graph the delta G
+            execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {file_outputDir}/{file_to_analyze}_deltaG.csv {file_outputDir}'
+            os.system(execGraphDeltaG)
 
     # analyze the data
     execAnalyzeData = f'python3 {codeDir}/analyzeData.py {outputDir}/{outputFile}.csv {outputDir}' 
     os.system(execAnalyzeData)
 
-    # convert to delta G
-    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {outputDir}/{dataFile}.csv {outputDir}'
-    os.system(execConvertToDeltaG)
-
-    # graph the delta G
-    execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {outputDir}/{dataFile}_deltaG.csv {outputDir}'
-    os.system(execGraphDeltaG)
+    

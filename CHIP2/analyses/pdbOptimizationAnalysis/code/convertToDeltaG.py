@@ -50,7 +50,6 @@ df = pd.read_csv(inputFile, sep=',', header=0)
 col = 'PercentGpA'
 std_col = 'PercentStd'
 df['toxcat'] = greenToCatFunction(df[col]*100)
-print(df)
 
 # convert toxcat to fraction dimer
 df['fractionDimer'] = catToFractionDimer(df['toxcat'])
@@ -59,7 +58,7 @@ df['fractionDimer'] = catToFractionDimer(df['toxcat'])
 df['Kd'] = fractionDimerToKd(df['fractionDimer'])
 
 # rid of the negative Kd values
-df = df[df['Kd'] > 0]
+#df = df[df['Kd'] > 0]
 
 # convert Kd to deltaG
 R = 0.0019872 # kcal/mol/K
@@ -76,7 +75,8 @@ df = df.sort_values(by=['Total'], ascending=True)
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
 
 # drop any sequences with NA values
-#df = df.dropna()
+df = df.dropna()
 
 # output the df to a csv file
 df.to_csv(f'{outputDir}/{inputFilename}_deltaG.csv', sep=',')
+
