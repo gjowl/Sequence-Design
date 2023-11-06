@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 
-def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis):
+def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis, roundToNearest=5, minY=-100000, maxY=-100000, reverseColormap=False):
     # get the x and y axes data to be plotted from the dataframe
     x = df_data.loc[:, xAxis]
     y = df_data.loc[:, yAxis]
@@ -12,9 +12,9 @@ def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis):
     # get the kde plot for the geometry data
     kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
     # plot the kde plot with an overlay of the input dataset   
-    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir)
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir, roundToNearest, minY, maxY, reverseColormap)
 
-def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, roundToNearest, minY, maxY, reverseColormap):
     # Plotting code below
     fig, ax = plt.subplots()
     # plotting labels and variables 
@@ -35,12 +35,14 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir):
     # Plot datapoints onto the graph with fluorescence as size
     # get colormap shades of green
     cmap = plt.cm.Reds
-    cmap = cmap.reversed()
+    if reverseColormap:
+        cmap = cmap.reversed()
     # get min and max of the data rounded to the nearest 5
-    minData = int(np.floor(np.min(data)/5)*5)
-    maxData = int(np.ceil(np.max(data)/5)*5)
+    if minY == -100000:
+        minY = int(np.floor(np.min(data)/5)*roundToNearest)
+        maxY = int(np.ceil(np.max(data)/5)*roundToNearest)
     # flip the data so that the min is at the top of the colorbar
-    norm = matplotlib.colors.Normalize(vmin=minData, vmax=maxData) 
+    norm = matplotlib.colors.Normalize(vmin=minY, vmax=maxY) 
     ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=10, alpha=0.5)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
@@ -75,11 +77,10 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     Z = np.reshape(kernel(positions).T, X.shape)
     return Z
 
-# read in the kde file
+# read in the command line arguments
 kdeFile = sys.argv[1]
-
-# read in the data files
 dataFile = sys.argv[2]
+outputDir = sys.argv[3]
 
 # read the files in as dataframes
 kdeDf = pd.read_csv(kdeFile)
@@ -96,4 +97,6 @@ df = df[df['Total'] < 0]
 #df = df[df['PercentStd'] < 15]
 
 # plot the kde data
-plotGeomKde(kdeDf, df, 'Total', cwd, 'endXShift', 'endCrossingAngle')
+plotGeomKde(kdeDf, df, 'Total', outputDir, 'preOptimizeXShift', 'preOptimizeCrossingAngle', reverseColormap=True)
+minY, maxY = 0, 1
+plotGeomKde(kdeDf, df, 'PercentGpA', outputDir, 'preOptimizeXShift', 'preOptimizeCrossingAngle', 1, minY, maxY)

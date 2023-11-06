@@ -2,6 +2,9 @@ import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt, seaborn as 
 
 _sentinel = object()
 def plotBoxplot(input_df, xaxis, yaxis, output_dir, output_filename=f"boxplot", xlabel=_sentinel, ylabel=_sentinel, ybottom=0, ytop=1.6):
+    # check if the input dataframe is empty
+    if input_df.empty:
+        return
     xlabel = xaxis if xlabel is _sentinel else xlabel
     ylabel = yaxis if ylabel is _sentinel else ylabel
     output_filename = f"{output_filename}_{xaxis}_vs_{yaxis}"
@@ -28,6 +31,9 @@ def plotBoxplot(input_df, xaxis, yaxis, output_dir, output_filename=f"boxplot", 
 
 # plots a boxplot for data that can be divided into multiple groups by a single columng
 def plotMultiBoxplot(input_df, xaxis, yaxis, group_col, output_dir, output_filename=f"boxplot", xlabel=_sentinel, ylabel=_sentinel, ybottom=0, ytop=1.6):
+    # check if the input dataframe is empty
+    if input_df.empty:
+        return
     xlabel = xaxis if xlabel is _sentinel else xlabel
     ylabel = yaxis if ylabel is _sentinel else ylabel
     output_filename = f"{output_filename}_{xaxis}_vs_{yaxis}"
