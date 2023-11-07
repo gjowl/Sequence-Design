@@ -7,19 +7,24 @@ import numpy as np
 colors = ['mediumseagreen', 'navajowhite', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 # plot scatterplot function
 #TODO: could get a standard deviation for the x axis energies now that I have multiple repack energies
-def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, output_dir, addColors):
-    if addColors:
+def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, output_dir, multiColor, sampleType=0, color=0):
+    if multiColor:
         for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
             df_sample = df[df['Sample'] == sample]
             # plot the WT sequence fluorescence vs the energy
             plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
             # plot the standard deviation
-            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='lightgray', elinewidth=3, capsize=0, markersize=5)
+            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='gray', elinewidth=1, capsize=2, markersize=4)
         plt.legend(loc='upper left', bbox_to_anchor=(1,1))
     else:
-        # make a scatter plot of the total energy vs the percent gpa
-        plt.scatter(df[xAxis], df[yAxis], s=3)
-        plt.errorbar(df[xAxis], df[yAxis], yerr=df[yStd], fmt='o', ecolor='lightgray', elinewidth=3, capsize=0, markersize=3)
+        df_sample = df[df['Sample'] == sampleType]
+        df_rest = df[df['Sample'] != sampleType]
+        # plot the WT sequence fluorescence vs the energy
+        plt.scatter(df_rest[xAxis], df_rest[yAxis], color='gray', label='Other', s=3)
+        plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sampleType, s=3)
+        # plot the standard deviation
+        plt.errorbar(df_rest[xAxis], df_rest[yAxis], yerr=df_rest[yStd], fmt='o', color='lightgray', ecolor='gray', elinewidth=1, capsize=2, markersize=4)
+        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='gray', elinewidth=1, capsize=2, markersize=4)
     plt.xlabel(xAxis)
     plt.ylabel(yAxis)
 
@@ -73,7 +78,7 @@ if __name__ == '__main__':
 
     # rid of any sequences where the PercentStd > 10
     #df = df[df['PercentStd'] < percentStdCutoff]
-    #df = df[df['PercentGpA'] < 3]
+    df = df[df['PercentGpA'] < 2]
 
     # TESTS
     #df = df[df['PercentGpA'] > 0.50]
@@ -106,6 +111,7 @@ if __name__ == '__main__':
         #for degree in [1,5]:
         #    print(degree)
         #    exit(0)
-        plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, False)
+        plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, True)
 
-    #TODO: write a script that will take in the energy file, combine it with the clashing file, and then use this script to plot the data
+    for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
+        plotScatterplot(df, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, False, sampleType=sample, color=colors[i])

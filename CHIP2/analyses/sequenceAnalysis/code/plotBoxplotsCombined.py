@@ -63,6 +63,7 @@ for sample in df_seq['Sample'].unique():
     df_sample.sort_values(by='Type', inplace=True)
     plotMultiBoxplot(df_sample, xaxis, yaxis, 'Type', sample_outputDir, filename)
     tmp_df = df_sample.groupby('mut_AA').filter(lambda x: len(x) > number_sequence_cutoff).copy()
+    print(len(tmp_df['WT_AA'] == 'F'))
     # only keep the mut_AA that have more than 1 sequence for both wt and mut
     # remove any mut_AA that have less than 1 sequence for either wt or mut
     plotMultiBoxplot(tmp_df, 'mut_AA', yaxis, 'Type', sample_outputDir, filename)
