@@ -56,14 +56,24 @@ df_seq['WT_MUT'] = df_seq['WT_AA'] + df_seq['mut_AA']
 
 number_sequence_cutoff = 5
 cols_to_plot = ['Position', 'WT_AA', 'mut_AA', 'pos_wtAA', 'pos_mutAA', 'WT_MUT']
+
 for sample in df_seq['Sample'].unique():
     df_sample = df_seq[df_seq['Sample'] == sample]
+    #print(f'Total proteins: {len(df_sample)}')
     sample_outputDir = f'{outputDir}/{sample}'
     os.makedirs(sample_outputDir, exist_ok=True)
     df_sample.sort_values(by='Type', inplace=True)
     plotMultiBoxplot(df_sample, xaxis, yaxis, 'Type', sample_outputDir, filename)
     tmp_df = df_sample.groupby('mut_AA').filter(lambda x: len(x) > number_sequence_cutoff).copy()
-    print(len(tmp_df['WT_AA'] == 'F'))
+    #print(tmp_df[tmp_df['WT_AA'] == 'F'])
+    #print(f"Number of F: {len(tmp_df[tmp_df['WT_AA'] == 'F'])}")
+    #print(f"Number of A: {len(tmp_df[tmp_df['WT_AA'] == 'A'])}")
+    #print(f"Number of unique wt_aa: {len(tmp_df['WT_AA'].unique())}")
+    #for wt_aa in tmp_df['WT_AA'].unique():
+    #    tmp_df_wt_aa = tmp_df[tmp_df['WT_AA'] == wt_aa]
+    #    print(f"Number of {wt_aa}: {len(tmp_df_wt_aa)}")
+    #    print(f"Number of clash: {len(tmp_df_wt_aa[tmp_df_wt_aa['Mutant Type'] == 'clash'])}")
+    #    print(f"Number of void: {len(tmp_df_wt_aa[tmp_df_wt_aa['Mutant Type'] == 'void'])}")
     # only keep the mut_AA that have more than 1 sequence for both wt and mut
     # remove any mut_AA that have less than 1 sequence for either wt or mut
     plotMultiBoxplot(tmp_df, 'mut_AA', yaxis, 'Type', sample_outputDir, filename)
