@@ -76,5 +76,6 @@ df_clash = df_mut[df_mut['Clash'] == True]
 df_c_v = df_void[df_void['Sequence'].isin(df_clash['Sequence'].unique())]
 df_wt_cv = df_wt[df_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
 df_mut_cv = df_mut[df_mut['Sequence'].isin(df_c_v['Sequence'].unique())]
-output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols]])
+df_copy_wt_cv = df_copy_wt[df_copy_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
+output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols], df_copy_wt_cv[cols]])
 output_df.to_csv(f'{outputDir}/clash_void.csv', index=False)
