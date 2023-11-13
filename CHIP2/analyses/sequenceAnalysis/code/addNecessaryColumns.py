@@ -38,6 +38,9 @@ df_wt['mut_AA'] = df_wt.apply(lambda row: row['Clash Mutant'][row['Position']], 
 
 df_wt.rename(columns={'Clash Mutant': 'Mutant'}, inplace=True)
 
+# keep only the sequences that are present in the wt dataframe
+df_mut = df_mut[df_mut['Sequence'].isin(df_wt['Sequence'].unique())]
+
 df_wt.to_csv(f'{outputDir}/wt.csv', index=False)
 df_mut.to_csv(f'{outputDir}/mutant.csv', index=False)
 
@@ -52,10 +55,9 @@ if 'PercentStd' not in df_wt.columns:
 # combine the files with the given columns
 cols = ['Sample', 'Sequence', 'Mutant', 'Position', 'Type', 'Mutant Type', 'WT_AA', 'mut_AA', 'PercentGpA', 'PercentStd']
 
-
 # add in wt data for each mutant, since the wt data only includes the best clash mutant for each sequence
 # change the mutant type to wt
-df_copy_wt = df_mut[cols].copy()
+df_copy_wt = df_mut.copy()
 df_copy_wt['Type'] = 'WT'
 copyCols = ['PercentGpA', 'PercentStd']
 # get the values from the wt dataframe for each sequence
@@ -63,6 +65,7 @@ df_copy_wt['PercentGpA'] = df_copy_wt.apply(lambda row: df_wt[df_wt['Sequence'] 
 df_copy_wt['PercentStd'] = df_copy_wt.apply(lambda row: df_wt[df_wt['Sequence'] == row['Sequence']]['PercentStd'].values[0], axis=1)
 
 # output the wt and mutant dataframes
+df_copy_wt = df_copy_wt[cols].copy()
 df_all = pd.concat([df_wt[cols], df_mut[cols], df_copy_wt[cols]])
 df_all.to_csv(f'{outputDir}/all.csv', index=False)
 
@@ -76,5 +79,6 @@ df_clash = df_mut[df_mut['Clash'] == True]
 df_c_v = df_void[df_void['Sequence'].isin(df_clash['Sequence'].unique())]
 df_wt_cv = df_wt[df_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
 df_mut_cv = df_mut[df_mut['Sequence'].isin(df_c_v['Sequence'].unique())]
-output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols]])
+df_copy_wt_cv = df_copy_wt[df_copy_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
+output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols], df_copy_wt_cv[cols]])
 output_df.to_csv(f'{outputDir}/clash_void.csv', index=False)

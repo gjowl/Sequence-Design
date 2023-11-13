@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 
-colors = ['mediumseagreen', 'navajowhite', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
+colors = ['mediumseagreen', 'moccasin', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 # plot scatterplot function
 #TODO: could get a standard deviation for the x axis energies now that I have multiple repack energies
 def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, output_dir, multiColor, sampleType=0, color=0):
@@ -14,8 +14,21 @@ def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, out
             # plot the WT sequence fluorescence vs the energy
             plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
             # plot the standard deviation
-            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='gray', elinewidth=1, capsize=2, markersize=4)
+            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
         plt.legend(loc='upper left', bbox_to_anchor=(1,1))
+        plt.text(0.99, 1.10, f'N = {len(df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
+        plt.xlabel(xAxis)
+        plt.ylabel(yAxis)
+        plt.title(f'{xAxis} vs {yAxis}')
+        plt.tight_layout()
+        plt.savefig(f'{output_dir}/scatter_{output_title}.png')
+        # add a line of best fit and an r^2 value
+        m, b = np.polyfit(df[xAxis], df[yAxis], regression_degree)
+        plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
+        # add the r^2 value to the top left of the plot
+        r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
+        plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+        plt.savefig(f'{output_dir}/scatterRegression_{output_title}_{regression_degree}.png')
     else:
         df_sample = df[df['Sample'] == sampleType]
         df_rest = df[df['Sample'] != sampleType]
@@ -23,37 +36,39 @@ def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, out
         plt.scatter(df_rest[xAxis], df_rest[yAxis], color='gray', label='Other', s=3)
         plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sampleType, s=3)
         # plot the standard deviation
-        plt.errorbar(df_rest[xAxis], df_rest[yAxis], yerr=df_rest[yStd], fmt='o', color='lightgray', ecolor='gray', elinewidth=1, capsize=2, markersize=4)
-        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='gray', elinewidth=1, capsize=2, markersize=4)
-    plt.xlabel(xAxis)
-    plt.ylabel(yAxis)
-
+        plt.errorbar(df_rest[xAxis], df_rest[yAxis], yerr=df_rest[yStd], fmt='o', color='dimgray', ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+        plt.text(0.99, 1.10, f'N = {len(df_sample)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
+        plt.xlabel(xAxis)
+        plt.ylabel(yAxis)
+        plt.title(f'{xAxis} vs {yAxis}')
+        plt.tight_layout()
+        plt.savefig(f'{output_dir}/scatter_{output_title}.png')
+        # add a line of best fit and an r^2 value
+        m, b = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)
+        plt.plot(df_sample[xAxis], m*df_sample[xAxis] + b, color='red')
+        # add the r^2 value to the top left of the plot
+        r2 = np.corrcoef(df_sample[xAxis], df_sample[yAxis])[0,1]**2
+        plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+        plt.savefig(f'{output_dir}/scatterRegression_{output_title}_{regression_degree}.png')
+    plt.clf()
     # set the yAxis lower limit to 0
     #plt.ylim(bottom=0)
     #plt.ylim(top=160)
     # set size of the points
     # add in the standard deviation
-    plt.title(f'{xAxis} vs {yAxis}')
     #plt.errorbar(df[xAxis], df[yAxis], yerr=df[yStd], fmt='none', ecolor='black')
-    plt.text(0.99, 1.10, f'N = {len(df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
-    plt.savefig(f'{output_dir}/scatter_{output_title}.png')
+    
 
     # add a line of best fit and an r^2 value
-    m, b = np.polyfit(df[xAxis], df[yAxis], regression_degree)
-    plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
+    #m, b = np.polyfit(df[xAxis], df[yAxis], regression_degree)
+    #plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
     # TODO: try the below code for sklearn regressions
     #    model = np.polyfit(df[xAxis], df[yAxis], regression_degree)
     #    predict = np.poly1d(model)
     #    x_lin_reg = np.linspace(df[xAxis].min(), df[xAxis].max(), 100)
     #    plt.plot(x_lin_reg, predict(x_lin_reg), color='red')
-
-    # add the r^2 value to the top left of the plot
-    r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
-    plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
     
-    plt.tight_layout()
-    plt.savefig(f'{output_dir}/scatterRegression_{output_title}_{regression_degree}.png')
-    plt.clf()
 
 def addEnergyDifferencesToDataframe(df, cols):
     for col in cols:
@@ -79,6 +94,8 @@ if __name__ == '__main__':
     # rid of any sequences where the PercentStd > 10
     #df = df[df['PercentStd'] < percentStdCutoff]
     df = df[df['PercentGpA'] < 2]
+    df = df[df['PercentGpA'] - df['PercentStd'] > 0]
+    df = df[df['PercentStd'] < .15]
 
     # TESTS
     #df = df[df['PercentGpA'] > 0.50]
@@ -111,6 +128,9 @@ if __name__ == '__main__':
         #for degree in [1,5]:
         #    print(degree)
         #    exit(0)
+        # check that the df_sample is not empty
+        if df_sample.empty:
+            continue
         plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, True)
 
     for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):

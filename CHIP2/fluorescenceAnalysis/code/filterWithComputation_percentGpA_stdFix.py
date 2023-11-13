@@ -130,7 +130,7 @@ maltose_limit = 10000000
 percent_error_cutoff = 0.30
 fluor_cutoff = 120 # percent GpA
 filter_maltose = False
-filter_percent_error = True
+filter_percent_error = False
 filter_fluor = False 
 transform_col = [col for col in df_fluor.columns if 'transformed' in col][0]
 

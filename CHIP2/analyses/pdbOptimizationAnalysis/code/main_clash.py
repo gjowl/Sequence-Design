@@ -52,7 +52,7 @@ if disruptionData:
     # separate the cutoffs by commas
     mutant_cutoffs = [float(x) for x in config['mutant_cutoff'].split(',')]
     percent_cutoffs = [float(x) for x in config['percent_cutoff'].split(',')]
-    number_of_mutants_cutoffs = [int(x) for x in config['number_of_mutants_cutoff'].split(',')]
+    number_of_mutants_cutoff = config['number_of_mutants_cutoff']
     # below are hardcoded output names from the fluorescenceAnalysis code that as of 2023-9-11 gets used for disruptioning
     sequenceFile = f'{disruptionInputDir}/sequence_fluor_energy_data.csv'
     mutantFile = f'{disruptionInputDir}/mutant_fluor_energy_data.csv'
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     # check if you want to analyze disruption data
     if disruptionData:
-        for mutant_cutoff, percent_cutoff, number_of_mutants_cutoff in zip(mutant_cutoffs, percent_cutoffs, number_of_mutants_cutoffs):
+        for mutant_cutoff, percent_cutoff in zip(mutant_cutoffs, percent_cutoffs):
             # convert the cutoffs to integers
             mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
             disruptionOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'

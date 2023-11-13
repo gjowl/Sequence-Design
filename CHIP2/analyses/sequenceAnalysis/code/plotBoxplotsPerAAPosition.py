@@ -55,8 +55,11 @@ for sample in df_mut['Sample'].unique():
     # get the sequences from the df_wt that are present in the df_sample
     df_wt_sample = df_wt[df_wt['Sequence'].isin(df_sample['Sequence'])]
     tmp_df = df_sample[df_sample['Sequence'].isin(df_wt_sample['Sequence'])].copy()
+    # check if the tmp_df is empty
+    if tmp_df.empty:
+        continue
     # make a column for wt_percentGpA that gets the vale from the df_wt_sample for matching sequences
-    tmp_df['wt_percentGpA'] = tmp_df.apply(lambda row: df_wt_sample[df_wt_sample['Sequence'] == row['Sequence']][yaxis].values[0], axis=1)
+    tmp_df['wt_percentGpA'] = tmp_df.apply(lambda row: df_wt_sample[df_wt_sample['Sequence'] == row['Sequence']][yaxis].values[0], axis=1).copy()
     tmp_df1 = tmp_df.groupby('pos_wtAA').filter(lambda x: len(x) > number_sequence_cutoff).copy()
     plotBoxplot(tmp_df1, 'Position', yaxis, sample_outputDir, mut_filename)
     # keep only unique sequences

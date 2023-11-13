@@ -32,6 +32,7 @@ df_input = pd.read_csv(inputFile)
 
 # remove data with total energy greater than 0
 df_input = df_input[df_input['Total'] < 0]
+df_input = df_input[df_input['deltaG'] < 0]
 # graph the data
 xaxes = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff']
 yaxis = 'deltaG'

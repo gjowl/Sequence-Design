@@ -37,6 +37,9 @@ if __name__ == "__main__":
 
     # loop through the directories in the clash directory
     for input_dir in os.listdir(clashDir):
+        # make sure the input directory is a directory
+        if not os.path.isdir(f'{clashDir}/{input_dir}'):
+            continue
         # get the input directory name
         outDir = outputDir + '/' + input_dir
 
