@@ -140,7 +140,7 @@ for sample in sample_names:
     # get the columns that contain rep
     cols = [col for col in df_control_plot.columns if 'Rep' in col]
     # currently not using Rep1 for all samples
-    cols = [col for col in cols if 'Rep1' not in col]
+    #cols = [col for col in cols if 'Rep1' not in col]
     # get the cols with the rep data
     cols = [col for col in df_sample.columns if 'Rep' in col]
     # transform the reconstruction data
@@ -162,7 +162,7 @@ for sample in sample_names:
     #df_sample = transform_data(df_sample, transform_col, sample, slope, yint, yaxis, output_df)
     # get the average for columns with transformed data
     cols = [col for col in df_sample.columns if 'transformed' in col]
-    cols = [col for col in cols if 'Rep1' not in col]
+    #cols = [col for col in cols if 'Rep1' not in col]
     df_sample[final_transform_col] = df_sample[cols].mean(axis=1)
     df_sample['std_adjusted'] = df_sample[cols].std(axis=1)
     print(df_sample)

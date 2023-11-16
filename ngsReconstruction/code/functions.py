@@ -185,7 +185,7 @@ def extractGoodSequenceDataframe(input_dir, output_dir):
                 largest_column_count = column_count if largest_column_count < column_count else largest_column_count
         colName = ''
         # get the proper column names if a bin file or LB and M9
-        LBM9_check = re.search('LB|M9', dataFile)
+        LBM9_check = re.search('maltose', dataFile)
         if LBM9_check == None:
             colName = file[0:7] # name, hour, and rep for LB/M9
         else:
@@ -213,6 +213,9 @@ def extractGoodSequenceDataframe(input_dir, output_dir):
         output_df = pd.concat([output_df, goodSequence_df])
     #remove all empty columns
     output_df = output_df.dropna(axis=1, how='all')
+    print(output_df)
+    # drop columns 4-8; added in on 2023-11-15 to rid of the extra columns from controls
+    output_df = output_df.drop(output_df.columns[[4,5,6,7,8]], axis=1)
     # hardcoded set column names
     output_df.columns = ['Sequence', 'Count', 'Percentage','Segment','Replicate']
     output_df.to_csv(output_dir+'seqIdDf.csv', index=False)

@@ -28,6 +28,10 @@ df_mut.rename(columns={'WT Sequence': 'Sequence'}, inplace=True)
 df_wt['Position'] = df_wt.apply(lambda row: [i for i in range(1, len(row['Sequence'])+1) if row['Sequence'][i-1] != row['Clash Mutant'][i-1]][0], axis=1)
 df_wt['Position'] = df_wt['Position'].astype(int)-1 # subtract 1 to the position to account for starting at 0
 
+# added in for GASrights (some mutants don't have the position, so just regetting it here)
+df_mut['Position'] = df_mut.apply(lambda row: [i for i in range(1, len(row['Sequence'])+1) if row['Sequence'][i-1] != row['Mutant'][i-1]][0], axis=1)
+df_mut['Position'] = df_mut['Position'].astype(int)-1 # subtract 1 to the position to account for starting at 0
+
 # Add the WT_AA column to the mutant dataframe
 df_wt['WT_AA'] = df_wt.apply(lambda row: row['Sequence'][row['Position']], axis=1)
 df_mut['WT_AA'] = df_mut.apply(lambda row: row['Sequence'][row['Position']], axis=1)
@@ -67,7 +71,7 @@ df_copy_wt['PercentStd'] = df_copy_wt.apply(lambda row: df_wt[df_wt['Sequence'] 
 # output the wt and mutant dataframes
 df_copy_wt = df_copy_wt[cols].copy()
 df_all = pd.concat([df_wt[cols], df_mut[cols], df_copy_wt[cols]])
-df_all.to_csv(f'{outputDir}/all.csv', index=False)
+#df_all.to_csv(f'{outputDir}/all.csv', index=False)
 
 # check if each sequence has at least 1 void and 1 clash in the Mutant Type column
 df_mut['Void'] = df_mut['Mutant Type'].apply(lambda x: 'void' in x)
@@ -81,4 +85,5 @@ df_wt_cv = df_wt[df_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
 df_mut_cv = df_mut[df_mut['Sequence'].isin(df_c_v['Sequence'].unique())]
 df_copy_wt_cv = df_copy_wt[df_copy_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
 output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols], df_copy_wt_cv[cols]])
-output_df.to_csv(f'{outputDir}/clash_void.csv', index=False)
+#output_df.to_csv(f'{outputDir}/clash_void.csv', index=False)
+output_df.to_csv(f'{outputDir}/all.csv', index=False)

@@ -94,8 +94,8 @@ if __name__ == '__main__':
     # rid of any sequences where the PercentStd > 10
     #df = df[df['PercentStd'] < percentStdCutoff]
     df = df[df['PercentGpA'] < 2]
-    #df = df[df['PercentGpA'] - df['PercentStd'] > 0]
-    #df = df[df['PercentStd'] < .15]
+    df = df[df['PercentGpA'] - df['PercentStd'] > 0]
+    df = df[df['PercentStd'] < .15]
 
     # TESTS
     #df = df[df['PercentGpA'] > 0.50]

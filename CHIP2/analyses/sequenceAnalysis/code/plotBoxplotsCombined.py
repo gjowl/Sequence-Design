@@ -94,15 +94,15 @@ for sample in df_seq['Sample'].unique():
             continue
         tmp_df.sort_values(by='Type', inplace=True)
         plotMultiBoxplot(tmp_df, col, yaxis, 'Type', sample_outputDir)
-    for mutant_type in tmp_df['Mutant Type'].unique():
-        df_mutant_type = tmp_df[tmp_df['Mutant Type'] == mutant_type]
-        mut_outputDir = f'{sample_outputDir}/{mutant_type}'
-        os.makedirs(mut_outputDir, exist_ok=True)
-        for col in cols_to_plot:
-            tmp_df1 = filterDf(df_mutant_type, col, 'Type')
-            tmp_df1 = keepSignificantInGrouping(tmp_df1, col, yaxis)
-            tmp_df1.sort_values(by='Type', inplace=True)
-            plotMultiBoxplot(tmp_df1, col, yaxis, 'Type', mut_outputDir)
+    #for mutant_type in tmp_df['Mutant Type'].unique():
+    #    df_mutant_type = tmp_df[tmp_df['Mutant Type'] == mutant_type]
+    #    mut_outputDir = f'{sample_outputDir}/{mutant_type}'
+    #    os.makedirs(mut_outputDir, exist_ok=True)
+    #    for col in cols_to_plot:
+    #        tmp_df1 = filterDf(df_mutant_type, col, 'Type')
+    #        tmp_df1 = keepSignificantInGrouping(tmp_df1, col, yaxis)
+    #        tmp_df1.sort_values(by='Type', inplace=True)
+    #        plotMultiBoxplot(tmp_df1, col, yaxis, 'Type', mut_outputDir)
     
 for col in cols_to_plot:
     tmp_df = keepSignificantInGrouping(df_seq, col, yaxis)
@@ -121,12 +121,12 @@ for col in cols_to_plot:
 #        tmp_df.sort_values(by='Type', inplace=True)
 #        plotMultiBoxplot(tmp_df, col, yaxis, 'Type', mut_outputDir, filename)
 
-# added on 2023-11-1 to compare just wt and mutant to different mutant types
-# convert the mutant type column to WT for any sequences that are type WT
-df_seq['Mutant Type'] = df_seq.apply(lambda row: 'WT' if row['Type'] == 'WT' else row['Mutant Type'], axis=1)
-# sort the dataframe by the mutant type in the order of clash, void, wt
-df_seq['Mutant Type'] = df_seq['Mutant Type'].astype('category')
-df_seq['Mutant Type'].cat.set_categories(['clash', 'void', 'WT'], inplace=True)
-df_seq.sort_values(['Mutant Type'], inplace=True)
-output_file = f'{filename}_all'
-plotMultiBoxplot(df_seq, 'Sample', yaxis, 'Mutant Type', outputDir, output_file)
+## added on 2023-11-1 to compare just wt and mutant to different mutant types
+## convert the mutant type column to WT for any sequences that are type WT
+#df_seq['Mutant Type'] = df_seq.apply(lambda row: 'WT' if row['Type'] == 'WT' else row['Mutant Type'], axis=1)
+## sort the dataframe by the mutant type in the order of clash, void, wt
+#df_seq['Mutant Type'] = df_seq['Mutant Type'].astype('category')
+#df_seq['Mutant Type'].cat.set_categories(['clash', 'void', 'WT'], inplace=True)
+#df_seq.sort_values(['Mutant Type'], inplace=True)
+#output_file = f'{filename}_all'
+#plotMultiBoxplot(df_seq, 'Sample', yaxis, 'Mutant Type', outputDir, output_file)

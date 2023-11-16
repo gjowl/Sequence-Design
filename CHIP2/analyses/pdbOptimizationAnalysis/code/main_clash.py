@@ -7,7 +7,11 @@ Code for compiling energyFile.csv files from an input directory and analyzing th
 description = '''
 This contains outputs for the pdbOptimizationAnalysis code. It extracts the energetics from a C++ program that predicts
 structures of mutant proteins based on a given dimeric pdb structure. The analysis for those energies, according to the 
-below given options, is found within this directory.
+below given options, is found within this directory. Directories named as follows:
+    - clash: trim by the clashing mutant data
+    - mutant_cutoff: fluorescence cutoff that the mutant must be less than to accept
+    - percent_cutoff: another cutoff for mutants where the mutant fluorescence must be at least this much less than the WT to be accepted
+    - number_of_mutants: the number of mutants necessary to be accepted for the WT design to be accepted
 '''
 # Helper file for reading the config file of interest for running the program
 def read_config(configFile):
