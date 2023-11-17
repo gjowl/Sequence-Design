@@ -53,23 +53,6 @@ for sequence in df_wt['Sequence'].unique():
     if len(clash) < number_of_mutants:
         continue # skip if less than the desired number the clash mutants are present
     tmp_mut = tmp_mut.sort_values(by=[sort_col], ascending=sortAscending)
-    ## check if the fluorescence of the WT is greater than the mutant
-    #wt_fluor = tmp_wt[yAxis].values[0]
-    #if wt_fluor < wt_fluor_cutoff:
-    #    continue # skip if the WT fluorescence is too low
-    ## check if there is are at least two mutants with a lower fluorescence than the WT
-    #tmp_mut['Fluor Difference'] = wt_fluor - tmp_mut[yAxis]
-    ## get all the mutants with mutant fluorescence less than the cutoff or the fluor difference less than the cutoff
-    #tmp_mut_less = tmp_mut[(tmp_mut[yAxis] < mutant_fluor_cutoff) | (tmp_mut['Fluor Difference'] < percent_wt_cutoff)]
-    ## rid of duplicates
-    #tmp_mut_less = tmp_mut_less.drop_duplicates(subset='Mutant', keep='first')
-    #if len(tmp_mut_less) < number_of_mutants:
-    #    continue # skip if there are not enough mutants
-    #mutant_fluor = tmp_mut[yAxis].values[0]
-    #wt_mutant_diff = wt_fluor - mutant_fluor
-    #if mutant_fluor > mutant_fluor_cutoff:
-    #    if wt_mutant_diff < disruptive_mutant_cutoff:
-    #        continue # skip if the mutant fluorescence is too high
     # get the mutant sequence
     mutant_seq = tmp_mut['Mutant'].values[0]
     # add it to the tmp_wt dataframe
