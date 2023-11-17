@@ -147,8 +147,6 @@ output_df_3 = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, 4)
 output_df_3.to_csv(f'{outputDir}/all_seqDiff_3.csv', index=False)
 output_df_4 = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, 5)
 output_df_4.to_csv(f'{outputDir}/all_seqDiff_4.csv', index=False)
-output_df_5 = getSimilarSequences(df_fluor, wt_seq_col, fluor_col, 6)
-output_df_5.to_csv(f'{outputDir}/all_seqDiff_5.csv', index=False)
 
 # add mismatched position to dataframe
 output_df = addMismatchedPositions(output_df, wt_seq_col, position_col)

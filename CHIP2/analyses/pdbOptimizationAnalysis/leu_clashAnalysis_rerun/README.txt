@@ -9,15 +9,15 @@ below given options, is found within this directory. Directories named as follow
 
 
 main
-codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun
-rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2023_DesignData/2023-9-5_allSeqsLeuEnds_bbOptimized
+codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun
+rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2023_DesignData/2023-9-5_allSeqsLeuEnds_bbOptimized
 datafile = leu_data
-toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/stripped_seqs_CHIP2_rerun.csv
-requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-disruptionscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
-disruptioninputdir = /mnt/d/github/Sequence-Design/CHIP2/fluorescenceAnalysis/analysis_with_toxgreenSeqs_CHIP2_rerun/sequenceVsMutant/all
-kdefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
+toxgreenfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/stripped_seqs_CHIP2_rerun.csv
+requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+disruptionscript = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
+disruptioninputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/fluorescenceAnalysis/analysis_with_toxgreenSeqs_CHIP2_rerun/sequenceVsMutant/all
+kdefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
 mutant_cutoff = 0.25, 0.25, 0.30, 0.30, 0.35, 0.35, 0.40, 0.40, 0
 percent_cutoff = 0.5, .75, 0.5, .75, 0.5, .75, 0.5, .75, 0
-number_of_mutants_cutoff = 1
+number_of_mutants_cutoff = 2

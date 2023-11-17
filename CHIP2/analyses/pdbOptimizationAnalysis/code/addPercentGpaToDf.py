@@ -11,7 +11,7 @@ outputFile = sys.argv[3]
 outputDir = sys.argv[4]
 
 # check if dataFile exists
-if os.path.isfile(outputFile):
+if os.path.isfile(f'{outputDir}/{outputFile}.csv'):
     # quit
     print('DataFile', outputFile,'exists. To overwrite, delete the file and run again.')
     sys.exit()
