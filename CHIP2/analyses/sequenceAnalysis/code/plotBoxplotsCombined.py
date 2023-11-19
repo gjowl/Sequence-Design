@@ -49,7 +49,7 @@ sequenceFile = sys.argv[1]
 outputDir = sys.argv[2]
 
 # read in the input files
-df_seq = pd.read_csv(sequenceFile) # wt data file
+df_seq = pd.read_csv(sequenceFile) 
 
 # make the output directory
 os.makedirs(outputDir, exist_ok=True)
@@ -60,12 +60,9 @@ xaxis = 'Sample'
 # plot the boxplots
 filename = os.path.basename(sequenceFile).split('.')[0]
 
-# remove anything with no sample name (TODO: figure out why this is happening)
-df_seq = df_seq[df_seq['Sample'].notnull()]
-df_seq = df_seq[df_seq['PercentGpA'] > 0]
 df_seq.sort_values(by='Type', inplace=True)
-plotBoxplot(df_seq, xaxis, yaxis, outputDir, filename)
-plotMultiBoxplot(df_seq, xaxis, yaxis, 'Type', outputDir, filename)
+#plotBoxplot(df_seq, xaxis, yaxis, outputDir, filename)
+#plotMultiBoxplot(df_seq, xaxis, yaxis, 'Type', outputDir, filename)
 
 df_seq['pos_wtAA'] = df_seq['Position'].astype(str) + df_seq['WT_AA']
 df_seq['pos_mutAA'] = df_seq['Position'].astype(str) + df_seq['mut_AA']
@@ -73,27 +70,26 @@ df_seq['WT_MUT'] = df_seq['WT_AA'] + df_seq['mut_AA']
 
 number_sequence_cutoff = 10
 cols_to_plot = ['Position', 'WT_AA', 'mut_AA', 'pos_wtAA', 'pos_mutAA', 'WT_MUT']
-
+hue_order = ['Mutant', 'WT']
 for sample in df_seq['Sample'].unique():
     df_sample = df_seq[df_seq['Sample'] == sample]
-    #print(f'Total proteins: {len(df_sample)}')
     sample_outputDir = f'{outputDir}/{sample}'
     os.makedirs(sample_outputDir, exist_ok=True)
-    #df_sample.sort_values(by='Type', inplace=True)
     df_sample.sort_values(by='Type')
-    plotMultiBoxplot(df_sample, xaxis, yaxis, 'Type', sample_outputDir)
     for col in cols_to_plot:
         tmp_df = df_sample.groupby(col).filter(lambda x: len(x) > number_sequence_cutoff).copy()
         # get the wt_aas in WT type sequences
         wt_vals = tmp_df[tmp_df['Type'] == 'WT'][col].unique()
         # keep only values in the tmp_df that are in the wt_aas
         tmp_df = tmp_df[tmp_df[col].isin(wt_vals)].copy()
-        tmp_df = keepSignificantInGrouping(tmp_df, col, yaxis)
         # check if the tmp_df is empty
         if tmp_df.empty:
             continue
         tmp_df.sort_values(by='Type', inplace=True)
-        plotMultiBoxplot(tmp_df, col, yaxis, 'Type', sample_outputDir)
+        # rid of duplicates in the tmp_df
+        tmp_df.drop_duplicates(subset=['Sequence', 'Type', 'PercentGpA', yaxis], inplace=True, keep='first')
+        tmp_df = keepSignificantInGrouping(tmp_df, col, yaxis)
+        plotMultiBoxplot(tmp_df, col, yaxis, 'Type', sample_outputDir, hue_order=hue_order)
     #for mutant_type in tmp_df['Mutant Type'].unique():
     #    df_mutant_type = tmp_df[tmp_df['Mutant Type'] == mutant_type]
     #    mut_outputDir = f'{sample_outputDir}/{mutant_type}'
@@ -110,7 +106,7 @@ for col in cols_to_plot:
     # keep only values in the tmp_df that are in the wt_aas
     tmp_df = tmp_df[tmp_df[col].isin(wt_vals)].copy()
     tmp_df.sort_values(by='Type', inplace=True)
-    plotMultiBoxplot(tmp_df, col, yaxis, 'Type', outputDir)
+    plotMultiBoxplot(tmp_df, col, yaxis, 'Type', outputDir, hue_order=hue_order)
 
 #for mutant_type in df_seq['Mutant Type'].unique():
 #    df_mutant_type = df_seq[df_seq['Mutant Type'] == mutant_type]
@@ -122,11 +118,22 @@ for col in cols_to_plot:
 #        plotMultiBoxplot(tmp_df, col, yaxis, 'Type', mut_outputDir, filename)
 
 # added on 2023-11-1 to compare just wt and mutant to different mutant types
+df_wt = df_seq[df_seq['Type'] == 'WT']
+df_wt.drop_duplicates(subset=['Sequence'], inplace=True, keep='first')
+df_wt.to_csv(f'{outputDir}/wt_test.csv', index=False)
+df_mut = df_seq[df_seq['Type'] == 'Mutant']
+df_mut.drop_duplicates(subset=['Mutant'], inplace=True, keep='first')
+df_all = pd.concat([df_wt, df_mut], ignore_index=True)
 # convert the mutant type column to WT for any sequences that are type WT
-df_seq['Mutant Type'] = df_seq.apply(lambda row: 'WT' if row['Type'] == 'WT' else row['Mutant Type'], axis=1)
+df_all['Mutant Type'] = df_all.apply(lambda row: 'WT' if row['Type'] == 'WT' else row['Mutant Type'], axis=1)
 # sort the dataframe by the mutant type in the order of clash, void, wt
-df_seq['Mutant Type'] = df_seq['Mutant Type'].astype('category')
-df_seq['Mutant Type'].cat.set_categories(['clash', 'void', 'WT'], inplace=True)
-df_seq.sort_values(['Mutant Type'], inplace=True)
+df_all['Mutant Type'] = df_all['Mutant Type'].astype('category')
+df_all['Mutant Type'].cat.set_categories(['clash', 'void', 'WT'], inplace=True)
+df_all.sort_values(['Mutant Type'], inplace=True)
 output_file = f'mutant_type'
-plotMultiBoxplot(df_seq, 'Sample', yaxis, 'Mutant Type', outputDir, output_file)
+# output the dataframe to a csv file
+df_all.to_csv(f'{outputDir}/{output_file}.csv', index=False)
+
+hue_order = ['clash', 'void', 'WT']
+#df_seq.drop_duplicates(subset=['Sequence', 'Mutant Type'], inplace=True, keep='first')
+plotMultiBoxplot(df_all, 'Sample', yaxis, 'Mutant Type', outputDir, output_file, hue_order=hue_order)

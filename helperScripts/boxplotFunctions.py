@@ -30,33 +30,34 @@ def plotBoxplot(input_df, xaxis, yaxis, output_dir, output_filename=f"boxplot", 
     plt.clf()
 
 # plots a boxplot for data that can be divided into multiple groups by a single columng
-def plotMultiBoxplot(input_df, xaxis, yaxis, group_col, output_dir, output_filename=f"boxplot", xlabel=_sentinel, ylabel=_sentinel, ybottom=0, ytop=1.6):
+def plotMultiBoxplot(input_df, xaxis, yaxis, group_col, output_dir, output_filename=f"boxplot", xlabel=_sentinel, ylabel=_sentinel, ybottom=0, ytop=1.6, hue_order=None):
     # check if the input dataframe is empty
     if input_df.empty:
         return
+    if hue_order is None:
+        hue_order = input_df[group_col].unique()
     xlabel = xaxis if xlabel is _sentinel else xlabel
     ylabel = yaxis if ylabel is _sentinel else ylabel
     output_filename = f"{output_filename}_{xaxis}_vs_{yaxis}"
     # sort by the xaxis
     input_df = input_df.sort_values(by=[xaxis])
     sns.set_style("whitegrid")
-    sns.boxplot(x=xaxis, y=yaxis, hue=group_col, data=input_df, color='green', fliersize=2)
-    #sns.swarmplot(x=xaxis, y=yaxis, hue=group_col, data=input_df, color='0', dodge=True, size=1)
-    sns.stripplot(x=xaxis, y=yaxis, hue=group_col, data=input_df, color='0', dodge=True, size=2)
+    sns.boxplot(x=xaxis, y=yaxis, hue=group_col, hue_order=hue_order, data=input_df, color='green', fliersize=2)
+    sns.stripplot(x=xaxis, y=yaxis, hue=group_col, hue_order=hue_order, data=input_df, color='0', dodge=True, size=2)
     #calculate_pvalues(input_df)
     for i, sample in enumerate(input_df[xaxis].unique()):
         # separate the dataframe by mutant and wt
         # divide the size of the groups column by the number of groups
-        groups = len(input_df[group_col].unique())
+        groups = len(hue_order)
         if groups == 1:
             dividers = [0]
         elif groups == 2:
             dividers = [-.15, .15]  
         elif groups == 3:
             dividers = [-.25, 0, .25]
-        for divider, group in zip(dividers, input_df[group_col].unique()):
+        for divider, group in zip(dividers, hue_order):
             df_group = input_df[input_df[group_col] == group]
-            plt.text(i+divider, 1.65, len(df_group[df_group[xaxis] == sample]))
+            plt.text(i + divider, 1.65, len(df_group[df_group[xaxis] == sample]), ha='left')
     # remove the swarm plot from the legend
     handles, labels = plt.gca().get_legend_handles_labels()
     plt.legend(handles[0:groups], labels[0:groups], frameon=False)
