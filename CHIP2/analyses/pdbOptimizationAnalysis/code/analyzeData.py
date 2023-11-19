@@ -91,19 +91,12 @@ if __name__ == '__main__':
     cols = df.columns.tolist()
     cols.insert(0, cols.pop(cols.index('Sequence')))
 
-    # rid of any sequences where the PercentStd > 10
-    #df = df[df['PercentStd'] < percentStdCutoff]
+    # TRIMMING THE DATAFRAME
     df = df[df['PercentGpA'] < 2]
     df = df[df['PercentGpA'] - df['PercentStd'] > 0]
     df = df[df['PercentStd'] < .15]
-
-    # TESTS
-    #df = df[df['PercentGpA'] > 0.50]
-    #maltose_col = 'LB-12H_M9-36H'
-    #maltose_cutoff = -99.9
-    #maltose_limit = 99999900 
-    #df = df[df[maltose_col] > maltose_cutoff]
-    #df = df[df[maltose_col] < maltose_limit]
+    df = df[df['Sample'].notnull()]
+    df = df[df['PercentGpA'] > 0]
 
     # add energy differences to the dataframe
     cols = ['VDW', 'HBOND', 'IMM1']
@@ -115,6 +108,9 @@ if __name__ == '__main__':
     # save the lowHbond_df to a csv file
     lowHbond_df.to_csv(f'{outputDir}/lowHbond_df.csv', index=False)
     df = df[df['Total'] < 0]
+
+    # save the df to a csv file
+    df.to_csv(f'{outputDir}/plotData.csv', index=False)
 
     # make list of dfs to plot
     df_list = [df, lowHbond_df]
