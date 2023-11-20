@@ -9,15 +9,15 @@ below given options, is found within this directory. Directories named as follow
 
 
 main
-codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/gasRight/ala_gasRight
-rawdatadir = /mnt/d/gasRight_designs/JC_ala/
+codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/gasRight/ala_gasRight
+rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/JC_data/JC_design_data/ala_ends/
 datafile = gasRight_ala
-toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/JC_reconstruction_data.csv
-requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-disruptionscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
-disruptioninputdir = /mnt/d/github/Sequence-Design/CHIP2/fluorescenceAnalysis/GASright_analysis/percentGpA_GAS/sequenceVsMutant/all
-kdefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
-mutant_cutoff = 0.25, 0.25, 0.30, 0.30, 0.35, 0.35, 0.40, 0.40
-percent_cutoff = 0.5, .75, 0.5, .75, 0.5, .75, 0.5, .75
-number_of_mutants_cutoff = 1
+toxgreenfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/JC_reconstruction_data.csv
+requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+clashscript = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
+clashinputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/toxgreenConversion/GASright_analysis/percentGpA_GAS/sequenceVsMutant/all
+kdefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
+mutant_cutoff = 0.25, 0.25, 0.30, 0.30, 0.35, 0.35, 0.40, 0.40, 0
+percent_cutoff = 0.5, .75, 0.5, .75, 0.5, .75, 0.5, .75, 0
+number_of_mutants_cutoff = 1, 2

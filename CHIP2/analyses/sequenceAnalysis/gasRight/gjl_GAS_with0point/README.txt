@@ -9,8 +9,8 @@ and analyzes the sequence composition against the fluorescence. Directories are 
 
 main
 codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
-clashdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_gjl_GAS_with0point
+clashdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/gasRight/gjl/leu_clashAnalysis_gjl_GAS_with0point
 outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/gjl_GAS_with0point
 requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-sequencefile = wt/lowestEnergySequences.csv
+sequencefile = wt/plotData.csv
 mutantfile = mutant/lowestEnergySequences.csv
