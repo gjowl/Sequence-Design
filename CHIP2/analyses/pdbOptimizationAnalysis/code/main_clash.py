@@ -47,19 +47,19 @@ kdeFile = config['kdeFile']
 dataFile = config['dataFile']
 requirementsFile = config['requirementsFile']
 toxgreenFile = config['toxgreenFile']
-disruptionScript = config['disruptionScript']
-# check if any of the disruptioning config options are found in the config file
-disruptionData = 'disruptionScript' in config
-if disruptionData:
-    disruptionInputDir = config['disruptionInputDir']
-    disruptionScript = config['disruptionScript']
+clashScript = config['clashScript']
+# check if any of the clashing config options are found in the config file
+clashData = 'clashScript' in config
+if clashData:
+    clashInputDir = config['clashInputDir']
+    clashScript = config['clashScript']
     # separate the cutoffs by commas
     mutant_cutoffs = [float(x) for x in config['mutant_cutoff'].split(',')]
     percent_cutoffs = [float(x) for x in config['percent_cutoff'].split(',')]
-    number_of_mutants_cutoff = config['number_of_mutants_cutoff']
-    # below are hardcoded output names from the fluorescenceAnalysis code that as of 2023-9-11 gets used for disruptioning
-    sequenceFile = f'{disruptionInputDir}/sequence_fluor_energy_data.csv'
-    mutantFile = f'{disruptionInputDir}/mutant_fluor_energy_data.csv'
+    number_of_mutants_cutoffs = [int(x) for x in config['number_of_mutants_cutoff'].split(',')]
+    # below are hardcoded output names from the fluorescenceAnalysis code that as of 2023-9-11 gets used for clashing
+    sequenceFile = f'{clashInputDir}/sequence_fluor_energy_data.csv'
+    mutantFile = f'{clashInputDir}/mutant_fluor_energy_data.csv'
 
 # make the output directory if it doesn't exist
 if not os.path.exists(outputDir):
@@ -83,33 +83,34 @@ if __name__ == "__main__":
     execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py {outputDir}/{dataFile}.csv {toxgreenFile} {outputFile} {outputDir}' 
     os.system(execAddPercentGpA)
 
-    # check if you want to analyze disruption data
-    if disruptionData:
-        for mutant_cutoff, percent_cutoff in zip(mutant_cutoffs, percent_cutoffs):
-            # convert the cutoffs to integers
-            mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
-            disruptionOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
-            execDisruptionCheck = f'python3 {disruptionScript} {sequenceFile} {mutantFile} {disruptionOutputDir} {mutant_cutoff} {percent_cutoff} {number_of_mutants_cutoff}'
-            os.system(execDisruptionCheck)
-            # loop through the files in the disruptionOutputDir
-            for filename in os.listdir(disruptionOutputDir):
-                # check if the file is a csv
-                if not filename.endswith('.csv'):
-                    continue
-                file_outputDir = f'{disruptionOutputDir}/{os.path.splitext(filename)[0]}'
-                execAnalyzeDisruption = f'python3 {codeDir}/combineFilesAndPlot.py {disruptionOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir}'
-                os.system(execAnalyzeDisruption)
-                file_to_analyze = 'lowestEnergySequences'
-                # plot kde plots of geometries
-                execPlotKde = f'python3 {codeDir}/makeKdePlots.py {kdeFile} {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
-                os.system(execPlotKde)
-            # convert to delta G
-            execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
-            os.system(execConvertToDeltaG)
+    # check if you want to analyze clash data
+    if clashData:
+        for number_of_mutants_cutoff in number_of_mutants_cutoffs:
+            for mutant_cutoff, percent_cutoff in zip(mutant_cutoffs, percent_cutoffs):
+                # convert the cutoffs to integers
+                mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
+                clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
+                execclashCheck = f'python3 {clashScript} {sequenceFile} {mutantFile} {clashOutputDir} {mutant_cutoff} {percent_cutoff} {number_of_mutants_cutoff}'
+                os.system(execclashCheck)
+                # loop through the files in the clashOutputDir
+                for filename in os.listdir(clashOutputDir):
+                    # check if the file is a csv
+                    if not filename.endswith('.csv'):
+                        continue
+                    file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
+                    execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir}'
+                    os.system(execAnalyzeclash)
+                    file_to_analyze = 'lowestEnergySequences'
+                    # plot kde plots of geometries
+                    execPlotKde = f'python3 {codeDir}/makeKdePlots.py {kdeFile} {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
+                    os.system(execPlotKde)
+                # convert to delta G
+                execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
+                os.system(execConvertToDeltaG)
 
-            # graph the delta G
-            execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {file_outputDir}/{file_to_analyze}_deltaG.csv {file_outputDir}'
-            os.system(execGraphDeltaG)
+                # graph the delta G
+                execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {file_outputDir}/{file_to_analyze}_deltaG.csv {file_outputDir}'
+                os.system(execGraphDeltaG)
 
     # analyze the data
     execAnalyzeData = f'python3 {codeDir}/analyzeData.py {outputDir}/{outputFile}.csv {outputDir}' 
