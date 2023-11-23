@@ -9,6 +9,8 @@ os.makedirs(outputDir, exist_ok=True)
 
 # read in the input file
 df = pd.read_csv(inputFile)
+# make the replicate column lowercase
+df['Replicate'] = df['Replicate'].str.lower()
 # get the maltose data by filtering on the replicate column
 df_maltose = df[df['Replicate'].str.contains('maltose')]
 df_maltose.to_csv(f'{outputDir}/all_maltose.csv', index=False)
