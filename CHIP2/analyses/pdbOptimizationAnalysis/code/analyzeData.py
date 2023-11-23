@@ -7,68 +7,66 @@ import numpy as np
 colors = ['mediumseagreen', 'moccasin', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 # plot scatterplot function
 #TODO: could get a standard deviation for the x axis energies now that I have multiple repack energies
-def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, output_dir, multiColor, sampleType=0, color=0):
-    if multiColor:
-        for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
-            df_sample = df[df['Sample'] == sample]
-            # plot the WT sequence fluorescence vs the energy
-            plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
-            # plot the standard deviation
-            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
-        plt.legend(loc='upper left', bbox_to_anchor=(1,1))
-        plt.text(0.99, 1.10, f'N = {len(df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
-        plt.xlabel(xAxis)
-        plt.ylabel(yAxis)
-        plt.title(f'{xAxis} vs {yAxis}')
-        plt.tight_layout()
-        plt.savefig(f'{output_dir}/scatter_{output_title}.png')
-        # add a line of best fit and an r^2 value
-        m, b = np.polyfit(df[xAxis], df[yAxis], regression_degree)
-        plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
-        # add the r^2 value to the top left of the plot
-        r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
-        plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
-        plt.savefig(f'{output_dir}/scatterRegression_{output_title}_{regression_degree}.png')
-    else:
-        df_sample = df[df['Sample'] == sampleType]
-        df_rest = df[df['Sample'] != sampleType]
+def plotScatterplot(df, xAxis, yAxis, yStd, regression_degree, output_title, output_dir, sampleType=0, color=0):
+    for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
+        df_sample = df[df['Sample'] == sample]
         # plot the WT sequence fluorescence vs the energy
-        plt.scatter(df_rest[xAxis], df_rest[yAxis], color='gray', label='Other', s=3)
-        plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sampleType, s=3)
+        plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
         # plot the standard deviation
-        plt.errorbar(df_rest[xAxis], df_rest[yAxis], yerr=df_rest[yStd], fmt='o', color='dimgray', ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
-        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
-        plt.text(0.99, 1.10, f'N = {len(df_sample)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
-        plt.xlabel(xAxis)
-        plt.ylabel(yAxis)
-        plt.title(f'{xAxis} vs {yAxis}')
-        plt.tight_layout()
-        plt.savefig(f'{output_dir}/scatter_{output_title}.png')
-        # add a line of best fit and an r^2 value
-        m, b = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)
-        plt.plot(df_sample[xAxis], m*df_sample[xAxis] + b, color='red')
-        # add the r^2 value to the top left of the plot
-        r2 = np.corrcoef(df_sample[xAxis], df_sample[yAxis])[0,1]**2
-        plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
-        plt.savefig(f'{output_dir}/scatterRegression_{output_title}_{regression_degree}.png')
-    plt.clf()
-    # set the yAxis lower limit to 0
-    #plt.ylim(bottom=0)
-    #plt.ylim(top=160)
-    # set size of the points
-    # add in the standard deviation
-    #plt.errorbar(df[xAxis], df[yAxis], yerr=df[yStd], fmt='none', ecolor='black')
-    
-
+        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+    plt.legend(loc='upper left', bbox_to_anchor=(1,1))
+    plt.text(0.99, 1.10, f'N = {len(df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
+    plt.xlabel(xAxis)
+    plt.ylabel(yAxis)
+    plt.title(f'{xAxis} vs {yAxis}')
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/png/scatter_{output_title}.png')
+    plt.savefig(f'{output_dir}/svg/scatter_{output_title}.svg')
     # add a line of best fit and an r^2 value
-    #m, b = np.polyfit(df[xAxis], df[yAxis], regression_degree)
-    #plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
-    # TODO: try the below code for sklearn regressions
-    #    model = np.polyfit(df[xAxis], df[yAxis], regression_degree)
-    #    predict = np.poly1d(model)
-    #    x_lin_reg = np.linspace(df[xAxis].min(), df[xAxis].max(), 100)
-    #    plt.plot(x_lin_reg, predict(x_lin_reg), color='red')
-    
+    m, b = np.polyfit(df[xAxis], df[yAxis], regression_degree)
+    plt.plot(df[xAxis], m*df[xAxis] + b, color='red')
+    # add the r^2 value to the top left of the plot
+    r2 = np.corrcoef(df[xAxis], df[yAxis])[0,1]**2
+    plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+    plt.savefig(f'{output_dir}/png/scatterRegression_{output_title}_{regression_degree}.png')
+    plt.savefig(f'{output_dir}/svg/scatterRegression_{output_title}_{regression_degree}.svg')
+    plt.clf()
+
+def plotScatterplotFaded(df, xAxis, yAxis, yStd, regression_degree, output_title, output_dir, sampleType=0, color=0):
+    main_color = 0
+    for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
+        df_sample = df[df['Sample'] == sample]
+        # check if this is the sampleType that we want to plot
+        if sample != sampleType:
+            # plot the WT sequence fluorescence vs the energy with a faded version of the color and a faded version of the error bars
+            plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5, alpha=0.5)
+            plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4, alpha=0.1)
+        else:
+            main_color = colors[i]
+    # get the main sampleType that we want to plot
+    df_sample = df[df['Sample'] == sampleType]
+    # plot the WT sequence fluorescence vs the energy
+    plt.scatter(df_sample[xAxis], df_sample[yAxis], color=main_color, label=sample, s=5)
+    # plot the standard deviation
+    plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=main_color, ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+    plt.legend(loc='upper left', bbox_to_anchor=(1,1))
+    plt.text(0.99, 1.10, f'N = {len(df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
+    plt.xlabel(xAxis)
+    plt.ylabel(yAxis)
+    plt.title(f'{xAxis} vs {yAxis}')
+    plt.tight_layout()
+    plt.savefig(f'{output_dir}/png/scatter_{output_title}.png')
+    plt.savefig(f'{output_dir}/svg/scatter_{output_title}.svg')
+    # add a line of best fit and an r^2 value
+    m, b = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)
+    plt.plot(df_sample[xAxis], m*df_sample[xAxis] + b, color='red')
+    # add the r^2 value to the top left of the plot
+    r2 = np.corrcoef(df_sample[xAxis], df_sample[yAxis])[0,1]**2
+    plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+    plt.savefig(f'{output_dir}/png/scatterRegression_{output_title}_{regression_degree}.png')
+    plt.savefig(f'{output_dir}/svg/scatterRegression_{output_title}_{regression_degree}.svg')
+    plt.clf()
+
 
 def addEnergyDifferencesToDataframe(df, cols):
     for col in cols:
@@ -82,7 +80,11 @@ if __name__ == '__main__':
 
     # get the output directory
     outputDir = sys.argv[2]
-    #percentStdCutoff = 15
+
+    # make the output directory if it doesn't exist and the png and svg subdirectories
+    os.makedirs(outputDir, exist_ok=True)
+    os.makedirs(f'{outputDir}/png', exist_ok=True)
+    os.makedirs(f'{outputDir}/svg', exist_ok=True)
 
     # only keep sequences with the lowest total energy
     df = df.sort_values(by=['Total'], ascending=True)
@@ -105,6 +107,7 @@ if __name__ == '__main__':
 
     # only plot the sequences with the HBONDDiff > 5
     lowHbond_df = df[df['HBONDDiff'] > -5]
+    lowHbond_df = lowHbond_df[lowHbond_df['Total'] < 0]
     # save the lowHbond_df to a csv file
     lowHbond_df.to_csv(f'{outputDir}/lowHbond_df.csv', index=False)
     df = df[df['Total'] < 0]
@@ -117,7 +120,7 @@ if __name__ == '__main__':
     outputTitle_list = ['TotalEnergy', 'LowHbond']
 
     for df_tmp,title in zip(df_list, outputTitle_list):
-        plotScatterplot(df_tmp, 'Total', 'PercentGpA', 'PercentStd', 1, title, outputDir, True)
+        plotScatterplot(df_tmp, 'Total', 'PercentGpA', 'PercentStd', 1, title, outputDir)
 
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
@@ -127,7 +130,7 @@ if __name__ == '__main__':
         # check that the df_sample is not empty
         if df_sample.empty:
             continue
-        plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, True)
+        plotScatterplot(df_sample, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir)
 
     for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
-        plotScatterplot(df, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, False, sampleType=sample, color=colors[i])
+        plotScatterplotFaded(df, 'Total', 'PercentGpA', 'PercentStd', 1, f'{sample}_Total', outputDir, sampleType=sample, color=colors[i])
