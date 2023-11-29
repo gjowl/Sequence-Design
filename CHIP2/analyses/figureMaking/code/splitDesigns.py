@@ -23,6 +23,7 @@ os.makedirs(name=outputDir, exist_ok=True)
 
 # read the input file as a dataframe
 df = pd.read_csv(inputFile, sep=',', dtype={'Interface': str})
+df = df[df['PercentGpA'] > 0.5]
 
 # separate into the two different designs
 df_ala = df[df['Design'] == 'ala']
