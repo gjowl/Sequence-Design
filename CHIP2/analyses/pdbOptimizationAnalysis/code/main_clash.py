@@ -86,31 +86,32 @@ if __name__ == "__main__":
     # check if you want to analyze clash data
     if clashData:
         for number_of_mutants_cutoff in number_of_mutants_cutoffs:
-            for mutant_cutoff, percent_cutoff in zip(mutant_cutoffs, percent_cutoffs):
-                # convert the cutoffs to integers
-                mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
-                clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
-                execclashCheck = f'python3 {clashScript} {sequenceFile} {mutantFile} {clashOutputDir} {mutant_cutoff} {percent_cutoff} {number_of_mutants_cutoff}'
-                os.system(execclashCheck)
-                # loop through the files in the clashOutputDir
-                for filename in os.listdir(clashOutputDir):
-                    # check if the file is a csv
-                    if not filename.endswith('.csv'):
-                        continue
-                    file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-                    execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir}'
-                    os.system(execAnalyzeclash)
-                    file_to_analyze = 'lowestEnergySequences'
-                    # plot kde plots of geometries
-                    execPlotKde = f'python3 {codeDir}/makeKdePlots.py {kdeFile} {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
-                    os.system(execPlotKde)
-                # convert to delta G
-                execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
-                os.system(execConvertToDeltaG)
+            for mutant_cutoff in mutant_cutoffs:
+                for percent_cutoff in percent_cutoffs:
+                    # convert the cutoffs to integers
+                    mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
+                    clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
+                    execclashCheck = f'python3 {clashScript} {sequenceFile} {mutantFile} {clashOutputDir} {mutant_cutoff} {percent_cutoff} {number_of_mutants_cutoff}'
+                    os.system(execclashCheck)
+                    # loop through the files in the clashOutputDir
+                    for filename in os.listdir(clashOutputDir):
+                        # check if the file is a csv
+                        if not filename.endswith('.csv'):
+                            continue
+                        file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
+                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir}'
+                        os.system(execAnalyzeclash)
+                        file_to_analyze = 'lowestEnergySequences'
+                        # plot kde plots of geometries
+                        execPlotKde = f'python3 {codeDir}/makeKdePlots.py {kdeFile} {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
+                        os.system(execPlotKde)
+                    # convert to delta G
+                    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
+                    os.system(execConvertToDeltaG)
 
-                # graph the delta G
-                execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {file_outputDir}/{file_to_analyze}_deltaG.csv {file_outputDir}'
-                os.system(execGraphDeltaG)
+                    # graph the delta G
+                    execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {file_outputDir}/{file_to_analyze}_deltaG.csv {file_outputDir}'
+                    os.system(execGraphDeltaG)
 
     # analyze the data
     execAnalyzeData = f'python3 {codeDir}/analyzeData.py {outputDir}/{outputFile}.csv {outputDir}' 

@@ -64,10 +64,6 @@ df_seq.sort_values(by='Type', inplace=True)
 #plotBoxplot(df_seq, xaxis, yaxis, outputDir, filename)
 #plotMultiBoxplot(df_seq, xaxis, yaxis, 'Type', outputDir, filename)
 
-df_seq['pos_wtAA'] = df_seq['Position'].astype(str) + df_seq['WT_AA']
-df_seq['pos_mutAA'] = df_seq['Position'].astype(str) + df_seq['mut_AA']
-df_seq['WT_MUT'] = df_seq['WT_AA'] + df_seq['mut_AA']
-
 number_sequence_cutoff = 10
 cols_to_plot = ['Position', 'WT_AA', 'mut_AA', 'pos_wtAA', 'pos_mutAA', 'WT_MUT']
 hue_order = ['Mutant', 'WT']

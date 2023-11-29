@@ -95,8 +95,10 @@ df = dataDf.sort_values(by=['Total'], ascending=True)
 df = df.drop_duplicates(subset=['Sequence'], keep='first')
 df = df[df['Total'] < 0]
 #df = df[df['PercentStd'] < 15]
+xAxis = 'endXShift'
+yAxis = 'endCrossingAngle'
 
 # plot the kde data
-plotGeomKde(kdeDf, df, 'Total', outputDir, 'preOptimizeXShift', 'preOptimizeCrossingAngle', reverseColormap=True)
+plotGeomKde(kdeDf, df, 'Total', outputDir, xAxis, yAxis, reverseColormap=True)
 minY, maxY = 0, 1
-plotGeomKde(kdeDf, df, 'PercentGpA', outputDir, 'preOptimizeXShift', 'preOptimizeCrossingAngle', 1, minY, maxY)
+plotGeomKde(kdeDf, df, 'PercentGpA', outputDir, xAxis, yAxis, 1, minY, maxY)

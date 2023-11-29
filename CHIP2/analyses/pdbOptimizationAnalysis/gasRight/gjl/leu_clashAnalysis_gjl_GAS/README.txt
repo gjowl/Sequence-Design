@@ -9,15 +9,15 @@ below given options, is found within this directory. Directories named as follow
 
 
 main
-codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/gasRight/gjl/leu_clashAnalysis_gjl_GAS
-rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2023_DesignData/2023-9-5_allSeqsLeuEnds_bbOptimized
+codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/gasRight/gjl/leu_clashAnalysis_gjl_GAS
+rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2023_DesignData/2023-9-5_allSeqsLeuEnds_bbOptimized
 datafile = leu_data
-toxgreenfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/stripped_seqs_gjl_GAS.csv
-requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-clashscript = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
-clashinputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/toxgreenConversion/CHIP2_rerun/sequenceVsMutant/all
-kdefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
-mutant_cutoff = 0.25, 0.25, 0.30, 0.30, 0.35, 0.35, 0.40, 0.40, 0
-percent_cutoff = 0.5, .75, 0.5, .75, 0.5, .75, 0.5, .75, 0
+toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/stripped_seqs_gjl_GAS.csv
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+clashscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
+clashinputdir = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/CHIP2_rerun/sequenceVsMutant/all
+kdefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
+mutant_cutoff = 0, 0.25, 0.30, 0.35, 0.40
+percent_cutoff = 0, 0.25, 0.5, .75
 number_of_mutants_cutoff = 1, 2
