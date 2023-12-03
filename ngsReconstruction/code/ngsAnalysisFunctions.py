@@ -60,7 +60,7 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
         if len(os.listdir(outputDir)) < 1:
             # remove the non-sorted data (H to distinguish LB and maltose data) from the df
             #dfBins = df.filter(like='H')
-            dfBins = df.filter(like='maltose')
+            dfBins = df.filter(like='E')
             # remove the those bins from the df
             dfBins = df.drop(dfBins.columns, axis=1)
             # remove the sequence and segment columns from the dfBins

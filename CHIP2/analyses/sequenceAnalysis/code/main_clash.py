@@ -75,8 +75,8 @@ if __name__ == "__main__":
         #os.system(execplotBoxplot)
 
         # run boxplot script for all of the data
-        #execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py {outDir}/all.csv {outDir}'
-        #os.system(execplotBoxplotCombined)
+        execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py {outDir}/all.csv {outDir}'
+        os.system(execplotBoxplotCombined)
 
-        execGraphDeltaFluorescence = f'python3 {codeDir}/graphDeltaFluorescence.py {outDir}/deltaFluorescence.csv {outDir}/deltaFluorescence'
-        os.system(execGraphDeltaFluorescence)
+        #execGraphDeltaFluorescence = f'python3 {codeDir}/graphDeltaFluorescence.py {outDir}/deltaFluorescence.csv {outDir}/deltaFluorescence'
+        #os.system(execGraphDeltaFluorescence)

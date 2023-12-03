@@ -68,6 +68,7 @@ list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, re
 # or even designability
 df_fluor = list_dfReconstructedFluor[0]
 divider = '-Fluor'
+print(df_fluor)
 calculatePercentGpA(df_fluor, gpa, g83i, noTMfluor, divider, outputDir)
 
 # hardcoded hour lists for LB and M9
