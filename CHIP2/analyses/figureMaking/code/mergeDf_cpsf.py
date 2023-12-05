@@ -17,13 +17,19 @@ df.rename(columns={'Directory': 'Optimized_Directory', 'replicateNumber': 'Optim
 
 # keep only the 3 to 17 str in the Sequence column
 df_to_merge['Sequence'] = df_to_merge['Sequence'].str[3:18]
-cols_to_keep = ['Sequence', 'Design', 'replicateNumber', 'Directory', 'Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
-# merge that data with the data to merge
-df = pd.merge(df, df_to_merge[cols_to_keep], on='Sequence', how='left')
+cols = ['Sequence', 'Design', 'replicateNumber', 'Directory', 'Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
+if all(col in df_to_merge.columns for col in cols):
+    df_to_merge = df_to_merge[cols]
+else:
+    # get the columns that are present
+    cols = [col for col in cols if col in df_to_merge.columns]
+    df_to_merge = df_to_merge[cols]
+# merge that data with the data to merge with any matching columns
+df = pd.merge(df, df_to_merge[cols], on='Sequence', how='left')
 #df = df[df['PercentGpA'] > 0.5]
 
 # keep only the rows where the replicateNumber is not null
-df = df[df['replicateNumber'].notnull()]
+#df = df[df['replicateNumber'].notnull()]
 
 # add LLL to the beginning of the sequence and ILI to the end of the sequence
 df['Sequence'] = 'LLL' + df['Sequence'] + 'ILI'
