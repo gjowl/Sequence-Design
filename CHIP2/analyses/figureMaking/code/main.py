@@ -47,7 +47,7 @@ if __name__ == '__main__':
     os.system(execInstallRequirements)
 
     # merge the dataframes
-    execMergeData = f'python3 {codeDir}/mergeDf.py {sequenceFile} {dataFile} {outputFile} {outputDir}'
+    execMergeData = f'python3 {codeDir}/mergeDf_cpsf.py {sequenceFile} {dataFile} {outputFile} {outputDir}'
     os.system(execMergeData)
 
     # replace the interface column
