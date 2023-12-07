@@ -32,5 +32,5 @@ for f in files:
         # untar the file
         print(f)
         os.system('gzip -dk '+ngsDir+f)
-        # rename the file
-        #os.system('mv '+outputDir+'fastq/'+name+' '+outputDir+'fastq/'+name[:-3])
+        # move the file to the output directory
+        os.system('mv '+ngsDir+name+' '+outputDir+name)
