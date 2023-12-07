@@ -60,6 +60,9 @@ for sample in df['Sample'].unique():
     high_counts, low_counts = getAACounts(df_sample, 'InterfaceSeq', 'Label')
     # make a histogram of the counts
     fig, ax = plt.subplots()
+    # sort the counts by index
+    high_counts = high_counts.sort_index()
+    low_counts = low_counts.sort_index()
     # plot the high and low counts adjacent to each other
     ax.bar(np.arange(len(high_counts))-0.2, high_counts, width=0.4, label='High', color='green')
     ax.bar(np.arange(len(low_counts))+0.2, low_counts, width=0.4, label='Low')

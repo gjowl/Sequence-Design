@@ -31,9 +31,9 @@ interfaceDf = pd.read_csv(interfaceFile, sep=',', dtype={'Interface': str})
 # replace the interface column with the interfaceDf interface column for matching sequences
 for i in range(0, len(df)):
     # get the sequence
-    sequence = df['Sequence'][i] # changed for the cpsf version from Directory
+    sequence = df['WTSequence'][i] # changed for the cpsf version from Directory
     # get the interface
-    interface = interfaceDf[interfaceDf['Sequence'] == sequence]['Interface']
+    interface = interfaceDf[interfaceDf['WTSequence'] == sequence]['Interface']
     # if the interface is not empty
     if len(interface) > 0:
         # replace the interface

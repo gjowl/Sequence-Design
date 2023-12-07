@@ -17,15 +17,15 @@ df.rename(columns={'Directory': 'Optimized_Directory', 'replicateNumber': 'Optim
 
 # keep only the 3 to 17 str in the Sequence column
 df_to_merge['Sequence'] = df_to_merge['Sequence'].str[3:18]
-cols = ['Sequence', 'Design', 'replicateNumber', 'Directory', 'Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
+cols = ['WTSequence', 'Sequence', 'Design', 'replicateNumber', 'Directory', 'Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
 
 # Below is a quick fix to be able to use this with mutant data from the pdboptimization analysis as well
 # check if there is a WTSequence column in the df_to_merge
-print(df_to_merge.columns)
-print(df.columns)
-if 'WTSequence' in df_to_merge.columns:
-    df['WTSequence'] = df['Sequence']
-    cols = ['WTSequence', 'Sequence', 'Design', 'replicateNumber', 'Directory', 'Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
+#print(df_to_merge.columns)
+#print(df.columns)
+#if 'WTSequence' in df_to_merge.columns:
+#    df['WTSequence'] = df['Sequence']
+#    cols = ['WTSequence', 'Sequence', 'Design', 'replicateNumber', 'Directory', 'Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff','VDWRepackDiff', 'HBONDRepackDiff', 'IMM1RepackDiff']
 if all(col in df_to_merge.columns for col in cols):
     df_to_merge = df_to_merge[cols]
 else:
@@ -33,6 +33,8 @@ else:
     cols = [col for col in cols if col in df_to_merge.columns]
     df_to_merge = df_to_merge[cols]
 
+print(df.columns)
+print(df_to_merge.columns)
 # merge that data with the data to merge with any matching columns
 df = pd.merge(df, df_to_merge[cols], on='Sequence', how='left')
 #df = df[df['PercentGpA'] > 0.5]
@@ -41,12 +43,10 @@ df = pd.merge(df, df_to_merge[cols], on='Sequence', how='left')
 #df = df[df['replicateNumber'].notnull()]
 
 # add LLL to the beginning of the sequence and ILI to the end of the sequence
-print(df.columns)
 df['Sequence'] = 'LLL' + df['Sequence'] + 'ILI'
 
-#if copy_wt_sequence:
-    # merge the wt sequence column
+# rid of any without a WTSequence
+df = df[df['WTSequence'].notnull()]
 
-print(df.columns)
 # output the dataframe to a csv file without the index
 df.to_csv(f'{output_dir}/{output_file}.csv', index=False)
