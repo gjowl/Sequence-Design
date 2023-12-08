@@ -33,10 +33,13 @@ def writeReadMe(config, outputDir):
 # get the current directory
 cwd = os.getcwd()
 
+# gets the name of this file to access the config options
+programName = getFilename(__file__)
+
 # get the config file options
 configFile = sys.argv[1]
 globalConfig = read_config(configFile)
-config = globalConfig['main']
+config = globalConfig[programName]
 
 # read in the config arguments
 codeDir = config['codeDir']

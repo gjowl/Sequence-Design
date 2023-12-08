@@ -35,7 +35,7 @@ def getFilename(file):
 # read in the input configuration file
 configFile = sys.argv[1]
 
-# gets the name of this file to access 
+# gets the name of this file to access the config options
 programName = getFilename(__file__)
 
 # Read in configuration file:
