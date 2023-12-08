@@ -30,6 +30,13 @@ def writeReadMe(config, outputDir):
         # close the file
         f.close()
 
+# get filename separate from type and directory
+def getFilename(file):
+    programPath = os.path.realpath(file)
+    programDir, programFile = os.path.split(programPath)
+    filename, programExt = os.path.splitext(programFile)
+    return filename
+
 # get the current directory
 cwd = os.getcwd()
 
@@ -49,9 +56,12 @@ requirementsFile = config['requirementsFile']
 sequenceFile = config['sequenceFile']
 mutantFile = config['mutantFile']
 
-# make the output directory if it doesn't exist
-if not os.path.exists(outputDir):
-    os.makedirs(outputDir)
+# check if output directory exists
+if os.path.exists(outputDir):
+    print(f"Output directory already exists. Delete {outputDir} to rerun.")
+    sys.exit()
+else:
+    os.makedirs(outputDir, exist_ok=True)
 
 if __name__ == "__main__":
     # write README file 

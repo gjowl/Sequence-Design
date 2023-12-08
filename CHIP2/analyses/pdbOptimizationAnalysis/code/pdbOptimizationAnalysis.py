@@ -31,6 +31,13 @@ def writeReadMe(config, outputDir):
         # close the file
         f.close()
 
+# get filename separate from type and directory
+def getFilename(file):
+    programPath = os.path.realpath(file)
+    programDir, programFile = os.path.split(programPath)
+    filename, programExt = os.path.splitext(programFile)
+    return filename
+
 # get the current directory
 cwd = os.getcwd()
 
@@ -50,6 +57,7 @@ kdeFile = config['kdeFile']
 dataFile = config['dataFile']
 requirementsFile = config['requirementsFile']
 toxgreenFile = config['toxgreenFile']
+strippedSequenceFile = config['strippedSequenceFile']
 clashScript = config['clashScript']
 # check if any of the clashing config options are found in the config file
 clashData = 'clashScript' in config
@@ -64,9 +72,12 @@ if clashData:
     sequenceFile = f'{clashInputDir}/sequence_fluor_energy_data.csv'
     mutantFile = f'{clashInputDir}/mutant_fluor_energy_data.csv'
 
-# make the output directory if it doesn't exist
-if not os.path.exists(outputDir):
-    os.makedirs(outputDir)
+# check if output directory exists
+if os.path.exists(outputDir):
+    print(f"Output directory already exists. Delete {outputDir} to rerun.")
+    sys.exit()
+else:
+    os.makedirs(outputDir, exist_ok=True)
 
 if __name__ == "__main__":
     # write README file 
@@ -74,6 +85,10 @@ if __name__ == "__main__":
     # install the requirements
     execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     os.system(execInstallRequirements)
+
+    # strip the sequence ends (the first and last 3 amino acids) from the sequence file since some of the sequences have alanine vs leucine ends
+    execStripSequenceEnds = f'python3 {codeDir}/stripSequenceEnds.py {toxgreenFile} {strippedSequenceFile} {outputDir}'
+    os.system(execStripSequenceEnds)
 
     # compile the energy files
     execCompileEnergyFiles = f'python3 {codeDir}/compileFilesFromDirectories.py {rawDataDir} {dataFile} {outputDir}'
@@ -83,7 +98,7 @@ if __name__ == "__main__":
     # get the dataFile name without the extension
     dataFilename = os.path.splitext(dataFile)[0]
     outputFile = f'{dataFilename}_percentGpa'
-    execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py {outputDir}/{dataFile}.csv {toxgreenFile} {outputFile} {outputDir}' 
+    execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py {outputDir}/{dataFile}.csv {outputDir}/{strippedSequenceFile}.csv {outputFile} {outputDir}' 
     os.system(execAddPercentGpA)
 
     # check if you want to analyze clash data
@@ -102,7 +117,7 @@ if __name__ == "__main__":
                         if not filename.endswith('.csv'):
                             continue
                         file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir}'
+                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir} {codeDir}'
                         os.system(execAnalyzeclash)
                         file_to_analyze = 'lowestEnergySequences'
                         # plot kde plots of geometries

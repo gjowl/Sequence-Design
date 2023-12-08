@@ -4,6 +4,7 @@ import os, sys, pandas as pd, matplotlib.pyplot as plt, numpy as np
 sequenceFile = sys.argv[1]
 energyFile = sys.argv[2]
 outputDir = sys.argv[3]
+codeDir = sys.argv[4]
 os.makedirs(outputDir, exist_ok=True)
 
 # read in the data files
@@ -30,5 +31,5 @@ df = sequence_df.merge(energy_df, on='Sequence', how='left')
 #df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'}, inplace=True)
 df.to_csv(f'{outputDir}/mergedData.csv', index=False)
 
-execPlot = f'python3 code/analyzeData.py {outputDir}/mergedData.csv {outputDir}'
+execPlot = f'python3 {codeDir}/analyzeData.py {outputDir}/mergedData.csv {outputDir}'
 os.system(execPlot)
