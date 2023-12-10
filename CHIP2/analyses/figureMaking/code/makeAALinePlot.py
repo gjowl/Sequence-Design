@@ -25,10 +25,33 @@ def getAACounts(input_df, interfaceCol, col):
         df_counts[f'{label}_count'] = aa_counts
     return df_counts
 
+def addLabels(input_df, number_of_labels, cutoff, percentGpaCutoff):
+    output_df = input_df.copy()
+    if number_of_labels <= 2:
+        output_df.loc[output_df['PercentGpA'] >= percentGpaCutoff, 'Label'] = f'>= {percentGpaCutoff}'
+        output_df.loc[output_df['PercentGpA'] < percentGpaCutoff, 'Label'] = f'< {percentGpaCutoff}'
+    else:
+        for i in range(number_of_labels):
+            if i == 0:
+                output_df.loc[output_df['PercentGpA'] >= percentGpaCutoff, 'Label'] = f'>= {percentGpaCutoff}'
+                prev_cutoff = percentGpaCutoff
+            elif i == number_of_labels - 1:
+                final_cutoff = prev_cutoff * i
+                output_df.loc[output_df['PercentGpA'] < final_cutoff, 'Label'] = f'< {final_cutoff}'
+            else:
+                low_cutoff = percentGpaCutoff - (cutoff * i)
+                print(low_cutoff, prev_cutoff)
+                # get the sequences with a percentGpa between the cutoffs
+                output_df.loc[(output_df['PercentGpA'] >= low_cutoff) & (output_df['PercentGpA'] < prev_cutoff), 'Label'] = f'{low_cutoff} - {prev_cutoff}'
+                prev_cutoff = low_cutoff
+    return output_df
+
 # read in the command line arguments
 sequenceFile = sys.argv[1]
 outputDir = sys.argv[2]
 percentGpaCutoff = float(sys.argv[3])
+number_of_labels = int(sys.argv[4])
+cutoff = float(sys.argv[5])
 
 # make the output directory if it doesn't exist
 os.makedirs(name=outputDir, exist_ok=True)
@@ -39,37 +62,14 @@ df = pd.read_csv(sequenceFile, dtype={'Interface': str})
 # keep only non-duplicated sequences
 df = df.drop_duplicates(subset=['Sequence'])
 
-#TODO: I think making more ways to break down these (like 3 breakdowns with a difference of 0.25) would be helpful
-label_number = 5
 # create the labels by the number of labels and the cutoff
-cutoff = 0.25
-if label_number <= 2:
-    df.loc[df['PercentGpA'] >= percentGpaCutoff, 'Label'] = f'>= {percentGpaCutoff}'
-    df.loc[df['PercentGpA'] < percentGpaCutoff, 'Label'] = f'< {percentGpaCutoff}'
-else:
-    for i in range(label_number):
-        if i == 0:
-            df.loc[df['PercentGpA'] >= percentGpaCutoff, 'Label'] = f'>= {percentGpaCutoff}'
-            prev_cutoff = percentGpaCutoff
-        elif i == label_number - 1:
-            final_cutoff = prev_cutoff * i
-            df.loc[df['PercentGpA'] < final_cutoff, 'Label'] = f'< {final_cutoff}'
-        else:
-            low_cutoff = percentGpaCutoff - (cutoff * i)
-            print(low_cutoff, prev_cutoff)
-            # get the sequences with a percentGpa between the cutoffs
-            df.loc[(df['PercentGpA'] >= low_cutoff) & (df['PercentGpA'] < prev_cutoff), 'Label'] = f'{low_cutoff} - {prev_cutoff}'
-            prev_cutoff = low_cutoff
-
-# print all of the labels
-print(df['Label'].unique())
+df = addLabels(df, number_of_labels, cutoff, percentGpaCutoff)
 
 # remove any labels that are nan
 df = df[~df['Label'].isna()]
 
-# define the aas to track
-hbond_aas = ['T', 'S']
-ring_aas = ['W', 'Y', 'F']
+# only keep the labels in the Label column
+labels = df['Label'].unique()
 
 # find positions that are 1 in the interface column for every sequence
 interface_positions = df['Interface'].apply(lambda x: [i for i, j in enumerate(x) if j == '1'])
@@ -81,8 +81,8 @@ for sequence, interface in zip(df['Sequence'], interface_positions):
     for pos in interface:
         interface_seq += sequence[pos]
     interface_seqs.append(interface_seq)
-
 df['InterfaceSeq'] = interface_seqs
+
 plot_by = 'freq'
 # loop through the samples and make a histogram for each
 for sample in df['Sample'].unique():
@@ -90,20 +90,23 @@ for sample in df['Sample'].unique():
     df_counts = getAACounts(df_sample, 'InterfaceSeq', 'Label')
     # make a histogram of the counts
     fig, ax = plt.subplots()
-    for label, i in zip(df_counts.columns, range(len(df_counts.columns))):
-        # keep only the columns that match the plot_by
-        df_plot = df_counts[[col for col in df_counts.columns if plot_by in col]]
-        [print(df_plot)]
-        if plot_by in label:
-            sorted_counts = df_plot[label].sort_index()
-            # check if i is half of the number of columns (rounded up)
-            if i == np.ceil(len(df_plot.columns) / 2):
-                ax.bar(np.arange(len(sorted_counts)), sorted_counts, width=0.1, label=label)
-                print(i)
-            elif i > np.ceil(len(df_plot.columns) / 2):
-                ax.bar(np.arange(len(sorted_counts))+(0.05 * i), sorted_counts, width=0.1, label=label)
-            elif i < np.ceil(len(df_plot.columns) / 2):
-                ax.bar(np.arange(len(sorted_counts))-(0.05 * i), sorted_counts, width=0.1, label=label)
+    text_y = 1.15
+    divider = 0.03
+    # keep the columns that match the plot_by
+    df_plot = df_counts[[col for col in df_counts.columns if plot_by in col]]
+    # remove the plot_by from the column names
+    df_plot.columns = [col.split('_')[0] for col in df_plot.columns]
+    for label, i in zip(labels, range(len(labels))):
+        sorted_counts = df_plot[label].sort_index()
+        ax.plot(np.arange(len(sorted_counts)), sorted_counts, linestyle='--', label=label)
+        # write the count on the plot
+        # get the label without the plot_by
+        label = label.split('_')[0]
+        if i == 0:
+            ax.text(0.05, 1.15, f'{label}: {len(df_sample[df_sample["Label"] == label])}', transform=ax.transAxes, fontsize=10, verticalalignment='top')
+        else:
+            curr_text_y = text_y - (divider * i)
+            ax.text(0.05, curr_text_y, f'{label}: {len(df_sample[df_sample["Label"] == label])}', transform=ax.transAxes, fontsize=10, verticalalignment='top')
     ax.set_ylim(0, 0.35)
     ax.set_ylabel('Frequency')
     ax.set_xlabel('Amino Acid')
@@ -112,12 +115,8 @@ for sample in df['Sample'].unique():
     ax.set_title(f'{sample}')
     # set the legend
     ax.legend()
-    # add the total number of sequences and the number of sequences in each group as a text box
-    #ax.text(0.05, 1.15, f'Total Sequences: {len(df_sample)}', transform=ax.transAxes, fontsize=10, verticalalignment='top')
-    #ax.text(0.05, 1.1, f'>= {percentGpaCutoff}: {len(df_sample[df_sample["Label"] == "high"])}', transform=ax.transAxes, fontsize=10, verticalalignment='top')
-    #ax.text(0.05, 1.05, f'< {percentGpaCutoff}: {len(df_sample[df_sample["Label"] == "low"])}', transform=ax.transAxes, fontsize=10, verticalalignment='top') 
     plt.savefig(f'{outputDir}/{sample}.png')
-    plt.close()
+    plt.clf()
     # save the counts to a csv
     df_counts.to_csv(f'{outputDir}/{sample}.csv')
     # save the dataframe to a csv
