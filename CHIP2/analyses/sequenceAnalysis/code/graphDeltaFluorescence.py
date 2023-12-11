@@ -22,5 +22,5 @@ for sample in df_seq['Sample'].unique():
     df_sample = df_seq[df_seq['Sample'] == sample]
     sample_outputDir = f'{outputDir}/{sample}'
     os.makedirs(sample_outputDir, exist_ok=True)
-    df_sample.sort_values(by='Type')
+    df_sample.sort_values(by='Mutant Type')
     plotMultiBoxplot(df_sample, xaxis, yaxis, 'Mutant Type', sample_outputDir, ybottom=-1, ytop=1)

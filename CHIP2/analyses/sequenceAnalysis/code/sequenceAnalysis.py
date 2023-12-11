@@ -91,5 +91,5 @@ if __name__ == "__main__":
         execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py {outDir}/all.csv {outDir}'
         os.system(execplotBoxplotCombined)
 
-        #execGraphDeltaFluorescence = f'python3 {codeDir}/graphDeltaFluorescence.py {outDir}/deltaFluorescence.csv {outDir}/deltaFluorescence'
-        #os.system(execGraphDeltaFluorescence)
+        execGraphDeltaFluorescence = f'python3 {codeDir}/graphDeltaFluorescence.py {outDir}/deltaFluorescence.csv {outDir}/deltaFluorescence'
+        os.system(execGraphDeltaFluorescence)

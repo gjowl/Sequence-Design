@@ -7,7 +7,7 @@ and analyzes the sequence composition against the fluorescence. Directories are 
     - number_of_mutants: the number of mutants necessary to be accepted for the WT design to be accepted
 
 
-main
+sequenceAnalysis
 codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
 clashdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun
 outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/clash_rerun

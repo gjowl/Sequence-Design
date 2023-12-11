@@ -6,6 +6,6 @@ aaLinePlotter
 sequencefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/2023-11-29_mutants/mutant_merge.csv
 outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/2023-11-29_mutants/aaLinePlots
 codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/code
-percentgpacutoffs = 0.75, 0.5, 0.35, 1
+percentgpacutoffs = 0.75, 0.5, 0.35, 0.6
 cutoffs = 0.25, 0.25, 0.00, 0.2
-number_of_labels = 5, 3, 1, 6
+number_of_labels = 5, 3, 1, 5

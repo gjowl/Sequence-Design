@@ -36,11 +36,10 @@ def addLabels(input_df, number_of_labels, cutoff, percentGpaCutoff):
                 output_df.loc[output_df['PercentGpA'] >= percentGpaCutoff, 'Label'] = f'>= {percentGpaCutoff}'
                 prev_cutoff = percentGpaCutoff
             elif i == number_of_labels - 1:
-                final_cutoff = prev_cutoff * i
+                final_cutoff = round(prev_cutoff * i, 2)
                 output_df.loc[output_df['PercentGpA'] < final_cutoff, 'Label'] = f'< {final_cutoff}'
             else:
-                low_cutoff = percentGpaCutoff - (cutoff * i)
-                print(low_cutoff, prev_cutoff)
+                low_cutoff = round(percentGpaCutoff - (cutoff * i), 2)
                 # get the sequences with a percentGpa between the cutoffs
                 output_df.loc[(output_df['PercentGpA'] >= low_cutoff) & (output_df['PercentGpA'] < prev_cutoff), 'Label'] = f'{low_cutoff} - {prev_cutoff}'
                 prev_cutoff = low_cutoff
