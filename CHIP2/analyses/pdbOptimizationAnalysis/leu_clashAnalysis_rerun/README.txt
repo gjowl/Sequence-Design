@@ -8,12 +8,13 @@ below given options, is found within this directory. Directories named as follow
     - number_of_mutants: the number of mutants necessary to be accepted for the WT design to be accepted
 
 
-main
+pdbOptimizationAnalysis
 codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
 outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun
 rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2023_DesignData/2023-9-5_allSeqsLeuEnds_bbOptimized
 datafile = leu_data
-toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/stripped_seqs_CHIP2_rerun.csv
+toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/CHIP2_rerun/filtered/all.csv
+strippedsequencefile = strippedSequenceFile
 requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
 clashscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
 clashinputdir = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/CHIP2_rerun/sequenceVsMutant/all
