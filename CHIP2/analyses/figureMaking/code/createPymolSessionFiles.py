@@ -54,18 +54,21 @@ def outputPseFiles(input_df, output_dir, rawDataDir, pdbOptimizedDir):
     for sequence in input_df['Sequence'].unique():
         df_sequence = input_df[input_df['Sequence'] == sequence]
         df_sequence.reset_index(inplace=True)
-        # get the directory name
-        dirName = df_sequence['Directory'].unique()[0]
-        # get the design number by splitting the directory name by _
-        designNum, repNum = dirName.split('_')[1], df_sequence['replicateNumber'].unique()[0]
-        # pdbName
-        pdbName = designNum+'_'+str(repNum)
-        # put together the filename
-        filename = rawDataDir+'/'+pdbName+'.pdb'
-        # load the designed pdb file
-        cmd.load(filename)
-        # rename the loaded pdb file to the sequence name
-        cmd.set_name(pdbName, sequence)
+        setupSideviewPymol()
+        # check if Directory is in the dataframe
+        if 'Directory' in df_sequence.columns:
+            # get the directory name
+            dirName = df_sequence['Directory'].unique()[0]
+            # get the design number by splitting the directory name by _
+            designNum, repNum = dirName.split('_')[1], df_sequence['replicateNumber'].unique()[0]
+            # pdbName
+            pdbName = designNum+'_'+str(repNum)
+            # put together the filename
+            filename = rawDataDir+'/'+pdbName+'.pdb'
+            # load the designed pdb file
+            cmd.load(filename)
+            # rename the loaded pdb file to the sequence name
+            cmd.set_name(pdbName, sequence)
         # load through the alternate pdbs made by the pdbOptimization script
         try:
             loadAlternatePdbs(df_sequence, pdbOptimizedDir)
@@ -73,12 +76,15 @@ def outputPseFiles(input_df, output_dir, rawDataDir, pdbOptimizedDir):
             print(f'No optimized pdbs for {sequence}')
         # this is fast, but kind of redundant: I should get a list of all of the interface pos and then loop through that
         for j in range(0, len(df_sequence['Interface'].unique()[0])):
-            # if the interface is 1
+            # get the names of the pdbs
+            names = cmd.get_names()
             if df_sequence['Interface'].unique()[0][j] == '1':
-                # select the current pdb
-                cmd.select('interface', sequence)
-                # color the residue for the current pdb
-                cmd.color('red', 'interface and resi '+str(j+23))
+                for name in names:
+                    # select the current pdb
+                    cmd.select('interface', name)
+                    # color the residue for the current pdb
+                    cmd.color('red', 'interface and resi '+str(j+23))
+                    cmd.show('spheres', 'interface and resi '+str(j+23))
         # show spheres
         cmd.show('spheres')
         # save the session file
@@ -86,7 +92,7 @@ def outputPseFiles(input_df, output_dir, rawDataDir, pdbOptimizedDir):
         # reset the pymol session
         cmd.reinitialize()
 
-def outputFrontview(input_df, output_dir):
+def outputFrontview(input_df, output_dir, rawDataDir):
     for sequence in input_df['Sequence'].unique():
         df_sequence = input_df[input_df['Sequence'] == sequence]
         df_sequence.reset_index(inplace=True)
@@ -108,7 +114,7 @@ def outputFrontview(input_df, output_dir):
         # reset the pymol session
         cmd.reinitialize()
 
-def outputSideview(input_df, output_dir):
+def outputSideview(input_df, output_dir, rawDataDir):
     for sequence in input_df['Sequence'].unique():
         df_sequence = input_df[input_df['Sequence'] == sequence]
         df_sequence.reset_index(inplace=True)
@@ -176,7 +182,7 @@ dataFilename = os.path.basename(dataFile).split('.')[0]
 # loop through the entire dataframe
 for sample in df['Sample'].unique():
     df_sample = df[df['Sample'] == sample]
-    df_sample = df_sample[df_sample['PercentGpA'] > 0.5]
+    #df_sample = df_sample[df_sample['PercentGpA'] > 0.5]
     png_dir = f'{outputDir}/png/{sample}'
     pse_dir = f'{outputDir}/pse/{sample}'
     frontview_dir = f'{png_dir}/frontview'
@@ -185,8 +191,8 @@ for sample in df['Sample'].unique():
     os.makedirs(name=sideview_dir, exist_ok=True)
     os.makedirs(name=pse_dir, exist_ok=True)
     df_sample.reset_index(inplace=True)
-    outputFrontview(df_sample, frontview_dir)
-    outputSideview(df_sample, sideview_dir)
+    #outputFrontview(df_sample, frontview_dir, rawDataDir)
+    #outputSideview(df_sample, sideview_dir, rawDataDir)
     # save the dataframe
     df_sample.to_csv(f'{outputDir}/{dataFilename}_{sample}.csv', index=False)
     outputPseFiles(df_sample, pse_dir, rawDataDir, pdbOptimizedDir)

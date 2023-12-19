@@ -39,5 +39,7 @@ for i in range(0, len(df)):
         # replace the interface
         df['Interface'][i] = interface.values[0]
 
+# rename the Optimized_Directory column to Directory
+#df.rename(columns={'Geometry': 'Directory', 'Optimized_replicateNumber': 'replicateNumber'}, inplace=True)
 # output the dataframe to a csv file without the index
 df.to_csv(f'{outputDir}/{outputFile}.csv', index=False)

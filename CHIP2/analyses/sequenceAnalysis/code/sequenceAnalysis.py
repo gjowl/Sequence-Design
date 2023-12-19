@@ -57,11 +57,10 @@ sequenceFile = config['sequenceFile']
 mutantFile = config['mutantFile']
 
 # check if output directory exists
-if os.path.exists(outputDir):
-    print(f"Output directory already exists. Delete {outputDir} to rerun.")
-    sys.exit()
-else:
-    os.makedirs(outputDir, exist_ok=True)
+#if os.path.exists(outputDir):
+#    print(f"Output directory already exists. Saving into new {outputDir}_1.")
+#else:
+os.makedirs(outputDir, exist_ok=True)
 
 if __name__ == "__main__":
     # write README file 

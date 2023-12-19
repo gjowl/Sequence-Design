@@ -53,7 +53,7 @@ if __name__ == '__main__':
     os.system(execMergeData)
 
     # replace the interface column
-    execReplaceInterface = f'python3 {codeDir}/replaceInterfaceColumn.py {interfaceFile} {outputDir}/{outputFile}.csv {outputFile} {outputDir}'
+    execReplaceInterface = f'python3 {codeDir}/replaceInterfaceColumn_mutant.py {interfaceFile} {outputDir}/{outputFile}.csv {outputFile} {outputDir}'
     os.system(execReplaceInterface)
 
     # split into leu and ala designs
@@ -61,7 +61,5 @@ if __name__ == '__main__':
     os.system(execSplitDesigns)
 
     # make the interface pdbs figures
-    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirAla} {optimizedPdbDir} {outputDir}/{outputFile}_ala.csv {outputDir}/interfacePdbs'
-    os.system(execCreatePses)
-    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirLeu} {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs'
+    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles_mutant.py {rawDataDirLeu} {optimizedPdbDir} {outputDir}/{outputFile}.csv {outputDir}/interfacePdbs'
     os.system(execCreatePses)

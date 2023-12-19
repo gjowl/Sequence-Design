@@ -1,5 +1,11 @@
 import os, sys, pandas as pd
 
+# energy difference function
+def addEnergyDifferencesToDataframe(df, cols):
+    for col in cols:
+        df[f'{col}Diff'] = df[f'{col}DimerOptimize'] - df[f'{col}Monomer']
+    return df
+
 # read the command line arguments
 file_to_merge = sys.argv[1]
 input_file = sys.argv[2]
@@ -37,10 +43,10 @@ print(df.columns)
 print(df_to_merge.columns)
 # merge that data with the data to merge with any matching columns
 df = pd.merge(df, df_to_merge[cols], on='Sequence', how='left')
-#df = df[df['PercentGpA'] > 0.5]
 
-# keep only the rows where the replicateNumber is not null
-#df = df[df['replicateNumber'].notnull()]
+# add energy differences to the dataframe
+cols = ['VDW', 'HBOND', 'IMM1']
+df = addEnergyDifferencesToDataframe(df, cols)
 
 # add LLL to the beginning of the sequence and ILI to the end of the sequence
 df['Sequence'] = 'LLL' + df['Sequence'] + 'ILI'
