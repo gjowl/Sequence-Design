@@ -117,7 +117,7 @@ if __name__ == "__main__":
                         if not filename.endswith('.csv'):
                             continue
                         file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir} {codeDir}'
+                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir} {percent_cutoff} {codeDir}'
                         os.system(execAnalyzeclash)
                         file_to_analyze = 'lowestEnergySequences'
                         # plot kde plots of geometries

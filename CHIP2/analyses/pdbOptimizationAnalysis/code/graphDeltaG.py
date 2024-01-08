@@ -1,7 +1,7 @@
 import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt
 from analyzeData import plotScatterplot
 
-def graphXVsY(input_df, output_file, x_col, y_col, error_col, output_dir):
+def graphXVsY(input_df, output_file, x_col, y_col, error_col, png_dir, svg_dir):
     # plot the WT sequence fluorescence vs the energy
     plt.scatter(input_df[x_col], input_df[y_col])
     # plot the standard deviation
@@ -18,7 +18,8 @@ def graphXVsY(input_df, output_file, x_col, y_col, error_col, output_dir):
     corr = np.corrcoef(input_df[x_col], input_df[y_col])[0,1]
     plt.text(0.1, 1.09, f'r^2 = {corr**2:.2f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.text(0.1, 1.06, f'n = {len(input_df)}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
-    plt.savefig(f'{output_dir}/{output_file}.png')
+    plt.savefig(f'{png_dir}/{output_file}.png')
+    plt.savefig(f'{svg_dir}/{output_file}.svg')
     plt.clf()
 
 # get command line arguments
@@ -39,7 +40,24 @@ yaxis = 'deltaG'
 error_col = 'std_deltaG'
 regression_degree = 1
 
+# defining the regression degrees
+regression_degrees = [1, 2, 3, 4]
 #graphXVsY(df_input, outputFile, xaxis, yaxis, error_col, outputDir)
 for xaxis in xaxes:
     outputFile = f'{xaxis}_vs_{yaxis}'
-    plotScatterplot(df_input, xaxis, yaxis, error_col, regression_degree, outputFile, outputDir, True)
+    png_dir = f'{outputDir}/png'
+    svg_dir = f'{outputDir}/svg'
+    os.makedirs(name=png_dir, exist_ok=True)
+    os.makedirs(name=svg_dir, exist_ok=True)
+    plotScatterplot(df_input, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, True)
+
+for sample in df_input['Sample'].unique():
+    df_sample = df_input[df_input['Sample'] == sample]
+    for xaxis in xaxes:
+        outputFile = f'{xaxis}_vs_{yaxis}'
+        sample_dir = f'{outputDir}/{sample}'
+        png_dir = f'{sample_dir}/png'
+        svg_dir = f'{sample_dir}/svg'
+        os.makedirs(name=png_dir, exist_ok=True)
+        os.makedirs(name=svg_dir, exist_ok=True)
+        plotScatterplot(df_sample, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, True)
