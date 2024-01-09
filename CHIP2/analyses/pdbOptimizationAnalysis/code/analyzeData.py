@@ -200,10 +200,16 @@ if __name__ == '__main__':
         # check that the df_sample is not empty
         if df_sample.empty:
             continue
+        sample_dir = f'{outputDir}/{sample}'
+        png_dir = f'{sample_dir}/png'
+        svg_dir = f'{sample_dir}/svg'
         plotScatterplot(df_sample, xAxis, yAxis, 'PercentStd', regression_degrees, f'{sample}_Total', png_dir, svg_dir)
 
     # plot individual scatterplots for each sample
     for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
+        sample_dir = f'{outputDir}/{sample}'
+        png_dir = f'{sample_dir}/png'
+        svg_dir = f'{sample_dir}/svg'
         plotScatterplotSingle(df, sample, xAxis, yAxis, 'PercentStd', regression_degrees, f'{sample}_Total', png_dir, svg_dir, sampleType=sample, color=colors[i])
     
     # define the energy diff / interfaceSasa
@@ -214,8 +220,10 @@ if __name__ == '__main__':
     for df_tmp,title in zip(df_list, output_list):
         for sample, i in zip(df_tmp['Sample'].unique(), range(len(df_tmp['Sample'].unique()))):
             sample_dir = f'{outputDir}/{sample}'
+            png_dir = f'{sample_dir}/png'
+            svg_dir = f'{sample_dir}/svg'
             plotScatterplotSingle(df_tmp, sample, 'interfaceSasa', yAxis, 'PercentStd', regression_degrees, f'interfaceSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=2000)
             plotScatterplotSingle(df_tmp, sample, 'vdwPerSasa', yAxis, 'PercentStd', regression_degrees, f'vdwPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)
             plotScatterplotSingle(df_tmp, sample, 'hbondPerSasa', yAxis, 'PercentStd', regression_degrees, f'hbondPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.05, xhighLim=.05)
             plotScatterplotSingle(df_tmp, sample, 'imm1PerSasa', yAxis, 'PercentStd', regression_degrees, f'imm1PerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=.1)
-            plotScatterplotSingle(df_tmp, sample, 'totalPerSasa', yAxis, 'PercentStd', regression_degrees, f'totalPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=.1)
+            plotScatterplotSingle(df_tmp, sample, 'totalPerSasa', yAxis, 'PercentStd', regression_degrees, f'totalPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)
