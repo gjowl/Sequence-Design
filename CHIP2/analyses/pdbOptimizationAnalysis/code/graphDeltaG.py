@@ -1,6 +1,7 @@
 import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt
-from analyzeData import plotScatterplot
+from analyzeData import plotScatterplotSingle, plotScatterplot
 
+colors = ['mediumseagreen', 'moccasin', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 def graphXVsY(input_df, output_file, x_col, y_col, error_col, png_dir, svg_dir):
     # plot the WT sequence fluorescence vs the energy
     plt.scatter(input_df[x_col], input_df[y_col])
@@ -51,7 +52,7 @@ for xaxis in xaxes:
     os.makedirs(name=svg_dir, exist_ok=True)
     plotScatterplot(df_input, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, True)
 
-for sample in df_input['Sample'].unique():
+for sample, i in zip(df_input['Sample'].unique(), range(len(df_input['Sample'].unique()))):
     df_sample = df_input[df_input['Sample'] == sample]
     for xaxis in xaxes:
         outputFile = f'{xaxis}_vs_{yaxis}'
@@ -60,4 +61,4 @@ for sample in df_input['Sample'].unique():
         svg_dir = f'{sample_dir}/svg'
         os.makedirs(name=png_dir, exist_ok=True)
         os.makedirs(name=svg_dir, exist_ok=True)
-        plotScatterplot(df_sample, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, True)
+        plotScatterplotSingle(df_sample, sample, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-60, xhighLim=0, ylowLim=-5.5, yhighLim=0)

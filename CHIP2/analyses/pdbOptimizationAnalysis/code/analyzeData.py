@@ -58,9 +58,9 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degrees, output_tit
 def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degrees, output_title, png_dir, svg_dir, sampleType=0, color=0, xlowLim=-60, xhighLim=0, ylowLim=0, yhighLim=1.75):
     df_sample = input_df[input_df['Sample'] == sample]
     # plot the WT sequence fluorescence vs the energy
-    plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
+    plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sample, s=5)
     # plot the standard deviation
-    plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+    plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
     plt.text(0.99, 1.10, f'N = {len(input_df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
     plt.xlabel(xAxis)
     plt.ylabel(yAxis)
