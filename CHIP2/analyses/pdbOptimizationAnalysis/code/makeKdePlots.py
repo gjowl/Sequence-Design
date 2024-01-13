@@ -1,9 +1,27 @@
-import os, sys, pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
+import os, sys, pandas as pd, matplotlib.pyplot as plt, matplotlib, numpy as np, argparse
 from scipy import stats
 
+# initialize the parser
+parser = argparse.ArgumentParser(description='Plots the KDE of Angle vs Distance w/ additional design data as input')
+
+# add the necessary arguments
+parser.add_argument('-kdeFile','--kdeFile', type=str, help='the input kde file')
+parser.add_argument('-dataFile','--dataFile', type=str, help='the input data file csv file')
+# add the optional arguments
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+
+# extract the arguments into variables
+args = parser.parse_args()
+kdeFile = args.kdeFile
+dataFile = args.dataFile
+# default values for the optional arguments
+outputDir = os.getcwd()
+# if the optional arguments are not specified, use the default values
+if args.outputDir is not None:
+    outputDir = args.outputDir
+    os.makedirs(outputDir, exist_ok=True)
+
+# Functions
 def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis, roundToNearest=5, minY=-100000, maxY=-100000, reverseColormap=False):
     # get the x and y axes data to be plotted from the dataframe
     x = df_data.loc[:, xAxis]
@@ -77,28 +95,21 @@ def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
     Z = np.reshape(kernel(positions).T, X.shape)
     return Z
 
-# read in the command line arguments
-kdeFile = sys.argv[1]
-dataFile = sys.argv[2]
-outputDir = sys.argv[3]
+if __name__ == '__main__':
+    # read the files in as dataframes
+    kdeDf = pd.read_csv(kdeFile)
+    dataDf = pd.read_csv(dataFile)
 
-# read the files in as dataframes
-kdeDf = pd.read_csv(kdeFile)
-dataDf = pd.read_csv(dataFile)
+    # only keep the unique sequence with best total energy
+    df = dataDf.sort_values(by=['Total'], ascending=True)
+    # keep only unique sequences, and the unique sequence with the lowest total energy
+    df = df.drop_duplicates(subset=['Sequence'], keep='first')
+    df = df[df['Total'] < 0]
+    #df = df[df['PercentStd'] < 15]
+    xAxis = 'endXShift'
+    yAxis = 'endCrossingAngle'
 
-# get the current working directory
-cwd = os.getcwd()
-
-# only keep the unique sequence with best total energy
-df = dataDf.sort_values(by=['Total'], ascending=True)
-# keep only unique sequences, and the unique sequence with the lowest total energy
-df = df.drop_duplicates(subset=['Sequence'], keep='first')
-df = df[df['Total'] < 0]
-#df = df[df['PercentStd'] < 15]
-xAxis = 'endXShift'
-yAxis = 'endCrossingAngle'
-
-# plot the kde data
-plotGeomKde(kdeDf, df, 'Total', outputDir, xAxis, yAxis, reverseColormap=True)
-minY, maxY = 0, 1
-plotGeomKde(kdeDf, df, 'PercentGpA', outputDir, xAxis, yAxis, 1, minY, maxY)
+    # plot the kde data
+    plotGeomKde(kdeDf, df, 'Total', outputDir, xAxis, yAxis, reverseColormap=True)
+    minY, maxY = 0, 1
+    plotGeomKde(kdeDf, df, 'PercentGpA', outputDir, xAxis, yAxis, 1, minY, maxY)

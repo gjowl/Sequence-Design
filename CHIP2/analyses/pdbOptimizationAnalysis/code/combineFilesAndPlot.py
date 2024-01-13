@@ -1,11 +1,22 @@
-import os, sys, pandas as pd, matplotlib.pyplot as plt, numpy as np
+import os, sys, pandas as pd, matplotlib.pyplot as plt, numpy as np, argparse
 
-# read command line arguments
-sequenceFile = sys.argv[1]
-energyFile = sys.argv[2]
-outputDir = sys.argv[3]
-percentGpA_cutoff = float(sys.argv[4])
-codeDir = sys.argv[5]
+# initialize the parser
+parser = argparse.ArgumentParser(description='Combines the sequence and energy files and plots the data')
+
+# add the necessary arguments
+parser.add_argument('-seqFile','--sequenceFile', type=str, help='the input WT design csv file')
+parser.add_argument('-energyFile','--energyFile', type=str, help='the input energy csv file')
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-percentCutoff','--percentCutoff', type=float, help='the cutoff for the percent GpA')
+parser.add_argument('-codeDir','--codeDir', type=str, help='the directory where the code is located')
+
+# extract the arguments into variables
+args = parser.parse_args()
+sequenceFile = args.sequenceFile
+energyFile = args.energyFile
+outputDir = args.outputDir
+percentGpA_cutoff = args.percentCutoff
+codeDir = args.codeDir
 os.makedirs(outputDir, exist_ok=True)
 
 # read in the data files
@@ -32,5 +43,5 @@ df = sequence_df.merge(energy_df, on='Sequence', how='left')
 #df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'}, inplace=True)
 df.to_csv(f'{outputDir}/mergedData.csv', index=False)
 
-execPlot = f'python3 {codeDir}/analyzeData.py {outputDir}/mergedData.csv {outputDir} {percentGpA_cutoff}'
+execPlot = f'python3 {codeDir}/analyzeData.py  -inFile {outputDir}/mergedData.csv -outDir {outputDir} -percentCutoff {percentGpA_cutoff}'
 os.system(execPlot)

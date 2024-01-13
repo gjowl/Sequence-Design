@@ -1,8 +1,26 @@
-import os, sys, pandas as pd
-import matplotlib.pyplot as plt
+import os, sys, pandas as pd, matplotlib.pyplot as plt, numpy as np, argparse
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
-import numpy as np
+
+# initialize the parser
+parser = argparse.ArgumentParser(description='Plots the data into scatterplots')
+
+# add the necessary arguments
+parser.add_argument('-inFile','--inputFile', type=str, help='the input csv file')
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+# add the optional arguments
+parser.add_argument('-percentCutoff','--percentCutoff', type=float, help='the cutoff for the percent GpA')
+
+# extract the arguments into variables
+args = parser.parse_args()
+inputFile = args.inputFile
+outputDir = args.outputDir
+percentGpA_cutoff = 0
+# default values for the optional arguments
+if args.percentCutoff is not None:
+    percentGpA_cutoff = args.percentCutoff
+# make the output directory if it doesn't exist and the png and svg subdirectories
+os.makedirs(outputDir, exist_ok=True)
 
 colors = ['mediumseagreen', 'moccasin', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 # plot scatterplot function
@@ -111,25 +129,12 @@ def addEnergyDifferencesToDataframe(input_df, cols):
 
 if __name__ == '__main__':
     # read in the data file
-    dataFile = sys.argv[1]
-    df = pd.read_csv(dataFile)
-
-    # get the output directory
-    outputDir = sys.argv[2]
-
-    # check if the percentGpA cutoff is provided
-    if len(sys.argv) > 3:
-        percentGpA_cutoff = float(sys.argv[3])
-    else:
-        percentGpA_cutoff = 0
+    df = pd.read_csv(inputFile)
 
     #xAxis = 'TotalPreOptimize'
     xAxis = 'Total'
     yAxis = 'PercentGpA'
-
-    # make the output directory if it doesn't exist and the png and svg subdirectories
-    os.makedirs(outputDir, exist_ok=True)
-
+    
     # only keep sequences with the lowest total energy
     df = df.sort_values(by=[xAxis], ascending=True)
     df = df.drop_duplicates(subset=['Sequence'], keep='first')
