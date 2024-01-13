@@ -36,5 +36,5 @@ if __name__ == "__main__":
     os.system(execInstallRequirements)
 
     # run the voiding script if the voiding data is found in the config file
-    execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {sequenceFile} {mutantFile} {outputDir}'
+    execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outputDir}'
     os.system(execplotBoxplot)

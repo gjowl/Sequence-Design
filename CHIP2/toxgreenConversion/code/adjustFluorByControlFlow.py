@@ -16,7 +16,27 @@ For every replicate, it adjusts the fluorescence of the reconstruction by the fl
 -----
 '''
 
-import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
+import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt, argparse
+
+# initialize the parser
+parser = argparse.ArgumentParser(description='Adjust the reconstructed fluorescence by the flow fluorescence of the controls')
+
+# add the necessary arguments
+parser.add_argument('-recFile','--reconstructionFile', type=str, help='the input reconstructed fluorescence csv file')
+parser.add_argument('-flowFile','--controlFlowFile', type=str, help='the input flow fluorescence csv file')
+# add the optional arguments
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+
+# extract the arguments into variables
+args = parser.parse_args()
+reconstructionFile = args.reconstructionFile
+controlFlowFile = args.controlFlowFile
+# default values for the optional arguments
+outputDir = os.getcwd()
+# if the optional arguments are not specified, use the default values
+if args.outputDir is not None:
+    outputDir = args.outputDir
+    os.makedirs(outputDir, exist_ok=True)
 
 def plot_and_transform(df_control_plot, df_sample, xaxis, cols, sample, outputDir):
     output_df = df_sample.copy()
@@ -81,83 +101,79 @@ def calculateStandardDeviation(df_sample, cols, sample):
     output_df['Percent Error'] = output_df['std']/mean*100
     return output_df
 
-# read in the reconstructed fluorescence dataframe
-reconstructionFile = sys.argv[1]
-controlFlowFile = sys.argv[2]
-outputDir = sys.argv[3]
-
-gpa = 'LIIFGVMAGVIGT'
-g83i = 'LIIFGVMAIVIGT'
-#noTM_fluor = 17870
-#flow_noTM_fluor = 28563
-# noTM from flow reruns
-noTM_fluor = 12429.6644
-subtract_noTM = False 
-#subtract_noTM = False 
-#TODO: the subtraction of the noTM fluor works, but it leads to some negative values. Maybe I should just add it to the fitting line as a control fluor?
-
-os.makedirs(outputDir, exist_ok=True)
-
-xaxis = 'Flow Mean'
-yaxis = 'mean'
-#xaxis = 'Percent GpA'
-#yaxis = 'mean_transformed'
-
-# read in the dataframes
-reconstruction_df = pd.read_csv(reconstructionFile)
-controlFlow_df = pd.read_csv(controlFlowFile)
-
-# get the sample names
-sample_names = reconstruction_df['Sample'].unique()
-
-# loop through each sample
-output_df = pd.DataFrame()
-for sample in sample_names:
-    # get the reconstruction data for this sample
-    df_sample = reconstruction_df[reconstruction_df['Sample'] == sample]
-    # get the matching sequence from the control flow dataframe
-    df_sample_controls = df_sample[df_sample['Sequence'].isin(controlFlow_df['Sequence'])]
-    df_control_plot = controlFlow_df.copy()
-    # get the columns that contain rep
-    df_control_plot = df_control_plot.merge(df_sample_controls[['Sequence', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor', 'Sample']], on='Sequence')
-    # get the columns that contain rep
-    cols = [col for col in df_control_plot.columns if 'Rep' in col]
-    if sample == 'G' or sample == 'R':
-        cols = [col for col in cols if 'Rep1' not in col]
-    # only keep the rows where no value is not 0
-    df_control_plot = df_control_plot[(df_control_plot[cols] != 0).all(axis=1)]
-    df_sample = df_sample[(df_sample[cols] != 0).all(axis=1)]
-    if subtract_noTM:
-        #df_control_plot[cols] = df_control_plot[cols] - flow_noTM_fluor
-        df_control_plot[cols] = df_control_plot[cols] - noTM_fluor
-        df_sample[cols] = df_sample[cols] - noTM_fluor
-    # get the standard deviation of the rep columns
-    df_sample = calculateStandardDeviation(df_sample, cols, sample)
-    # get the mean of the rep columns
-    df_control_plot['mean'] = df_control_plot[cols].mean(axis=1)
-    # add the standard deviation of the mean to the dataframe
-    df_control_plot['std'] = df_control_plot[cols].std(axis=1)
-    df_sample['mean'] = df_sample[cols].mean(axis=1)
-    slope, yint = plot_and_get_regression(df_control_plot, xaxis, yaxis, sample)
-    # transform the reconstruction data 
-    df_sample = transform_col(df_sample, sample, slope, yint, 'mean', output_df)
-    # get the index of GpA and G83I from the sequence column 
-    gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
-    # get the fluorescence from the index
-    fluor_transform_col = f'mean_transformed'
-    gpaFluor, g83iFluor = gpaIndex[fluor_transform_col].values[0], g83iIndex[fluor_transform_col].values[0]
-    df_sample['Percent GpA'] = df_sample[fluor_transform_col]/gpaFluor*100 
-    # save the transformed data
-    df_sample.to_csv(f'{outputDir}/{sample}_transformed.csv', index=False)
-    df_sample = df_sample[df_sample['mean_transformed'] > 0]
-    # keep sequences with a higher fluorescence than G83I
-    df_sample_g83i = df_sample[df_sample[fluor_transform_col] > g83iFluor]
-    # save the filtered data
-    df_sample_g83i.to_csv(f'{outputDir}/{sample}_g83i_filtered.csv', index=False)
-    # add the sample to the output dataframe
-    output_df = pd.concat([output_df, df_sample])
-    # add in a way to add a standard error? Should I try to calculate standard error for each sequence by using the count of sequences from the flow data? Would that give my values more weight?
-    # I think I can at the very least transform the standard deviation and then do percent GpA of that error?
-    # I think the standard error formula is standard deviation / sqrt(n)
-    # TODO: get G to I mutants for GASrights and evaluate those sequence
-output_df.to_csv(f'{outputDir}/all_transformed.csv', index=False)
+if __name__ == '__main__':
+    gpa = 'LIIFGVMAGVIGT'
+    g83i = 'LIIFGVMAIVIGT'
+    #noTM_fluor = 17870
+    #flow_noTM_fluor = 28563
+    # noTM from flow reruns
+    noTM_fluor = 12429.6644
+    subtract_noTM = False 
+    #subtract_noTM = False 
+    #TODO: the subtraction of the noTM fluor works, but it leads to some negative values. Maybe I should just add it to the fitting line as a control fluor?
+    
+    os.makedirs(outputDir, exist_ok=True)
+    
+    xaxis = 'Flow Mean'
+    yaxis = 'mean'
+    #xaxis = 'Percent GpA'
+    #yaxis = 'mean_transformed'
+    
+    # read in the dataframes
+    reconstruction_df = pd.read_csv(reconstructionFile)
+    controlFlow_df = pd.read_csv(controlFlowFile)
+    
+    # get the sample names
+    sample_names = reconstruction_df['Sample'].unique()
+    
+    # loop through each sample
+    output_df = pd.DataFrame()
+    for sample in sample_names:
+        # get the reconstruction data for this sample
+        df_sample = reconstruction_df[reconstruction_df['Sample'] == sample]
+        # get the matching sequence from the control flow dataframe
+        df_sample_controls = df_sample[df_sample['Sequence'].isin(controlFlow_df['Sequence'])]
+        df_control_plot = controlFlow_df.copy()
+        # get the columns that contain rep
+        df_control_plot = df_control_plot.merge(df_sample_controls[['Sequence', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor', 'Sample']], on='Sequence')
+        # get the columns that contain rep
+        cols = [col for col in df_control_plot.columns if 'Rep' in col]
+        if sample == 'G' or sample == 'R':
+            cols = [col for col in cols if 'Rep1' not in col]
+        # only keep the rows where no value is not 0
+        df_control_plot = df_control_plot[(df_control_plot[cols] != 0).all(axis=1)]
+        df_sample = df_sample[(df_sample[cols] != 0).all(axis=1)]
+        if subtract_noTM:
+            #df_control_plot[cols] = df_control_plot[cols] - flow_noTM_fluor
+            df_control_plot[cols] = df_control_plot[cols] - noTM_fluor
+            df_sample[cols] = df_sample[cols] - noTM_fluor
+        # get the standard deviation of the rep columns
+        df_sample = calculateStandardDeviation(df_sample, cols, sample)
+        # get the mean of the rep columns
+        df_control_plot['mean'] = df_control_plot[cols].mean(axis=1)
+        # add the standard deviation of the mean to the dataframe
+        df_control_plot['std'] = df_control_plot[cols].std(axis=1)
+        df_sample['mean'] = df_sample[cols].mean(axis=1)
+        slope, yint = plot_and_get_regression(df_control_plot, xaxis, yaxis, sample)
+        # transform the reconstruction data 
+        df_sample = transform_col(df_sample, sample, slope, yint, 'mean', output_df)
+        # get the index of GpA and G83I from the sequence column 
+        gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
+        # get the fluorescence from the index
+        fluor_transform_col = f'mean_transformed'
+        gpaFluor, g83iFluor = gpaIndex[fluor_transform_col].values[0], g83iIndex[fluor_transform_col].values[0]
+        df_sample['Percent GpA'] = df_sample[fluor_transform_col]/gpaFluor*100 
+        # save the transformed data
+        df_sample.to_csv(f'{outputDir}/{sample}_transformed.csv', index=False)
+        df_sample = df_sample[df_sample['mean_transformed'] > 0]
+        # keep sequences with a higher fluorescence than G83I
+        df_sample_g83i = df_sample[df_sample[fluor_transform_col] > g83iFluor]
+        # save the filtered data
+        df_sample_g83i.to_csv(f'{outputDir}/{sample}_g83i_filtered.csv', index=False)
+        # add the sample to the output dataframe
+        output_df = pd.concat([output_df, df_sample])
+        # add in a way to add a standard error? Should I try to calculate standard error for each sequence by using the count of sequences from the flow data? Would that give my values more weight?
+        # I think I can at the very least transform the standard deviation and then do percent GpA of that error?
+        # I think the standard error formula is standard deviation / sqrt(n)
+        # TODO: get G to I mutants for GASrights and evaluate those sequence
+    output_df.to_csv(f'{outputDir}/all_transformed.csv', index=False)

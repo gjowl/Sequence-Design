@@ -16,7 +16,29 @@ percent difference of the mutant to the WT sequence.
 -----
 '''
 
-import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
+import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt, argparse
+
+# initialize the parser
+parser = argparse.ArgumentParser(description='Compare the fluorescence of mutants to the WT sequence')
+
+# add the necessary arguments
+parser.add_argument('-fluorFile','--fluorescenceFile', type=str, help='the input reconstructed fluorescence csv file')
+parser.add_argument('-seqFile','--sequenceFile', type=str, help='the input sequence csv file')
+parser.add_argument('-mutFile','--mutantFile', type=str, help='the input mutant csv file')
+# add the optional arguments
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+
+# extract the arguments into variables
+args = parser.parse_args()
+fluorescenceFile = args.fluorescenceFile
+sequenceFile = args.sequenceFile
+mutantFile = args.mutantFile
+# default values for the optional arguments
+outputDir = os.getcwd()
+# if the optional arguments are not specified, use the default values
+if args.outputDir is not None:
+    outputDir = args.outputDir
+    os.makedirs(outputDir, exist_ok=True)
 
 def filterExperimentDataframes(input_df, maltose_col, maltose_cutoff, maltose_limit, 
  filter_maltose, filter_percent_error, filter_fluor):
@@ -103,59 +125,52 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
     return df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor
 
 # TODO: currently comparing energies between L designs and A designs; fix
-# read in the reconstructed fluorescence dataframe
-fluorescenceFile = sys.argv[1]
-sequenceFile = sys.argv[2]
-mutantFile = sys.argv[3]
-outputDir = sys.argv[4]
-
-os.makedirs(outputDir, exist_ok=True)
-
-gpa = 'LIIFGVMAGVIGT'
-g83i = 'LIIFGVMAIVIGT'
-#g83iCutoff = 20000
-
-df_fluor = pd.read_csv(fluorescenceFile)
-df_sequence = pd.read_csv(sequenceFile)
-df_mutant = pd.read_csv(mutantFile)
-
-# THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
-# check if wt_seq is a column in the dataframe
-fluor_col = [col for col in df_fluor.columns if 'transformed' in col][0]
-cols_to_add = ['Sequence', fluor_col, 'std_adjusted', 'Sample']
-if 'wt_seq' in df_fluor.columns:
-    cols_to_add = ['Sequence', fluor_col, 'std_adjusted', 'Sample', 'wt_seq']
-
-# filtering variables
-maltose_col = 'LB-12H_M9-36H'
-maltose_cutoff = -97
-maltose_limit = 10000000
-percent_error_cutoff = 15
-fluor_cutoff = 120 # percent GpA
-filter_maltose = False
-filter_percent_error= True
-filter_fluor = False 
-
-# Filtering
-df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, filter_maltose, filter_percent_error, filter_fluor)
-
-# get the error for each sequence
-df_fluor['std_adjusted'] = df_fluor[fluor_col] * df_fluor['Percent Error'] / 100
-
-# filter the dataframes
-df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
-
-# get sequences that don't fluoresce
-df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor = getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled, fluor_col)
-
-# output dataframes
-df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor_energy_data.csv', index=False)
-df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor_energy_data.csv', index=False)
-df_sequence_no_fluor.to_csv(f'{outputDir}/sequence_no_fluor.csv', index=False)
-df_mutant_no_fluor.to_csv(f'{outputDir}/mutant_no_fluor.csv', index=False)
-df_fluor_labeled.to_csv(f'{outputDir}/fluor_WT_mutant_labeled.csv', index=False)
-df_no_fluor.to_csv(f'{outputDir}/no_fluor.csv', index=False)
-df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample', fluor_col]]])
-df_all.to_csv(f'{outputDir}/all.csv', index=False)
-print(f'Sequences: {len(df_sequence_no_duplicates)}')
-print(f'Mutants: {len(df_mutant_no_duplicates)}')
+if __name__ == '__main__':
+    gpa = 'LIIFGVMAGVIGT'
+    g83i = 'LIIFGVMAIVIGT'
+    #g83iCutoff = 20000
+    
+    df_fluor = pd.read_csv(fluorescenceFile)
+    df_sequence = pd.read_csv(sequenceFile)
+    df_mutant = pd.read_csv(mutantFile)
+    
+    # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
+    # check if wt_seq is a column in the dataframe
+    fluor_col = [col for col in df_fluor.columns if 'transformed' in col][0]
+    cols_to_add = ['Sequence', fluor_col, 'std_adjusted', 'Sample']
+    if 'wt_seq' in df_fluor.columns:
+        cols_to_add = ['Sequence', fluor_col, 'std_adjusted', 'Sample', 'wt_seq']
+    
+    # filtering variables
+    maltose_col = 'LB-12H_M9-36H'
+    maltose_cutoff = -97
+    maltose_limit = 10000000
+    percent_error_cutoff = 15
+    fluor_cutoff = 120 # percent GpA
+    filter_maltose = False
+    filter_percent_error= True
+    filter_fluor = False 
+    
+    # Filtering
+    df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, filter_maltose, filter_percent_error, filter_fluor)
+    
+    # get the error for each sequence
+    df_fluor['std_adjusted'] = df_fluor[fluor_col] * df_fluor['Percent Error'] / 100
+    
+    # filter the dataframes
+    df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
+    
+    # get sequences that don't fluoresce
+    df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor = getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled, fluor_col)
+    
+    # output dataframes
+    df_sequence_no_duplicates.to_csv(f'{outputDir}/sequence_fluor_energy_data.csv', index=False)
+    df_mutant_no_duplicates.to_csv(f'{outputDir}/mutant_fluor_energy_data.csv', index=False)
+    df_sequence_no_fluor.to_csv(f'{outputDir}/sequence_no_fluor.csv', index=False)
+    df_mutant_no_fluor.to_csv(f'{outputDir}/mutant_no_fluor.csv', index=False)
+    df_fluor_labeled.to_csv(f'{outputDir}/fluor_WT_mutant_labeled.csv', index=False)
+    df_no_fluor.to_csv(f'{outputDir}/no_fluor.csv', index=False)
+    df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample', fluor_col]]])
+    df_all.to_csv(f'{outputDir}/all.csv', index=False)
+    print(f'Sequences: {len(df_sequence_no_duplicates)}')
+    print(f'Mutants: {len(df_mutant_no_duplicates)}')

@@ -36,13 +36,13 @@ if __name__ == "__main__":
     os.system(execInstallRequirements)
 
     # run the script to add the necessary columns to the dataframes
-    execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py {sequenceFile} {mutantFile} {outputDir}'
+    execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outputDir}'
     os.system(execAddColumns)
 
     # run the voiding script if the voiding data is found in the config file
-    execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outputDir}/wt.csv {outputDir}/mutant.csv {outputDir}'
+    execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py -seqFile {outputDir}/wt.csv -mutFile {outputDir}/mutant.csv -outDir {outputDir}'
     os.system(execplotBoxplot)
 
     # run boxplot script for all of the data
-    execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py {outputDir}/clash_void.csv {outputDir}/combined'
+    execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py -inFile {outputDir}/clash_void.csv -outDir {outputDir}/combined'
     os.system(execplotBoxplotCombined)
