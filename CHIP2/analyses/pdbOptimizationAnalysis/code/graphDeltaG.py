@@ -1,6 +1,20 @@
-import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt
-from analyzeData import plotScatterplot
+import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt, argparse
+from analyzeData import plotScatterplotSingle, plotScatterplot
 
+# initialize the parser
+parser = argparse.ArgumentParser(description='Graphs data as scatterplots against deltaG')
+
+# add the necessary arguments
+parser.add_argument('-inFile','--inputFile', type=str, help='the input csv file')
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+
+# extract the arguments into variables
+args = parser.parse_args()
+inputFile = args.inputFile
+outputDir = args.outputDir
+os.makedirs(name=outputDir, exist_ok=True)
+
+colors = ['mediumseagreen', 'moccasin', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 def graphXVsY(input_df, output_file, x_col, y_col, error_col, png_dir, svg_dir):
     # plot the WT sequence fluorescence vs the energy
     plt.scatter(input_df[x_col], input_df[y_col])
@@ -22,42 +36,37 @@ def graphXVsY(input_df, output_file, x_col, y_col, error_col, png_dir, svg_dir):
     plt.savefig(f'{svg_dir}/{output_file}.svg')
     plt.clf()
 
-# get command line arguments
-inputFile = sys.argv[1]
-outputDir = sys.argv[2]
+if __name__ == '__main__':
+    # read in the data
+    df_input = pd.read_csv(inputFile)
 
-os.makedirs(name=outputDir, exist_ok=True)
+    # remove data with total energy greater than 0
+    df_input = df_input[df_input['Total'] < 0]
+    df_input = df_input[df_input['deltaG'] < 0]
+    # graph the data
+    xaxes = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff']
+    yaxis = 'deltaG'
+    error_col = 'std_deltaG'
+    regression_degree = 1
 
-# read in the data
-df_input = pd.read_csv(inputFile)
-
-# remove data with total energy greater than 0
-df_input = df_input[df_input['Total'] < 0]
-df_input = df_input[df_input['deltaG'] < 0]
-# graph the data
-xaxes = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff']
-yaxis = 'deltaG'
-error_col = 'std_deltaG'
-regression_degree = 1
-
-# defining the regression degrees
-regression_degrees = [1, 2, 3, 4]
-#graphXVsY(df_input, outputFile, xaxis, yaxis, error_col, outputDir)
-for xaxis in xaxes:
-    outputFile = f'{xaxis}_vs_{yaxis}'
-    png_dir = f'{outputDir}/png'
-    svg_dir = f'{outputDir}/svg'
-    os.makedirs(name=png_dir, exist_ok=True)
-    os.makedirs(name=svg_dir, exist_ok=True)
-    plotScatterplot(df_input, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, True)
-
-for sample in df_input['Sample'].unique():
-    df_sample = df_input[df_input['Sample'] == sample]
+    # defining the regression degrees
+    regression_degrees = [1, 2, 3, 4]
+    #graphXVsY(df_input, outputFile, xaxis, yaxis, error_col, outputDir)
     for xaxis in xaxes:
         outputFile = f'{xaxis}_vs_{yaxis}'
-        sample_dir = f'{outputDir}/{sample}'
-        png_dir = f'{sample_dir}/png'
-        svg_dir = f'{sample_dir}/svg'
+        png_dir = f'{outputDir}/png'
+        svg_dir = f'{outputDir}/svg'
         os.makedirs(name=png_dir, exist_ok=True)
         os.makedirs(name=svg_dir, exist_ok=True)
-        plotScatterplot(df_sample, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, True)
+        plotScatterplot(df_input, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, True)
+
+    for sample, i in zip(df_input['Sample'].unique(), range(len(df_input['Sample'].unique()))):
+        df_sample = df_input[df_input['Sample'] == sample]
+        for xaxis in xaxes:
+            outputFile = f'{xaxis}_vs_{yaxis}'
+            sample_dir = f'{outputDir}/{sample}'
+            png_dir = f'{sample_dir}/png'
+            svg_dir = f'{sample_dir}/svg'
+            os.makedirs(name=png_dir, exist_ok=True)
+            os.makedirs(name=svg_dir, exist_ok=True)
+            plotScatterplotSingle(df_sample, sample, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-60, xhighLim=0, ylowLim=-5.5, yhighLim=0)

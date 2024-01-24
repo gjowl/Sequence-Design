@@ -1,5 +1,23 @@
-import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt
+import os, sys, pandas as pd, numpy as np, matplotlib.pyplot as plt, argparse
 from scipy.stats import linregress
+
+# initialize the parser
+parser = argparse.ArgumentParser(description='Graph the computation vs experiment data')
+
+# add the necessary arguments
+parser.add_argument('-inFile','--inputFile', type=str, help='the input csv file')
+# add the optional arguments
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+
+# extract the arguments into variables
+args = parser.parse_args()
+inputFile = args.inputFile
+# default values for the optional arguments
+outputDir = os.getcwd()
+# if the optional arguments are not specified, use the default values
+if args.outputDir is not None:
+    outputDir = args.outputDir
+    os.makedirs(outputDir, exist_ok=True)
 
 colors = ['mediumseagreen', 'navajowhite', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, output_dir, useColors=False):
@@ -52,35 +70,30 @@ def graphVsFluorescence(input_df, sample_names, cols_to_graph, fluor_col, error_
                 df_col = df_sample[col].copy()
         df_sample.to_csv(f'{output_dir}/{sample}.csv', index=False)
 
-# get command line arguments
-inputFile = sys.argv[1]
-outputDir = sys.argv[2]
+if __name__ == '__main__':
+    # read in the data
+    df_fluorAndEnergy = pd.read_csv(inputFile)
 
-# read in the data
-df_fluorAndEnergy = pd.read_csv(inputFile)
+    # graph the data
+    cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
+    #fluor_col = 'Percent GpA'
+    #error_col = 'Percent Error'
+    #fluor_col = 'mean_transformed'
+    fluor_col = [col for col in df_fluorAndEnergy.columns if 'transformed' in col][0]
+    error_col = 'std_adjusted'
+    #fluor_col = 'Fluorescence'
+    #error_col = 'FluorStdDev'
+    samples = df_fluorAndEnergy['Sample'].unique()
+    # check if there is a design column
+    if 'Design' in df_fluorAndEnergy.columns:
+        for design in df_fluorAndEnergy['Design'].unique():
+            df_design = df_fluorAndEnergy[df_fluorAndEnergy['Design'] == design].copy()
+            df_design.drop_duplicates(subset='Sequence', keep='first', inplace=True)
+            design_dir = outputDir + '/' + design
+            os.makedirs(design_dir, exist_ok=True)
+            graphFluorescence(df_design, f'all_{design}', 'Total', fluor_col, error_col, design_dir, True)
+            graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, design_dir)
 
-# graph the data
-cols_to_graph = ['Total', 'VDWDiff', 'HBONDDiff', 'IMM1Diff', 'SasaDiff']
-#fluor_col = 'Percent GpA'
-#error_col = 'Percent Error'
-#fluor_col = 'mean_transformed'
-fluor_col = [col for col in df_fluorAndEnergy.columns if 'transformed' in col][0]
-error_col = 'std_adjusted'
-#fluor_col = 'Fluorescence'
-#error_col = 'FluorStdDev'
-samples = df_fluorAndEnergy['Sample'].unique()
-# check if there is a design column
-if 'Design' in df_fluorAndEnergy.columns:
-    for design in df_fluorAndEnergy['Design'].unique():
-        df_design = df_fluorAndEnergy[df_fluorAndEnergy['Design'] == design].copy()
-        df_design.drop_duplicates(subset='Sequence', keep='first', inplace=True)
-        design_dir = outputDir + '/' + design
-        os.makedirs(design_dir, exist_ok=True)
-        graphFluorescence(df_design, f'all_{design}', 'Total', fluor_col, error_col, design_dir, True)
-        graphVsFluorescence(df_design, samples, cols_to_graph, fluor_col, error_col, design_dir)
-
-for col in cols_to_graph:
-    df_fluorAndEnergy.drop_duplicates(subset='Sequence', keep='first', inplace=True)
-    graphFluorescence(df_fluorAndEnergy, f'all_{col}', col, fluor_col, error_col, outputDir, True)
-
-
+    for col in cols_to_graph:
+        df_fluorAndEnergy.drop_duplicates(subset='Sequence', keep='first', inplace=True)
+        graphFluorescence(df_fluorAndEnergy, f'all_{col}', col, fluor_col, error_col, outputDir, True)

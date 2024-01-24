@@ -92,19 +92,19 @@ if __name__ == '__main__':
 
     # adjust fluorescence by control flow
     if runAdjustFluor:
-        execAdjustFluor = f'python3 {adjustFluorByControlFlow} {reconstructionFile} {controlFlowFile} {outputDir}'
+        execAdjustFluor = f'python3 {adjustFluorByControlFlow} -recFile {reconstructionFile} -flowFile {controlFlowFile} -outDir {outputDir}'
         os.system(execAdjustFluor)
 
     # mutant analysis
     if runfilterWithComputation:
         fluorFile = f'{outputDir}/all_transformed.csv'
-        execMutantAnalysis = f'python3 {filteringScript} {fluorFile} {wtSequenceFile} {mutantSequenceFile} {filteringDir}'
+        execMutantAnalysis = f'python3 {filteringScript} -fluorFile {fluorFile} -seqFile {wtSequenceFile} -mutFile {mutantSequenceFile} -outDir {filteringDir}'
         os.system(execMutantAnalysis)
 
     # sequence vs mutant
     if runSequenceVsMutant:
         fluorFile = f'{filteringDir}/all.csv'
-        execSequenceVsMutant = f'python3 {sequenceVsMutantScript} {fluorFile} {seqDir}'
+        execSequenceVsMutant = f'python3 {sequenceVsMutantScript} -fluorFile {fluorFile} -outDir {seqDir}'
         os.system(execSequenceVsMutant)
 
     # graphing code
@@ -121,14 +121,14 @@ if __name__ == '__main__':
                 inputFile = f'{seqDir}/{file}'
                 fluorDir = f'{seqDir}/{file_name}'
                 if runfilterBeforeGraphing:
-                    execMutantAnalysis = f'python3 {filteringScript} {inputFile} {wtSequenceFile} {mutantSequenceFile} {fluorDir}'
+                    execMutantAnalysis = f'python3 {filteringScript} -fluorFile {inputFile} -seqFile {wtSequenceFile} -mutFile {mutantSequenceFile} -outDir {fluorDir}'
                     os.system(execMutantAnalysis)
                 outDir = f'{graphingDir}/{file_name}'
                 fluorFile = f'{fluorDir}/sequence_fluor_energy_data.csv'
-                execGraphing = f'python3 {graphScript} {fluorFile} {outDir}'
+                execGraphing = f'python3 {graphScript} -inFile {fluorFile} -outDir {outDir}'
                 os.system(execGraphing)
                 individualOutDir = f'{outDir}/individual_graphs'
-                execIndividualGraphing = f'python3 {graphScript2} {fluorFile} {individualOutDir}'
+                execIndividualGraphing = f'python3 {graphScript2} -inFile {fluorFile} -outDir {individualOutDir}'
                 os.system(execIndividualGraphing)
     
     # will now output graphs for anything that gets output from the sequenceVsMutant script

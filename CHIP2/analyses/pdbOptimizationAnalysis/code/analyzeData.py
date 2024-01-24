@@ -1,8 +1,26 @@
-import os, sys, pandas as pd
-import matplotlib.pyplot as plt
+import os, sys, pandas as pd, matplotlib.pyplot as plt, numpy as np, argparse
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
-import numpy as np
+
+# initialize the parser
+parser = argparse.ArgumentParser(description='Plots the data into scatterplots')
+
+# add the necessary arguments
+parser.add_argument('-inFile','--inputFile', type=str, help='the input csv file')
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+# add the optional arguments
+parser.add_argument('-percentCutoff','--percentCutoff', type=float, help='the cutoff for the percent GpA')
+
+# extract the arguments into variables
+args = parser.parse_args()
+inputFile = args.inputFile
+outputDir = args.outputDir
+percentGpA_cutoff = 0
+# default values for the optional arguments
+if args.percentCutoff is not None:
+    percentGpA_cutoff = args.percentCutoff
+# make the output directory if it doesn't exist and the png and svg subdirectories
+os.makedirs(outputDir, exist_ok=True)
 
 colors = ['mediumseagreen', 'moccasin', 'darkslateblue', 'brown', 'pink', 'gray', 'olive', 'cyan']
 # plot scatterplot function
@@ -58,9 +76,9 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degrees, output_tit
 def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degrees, output_title, png_dir, svg_dir, sampleType=0, color=0, xlowLim=-60, xhighLim=0, ylowLim=0, yhighLim=1.75):
     df_sample = input_df[input_df['Sample'] == sample]
     # plot the WT sequence fluorescence vs the energy
-    plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
+    plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sample, s=5)
     # plot the standard deviation
-    plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+    plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
     plt.text(0.99, 1.10, f'N = {len(input_df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
     plt.xlabel(xAxis)
     plt.ylabel(yAxis)
@@ -111,25 +129,12 @@ def addEnergyDifferencesToDataframe(input_df, cols):
 
 if __name__ == '__main__':
     # read in the data file
-    dataFile = sys.argv[1]
-    df = pd.read_csv(dataFile)
-
-    # get the output directory
-    outputDir = sys.argv[2]
-
-    # check if the percentGpA cutoff is provided
-    if len(sys.argv) > 3:
-        percentGpA_cutoff = float(sys.argv[3])
-    else:
-        percentGpA_cutoff = 0
+    df = pd.read_csv(inputFile)
 
     #xAxis = 'TotalPreOptimize'
     xAxis = 'Total'
     yAxis = 'PercentGpA'
-
-    # make the output directory if it doesn't exist and the png and svg subdirectories
-    os.makedirs(outputDir, exist_ok=True)
-
+    
     # only keep sequences with the lowest total energy
     df = df.sort_values(by=[xAxis], ascending=True)
     df = df.drop_duplicates(subset=['Sequence'], keep='first')
@@ -200,10 +205,16 @@ if __name__ == '__main__':
         # check that the df_sample is not empty
         if df_sample.empty:
             continue
+        sample_dir = f'{outputDir}/{sample}'
+        png_dir = f'{sample_dir}/png'
+        svg_dir = f'{sample_dir}/svg'
         plotScatterplot(df_sample, xAxis, yAxis, 'PercentStd', regression_degrees, f'{sample}_Total', png_dir, svg_dir)
 
     # plot individual scatterplots for each sample
     for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
+        sample_dir = f'{outputDir}/{sample}'
+        png_dir = f'{sample_dir}/png'
+        svg_dir = f'{sample_dir}/svg'
         plotScatterplotSingle(df, sample, xAxis, yAxis, 'PercentStd', regression_degrees, f'{sample}_Total', png_dir, svg_dir, sampleType=sample, color=colors[i])
     
     # define the energy diff / interfaceSasa
@@ -214,8 +225,10 @@ if __name__ == '__main__':
     for df_tmp,title in zip(df_list, output_list):
         for sample, i in zip(df_tmp['Sample'].unique(), range(len(df_tmp['Sample'].unique()))):
             sample_dir = f'{outputDir}/{sample}'
+            png_dir = f'{sample_dir}/png'
+            svg_dir = f'{sample_dir}/svg'
             plotScatterplotSingle(df_tmp, sample, 'interfaceSasa', yAxis, 'PercentStd', regression_degrees, f'interfaceSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=2000)
             plotScatterplotSingle(df_tmp, sample, 'vdwPerSasa', yAxis, 'PercentStd', regression_degrees, f'vdwPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)
             plotScatterplotSingle(df_tmp, sample, 'hbondPerSasa', yAxis, 'PercentStd', regression_degrees, f'hbondPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.05, xhighLim=.05)
             plotScatterplotSingle(df_tmp, sample, 'imm1PerSasa', yAxis, 'PercentStd', regression_degrees, f'imm1PerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=.1)
-            plotScatterplotSingle(df_tmp, sample, 'totalPerSasa', yAxis, 'PercentStd', regression_degrees, f'totalPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=.1)
+            plotScatterplotSingle(df_tmp, sample, 'totalPerSasa', yAxis, 'PercentStd', regression_degrees, f'totalPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)

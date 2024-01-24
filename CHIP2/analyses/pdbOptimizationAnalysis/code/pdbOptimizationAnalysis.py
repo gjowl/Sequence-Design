@@ -86,19 +86,19 @@ if __name__ == "__main__":
     execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     os.system(execInstallRequirements)
 
-    # strip the sequence ends (the first and last 3 amino acids) from the sequence file since some of the sequences have alanine vs leucine ends
-    execStripSequenceEnds = f'python3 {codeDir}/stripSequenceEnds.py {toxgreenFile} {strippedSequenceFile} {outputDir}'
+    # strip the sequence ends (the first and last 3 amino acids) from the sequence file since some of the sequences have alanine vs leucine ends (overwrites the strippedSequenceFile if it already exists)
+    execStripSequenceEnds = f'python3 {codeDir}/stripSequenceEnds.py -inFile {toxgreenFile} -outFile {strippedSequenceFile} -outDir {outputDir}'
     os.system(execStripSequenceEnds)
 
-    # compile the energy files
-    execCompileEnergyFiles = f'python3 {codeDir}/compileFilesFromDirectories.py {rawDataDir} {dataFile} {outputDir}'
+    # compile the energy files (overwrites the dataFile if it already exists)
+    execCompileEnergyFiles = f'python3 {codeDir}/compileFilesFromDirectories.py -inDir {rawDataDir} -outFile {dataFile} -outDir {outputDir}'
     os.system(execCompileEnergyFiles) 
 
-    # add the percent gpa to the dataframe
     # get the dataFile name without the extension
     dataFilename = os.path.splitext(dataFile)[0]
     outputFile = f'{dataFilename}_percentGpa'
-    execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py {outputDir}/{dataFile}.csv {outputDir}/{strippedSequenceFile}.csv {outputFile} {outputDir}' 
+    # add the percent gpa to the dataframe
+    execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py -inFile {outputDir}/{dataFile}.csv -toxgreenFile {outputDir}/{strippedSequenceFile}.csv -outFile {outputFile} -outDir {outputDir}' 
     os.system(execAddPercentGpA)
 
     # check if you want to analyze clash data
@@ -109,7 +109,7 @@ if __name__ == "__main__":
                     # convert the cutoffs to integers
                     mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
                     clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
-                    execclashCheck = f'python3 {clashScript} {sequenceFile} {mutantFile} {clashOutputDir} {mutant_cutoff} {percent_cutoff} {number_of_mutants_cutoff}'
+                    execclashCheck = f'python3 {clashScript} -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
                     os.system(execclashCheck)
                     # loop through the files in the clashOutputDir
                     for filename in os.listdir(clashOutputDir):
@@ -117,22 +117,22 @@ if __name__ == "__main__":
                         if not filename.endswith('.csv'):
                             continue
                         file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py {clashOutputDir}/{filename} {outputDir}/{outputFile}.csv {file_outputDir} {percent_cutoff} {codeDir}'
+                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{outputFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
                         os.system(execAnalyzeclash)
                         file_to_analyze = 'lowestEnergySequences'
                         # plot kde plots of geometries
-                        execPlotKde = f'python3 {codeDir}/makeKdePlots.py {kdeFile} {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
+                        execPlotKde = f'python3 {codeDir}/makeKdePlots.py -kdeFile {kdeFile} -dataFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
                         os.system(execPlotKde)
                     # convert to delta G
-                    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py {file_outputDir}/{file_to_analyze}.csv {file_outputDir}'
+                    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
                     os.system(execConvertToDeltaG)
 
                     # graph the delta G
-                    execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py {file_outputDir}/{file_to_analyze}_deltaG.csv {file_outputDir}'
+                    execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py -inFile {file_outputDir}/{file_to_analyze}_deltaG.csv -outDir {file_outputDir}'
                     os.system(execGraphDeltaG)
 
     # analyze the data
-    execAnalyzeData = f'python3 {codeDir}/analyzeData.py {outputDir}/{outputFile}.csv {outputDir}' 
+    execAnalyzeData = f'python3 {codeDir}/analyzeData.py -inFile {outputDir}/{outputFile}.csv -outDir {outputDir}' 
     os.system(execAnalyzeData)
 
     

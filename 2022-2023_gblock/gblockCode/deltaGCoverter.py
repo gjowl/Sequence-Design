@@ -1,8 +1,19 @@
-import sys
-import os
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
+'''
+File: d:\github\Sequence-Design\2022-2023_gblock\gblockCode\deltaGCoverter.py
+Project: d:\github\Sequence-Design\2022-2023_gblock\gblockCode
+Created Date: Monday February 27th 2023
+Author: gjowl
+-----
+Last Modified: Monday February 27th 2023 8:01:35 pm
+Modified By: gjowl
+-----
+Description: 
+Converts toxcat to deltaG values
+-----
+'''
+
+import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
+import argparse
 
 # convert toxgreen to toxcat using the equation from Armstrong and Senes 2016
 def greenToCatFunction(toxgreen):
@@ -34,32 +45,50 @@ def fractionDimerToKd(fractionDimer):
     Kd = 2*chiT*((1+fractionDimer**2-2*fractionDimer)/fractionDimer)
     return Kd
 
-# get the current directory
-cwd = os.getcwd()
+# initialize the parser
+parser = argparse.ArgumentParser(description='Converts toxcat to deltaG')
 
-# get the csv file from the command line
-inputFile = sys.argv[1]
+# add the necessary arguments
+parser.add_argument('-inFile','--inputFile', type=str, help='the input csv file')
 
-# read in csv as a dataframe
-df = pd.read_csv(inputFile, sep=',', header=0)
+# add the optional arguments
+parser.add_argument('-outFile','--outputFile', type=str, help='the output csv file')
+parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
 
-# convert toxgreen to toxcat
-df['toxcat'] = greenToCatFunction(df['PercentGpA'])
+# extract the arguments into variables
+args = parser.parse_args()
+inputFile = args.inputFile
+# default values for the optional arguments
+outputFile = 'deltaG' 
+outputDir = os.getcwd()
 
-# convert toxcat to fraction dimer
-df['fractionDimer'] = catToFractionDimer(df['toxcat'])
+# if the optional arguments are not specified, use the default values
+if args.outputFile is not None:
+    outputFile = args.outputFile
+if args.outputDir is not None:
+    outputDir = args.outputDir
 
-# convert fraction dimer to Kd
-df['Kd'] = fractionDimerToKd(df['fractionDimer'])
+if __name__ == '__main__':
+    # read in csv as a dataframe
+    df = pd.read_csv(inputFile, sep=',', header=0)
 
-# rid of the negative Kd values
-df = df[df['Kd'] > 0]
+    # convert toxgreen to toxcat
+    df['toxcat'] = greenToCatFunction(df['PercentGpA'])
 
-# convert Kd to deltaG
-R = 0.0019872 # kcal/mol/K
-#T = 298.15 # K
-T = 310 # K
-df['deltaG'] = np.log(df['Kd']) * R * T
+    # convert toxcat to fraction dimer
+    df['fractionDimer'] = catToFractionDimer(df['toxcat'])
 
-# output the df to a csv file
-df.to_csv(cwd+'/test.csv', sep=',')
+    # convert fraction dimer to Kd
+    df['Kd'] = fractionDimerToKd(df['fractionDimer'])
+
+    # rid of the negative Kd values
+    df = df[df['Kd'] > 0]
+
+    # convert Kd to deltaG
+    R = 0.0019872 # kcal/mol/K
+    #T = 298.15 # K
+    T = 310 # K
+    df['deltaG'] = np.log(df['Kd']) * R * T
+
+    # output the df to a csv file
+    df.to_csv(f'{outputDir}/{outputFile}.csv', sep=',')
