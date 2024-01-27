@@ -51,7 +51,7 @@ if __name__ == '__main__':
     #  https://pip.pypa.io/en/latest/reference/requirements-file-format/#requirements-file-format
     #  gets rid of requirement output: https://github.com/pypa/pip/issues/5900?msclkid=474dd7c0c72911ec8bf671f1ae3975f0
     execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
-    os.system(execInstallRequirements)
+    #os.system(execInstallRequirements)
 
     # runs through all files in the dataDir and converts fastq to txt; only runs if no files are found in the output dir
     convertFastqToTxt(fastqTotxt, namesFile, refFile, dataDir, extractionDir)
