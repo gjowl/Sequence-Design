@@ -184,12 +184,14 @@ def extractGoodSequenceDataframe(input_dir, output_dir):
                 # Set the new most column count
                 largest_column_count = column_count if largest_column_count < column_count else largest_column_count
         colName = ''
-        # get the proper column names if a bin file or LB and M9
-        LBM9_check = re.search('maltose', dataFile)
-        if LBM9_check == None:
-            colName = file[0:7] # name, hour, and rep for LB/M9
+        # get the proper column names if file contains H (for hour of LB/M9)
+        LBM9_check = re.search('LB|M9', dataFile)
+        if LBM9_check != None:
+            # get the name of the file without the extension
+            colName = file.split('.')[0]
         else:
-            colName = file[0:11] # name and rep for bins
+            # get the name of the file without the extension
+            colName = file.split('.')[0]
         # Generate column names (will be 0, 1, 2, ..., largest_column_count - 1)
         column_names = [i for i in range(0, largest_column_count)]
         # the above works, but if you run into an error for column mismatch then find the file that has too many and delete the extra columns

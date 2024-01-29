@@ -59,8 +59,8 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
         # if the dir is empty, continue
         if len(os.listdir(outputDir)) < 1:
             # remove the non-sorted data (H to distinguish LB and maltose data) from the df
-            #dfBins = df.filter(like='H')
-            dfBins = df.filter(like='E')
+            dfBins = df.filter(like='H')
+            #dfBins = df.filter(like='E')
             # remove the those bins from the df
             dfBins = df.drop(dfBins.columns, axis=1)
             # remove the sequence and segment columns from the dfBins
@@ -354,7 +354,8 @@ def getReconstructedFluorescenceStats(df):
 def getPercentDifference(list_df, list_of_hours, seqs, segments, inputDir, outputDir):
     df_percentDiff = pd.DataFrame()
     #TODO: this only gets number for one df; they should be the same, but it may need to be moved
-    numReplicates = getNumberReplicates(list_df[0])
+    #numReplicates = getNumberReplicates(list_df[0])
+    numReplicates = 3
     if len(os.listdir(outputDir)) == 0:
         # list to hold the output df: the first output is for LB and the second is for M9
         # after the loop, it uses both to calculate the percent difference 
