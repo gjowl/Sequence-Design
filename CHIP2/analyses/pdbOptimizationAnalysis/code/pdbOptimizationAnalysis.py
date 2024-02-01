@@ -101,6 +101,10 @@ if __name__ == "__main__":
     execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py -inFile {outputDir}/{dataFile}.csv -toxgreenFile {outputDir}/{strippedSequenceFile}.csv -outFile {outputFile} -outDir {outputDir}' 
     os.system(execAddPercentGpA)
 
+    # keep only the data passing the maltose test
+    execKeepMaltoseData = f'python3 {codeDir}/keepMaltoseData.py -inFile {outputDir}/{dataFile}.csv -maltoseFile {maltoseFile} -outFile {dataFile}_maltose -outDir {outputDir}'
+    os.system(execKeepMaltoseData)
+
     # check if you want to analyze clash data
     if clashData:
         for number_of_mutants_cutoff in number_of_mutants_cutoffs:
