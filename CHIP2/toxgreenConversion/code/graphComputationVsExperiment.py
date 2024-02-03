@@ -58,6 +58,7 @@ def graphFluorescence(input_df, output_file, energy_col, fluor_col, error_col, o
     #plt.text(0.1, 1.03, f'p = {p_value:.5f}', horizontalalignment='center', verticalalignment='center', transform=plt.gca().transAxes)
     plt.tight_layout()
     plt.savefig(f'{output_dir}/{output_file}.png')
+    plt.savefig(f'{output_dir}/{output_file}.svg')
     plt.clf()
 
 def graphVsFluorescence(input_df, sample_names, cols_to_graph, fluor_col, error_col, output_dir):

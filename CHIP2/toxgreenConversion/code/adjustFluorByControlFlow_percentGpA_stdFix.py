@@ -27,6 +27,7 @@ parser.add_argument('-recFile','--reconstructionFile', type=str, help='the input
 parser.add_argument('-flowFile','--controlFlowFile', type=str, help='the input flow fluorescence csv file')
 # add the optional arguments
 parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-transform','--transform', type=bool, help='transform the data to Percent GpA')
 
 # extract the arguments into variables
 args = parser.parse_args()
@@ -34,10 +35,13 @@ reconstructionFile = args.reconstructionFile
 controlFlowFile = args.controlFlowFile
 # default values for the optional arguments
 outputDir = os.getcwd()
+transform = True
 # if the optional arguments are not specified, use the default values
 if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
+if args.transform is not None:
+    transform = args.transform
 
 def plot_and_transform(df_control_plot, input_df, xaxis, cols, sample, outputDir):
     output_df = input_df.copy()
@@ -87,6 +91,7 @@ def plot_and_get_regression(df_control_plot, xaxis_col, yaxis_col, sample):
     # add the r^2 value to the plot
     plt.text(0.05, 0.90, f'r^2 = {np.corrcoef(xaxis, yaxis)[0,1]**2:.2f}', transform=plt.gca().transAxes)
     plt.savefig(f'{outputDir}/{sample}_fit.png')
+    plt.savefig(f'{outputDir}/{sample}_fit.svg')
     plt.clf()
     return m, b
 
@@ -126,14 +131,17 @@ if __name__ == '__main__':
     # noTM from flow reruns
     noTM_fluor = 12429.6644
     subtract_noTM = False 
+    transform = False
     #subtract_noTM = False 
     #TODO: the subtraction of the noTM fluor works, but it leads to some negative values. Maybe I should just add it to the fitting line as a control fluor?
     os.makedirs(outputDir, exist_ok=True)
     
-    #xaxis = 'Flow Mean'
-    yaxis = 'mean'
-    xaxis = 'Percent GpA'
-    #yaxis = 'mean_transformed'
+    if transform == True:
+        xaxis = 'Percent GpA'
+        yaxis = 'mean'
+    else:
+        xaxis = 'Flow Mean'
+        yaxis = 'Mean Std'
     final_transform_col = f'PercentGpA_transformed'
     
     # read in the dataframes
@@ -181,12 +189,14 @@ if __name__ == '__main__':
         #cols = [col for col in cols if 'Rep1' not in col]
         df_sample[final_transform_col] = df_sample[cols].mean(axis=1)
         df_sample['std_adjusted'] = df_sample[cols].std(axis=1)
-        print(df_sample)
         # get the index of GpA and G83I from the sequence column
         gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
         # get the fluorescence from the index
         gpaFluor, g83iFluor = gpaIndex[transform_col].values[0], g83iIndex[transform_col].values[0]
-        df_sample['Percent GpA'] = df_sample[transform_col]/gpaFluor*100 
+        if transform == True:
+            df_sample['Percent GpA'] = df_sample[transform_col]/gpaFluor*100 
+        else:
+            df_sample['Percent GpA'] = df_sample[transform_col] 
         # TODO: fix the calculation of uncertainty; still can't figure out the way to do error propagation with a regression line
         gpa_sd = controlFlow_df[controlFlow_df['Sequence'] == gpa]['Sd'].values[0]
         gpa_error = gpa_sd/gpaFluor

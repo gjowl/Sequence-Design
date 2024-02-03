@@ -67,6 +67,7 @@ def plotBarGraph(df_seq, xaxis, yaxis, xaxis_labels, seq, output_dir):
     ax.autoscale(tight=False)
     plt.tight_layout()
     plt.savefig(f'{output_dir}/{seq}.png')
+    plt.savefig(f'{output_dir}/{seq}.svg')
     plt.clf()
 
 def addMismatchedPositions(df, wt_seq_col, position_col):
