@@ -50,9 +50,7 @@ requirementsFile        = f'{inputDir}/{config["requirementsFile"]}'
 wtSequenceFile          = f'{inputDir}/{config["wtSequenceComputationFile"]}'
 mutantSequenceFile      = f'{inputDir}/{config["mutantSequenceComputationFile"]}'
 controlFlowFile         = f'{inputDir}/{config["controlFlowFile"]}'
-
-# files from other directories
-reconstructionFile      = f'{config["reconstructionFile"]}'
+reconstructionFile      = f'{inputDir}/{config["reconstructionFile"]}'
 
 # scripts to run
 scriptDir               = config["scriptDir"]
@@ -73,11 +71,7 @@ runSequenceVsMutant      = config["runSequenceVsMutant"].lower() == 'true'
 runGraphing              = config["runGraphing"].lower() == 'true'
 
 # check if output directory exists
-if os.path.exists(outputDir):
-    print(f"Output directory already exists. Delete {outputDir} to rerun.")
-    sys.exit()
-else:
-    os.makedirs(outputDir, exist_ok=True)
+os.makedirs(outputDir, exist_ok=True)
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
