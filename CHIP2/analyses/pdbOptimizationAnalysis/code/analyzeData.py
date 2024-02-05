@@ -74,6 +74,11 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degrees, output_tit
     plt.clf()
 
 def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degrees, output_title, png_dir, svg_dir, sampleType=0, color=0, xlowLim=-60, xhighLim=0, ylowLim=0, yhighLim=1.75):
+    # check if the yaxis highest value is above the yhighLim
+    if input_df[yAxis].max() > yhighLim:
+        # get 1/10th of the highest value
+        yhighLim_10th = input_df[yAxis].max() / 10
+        yhighLim = input_df[yAxis].max() + yhighLim_10th
     df_sample = input_df[input_df['Sample'] == sample]
     # plot the WT sequence fluorescence vs the energy
     plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sample, s=5)
@@ -92,24 +97,24 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     plt.savefig(f'{svg_dir}/scatter_{output_title}.svg')
     for regression_degree in regression_degrees:
         if regression_degree == 1:
-            m, b = np.polyfit(input_df[xAxis], input_df[yAxis], regression_degree)
-            plt.plot(input_df[xAxis], m*input_df[xAxis] + b, color='red')
+            m, b = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)
+            plt.plot(df_sample[xAxis], m*df_sample[xAxis] + b, color='red')
             # add the r^2 value to the top left of the plot
-            r2 = np.corrcoef(input_df[xAxis], input_df[yAxis])[0,1]**2
+            r2 = np.corrcoef(df_sample[xAxis], df_sample[yAxis])[0,1]**2
             plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
         if regression_degree == 2:
-            m, b, c = np.polyfit(input_df[xAxis], input_df[yAxis], regression_degree)
-            plt.plot(input_df[xAxis], c + b*input_df[xAxis] + m*input_df[xAxis]**2, color='red')
+            m, b, c = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)
+            plt.plot(df_sample[xAxis], c + b*df_sample[xAxis] + m*df_sample[xAxis]**2, color='red')
             # add the equation to the top left of the plot
             plt.text(0.01, 1.10, f'y = {m:.2f}x^2 + {b:.2f}x + {c:.2f}', transform=plt.gca().transAxes, fontsize=10, verticalalignment='top')
         if regression_degree == 3:
-            m, b, c, d = np.polyfit(input_df[xAxis], input_df[yAxis], regression_degree)
-            plt.plot(input_df[xAxis], d + c*input_df[xAxis] + b*input_df[xAxis]**2 + m*input_df[xAxis]**3, color='red')
+            m, b, c, d = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)
+            plt.plot(df_sample[xAxis], d + c*df_sample[xAxis] + b*df_sample[xAxis]**2 + m*df_sample[xAxis]**3, color='red')
             # add the equation to the top left of the plot
             plt.text(0.01, 1.10, f'y = {m:.2f}x^3 + {b:.2f}x^2 + {c:.2f}x + {d:.2f}', transform=plt.gca().transAxes, fontsize=10, verticalalignment='top')
         if regression_degree == 4:
-            m, b, c, d, e = np.polyfit(input_df[xAxis], input_df[yAxis], regression_degree)
-            plt.plot(input_df[xAxis], e + d*input_df[xAxis] + c*input_df[xAxis]**2 + b*input_df[xAxis]**3 + m*input_df[xAxis]**4, color='red')
+            m, b, c, d, e = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)
+            plt.plot(df_sample[xAxis], e + d*df_sample[xAxis] + c*df_sample[xAxis]**2 + b*df_sample[xAxis]**3 + m*df_sample[xAxis]**4, color='red')
             # add the equation to the top left of the plot
             plt.text(0.01, 1.10, f'y = {m:.2f}x^4 + {b:.2f}x^3 + {c:.2f}x^2 + {d:.2f}x + {e:.2f}', transform=plt.gca().transAxes, fontsize=10, verticalalignment='top')
         plt.savefig(f'{png_dir}/scatterRegression_{output_title}_{regression_degree}.png')
@@ -133,7 +138,10 @@ if __name__ == '__main__':
 
     #xAxis = 'TotalPreOptimize'
     xAxis = 'Total'
-    yAxis = 'PercentGpA'
+    #yAxis = 'PercentGpA'
+    #yStd = 'PercentStd'
+    yAxis = 'toxgreen_fluor'
+    yStd = 'toxgreen_std'
     
     # only keep sequences with the lowest total energy
     df = df.sort_values(by=[xAxis], ascending=True)
@@ -189,7 +197,7 @@ if __name__ == '__main__':
     os.makedirs(png_dir, exist_ok=True)
     os.makedirs(svg_dir, exist_ok=True)
     for df_tmp,title in zip(df_list, outputTitle_list):
-        plotScatterplot(df_tmp, xAxis, yAxis, 'PercentStd', regression_degrees, title, png_dir, svg_dir)
+        plotScatterplot(df_tmp, xAxis, yAxis, yStd, regression_degrees, title, png_dir, svg_dir)
 
     # make the directory for each sample
     for sample in df['Sample'].unique():
@@ -208,14 +216,14 @@ if __name__ == '__main__':
         sample_dir = f'{outputDir}/{sample}'
         png_dir = f'{sample_dir}/png'
         svg_dir = f'{sample_dir}/svg'
-        plotScatterplot(df_sample, xAxis, yAxis, 'PercentStd', regression_degrees, f'{sample}_Total', png_dir, svg_dir)
+        plotScatterplot(df_sample, xAxis, yAxis, yStd, regression_degrees, f'{sample}_Total', png_dir, svg_dir)
 
     # plot individual scatterplots for each sample
     for sample, i in zip(df['Sample'].unique(), range(len(df['Sample'].unique()))):
         sample_dir = f'{outputDir}/{sample}'
         png_dir = f'{sample_dir}/png'
         svg_dir = f'{sample_dir}/svg'
-        plotScatterplotSingle(df, sample, xAxis, yAxis, 'PercentStd', regression_degrees, f'{sample}_Total', png_dir, svg_dir, sampleType=sample, color=colors[i])
+        plotScatterplotSingle(df, sample, xAxis, yAxis, yStd, regression_degrees, f'{sample}_Total', png_dir, svg_dir, sampleType=sample, color=colors[i])
     
     # define the energy diff / interfaceSasa
     df_all = df[(df['interfaceSasa'] > 0) & (df['vdwPerSasa'] < 0)]
@@ -227,8 +235,8 @@ if __name__ == '__main__':
             sample_dir = f'{outputDir}/{sample}'
             png_dir = f'{sample_dir}/png'
             svg_dir = f'{sample_dir}/svg'
-            plotScatterplotSingle(df_tmp, sample, 'interfaceSasa', yAxis, 'PercentStd', regression_degrees, f'interfaceSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=2000)
-            plotScatterplotSingle(df_tmp, sample, 'vdwPerSasa', yAxis, 'PercentStd', regression_degrees, f'vdwPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)
-            plotScatterplotSingle(df_tmp, sample, 'hbondPerSasa', yAxis, 'PercentStd', regression_degrees, f'hbondPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.05, xhighLim=.05)
-            plotScatterplotSingle(df_tmp, sample, 'imm1PerSasa', yAxis, 'PercentStd', regression_degrees, f'imm1PerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=.1)
-            plotScatterplotSingle(df_tmp, sample, 'totalPerSasa', yAxis, 'PercentStd', regression_degrees, f'totalPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)
+            plotScatterplotSingle(df_tmp, sample, 'interfaceSasa', yAxis, yStd, regression_degrees, f'interfaceSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=2000)
+            plotScatterplotSingle(df_tmp, sample, 'vdwPerSasa', yAxis, yStd, regression_degrees, f'vdwPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)
+            plotScatterplotSingle(df_tmp, sample, 'hbondPerSasa', yAxis, yStd, regression_degrees, f'hbondPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.05, xhighLim=.05)
+            plotScatterplotSingle(df_tmp, sample, 'imm1PerSasa', yAxis, yStd, regression_degrees, f'imm1PerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=.1)
+            plotScatterplotSingle(df_tmp, sample, 'totalPerSasa', yAxis, yStd, regression_degrees, f'totalPerSasa_{title}', png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-.1, xhighLim=0)

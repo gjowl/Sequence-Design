@@ -14,8 +14,8 @@ parser.add_argument('-outDir','--outputDir', type=str, help='the output director
 # extract the arguments into variables
 args = parser.parse_args()
 dataFile = args.inputFile
-maltoseFile = args.toxgreenFile
-maltose
+maltoseFile = args.maltoseFile
+maltoseCol = args.maltoseCol
 outputFile = args.outputFile
 # default values for the optional arguments
 outputDir = os.getcwd()
@@ -29,11 +29,20 @@ if __name__ == '__main__':
     data = pd.read_csv(dataFile)
     maltose = pd.read_csv(maltoseFile)
 
-    # sort by the maltose column
-    maltose = maltose.sort_values(by=[maltoseCol])
-
-    # get the highest maltose value for segment w/ N
-    highest_maltose = maltose.groupby(['Segment','N']).max().reset_index()
+    # keep the maltose data for Segments N
+    neg_maltose = maltose[maltose['Segments'] == 'N']
+    highest_maltose = neg_maltose[maltoseCol].max()
 
     # only keep sequences that pass the maltose test
-    maltose_passing_data = maltose[maltose[] >= highest_maltose['Maltose']]
+    maltose_passing_data = maltose[maltose[maltoseCol] >= highest_maltose]
+    maltose_passing_sequences = maltose_passing_data['Sequence']
+
+    # remove the first 3 amino acids from the sequence (since the data file has the first 3 amino acids removed)
+    maltose_passing_sequences = [x[3:] for x in maltose_passing_sequences]
+
+    # keep only the data passing the maltose test
+    data = data[data['Sequence'].isin(maltose_passing_sequences)]
+
+    # output the dataframe to a csv file
+    data.to_csv(f'{outputDir}/{outputFile}.csv', sep=',', index=False)
+

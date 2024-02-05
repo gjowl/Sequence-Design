@@ -59,6 +59,8 @@ requirementsFile = config['requirementsFile']
 toxgreenFile = config['toxgreenFile']
 strippedSequenceFile = config['strippedSequenceFile']
 clashScript = config['clashScript']
+maltoseFile = config['maltoseFile']
+maltoseCol = config['maltoseCol']
 # check if any of the clashing config options are found in the config file
 clashData = 'clashScript' in config
 if clashData:
@@ -77,7 +79,7 @@ if clashData:
 #    print(f"Output directory already exists. Delete {outputDir} to rerun.")
 #    sys.exit()
 #else:
-#    os.makedirs(outputDir, exist_ok=True)
+os.makedirs(outputDir, exist_ok=True)
 
 if __name__ == "__main__":
     # write README file 
@@ -102,7 +104,8 @@ if __name__ == "__main__":
     os.system(execAddPercentGpA)
 
     # keep only the data passing the maltose test
-    execKeepMaltoseData = f'python3 {codeDir}/keepMaltoseData.py -inFile {outputDir}/{dataFile}.csv -maltoseFile {maltoseFile} -outFile {dataFile}_maltose -outDir {outputDir}'
+    maltosePassingFile = f'{outputFile}_maltose'
+    execKeepMaltoseData = f'python3 {codeDir}/keepMaltoseData.py -inFile {outputDir}/{outputFile}.csv -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {maltosePassingFile} -outDir {outputDir}'
     os.system(execKeepMaltoseData)
 
     # check if you want to analyze clash data
@@ -121,9 +124,10 @@ if __name__ == "__main__":
                         if not filename.endswith('.csv'):
                             continue
                         file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{outputFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
+                        #execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{outputFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
+                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{maltosePassingFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
                         os.system(execAnalyzeclash)
-                        file_to_analyze = 'lowestEnergySequences'
+                        file_to_analyze = 'lowestEnergySequences' # made in analyzeData.py
                         # plot kde plots of geometries
                         execPlotKde = f'python3 {codeDir}/makeKdePlots.py -kdeFile {kdeFile} -dataFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
                         os.system(execPlotKde)
@@ -136,7 +140,6 @@ if __name__ == "__main__":
                     os.system(execGraphDeltaG)
 
     # analyze the data
-    execAnalyzeData = f'python3 {codeDir}/analyzeData.py -inFile {outputDir}/{outputFile}.csv -outDir {outputDir}' 
+    #execAnalyzeData = f'python3 {codeDir}/analyzeData.py -inFile {outputDir}/{outputFile}.csv -outDir {outputDir}' 
+    execAnalyzeData = f'python3 {codeDir}/analyzeData.py -inFile {outputDir}/{maltosePassingFile}.csv -outDir {outputDir}' 
     os.system(execAnalyzeData)
-
-    

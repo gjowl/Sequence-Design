@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # remove the first and last 6 residues
     df['Sequence'] = df['Sequence'].apply(lambda x: x[3:-3])
     #cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Total','VDWDiff','HBONDDiff','IMM1Diff','Sample','LB-12H_M9-36H']
-    cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Sample','LB-12H_M9-36H']
+    cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Sample','LB-12H_M9-36H','toxgreen_fluor','toxgreen_std']
     df = df[cols]
     # rename the columns
     df = df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'})
