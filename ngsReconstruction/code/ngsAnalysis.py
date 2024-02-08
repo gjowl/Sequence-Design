@@ -69,11 +69,11 @@ list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, re
 df_fluor = list_dfReconstructedFluor[0]
 divider = '-Fluor'
 print(df_fluor)
-calculatePercentGpA(df_fluor, gpa, g83i, noTMfluor, divider, outputDir)
+#calculatePercentGpA(df_fluor, gpa, g83i, noTMfluor, divider, outputDir)
 
 # hardcoded hour lists for LB and M9
 # TODO: make this just search through the dataframe for the hours in the future
-LBhours = ['12H', '24H', '36H']
+LBhours = ['0H', '12H', '24H', '36H']
 M9hours = ['30H', '36H']
 list_of_hours = [LBhours, M9hours]
 
