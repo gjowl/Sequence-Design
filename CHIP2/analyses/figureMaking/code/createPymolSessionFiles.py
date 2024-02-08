@@ -191,8 +191,8 @@ for sample in df['Sample'].unique():
     os.makedirs(name=sideview_dir, exist_ok=True)
     os.makedirs(name=pse_dir, exist_ok=True)
     df_sample.reset_index(inplace=True)
-    #outputFrontview(df_sample, frontview_dir, rawDataDir)
-    #outputSideview(df_sample, sideview_dir, rawDataDir)
+    outputFrontview(df_sample, frontview_dir, rawDataDir)
+    outputSideview(df_sample, sideview_dir, rawDataDir)
     # save the dataframe
     df_sample.to_csv(f'{outputDir}/{dataFilename}_{sample}.csv', index=False)
     outputPseFiles(df_sample, pse_dir, rawDataDir, pdbOptimizedDir)

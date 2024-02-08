@@ -120,6 +120,7 @@ def outputPngs(input_df, output_dir, hbondAAs, ringAAs):
             pdbName = str(repNum)
             # put together the filename
             filename = f'{raw_data_dir}/{dirName}/{pdbName}.pdb'
+            print(filename)
             # load the pdb file
             cmd.load(filename)
             # setup the pymol session for output

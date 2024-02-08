@@ -65,3 +65,7 @@ if __name__ == '__main__':
     os.system(execCreatePses)
     execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirLeu} {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs'
     os.system(execCreatePses)
+    
+    # output pngs of the interface pdbs with hbonds and rings highlighted
+    execCreatePses = f'python3 {codeDir}/mutantInterfacePdbs.py {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs/highlighted'
+    os.system(execCreatePses)
