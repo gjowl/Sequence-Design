@@ -28,6 +28,10 @@ if __name__ == '__main__':
     df['Sequence'] = df['Sequence'].apply(lambda x: x[3:-3])
     #cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Total','VDWDiff','HBONDDiff','IMM1Diff','Sample','LB-12H_M9-36H']
     cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Sample','LB-12H_M9-36H','toxgreen_fluor','toxgreen_std']
+    # check if all of the columns are in the dataframe
+    if not all([col in df.columns for col in cols]):
+        print(f'Not all of the columns {cols} are in the dataframe, only using the ones that are present.')
+        cols = [col for col in cols if col in df.columns]
     df = df[cols]
     # rename the columns
     df = df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'})

@@ -61,11 +61,15 @@ if __name__ == '__main__':
     os.system(execSplitDesigns)
 
     # make the interface pdbs figures
-    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirAla} {optimizedPdbDir} {outputDir}/{outputFile}_ala.csv {outputDir}/interfacePdbs'
-    os.system(execCreatePses)
-    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirLeu} {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs'
-    os.system(execCreatePses)
+    #execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirAla} {optimizedPdbDir} {outputDir}/{outputFile}_ala.csv {outputDir}/interfacePdbs'
+    #os.system(execCreatePses)
+    #execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirLeu} {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs'
+    #os.system(execCreatePses)
     
-    # output pngs of the interface pdbs with hbonds and rings highlighted
-    execCreatePses = f'python3 {codeDir}/mutantInterfacePdbs.py {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs/highlighted'
-    os.system(execCreatePses)
+    ## output pngs of the interface pdbs with hbonds and rings highlighted
+    #execCreatePses = f'python3 {codeDir}/mutantInterfacePdbs.py {optimizedPdbDir} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs/highlighted'
+    #os.system(execCreatePses)
+
+    # get the potential hydrogen bonds
+    execPotentialHBonds = f'python3 {codeDir}/potentialHBondCounter.py -inFile {outputDir}/{outputFile}_leu.csv -pseDir {optimizedPdbDir} -outFile {outputFile} -outDir {outputDir}'
+    os.system(execPotentialHBonds)
