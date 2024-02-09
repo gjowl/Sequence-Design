@@ -138,10 +138,13 @@ if __name__ == '__main__':
 
     #xAxis = 'TotalPreOptimize'
     xAxis = 'Total'
-    #yAxis = 'PercentGpA'
-    #yStd = 'PercentStd'
-    yAxis = 'toxgreen_fluor'
-    yStd = 'toxgreen_std'
+    # check if toxgreen_fluor is in the dataframe
+    if 'toxgreen_fluor' in df.columns:
+        yAxis = 'toxgreen_fluor'
+        yStd = 'toxgreen_std'
+    else:
+        yAxis = 'PercentGpA'
+        yStd = 'PercentStd'
     
     # only keep sequences with the lowest total energy
     df = df.sort_values(by=[xAxis], ascending=True)
