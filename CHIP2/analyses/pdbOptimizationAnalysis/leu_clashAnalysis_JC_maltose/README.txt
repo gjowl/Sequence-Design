@@ -9,18 +9,18 @@ below given options, is found within this directory. Directories named as follow
 
 
 pdbOptimizationAnalysis
-codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_JC_maltose
-rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2023_DesignData/2023-9-5_allSeqsLeuEnds_bbOptimized
+codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_JC_maltose
+rawdatadir = /mnt/d/gasRight_designs/JC_leu/
 datafile = gasRight_leu
-toxgreenfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/JC_reconstruction_data.csv
+toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/JC_reconstruction_rerun.csv
 strippedsequencefile = strippedSequenceFile
-requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-clashscript = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
-clashinputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/toxgreenConversion/GASright_analysis/percentGpA_GAS/sequenceVsMutant/all
-kdefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+clashscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
+clashinputdir = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/GASright_analysis/percentGpA_GAS_JC_rerun/sequenceVsMutant/all
+kdefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
 mutant_cutoff = 0, 0.25, 0.30, 0.35, 0.40
 percent_cutoff = 0, 0.25, 0.5, .75
 number_of_mutants_cutoff = 1, 2
-maltosefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/ngsReconstruction/JC_maltose_2023-12/fwd/reconstructedData/maltoseTest/percentDifference.csv
+maltosefile = /mnt/d/github/Sequence-Design/ngsReconstruction/JC_maltose_2023-12/fwd/reconstructedData/maltoseTest/percentDifference.csv
 maltosecol = LB-0H_M9-36H
