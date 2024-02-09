@@ -35,6 +35,7 @@ if __name__ == '__main__':
 
     # only keep sequences that pass the maltose test
     maltose_passing_data = maltose[maltose[maltoseCol] >= highest_maltose]
+    maltose_passing_data = maltose_passing_data[maltose_passing_data[maltoseCol] < 99999900] # value set in reconstruction of the maltose data that is the upper limit, anything above isn't present in maltose
 
     # remove the first 3 amino acids from the sequence (since the data file has the first 3 amino acids removed)
     maltose_passing_data['Sequence'] = [x[3:] for x in maltose_passing_data['Sequence']]

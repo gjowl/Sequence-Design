@@ -11,6 +11,10 @@ in the protein.
 -----
 '''
 
+from pymol import cmd
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 
 # TODO:
 # 1. Take functions from other scripts to read in pdb
