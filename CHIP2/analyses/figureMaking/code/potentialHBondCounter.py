@@ -39,8 +39,12 @@ if args.outputDir is not None:
 def loadPdbAndGetBonds(filename, hbondAAs, ringAAs):
     # load the designed pdb file
     cmd.load(filename)
+    # get the name of the pdb file without the extension
+    sequence = filename.split('/')[-1].split('.')[0]
     # count the numbe of objects in the pdb file
     numObjs = len(cmd.get_names())
+    # initialize the output dataframe
+    output_df = pd.DataFrame(columns=['sequence', 'object_name', 'hbondAcceptors', 'hbondDonors'])
     # loop through the states of the pdb file
     for obj in cmd.get_names():
         # select this object
@@ -59,51 +63,54 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs):
             #    # get the number of atoms on the opposite chain that are within 1.5 angstroms of the oxygen atoms
             #    numHBonds = cmd.count_atoms(f'{obj} and name O and byres (chain {chain} and resn {ringAAs[0]}+{ringAAs[1]}+{ringAAs[2]}) within 1.5')
             #    print(numHBonds)
-        totalHbonds = 0
-        totalHbonds_acc = 0
+        donors, acceptors = 0, 0
         # get all of the chainName combinations
         combinations = [[chainNames[i], chainNames[j]] for i in range(len(chainNames)) for j in range(i+1, len(chainNames))]
         for combo in combinations:
-            print(combo)
             #numHbondA = cmd.count_atoms(f'{combo[0]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[1]}')
             #numHbondB = cmd.count_atoms(f'{combo[1]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[0]}')
-            numHbondA = cmd.count_atoms(f'{combo[0]} and name O within 3.3 of {combo[1]} and h.')
-            numHbondA_acc = cmd.count_atoms(f'{combo[0]} and h. within 3.3 of {combo[1]} and name O')
-            numHbondB = cmd.count_atoms(f'{combo[1]} and name O within 3.3 of {combo[0]} and h.')
-            numHbondB_acc = cmd.count_atoms(f'{combo[1]} and h. within 3.3 of {combo[0]} and name O')
-        totalHbonds += numHbondA + numHbondB
-        totalHbonds_acc += numHbondA_acc + numHbondB_acc
-        print(totalHbonds, totalHbonds_acc)
-        exit(0)
-        #for chainNames:
-        #    numHBonds = cmd.count_atoms(f'{obj} and name O and byres (chain {chain} and resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 1.5')
-        #    totalHbonds += numHBonds
-        #print(totalHbonds)
+            A_donors = cmd.count_atoms(f'{combo[0]} and name O within 3.3 of {combo[1]} and h.')
+            A_acceptors = cmd.count_atoms(f'{combo[0]} and h. within 3.3 of {combo[1]} and name O')
+            B_donors = cmd.count_atoms(f'{combo[1]} and name O within 3.3 of {combo[0]} and h.')
+            B_acceptors = cmd.count_atoms(f'{combo[1]} and h. within 3.3 of {combo[0]} and name O')
+        donors += A_donors + B_donors
+        acceptors += A_acceptors + B_acceptors
+        # add the data to the output dataframe using concat
+        output_df = pd.concat([output_df, pd.DataFrame({'sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors}, index=[0])])
     # close the pdb file
     cmd.reinitialize()
+    return output_df
 
-def measurePotentialHBonds(rawDataDir, hbondAAs, ringAAs, outputDir):
+def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs, output_dir, output_file):
+    # initialize the output dataframe
+    output_df = pd.DataFrame()
     # loop through the files in the rawDataDir
-    for file in os.listdir(rawDataDir):
+    for file in os.listdir(raw_data_dir):
         if file.endswith('.pse'):
             # get the filename
-            filename = rawDataDir+'/'+file
-            print(filename)
+            filename = raw_data_dir+'/'+file
             # load the pdb file and get the hydrogen bonds
-            loadPdbAndGetBonds(filename, hbondAAs, ringAAs)
+            bond_df = loadPdbAndGetBonds(filename, hbondAAs, ringAAs)
+            output_df = pd.concat([output_df, bond_df])
+    return output_df
+    
             
 if __name__ == '__main__':
-    # define the hbondAAs and ringAAs
+    # define the hbondAAs and ringAAs (for now it doesn't seem like I'll need these? But I'll take a look again later)
     hbondAAs = ['SER', 'THR', 'GLY']
     ringAAs = ['PHE', 'TYR', 'TRP']
-    #hbondAAs = ['S', 'T', 'G']
-    #ringAAs = ['W', 'Y', 'F']
-    # loop through the pseDir
-    for dir in os.listdir(pseDir):
-        currDir = pseDir+'/'+dir
+    
+    # loop through the pseDir (which contains the directories of pse files for each design region)
+    outputDf = pd.DataFrame()
+    for d in os.listdir(pseDir):
+        # define the current directory (current design region)
+        currDir = f'{pseDir}/{d}'
         if os.path.isdir(currDir):
             # get the potential hydrogen bonds
-            measurePotentialHBonds(currDir, hbondAAs, ringAAs, outputDir)
+            currHbonds = measurePotentialHBonds(currDir, hbondAAs, ringAAs, output_dir, outputFile)
+            outputDf = pd.concat([outputDf, currHbonds])
+    # save the output dataframe to a csv file
+    outputDf.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
 
 
 
