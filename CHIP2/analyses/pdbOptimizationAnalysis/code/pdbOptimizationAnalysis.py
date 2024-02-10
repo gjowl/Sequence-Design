@@ -1,9 +1,6 @@
 import os, sys, configparser
 import pandas as pd
 
-"""
-Code for compiling energyFile.csv files from an input directory and analyzing the data
-"""
 description = '''
 This contains outputs for the pdbOptimizationAnalysis code. It extracts the energetics from a C++ program that predicts
 structures of mutant proteins based on a given dimeric pdb structure. The analysis for those energies, according to the 

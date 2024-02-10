@@ -24,6 +24,7 @@ parser.add_argument('-pseDir','--pseDir', type=str, help='the raw data directory
 parser.add_argument('-outFile','--outputFile', type=str, help='the output csv file')
 # add the optional arguments
 parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-hbondDistance', '--hbondDistance', type=float, help='the distance cutoff for hydrogen bonds')
 
 # extract the arguments into variables
 args = parser.parse_args()
@@ -31,12 +32,15 @@ pseDir = args.pseDir
 outputFile = args.outputFile
 # default values for the optional arguments
 outputDir = os.getcwd()
+hbondDist = 3.3
 # if the optional arguments are not specified, use the default values
 if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
+if args.hbondDistance is not None:
+    hbondDist = args.hbondDistance
 
-def loadPdbAndGetBonds(filename, hbondAAs, ringAAs):
+def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, hbondDist=3.3):
     # load the designed pdb file
     cmd.load(filename)
     # get the name of the pdb file without the extension
@@ -44,7 +48,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs):
     # count the numbe of objects in the pdb file
     numObjs = len(cmd.get_names())
     # initialize the output dataframe
-    output_df = pd.DataFrame(columns=['sequence', 'object_name', 'hbondAcceptors', 'hbondDonors'])
+    output_df = pd.DataFrame()
     # loop through the states of the pdb file
     for obj in cmd.get_names():
         # select this object
@@ -69,19 +73,19 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs):
         for combo in combinations:
             #numHbondA = cmd.count_atoms(f'{combo[0]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[1]}')
             #numHbondB = cmd.count_atoms(f'{combo[1]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[0]}')
-            A_donors = cmd.count_atoms(f'{combo[0]} and name O within 3.3 of {combo[1]} and h.')
-            A_acceptors = cmd.count_atoms(f'{combo[0]} and h. within 3.3 of {combo[1]} and name O')
-            B_donors = cmd.count_atoms(f'{combo[1]} and name O within 3.3 of {combo[0]} and h.')
-            B_acceptors = cmd.count_atoms(f'{combo[1]} and h. within 3.3 of {combo[0]} and name O')
+            A_donors = cmd.count_atoms(f'{combo[0]} and name O within {hbondDist} of {combo[1]} and h.')
+            A_acceptors = cmd.count_atoms(f'{combo[0]} and h. within {hbondDist} of {combo[1]} and name O')
+            B_donors = cmd.count_atoms(f'{combo[1]} and name O within {hbondDist} of {combo[0]} and h.')
+            B_acceptors = cmd.count_atoms(f'{combo[1]} and h. within {hbondDist} of {combo[0]} and name O')
         donors += A_donors + B_donors
         acceptors += A_acceptors + B_acceptors
         # add the data to the output dataframe using concat
-        output_df = pd.concat([output_df, pd.DataFrame({'sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors}, index=[0])])
+        output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors}, index=[0])])
     # close the pdb file
     cmd.reinitialize()
     return output_df
 
-def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs, output_dir, output_file):
+def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs):
     # initialize the output dataframe
     output_df = pd.DataFrame()
     # loop through the files in the rawDataDir
@@ -107,7 +111,7 @@ if __name__ == '__main__':
         currDir = f'{pseDir}/{d}'
         if os.path.isdir(currDir):
             # get the potential hydrogen bonds
-            currHbonds = measurePotentialHBonds(currDir, hbondAAs, ringAAs, output_dir, outputFile)
+            currHbonds = measurePotentialHBonds(currDir, hbondAAs, ringAAs)
             outputDf = pd.concat([outputDf, currHbonds])
     # save the output dataframe to a csv file
     outputDf.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
