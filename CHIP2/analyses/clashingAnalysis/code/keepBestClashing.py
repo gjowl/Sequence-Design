@@ -60,9 +60,6 @@ if __name__ == '__main__':
         tmp_mut['Fluor Difference'] = wt_fluor - tmp_mut[yAxis]
         # keep the clash mutants only
         clash = tmp_mut[tmp_mut['Mutant Type'].str.contains('clash')]
-        #print(wt_fluor)
-        #print(tmp_mut[yAxis])
-        #print(clash)
         # keep the mutants that are less than the cutoff
         clash = clash[(clash[yAxis] < mutantFluorCutoff) | (clash['Fluor Difference'] > percentWtCutoff)]
         if len(clash) < numberMutants:
