@@ -25,10 +25,18 @@ if args.outputFile is not None:
 if __name__ == '__main__':
     # read the input file as a dataframe
     df = pd.read_csv(inputFile, sep=',', dtype={'Interface': str})
-    
-    yaxis = 'PercentGpA'
-    #yaxis = 'toxgreen_fluor'
-    cols = ['hbondDonors', 'hbondAcceptors']
+
+    yaxes = []
+    if 'toxgreen_fluor' in df.columns:
+        yaxes.append('toxgreen_fluor')
+    if 'PercentGpA' in df.columns:
+        yaxes.append('PercentGpA')
+    else:
+        print('No columns for the yaxis found: toxgreen_fluor or PercentGpA. Exiting.')
+        sys.exit(1)
+
+    cols = ['hbondDonors', 'hbondAcceptors', 'c-alphaDonors', 'c-alphaAcceptors']
+
     # loop through the different design regions
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
@@ -37,17 +45,23 @@ if __name__ == '__main__':
         os.makedirs(sampleDir, exist_ok=True)
         # loop through the columns of interest
         for col in cols:
+            xhigh = df_sample[col].max() 
             # keep only the sequence with the highest number of potential hydrogen bonds
             df_sample = df_sample.sort_values(col, ascending=False).drop_duplicates('Sequence').sort_index()
-            # plot the data
-            plt.scatter(df_sample[col], df_sample[yaxis])
-            plt.xlabel(col)
-            plt.ylabel(yaxis)
-            # set the yaxis limit to be 1/10 more than the max value
-            plt.ylim(0, df[yaxis].max() + df[yaxis].max()/10)
-            plt.title(f'{yaxis} vs {col}')
-            plt.savefig(f'{sampleDir}/{outputFile}_{col}.png')
-            plt.savefig(f'{sampleDir}/{outputFile}_{col}.svg')
-            plt.close()
-            # output the dataframe to a csv file without the index
-            df_sample.to_csv(f'{sampleDir}/{outputFile}_{col}.csv', index=False)
+            for yaxis in yaxes:
+                # plot the data
+                plt.scatter(df_sample[col], df_sample[yaxis])
+                plt.xlabel(col)
+                plt.ylabel(yaxis)
+                # set the xaxis limits
+                plt.xlim(-0.5, xhigh+1)
+                # set the xaxis display to be integers separated by 1
+                plt.xticks(range(0, int(xhigh)+1, 1))
+                # set the yaxis limit to be 1/10 more than the max value
+                plt.ylim(0, df[yaxis].max() + df[yaxis].max()/10)
+                plt.title(f'{yaxis} vs {col}')
+                plt.savefig(f'{sampleDir}/{outputFile}_{yaxis}_{col}.png')
+                plt.savefig(f'{sampleDir}/{outputFile}_{yaxis}_{col}.svg')
+                plt.close()
+                # output the dataframe to a csv file without the index
+                df_sample.to_csv(f'{sampleDir}/{outputFile}_{yaxis}_{col}.csv', index=False)

@@ -77,16 +77,22 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, hbondDist=3.3):
             A_acceptors = cmd.count_atoms(f'{combo[0]} and h. within {hbondDist} of {combo[1]} and name O')
             B_donors = cmd.count_atoms(f'{combo[1]} and name O within {hbondDist} of {combo[0]} and h.')
             B_acceptors = cmd.count_atoms(f'{combo[1]} and h. within {hbondDist} of {combo[0]} and name O')
+            A_calpha_donors = cmd.count_atoms(f'{combo[0]} and name O within 2.69 of {combo[1]} and h.')
+            A_calpha_acceptors = cmd.count_atoms(f'{combo[0]} and h. within 2.69 of {combo[1]} and name O')
+            B_calpha_donors = cmd.count_atoms(f'{combo[1]} and name O within 2.69 of {combo[0]} and h.')
+            B_calpha_acceptors = cmd.count_atoms(f'{combo[1]} and h. within 2.69 of {combo[0]} and name O')
         donors += A_donors + B_donors
         acceptors += A_acceptors + B_acceptors
+        calpha_donors = A_calpha_donors + B_calpha_donors
+        calpha_acceptors = A_calpha_acceptors + B_calpha_acceptors
         # add the data to the output dataframe using concat
-        output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors}, index=[0])])
+        output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
     # close the pdb file
     cmd.reinitialize()
     return output_df
 
 def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs):
-    # initialize the output dataframe
+    # initialize the output datafram
     output_df = pd.DataFrame()
     # loop through the files in the rawDataDir
     for file in os.listdir(raw_data_dir):

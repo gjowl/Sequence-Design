@@ -60,8 +60,16 @@ def keepSignificantInGrouping(input_df, grouping_col, yaxis, p_value_cutoff=0.05
 if __name__ == '__main__':
     # read in the input files
     df_seq = pd.read_csv(sequenceFile) 
-    
-    yaxis = 'PercentGpA'
+
+    # check if the toxgreen_fluor is in the dataframe
+    yaxes = []
+    if 'toxgreen_fluor' in df_seq.columns:
+        yaxes.append('toxgreen_fluor')
+    if 'PercentGpA' in df_seq.columns:
+        yaxes.append('PercentGpA')
+    else:
+        print('The input dataframe does not have the necessary columns: toxgreen_fluor or PercentGpA. Exiting.')
+        sys.exit(1)
     xaxis = 'Sample'
     
     # plot the boxplots
@@ -80,19 +88,21 @@ if __name__ == '__main__':
         os.makedirs(sample_outputDir, exist_ok=True)
         df_sample.sort_values(by='Type')
         for col in cols_to_plot:
-            tmp_df = df_sample.groupby(col).filter(lambda x: len(x) > number_sequence_cutoff).copy()
+            col_df = df_sample.groupby(col).filter(lambda x: len(x) > number_sequence_cutoff).copy()
             # get the wt_aas in WT type sequences
-            wt_vals = tmp_df[tmp_df['Type'] == 'WT'][col].unique()
-            # keep only values in the tmp_df that are in the wt_aas
-            tmp_df = tmp_df[tmp_df[col].isin(wt_vals)].copy()
-            # check if the tmp_df is empty
-            if tmp_df.empty:
+            wt_vals = col_df[col_df['Type'] == 'WT'][col].unique()
+            # keep only values in the col_df that are in the wt_aas
+            col_df = col_df[col_df[col].isin(wt_vals)].copy()
+            # check if the col_df is empty
+            if col_df.empty:
                 continue
-            tmp_df.sort_values(by='Type', inplace=True)
-            # rid of duplicates in the tmp_df
-            tmp_df.drop_duplicates(subset=['Sequence', 'Type', 'PercentGpA', yaxis], inplace=True, keep='first')
-            tmp_df = keepSignificantInGrouping(tmp_df, col, yaxis)
-            plotMultiBoxplot(tmp_df, col, yaxis, 'Type', sample_outputDir, hue_order=hue_order)
+            col_df.sort_values(by='Type', inplace=True)
+            # rid of duplicates in the col_df
+            col_df.drop_duplicates(subset=['Sequence', 'Type', 'PercentGpA'], inplace=True, keep='first')
+            for yaxis in yaxes:
+                print(yaxis)
+                axis_df = keepSignificantInGrouping(col_df, col, yaxis)
+                plotMultiBoxplot(axis_df, col, yaxis, 'Type', sample_outputDir, hue_order=hue_order)
         #for mutant_type in tmp_df['Mutant Type'].unique():
         #    df_mutant_type = tmp_df[tmp_df['Mutant Type'] == mutant_type]
         #    mut_outputDir = f'{sample_outputDir}/{mutant_type}'
@@ -109,7 +119,8 @@ if __name__ == '__main__':
         # keep only values in the tmp_df that are in the wt_aas
         tmp_df = tmp_df[tmp_df[col].isin(wt_vals)].copy()
         tmp_df.sort_values(by='Type', inplace=True)
-        plotMultiBoxplot(tmp_df, col, yaxis, 'Type', outputDir, hue_order=hue_order)
+        for yaxis in yaxes:
+            plotMultiBoxplot(tmp_df, col, yaxis, 'Type', outputDir, hue_order=hue_order)
     
     #for mutant_type in df_seq['Mutant Type'].unique():
     #    df_mutant_type = df_seq[df_seq['Mutant Type'] == mutant_type]
@@ -139,4 +150,5 @@ if __name__ == '__main__':
     
     hue_order = ['clash', 'void', 'WT']
     #df_seq.drop_duplicates(subset=['Sequence', 'Mutant Type'], inplace=True, keep='first')
-    plotMultiBoxplot(df_all, 'Sample', yaxis, 'Mutant Type', outputDir, output_file, hue_order=hue_order)
+    for yaxis in yaxes:
+        plotMultiBoxplot(df_all, 'Sample', yaxis, 'Mutant Type', outputDir, output_file, hue_order=hue_order)
