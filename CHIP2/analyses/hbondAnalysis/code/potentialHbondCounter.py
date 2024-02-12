@@ -60,6 +60,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
             chainName = f'{obj}_{chain}'
             chainNames.append(chainName)
             cmd.select(chainName, f'{obj} and chain {chain}')
+            #TODO: need to loop through the potential hydrogen bond AAs and identify the donating atoms (OG? OH?) and the accepting atoms (O?)
             ## loop through the amino acids
             #for aa in hbondAAs:
             #    # select the chain atoms of the object
