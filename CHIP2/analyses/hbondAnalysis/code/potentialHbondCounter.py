@@ -61,13 +61,15 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
             chainNames.append(chainName)
             cmd.select(chainName, f'{obj} and chain {chain}')
             #TODO: need to loop through the potential hydrogen bond AAs and identify the donating atoms (OG? OH?) and the accepting atoms (O?)
-            ## loop through the amino acids
-            #for aa in hbondAAs:
-            #    # select the chain atoms of the object
-            #    #cmd.select(f'{obj}_tmp', f'{obj} and chain {chain} and resn "{aa}"')
-            #    # get the number of atoms on the opposite chain that are within 1.5 angstroms of the oxygen atoms
-            #    numHBonds = cmd.count_atoms(f'{obj} and name O and byres (chain {chain} and resn {ringAAs[0]}+{ringAAs[1]}+{ringAAs[2]}) within 1.5')
-            #    print(numHBonds)
+            # loop through the amino acids
+            for aa in hbondAAs:
+                # get the oxygen atoms for the amino acid
+                if aa == 'SER':
+                    cmd.select(f'{chainName}_O', f'{obj} and chain {chain} and resn "{aa}" and name OG')
+                elif aa == 'THR':
+                    cmd.select(f'{chainName}_tmp', f'{obj} and chain {chain} and resn "{aa}" and name OG1')
+                elif aa == 'TYR':
+                    cmd.select(f'{obj}_tmp', f'{obj} and chain {chain} and resn "{aa}" and name OH')
         # get all of the chainName combinations
         combinations = [[chainNames[i], chainNames[j]] for i in range(len(chainNames)) for j in range(i+1, len(chainNames))]
         # loop through the chain combinations and get the hydrogen bond donors and acceptors
