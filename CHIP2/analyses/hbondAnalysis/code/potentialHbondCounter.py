@@ -67,31 +67,36 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
             #    # get the number of atoms on the opposite chain that are within 1.5 angstroms of the oxygen atoms
             #    numHBonds = cmd.count_atoms(f'{obj} and name O and byres (chain {chain} and resn {ringAAs[0]}+{ringAAs[1]}+{ringAAs[2]}) within 1.5')
             #    print(numHBonds)
-        # initialize the number of donors and acceptors
-        donors, acceptors, calpha_donors, calpha_acceptors = 0, 0, 0, 0
         # get all of the chainName combinations
         combinations = [[chainNames[i], chainNames[j]] for i in range(len(chainNames)) for j in range(i+1, len(chainNames))]
         # loop through the chain combinations and get the hydrogen bond donors and acceptors
         for combo in combinations:
+            # initialize the number of donors and acceptors
+            donors, acceptors, calpha_donors, calpha_acceptors = 0, 0, 0, 0
             # define the donors and acceptors for each chain
             A_donors = f'{combo[0]} and name O within {hbondDist} of {combo[1]} and h.'
             A_acceptors = f'{combo[0]} and h. within {hbondDist} of {combo[1]} and name O'
             B_donors = f'{combo[1]} and name O within {hbondDist} of {combo[0]} and h.'
             B_acceptors = f'{combo[1]} and h. within {hbondDist} of {combo[0]} and name O'
-            A_calpha_donors = f'{combo[0]} and name O within 2.69 of {combo[1]} and h.'
-            A_calpha_acceptors = f'{combo[0]} and h. within 2.69 of {combo[1]} and name O'
-            B_calpha_donors = f'{combo[1]} and name O within 2.69 of {combo[0]} and h.'
-            B_calpha_acceptors = f'{combo[1]} and h. within 2.69 of {combo[0]} and name O'
+            A_calpha_donors = f'{combo[0]} and name O within 2.69 of {combo[1]} and name HA'
+            A_calpha_acceptors = f'{combo[0]} and name HA within 2.69 of {combo[1]} and name O'
+            B_calpha_donors = f'{combo[1]} and name O within 2.69 of {combo[0]} and name HA'
+            B_calpha_acceptors = f'{combo[1]} and name HA within 2.69 of {combo[0]} and name O'
             # select the donors and acceptors and name them by the chain combination
-            cmd.select(f'donors_{combo[0]}_{combo[1]}', f'{A_donors} or {B_donors}')
-            cmd.select(f'acceptors_{combo[0]}_{combo[1]}', f'{A_acceptors} or {B_acceptors}')
-            cmd.select(f'calpha_donors_{combo[0]}_{combo[1]}', f'{A_calpha_donors} or {B_calpha_donors}')
-            cmd.select(f'calpha_acceptors_{combo[0]}_{combo[1]}', f'{A_calpha_acceptors} or {B_calpha_acceptors}')
+            cmd.select(f'donors_{combo[0]}', f'{A_donors}')
+            cmd.select(f'donors_{combo[1]}', f'{B_donors}')
+            cmd.select(f'acceptors_{combo[0]}', f'{A_acceptors}')
+            cmd.select(f'acceptors_{combo[1]}', f'{B_acceptors}')
+            cmd.select(f'calpha_donors_{combo[0]}', f'{A_calpha_donors}')
+            cmd.select(f'calpha_donors_{combo[1]}', f'{B_calpha_donors}')
+            cmd.select(f'calpha_acceptors_{combo[0]}', f'{A_calpha_acceptors}')
+            cmd.select(f'calpha_acceptors_{combo[1]}', f'{B_calpha_acceptors}')
             # add them to the total count
-            donors = donors + cmd.count_atoms(f'donors_{combo[0]}_{combo[1]}')
-            acceptors = acceptors + cmd.count_atoms(f'acceptors_{combo[0]}_{combo[1]}')
-            calpha_donors = calpha_donors + cmd.count_atoms(f'calpha_donors_{combo[0]}_{combo[1]}')
-            calpha_acceptors = calpha_acceptors + cmd.count_atoms(f'calpha_acceptors_{combo[0]}_{combo[1]}')
+            donors = donors + cmd.count_atoms(f'donors_{combo[0]}') + cmd.count_atoms(f'donors_{combo[1]}')
+            acceptors = acceptors + cmd.count_atoms(f'acceptors_{combo[0]}') + cmd.count_atoms(f'acceptors_{combo[1]}')
+            calpha_donors = calpha_donors + cmd.count_atoms(f'calpha_donors_{combo[0]}') + cmd.count_atoms(f'calpha_donors_{combo[1]}')
+            calpha_acceptors = calpha_acceptors + cmd.count_atoms(f'calpha_acceptors_{combo[0]}') + cmd.count_atoms(f'calpha_acceptors_{combo[1]}')
+            output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
             #numHbondA = cmd.count_atoms(f'{combo[0]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[1]}')
             #numHbondB = cmd.count_atoms(f'{combo[1]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[0]}')
             #A_donors = cmd.count_atoms(f'{combo[0]} and name O within {hbondDist} of {combo[1]} and h.')
@@ -107,7 +112,6 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
         #calpha_donors = A_calpha_donors + B_calpha_donors
         #calpha_acceptors = A_calpha_acceptors + B_calpha_acceptors
         # add the data to the output dataframe using concat
-        output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
     # save the session file
     cmd.save(f'{output_dir}/{sequence}.pse')
     # close the pdb file
