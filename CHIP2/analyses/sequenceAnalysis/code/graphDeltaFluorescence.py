@@ -38,4 +38,7 @@ if __name__ == '__main__':
         sample_outputDir = f'{outputDir}/{sample}'
         os.makedirs(sample_outputDir, exist_ok=True)
         df_sample.sort_values(by='Mutant Type')
-        plotMultiBoxplot(df_sample, xaxis, yaxis, 'Mutant Type', sample_outputDir, ybottom=-1, ytop=1)
+        # get the smallest and largest values for the yaxis
+        ybottom = df_sample[yaxis].min()
+        ytop = df_sample[yaxis].max()
+        plotMultiBoxplot(df_sample, xaxis, yaxis, 'Mutant Type', sample_outputDir, ybottom=ybottom, ytop=ytop)

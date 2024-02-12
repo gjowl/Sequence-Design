@@ -69,16 +69,18 @@ if __name__ == '__main__':
         df_mut['PercentStd'] = df_mut['std_adjusted']
     
     # combine the files with the given columns
-    cols = ['Sample', 'Sequence', 'Mutant', 'Position', 'Type', 'Mutant Type', 'WT_AA', 'mut_AA', 'PercentGpA', 'PercentStd']
+    cols = ['Sample', 'Sequence', 'Mutant', 'Position', 'Type', 'Mutant Type', 'WT_AA', 'mut_AA', 'PercentGpA', 'PercentStd', 'toxgreen_fluor', 'toxgreen_std']
     
     # add in wt data for each mutant, since the wt data only includes the best clash mutant for each sequence
     # change the mutant type to wt
     df_copy_wt = df_mut.copy()
     df_copy_wt['Type'] = 'WT'
-    copyCols = ['PercentGpA', 'PercentStd']
+    copyCols = ['PercentGpA', 'PercentStd', 'toxgreen_fluor', 'toxgreen_std']
     # get the values from the wt dataframe for each sequence
     df_copy_wt['PercentGpA'] = df_copy_wt.apply(lambda row: df_wt[df_wt['Sequence'] == row['Sequence']]['PercentGpA'].values[0], axis=1)
     df_copy_wt['PercentStd'] = df_copy_wt.apply(lambda row: df_wt[df_wt['Sequence'] == row['Sequence']]['PercentStd'].values[0], axis=1)
+    df_copy_wt['toxgreen_fluor'] = df_copy_wt.apply(lambda row: df_wt[df_wt['Sequence'] == row['Sequence']]['toxgreen_fluor'].values[0], axis=1)
+    df_copy_wt['toxgreen_std'] = df_copy_wt.apply(lambda row: df_wt[df_wt['Sequence'] == row['Sequence']]['toxgreen_std'].values[0], axis=1)
     
     # output the wt and mutant dataframes
     df_copy_wt = df_copy_wt[cols].copy()
@@ -106,9 +108,9 @@ if __name__ == '__main__':
     
     # add the mutant percent gpA column by searching for the mutant sequence in the output dataframe
     df_deltaPercentGpA = df_mut_cv.copy()
-    df_deltaPercentGpA['WT PercentGpA'] = df_mut_cv.apply(lambda row: df_wt_cv[df_wt_cv['Sequence'] == row['Sequence']]['PercentGpA'].values[0], axis=1)
-    df_deltaPercentGpA['Delta Fluorescence'] = df_deltaPercentGpA['WT PercentGpA'] - df_deltaPercentGpA['PercentGpA']
-    cols.append('WT PercentGpA')
+    df_deltaPercentGpA['WT Fluor'] = df_mut_cv.apply(lambda row: df_wt_cv[df_wt_cv['Sequence'] == row['Sequence']]['toxgreen_fluor'].values[0], axis=1)
+    df_deltaPercentGpA['Delta Fluorescence'] = df_deltaPercentGpA['WT Fluor'] - df_deltaPercentGpA['toxgreen_fluor']
+    cols.append('WT Fluor')
     cols.append('Delta Fluorescence')
     df_deltaPercentGpA = df_deltaPercentGpA[cols].copy()
     # for the rows that delta fluorescence is 0, get the mutant 

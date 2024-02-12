@@ -79,8 +79,8 @@ if __name__ == "__main__":
         outDir = outputDir + '/' + input_dir
 
         # run the script to add the necessary columns to the dataframes
-        execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {clashDir}/{input_dir}/{sequenceFile} -mutFile {clashDir}/{input_dir}/{mutantFile} -outDir {outDir}'
-        os.system(execAddColumns)
+        #execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {clashDir}/{input_dir}/{sequenceFile} -mutFile {clashDir}/{input_dir}/{mutantFile} -outDir {outDir}'
+        #os.system(execAddColumns)
 
         # run the voiding script if the voiding data is found in the config file
         #execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
