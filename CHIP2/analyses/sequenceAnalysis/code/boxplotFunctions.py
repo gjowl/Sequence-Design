@@ -107,7 +107,6 @@ def plotMultiBoxplot(input_df, xaxis, yaxis, group_col, output_dir, output_filen
     # set the y axis limits
     # get the lowest and highest values for y axis
     plt.ylim(bottom=ybottom)
-    
     plt.ylim(top=ytop)
     plt.tight_layout()
     plt.savefig(f'{output_dir}/{output_filename}.png')

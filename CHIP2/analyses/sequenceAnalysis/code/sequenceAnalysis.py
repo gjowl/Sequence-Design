@@ -82,13 +82,13 @@ if __name__ == "__main__":
         #execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {clashDir}/{input_dir}/{sequenceFile} -mutFile {clashDir}/{input_dir}/{mutantFile} -outDir {outDir}'
         #os.system(execAddColumns)
 
-        ## run the voiding script if the voiding data is found in the config file
-        ##execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
-        ##os.system(execplotBoxplot)
+        # run the voiding script if the voiding data is found in the config file
+        #execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
+        #os.system(execplotBoxplot)
 
-        ## run boxplot script for all of the data
-        #execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py -inFile {outDir}/all.csv -outDir {outDir}'
-        #os.system(execplotBoxplotCombined)
+        # run boxplot script for all of the data
+        execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py -inFile {outDir}/all.csv -outDir {outDir}'
+        os.system(execplotBoxplotCombined)
 
         execGraphDeltaFluorescence = f'python3 {codeDir}/graphDeltaFluorescence.py -inFile {outDir}/deltaFluorescence.csv -outDir {outDir}/deltaFluorescence'
         os.system(execGraphDeltaFluorescence)

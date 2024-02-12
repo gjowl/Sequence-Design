@@ -69,4 +69,4 @@ if __name__ == '__main__':
             svg_dir = f'{sample_dir}/svg'
             os.makedirs(name=png_dir, exist_ok=True)
             os.makedirs(name=svg_dir, exist_ok=True)
-            plotScatterplotSingle(df_sample, sample, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-60, xhighLim=0, ylowLim=-5.5, yhighLim=0)
+            plotScatterplotSingle(df_sample, sample, xaxis, yaxis, error_col, regression_degrees, outputFile, png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-60, xhighLim=0, ylowLim=-6.5, yhighLim=0)
