@@ -1,9 +1,6 @@
 import os, sys, configparser
 import pandas as pd
 
-"""
-Code for compiling energyFile.csv files from an input directory and analyzing the data
-"""
 description = '''
 This contains outputs for the pdbOptimizationAnalysis code. It extracts the energetics from a C++ program that predicts
 structures of mutant proteins based on a given dimeric pdb structure. The analysis for those energies, according to the 
@@ -90,23 +87,23 @@ if __name__ == "__main__":
 
     # strip the sequence ends (the first and last 3 amino acids) from the sequence file since some of the sequences have alanine vs leucine ends (overwrites the strippedSequenceFile if it already exists)
     execStripSequenceEnds = f'python3 {codeDir}/stripSequenceEnds.py -inFile {toxgreenFile} -outFile {strippedSequenceFile} -outDir {outputDir}'
-    os.system(execStripSequenceEnds)
+    #os.system(execStripSequenceEnds)
 
     # compile the energy files (overwrites the dataFile if it already exists)
     execCompileEnergyFiles = f'python3 {codeDir}/compileFilesFromDirectories.py -inDir {rawDataDir} -outFile {dataFile} -outDir {outputDir}'
-    os.system(execCompileEnergyFiles) 
+    #os.system(execCompileEnergyFiles) 
 
-    # get the dataFile name without the extension
+    ## get the dataFile name without the extension
     dataFilename = os.path.splitext(dataFile)[0]
     outputFile = f'{dataFilename}_percentGpa'
     # add the percent gpa to the dataframe
     execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py -inFile {outputDir}/{dataFile}.csv -toxgreenFile {outputDir}/{strippedSequenceFile}.csv -outFile {outputFile} -outDir {outputDir}' 
-    os.system(execAddPercentGpA)
+    #os.system(execAddPercentGpA)
 
-    # keep only the data passing the maltose test
+    ## keep only the data passing the maltose test
     maltosePassingFile = f'{outputFile}_maltose'
     execKeepMaltoseData = f'python3 {codeDir}/keepMaltoseData.py -inFile {outputDir}/{outputFile}.csv -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {maltosePassingFile} -outDir {outputDir}'
-    os.system(execKeepMaltoseData)
+    #os.system(execKeepMaltoseData)
 
     # check if you want to analyze clash data
     if clashData:
@@ -117,7 +114,7 @@ if __name__ == "__main__":
                     mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
                     clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
                     execclashCheck = f'python3 {clashScript} -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
-                    os.system(execclashCheck)
+                    #os.system(execclashCheck)
                     # loop through the files in the clashOutputDir
                     for filename in os.listdir(clashOutputDir):
                         # check if the file is a csv
@@ -126,14 +123,14 @@ if __name__ == "__main__":
                         file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
                         #execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{outputFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
                         execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{maltosePassingFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
-                        os.system(execAnalyzeclash)
+                        #os.system(execAnalyzeclash)
                         file_to_analyze = 'lowestEnergySequences' # made in analyzeData.py
                         # plot kde plots of geometries
                         execPlotKde = f'python3 {codeDir}/makeKdePlots.py -kdeFile {kdeFile} -dataFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
-                        os.system(execPlotKde)
+                        #os.system(execPlotKde)
                     # convert to delta G
-                    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
-                    os.system(execConvertToDeltaG)
+                    #execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
+                    #os.system(execConvertToDeltaG)
 
                     # graph the delta G
                     execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py -inFile {file_outputDir}/{file_to_analyze}_deltaG.csv -outDir {file_outputDir}'

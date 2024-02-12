@@ -38,6 +38,7 @@ rawDataDirLeu = config['rawDataDirLeu'] # where the pdbs for the sequences are l
 optimizedPdbDir = config['optimizedPdbDir'] # where the pdbs for the sequences are located
 outputDir = config['outputDir']
 outputFile = config['outputFile']
+percentGpACutoff = float(config['percentGpACutoff'])
 dataFile = config['dataFile'] # file with the raw data information, including the directory of the pdb files for each sequence
 sequenceFile = config['sequenceFile'] # file with the sequences of interest
 interfaceFile = config['interfaceFile'] # file with the correct interfaces for each sequence
@@ -57,7 +58,7 @@ if __name__ == '__main__':
     os.system(execReplaceInterface)
 
     # split into leu and ala designs
-    execSplitDesigns = f'python3 {codeDir}/splitDesigns.py {outputDir}/{outputFile}.csv {outputFile} {outputDir}'
+    execSplitDesigns = f'python3 {codeDir}/splitDesigns_gpaCutoff.py {outputDir}/{outputFile}.csv {outputFile} {percentGpACutoff} {outputDir}'
     os.system(execSplitDesigns)
 
     # make the interface pdbs figures
