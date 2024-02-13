@@ -134,7 +134,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
                     distance = cmd.distance('distance', 'donor', 'acceptor')
                     if distance < hbondDist:
                         hbonds += 1
-                    f.write(f'{donor} to {acceptor} distance: {distance}\n')
+                    f.write(f'{donor} to {carbonyl_acceptor[1]} distance: {distance}\n')
         for combo in combinations:
             #cmd.select(f'{combo[1]}_donors', f'donors_{combo[1]} within {hbondDist} of acceptors_{combo[0]}')
             # initialize the number of donors and acceptors
@@ -163,7 +163,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
     cmd.reinitialize()
     return output_df
 
-def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs, output_dir):
+def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs, output_dir, hbondDist):
     # initialize the output datafram
     output_df = pd.DataFrame()
     # loop through the files in the rawDataDir
@@ -172,7 +172,7 @@ def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs, output_dir):
             # get the filename
             filename = raw_data_dir+'/'+file
             # load the pdb file and get the hydrogen bonds
-            bond_df = loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir)
+            bond_df = loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist)
             output_df = pd.concat([output_df, bond_df])
     return output_df
     
@@ -193,7 +193,7 @@ if __name__ == '__main__':
             pseDir = f'{outputDir}/pse/{d}'
             os.makedirs(pseDir, exist_ok=True)
             # get the potential hydrogen bonds
-            currHbonds = measurePotentialHBonds(currDir, hbondAAs, ringAAs, pseDir)
+            currHbonds = measurePotentialHBonds(currDir, hbondAAs, ringAAs, pseDir, hbondDist)
             outputDf = pd.concat([outputDf, currHbonds])
     # save the output dataframe to a csv file
     outputDf.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
