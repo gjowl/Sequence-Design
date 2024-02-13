@@ -39,6 +39,7 @@ config = globalConfig[programName]
 codeDir = config['codeDir']
 pseDir = config['pseDir']
 hbondFile = config['hbondFile']
+hbondDistance = config['hbondDistance']
 plotDataFile = config['plotDataFile']
 dataFile = config['dataFile']
 outputDir = config['outputDir']
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     # get the hbonddata
     #execGetHbondData = f'python3 {codeDir}/potentialHbondCounter.py -pseDir {pseDir} -outFile {hbondFile} -outDir {outputDir} -hbondDistance 3.3'
     #os.system(execGetHbondData)
-    execGetHbondData = f'python3 {codeDir}/potentialHbondCounter.py -pseDir {pseDir} -outFile {hbondFile} -outDir {outputDir} -hbondDistance 3.3'
+    execGetHbondData = f'python3 {codeDir}/potentialHbondCounter.py -pseDir {pseDir} -outFile {hbondFile} -outDir {outputDir} -hbondDistance {hbondDistance}'
     os.system(execGetHbondData)
 
     ## merge the data

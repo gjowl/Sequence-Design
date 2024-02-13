@@ -55,51 +55,65 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
         cmd.select(obj)
         # loop through the chains of the object to get all of the chain combinations
         chainNames = []
+        donors, acceptors = 0, 0
         for chain in cmd.get_chains(obj):
             # select the chain
             chainName = f'{obj}_{chain}'
             chainNames.append(chainName)
             cmd.select(chainName, f'{obj} and chain {chain}')
-            #TODO: need to loop through the potential hydrogen bond AAs and identify the donating atoms (OG? OH?) and the accepting atoms (O?)
+            # command for selecting the donors
+            donor_command = ''
+            acceptor_command = ''
             # loop through the amino acids
             for aa in hbondAAs:
-                # get the oxygen atoms for the amino acid
+                donor_atom, acceptor_atom = '', ''
                 if aa == 'SER':
-                    cmd.select(f'{chainName}_O', f'{obj} and chain {chain} and resn "{aa}" and name OG')
+                    donor_atom = 'OG'
+                    acceptor_atom = 'HG1'
                 elif aa == 'THR':
-                    cmd.select(f'{chainName}_tmp', f'{obj} and chain {chain} and resn "{aa}" and name OG1')
+                    donor_atom = 'OG1'
+                    acceptor_atom = 'HG1'
                 elif aa == 'TYR':
-                    cmd.select(f'{obj}_tmp', f'{obj} and chain {chain} and resn "{aa}" and name OH')
+                    donor_atom = 'OH'
+                    acceptor_atom = 'HH'
+                # get the oxygen atoms for the amino acid
+                if donor_command == '':
+                    donor_command =  f'{obj} and chain {chain} and resn {aa} and name {donor_atom}'
+                else:
+                    donor_command = donor_command + f' + {obj} and chain {chain} and resn {aa} and name {donor_atom}'
+                if acceptor_command == '':
+                    acceptor_command =  f'{obj} and chain {chain} and resn {aa} and name {acceptor_atom}'
+                else:
+                    acceptor_command = acceptor_command + f' + {obj} and chain {chain} and resn {aa} and name {acceptor_atom}'
+            cmd.select(f'donors_{obj}_{chain}', donor_command)
+            cmd.select(f'acceptors_{obj}_{chain}', acceptor_command)
+            donors = donors + cmd.count_atoms(f'donors_{obj}_{chain}')
+            acceptors = acceptors + cmd.count_atoms(f'acceptors_{obj}_{chain}')
         # get all of the chainName combinations
         combinations = [[chainNames[i], chainNames[j]] for i in range(len(chainNames)) for j in range(i+1, len(chainNames))]
         # loop through the chain combinations and get the hydrogen bond donors and acceptors
+        hbonds = 0
         for combo in combinations:
+            cmd.select(f'{combo[0]}_donors', f'donors_{combo[0]} within {hbondDist} of acceptors_{combo[1]}')
+            cmd.select(f'{combo[1]}_donors', f'donors_{combo[1]} within {hbondDist} of acceptors_{combo[0]}')
+            hbonds = cmd.count_atoms(f'{combo[0]}_donors') + cmd.count_atoms(f'{combo[1]}_donors')
             # initialize the number of donors and acceptors
-            donors, acceptors, calpha_donors, calpha_acceptors = 0, 0, 0, 0
+            calpha_donors, calpha_acceptors = 0, 0
             # define the donors and acceptors for each chain
-            A_donors = f'{combo[0]} and name O within {hbondDist} of {combo[1]} and h.'
-            A_acceptors = f'{combo[0]} and h. within {hbondDist} of {combo[1]} and name O'
-            B_donors = f'{combo[1]} and name O within {hbondDist} of {combo[0]} and h.'
-            B_acceptors = f'{combo[1]} and h. within {hbondDist} of {combo[0]} and name O'
             A_calpha_donors = f'{combo[0]} and name O within 2.69 of {combo[1]} and name HA'
             A_calpha_acceptors = f'{combo[0]} and name HA within 2.69 of {combo[1]} and name O'
             B_calpha_donors = f'{combo[1]} and name O within 2.69 of {combo[0]} and name HA'
             B_calpha_acceptors = f'{combo[1]} and name HA within 2.69 of {combo[0]} and name O'
             # select the donors and acceptors and name them by the chain combination
-            cmd.select(f'donors_{combo[0]}', f'{A_donors}')
-            cmd.select(f'donors_{combo[1]}', f'{B_donors}')
-            cmd.select(f'acceptors_{combo[0]}', f'{A_acceptors}')
-            cmd.select(f'acceptors_{combo[1]}', f'{B_acceptors}')
             cmd.select(f'calpha_donors_{combo[0]}', f'{A_calpha_donors}')
             cmd.select(f'calpha_donors_{combo[1]}', f'{B_calpha_donors}')
             cmd.select(f'calpha_acceptors_{combo[0]}', f'{A_calpha_acceptors}')
             cmd.select(f'calpha_acceptors_{combo[1]}', f'{B_calpha_acceptors}')
             # add them to the total count
-            donors = donors + cmd.count_atoms(f'donors_{combo[0]}') + cmd.count_atoms(f'donors_{combo[1]}')
-            acceptors = acceptors + cmd.count_atoms(f'acceptors_{combo[0]}') + cmd.count_atoms(f'acceptors_{combo[1]}')
             calpha_donors = calpha_donors + cmd.count_atoms(f'calpha_donors_{combo[0]}') + cmd.count_atoms(f'calpha_donors_{combo[1]}')
             calpha_acceptors = calpha_acceptors + cmd.count_atoms(f'calpha_acceptors_{combo[0]}') + cmd.count_atoms(f'calpha_acceptors_{combo[1]}')
-            output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbondAcceptors': acceptors, 'hbondDonors': donors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
+            output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbonds': hbonds, 'hbondDonors': donors, 'hbondAcceptors': acceptors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
+            print(output_df)
             #numHbondA = cmd.count_atoms(f'{combo[0]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[1]}')
             #numHbondB = cmd.count_atoms(f'{combo[1]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[0]}')
             #A_donors = cmd.count_atoms(f'{combo[0]} and name O within {hbondDist} of {combo[1]} and h.')
@@ -137,7 +151,7 @@ def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs, output_dir):
             
 if __name__ == '__main__':
     # define the hbondAAs and ringAAs (for now it doesn't seem like I'll need these? But I'll take a look again later)
-    hbondAAs = ['SER', 'THR', 'GLY']
+    hbondAAs = ['SER', 'THR', 'TYR']
     ringAAs = ['PHE', 'TYR', 'TRP']
     
     # loop through the pseDir (which contains the directories of pse files for each design region)

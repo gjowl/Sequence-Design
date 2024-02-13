@@ -35,7 +35,7 @@ if __name__ == '__main__':
         print('No columns for the yaxis found: toxgreen_fluor or PercentGpA. Exiting.')
         sys.exit(1)
 
-    cols = ['hbondDonors', 'hbondAcceptors', 'c-alphaDonors', 'c-alphaAcceptors']
+    cols = ['hbonds', 'hbondDonors', 'hbondAcceptors', 'c-alphaDonors', 'c-alphaAcceptors']
 
     # loop through the different design regions
     for sample in df['Sample'].unique():
