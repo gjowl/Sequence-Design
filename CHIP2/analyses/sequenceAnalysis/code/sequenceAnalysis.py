@@ -75,16 +75,19 @@ if __name__ == "__main__":
         # make sure the input directory is a directory
         if not os.path.isdir(f'{clashDir}/{input_dir}'):
             continue
+        # check that 'clash' is in the directory name
+        if 'clash' not in input_dir:
+            continue
         # get the input directory name
         outDir = outputDir + '/' + input_dir
 
         # run the script to add the necessary columns to the dataframes
-        #execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {clashDir}/{input_dir}/{sequenceFile} -mutFile {clashDir}/{input_dir}/{mutantFile} -outDir {outDir}'
-        #os.system(execAddColumns)
+        execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {clashDir}/{input_dir}/{sequenceFile} -mutFile {clashDir}/{input_dir}/{mutantFile} -outDir {outDir}'
+        os.system(execAddColumns)
 
         # run the voiding script if the voiding data is found in the config file
-        #execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
-        #os.system(execplotBoxplot)
+        execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
+        os.system(execplotBoxplot)
 
         # run boxplot script for all of the data
         execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py -inFile {outDir}/all.csv -outDir {outDir}'

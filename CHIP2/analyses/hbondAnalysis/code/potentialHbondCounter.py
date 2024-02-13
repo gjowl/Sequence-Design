@@ -50,53 +50,93 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
     # initialize the output dataframe
     output_df = pd.DataFrame()
     # loop through the states of the pdb file
+    # create the output directory for the distance files
+    distanceDir = f'{output_dir}/distances'
+    os.makedirs(distanceDir, exist_ok=True)
+    # open the hbond distance file
+    f = open(f'{distanceDir}/{sequence}_hbondDistances.txt', 'w')
     for obj in cmd.get_names():
         # select this object
         cmd.select(obj)
         # loop through the chains of the object to get all of the chain combinations
         chainNames = []
-        donors, acceptors = 0, 0
+        # initialize the donors and acceptors lists
+        all_donors = []
+        all_acceptors = []
+        carbonyl_acceptors = []
+        hbondDonors, hbondAcceptors = 0, 0
         for chain in cmd.get_chains(obj):
             # select the chain
             chainName = f'{obj}_{chain}'
             chainNames.append(chainName)
             cmd.select(chainName, f'{obj} and chain {chain}')
-            # command for selecting the donors
-            donor_command = ''
-            acceptor_command = ''
             # loop through the amino acids
             for aa in hbondAAs:
-                donor_atom, acceptor_atom = '', ''
+                # check if the amino acid is in the chain
+                if not cmd.select(f'{obj} and chain {chain} and resn {aa}'):
+                    continue
+                donors, acceptors = [], []
+                donor_atoms, acceptor_atom = [], ''
                 if aa == 'SER':
-                    donor_atom = 'OG'
-                    acceptor_atom = 'HG1'
+                    donor_atoms.append('OG'), donor_atoms.append('HG1')
+                    acceptor_atom = 'OG'
                 elif aa == 'THR':
-                    donor_atom = 'OG1'
-                    acceptor_atom = 'HG1'
+                    donor_atoms.append('OG1'), donor_atoms.append('HG1')
+                    acceptor_atom = 'OG1'
                 elif aa == 'TYR':
-                    donor_atom = 'OH'
-                    acceptor_atom = 'HH'
+                    donor_atoms.append('OH'), donor_atoms.append('HH')
+                    acceptor_atom = 'OH'
                 # get the oxygen atoms for the amino acid
-                if donor_command == '':
-                    donor_command =  f'{obj} and chain {chain} and resn {aa} and name {donor_atom}'
-                else:
-                    donor_command = donor_command + f' + {obj} and chain {chain} and resn {aa} and name {donor_atom}'
-                if acceptor_command == '':
-                    acceptor_command =  f'{obj} and chain {chain} and resn {aa} and name {acceptor_atom}'
-                else:
-                    acceptor_command = acceptor_command + f' + {obj} and chain {chain} and resn {aa} and name {acceptor_atom}'
-            cmd.select(f'donors_{obj}_{chain}', donor_command)
-            cmd.select(f'acceptors_{obj}_{chain}', acceptor_command)
-            donors = donors + cmd.count_atoms(f'donors_{obj}_{chain}')
-            acceptors = acceptors + cmd.count_atoms(f'acceptors_{obj}_{chain}')
+                for atom in donor_atoms:
+                    donors.append(f'{obj} and chain {chain} and resn {aa} and name {atom}')
+                acceptors.append(f'{obj} and chain {chain} and resn {aa} and name {acceptor_atom}')
+                all_donors.append((chainName, donors))
+                all_acceptors.append((chainName, acceptors))
+            # get the carbonyl acceptors
+            carbonyl_acceptors.append((chainName, f'{obj} and chain {chain} and name O'))
         # get all of the chainName combinations
         combinations = [[chainNames[i], chainNames[j]] for i in range(len(chainNames)) for j in range(i+1, len(chainNames))]
         # loop through the chain combinations and get the hydrogen bond donors and acceptors
         hbonds = 0
+        # loop through all of the donors and acceptors
+        hbondDonors = len(all_donors)
+        hbondAcceptors = len(all_acceptors)
+        # loop through the different combinations of donors and acceptors
+        for donor_obj in all_donors:
+            for acceptor_obj in all_acceptors:
+                #make sure they are not the same object
+                if donor_obj[0] == acceptor_obj[0]:
+                    continue
+                # get the donors and acceptors
+                donors = donor_obj[1]
+                acceptors = acceptor_obj[1]
+                # get the number of hydrogen bonds between the donors and acceptors
+                for donor in donors:
+                    cmd.select('donor', f'{donor}')
+                    for acceptor in acceptors:
+                        cmd.select('acceptor', f'{acceptor}')
+                        distance = cmd.distance('distance', 'donor', 'acceptor')
+                        if distance < hbondDist:
+                            hbonds += 1
+                        f.write(f'{donor} to {acceptor} distance: {distance}\n')
+        # loop through the carbonyl acceptors and get the number of hydrogen bonds
+        for donor_obj in all_donors:
+            for carbonyl_acceptor in carbonyl_acceptors:
+                #make sure they are not the same object
+                if donor_obj[0] == carbonyl_acceptor[0]:
+                    continue
+                # get the donors and acceptors
+                donors = donor_obj[1]
+                # get the number of hydrogen bonds between the donors and acceptors
+                for donor in donors:
+                    cmd.select('donor', f'{donor}')
+                    cmd.select('acceptor', f'{carbonyl_acceptor[1]}')
+                    distance = cmd.distance('distance', 'donor', 'acceptor')
+                    if distance < hbondDist:
+                        hbonds += 1
+                    f.write(f'{donor} to {acceptor} distance: {distance}\n')
         for combo in combinations:
-            cmd.select(f'{combo[0]}_donors', f'donors_{combo[0]} within {hbondDist} of acceptors_{combo[1]}')
-            cmd.select(f'{combo[1]}_donors', f'donors_{combo[1]} within {hbondDist} of acceptors_{combo[0]}')
-            hbonds = cmd.count_atoms(f'{combo[0]}_donors') + cmd.count_atoms(f'{combo[1]}_donors')
+            #cmd.select(f'{combo[1]}_donors', f'donors_{combo[1]} within {hbondDist} of acceptors_{combo[0]}')
             # initialize the number of donors and acceptors
             calpha_donors, calpha_acceptors = 0, 0
             # define the donors and acceptors for each chain
@@ -112,23 +152,11 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
             # add them to the total count
             calpha_donors = calpha_donors + cmd.count_atoms(f'calpha_donors_{combo[0]}') + cmd.count_atoms(f'calpha_donors_{combo[1]}')
             calpha_acceptors = calpha_acceptors + cmd.count_atoms(f'calpha_acceptors_{combo[0]}') + cmd.count_atoms(f'calpha_acceptors_{combo[1]}')
-            output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbonds': hbonds, 'hbondDonors': donors, 'hbondAcceptors': acceptors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
-            print(output_df)
-            #numHbondA = cmd.count_atoms(f'{combo[0]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[1]}')
-            #numHbondB = cmd.count_atoms(f'{combo[1]} and name O and byres (resn {hbondAAs[0]}+{hbondAAs[1]}+{hbondAAs[2]}) within 3.3 of {combo[0]}')
-            #A_donors = cmd.count_atoms(f'{combo[0]} and name O within {hbondDist} of {combo[1]} and h.')
-            #A_acceptors = cmd.count_atoms(f'{combo[0]} and h. within {hbondDist} of {combo[1]} and name O')
-            #B_donors = cmd.count_atoms(f'{combo[1]} and name O within {hbondDist} of {combo[0]} and h.')
-            #B_acceptors = cmd.count_atoms(f'{combo[1]} and h. within {hbondDist} of {combo[0]} and name O')
-            #A_calpha_donors = cmd.count_atoms(f'{combo[0]} and name O within 2.69 of {combo[1]} and h.')
-            #A_calpha_acceptors = cmd.count_atoms(f'{combo[0]} and h. within 2.69 of {combo[1]} and name O')
-            #B_calpha_donors = cmd.count_atoms(f'{combo[1]} and name O within 2.69 of {combo[0]} and h.')
-            #B_calpha_acceptors = cmd.count_atoms(f'{combo[1]} and h. within 2.69 of {combo[0]} and name O')
-        #donors += A_donors + B_donors
-        #acceptors += A_acceptors + B_acceptors
-        #calpha_donors = A_calpha_donors + B_calpha_donors
-        #calpha_acceptors = A_calpha_acceptors + B_calpha_acceptors
+            output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbonds': hbonds, 'hbondDonors': hbondDonors, 'hbondAcceptors': hbondAcceptors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
+            #print(output_df)
         # add the data to the output dataframe using concat
+    # close the hbond distance file
+    f.close()
     # save the session file
     cmd.save(f'{output_dir}/{sequence}.pse')
     # close the pdb file

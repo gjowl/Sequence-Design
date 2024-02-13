@@ -110,8 +110,12 @@ if __name__ == '__main__':
     df_deltaPercentGpA = df_mut_cv.copy()
     df_deltaPercentGpA['WT Fluor'] = df_mut_cv.apply(lambda row: df_wt_cv[df_wt_cv['Sequence'] == row['Sequence']]['toxgreen_fluor'].values[0], axis=1)
     df_deltaPercentGpA['Delta Fluorescence'] = df_deltaPercentGpA['WT Fluor'] - df_deltaPercentGpA['toxgreen_fluor']
+    df_deltaPercentGpA['WT PercentGpA'] = df_mut_cv.apply(lambda row: df_wt_cv[df_wt_cv['Sequence'] == row['Sequence']]['PercentGpA'].values[0], axis=1)
+    df_deltaPercentGpA['Delta PercentGpA'] = df_deltaPercentGpA['WT PercentGpA'] - df_deltaPercentGpA['PercentGpA']
     cols.append('WT Fluor')
     cols.append('Delta Fluorescence')
+    cols.append('WT PercentGpA')
+    cols.append('Delta PercentGpA')
     df_deltaPercentGpA = df_deltaPercentGpA[cols].copy()
     # for the rows that delta fluorescence is 0, get the mutant 
     df_deltaPercentGpA.to_csv(f'{outputDir}/deltaFluorescence.csv', index=False)
