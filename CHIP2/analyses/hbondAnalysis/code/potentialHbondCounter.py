@@ -71,29 +71,48 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
             chainNames.append(chainName)
             cmd.select(chainName, f'{obj} and chain {chain}')
             # loop through the amino acids
+            donors, acceptors = [], []
+            donor_atoms, acceptor_atom = [], ''
             for aa in hbondAAs:
                 # check if the amino acid is in the chain
                 if not cmd.select(f'{obj} and chain {chain} and resn {aa}'):
                     continue
-                donors, acceptors = [], []
-                donor_atoms, acceptor_atom = [], ''
-                if aa == 'SER':
-                    donor_atoms.append('OG'), donor_atoms.append('HG1')
-                    acceptor_atom = 'OG'
-                elif aa == 'THR':
-                    donor_atoms.append('OG1'), donor_atoms.append('HG1')
-                    acceptor_atom = 'OG1'
-                elif aa == 'TYR':
-                    donor_atoms.append('OH'), donor_atoms.append('HH')
-                    acceptor_atom = 'OH'
+                # loop through the number of residues in the chain
+                #TODO: fix this so it's not slow
+                for res in range(1, cmd.count_atoms(f'{obj} and chain {chain} and name CA')):
+                    # get the residue name 
+                    # check the letter in the sequence
+                    letter = sequence[res-1]
+                    resName = ''
+                    if letter == 'S':
+                        resName = 'SER'
+                    elif letter == 'T':
+                        resName = 'THR'
+                    elif letter == 'Y':
+                        resName = 'TYR'
+                    if resName == '':
+                        continue
+                    elif resName == 'SER':
+                        donor_atoms.append('OG'), donor_atoms.append('HG1')
+                        acceptor_atom = 'OG'
+                    elif resName == 'THR':
+                        donor_atoms.append('OG1'), donor_atoms.append('HG1')
+                        acceptor_atom = 'OG1'
+                    elif resName == 'TYR':
+                        donor_atoms.append('OH'), donor_atoms.append('HH')
+                        acceptor_atom = 'OH'
                 # get the oxygen atoms for the amino acid
                 for atom in donor_atoms:
-                    donors.append(f'{obj} and chain {chain} and resn {aa} and name {atom}')
-                acceptors.append(f'{obj} and chain {chain} and resn {aa} and name {acceptor_atom}')
+                    donors.append(f'{obj} and chain {chain} and resi {res+22} and resn {aa} and name {atom}')
+                acceptors.append(f'{obj} and chain {chain} and resi {res+22} and resn {aa} and name {acceptor_atom}')
                 all_donors.append((chainName, donors))
                 all_acceptors.append((chainName, acceptors))
             # get the carbonyl acceptors
-            carbonyl_acceptors.append((chainName, f'{obj} and chain {chain} and name O'))
+            # loop through the number of residues in the chain
+            for res in range(1, cmd.count_atoms(f'{obj} and chain {chain} and name CA')):
+                # get the carbonyl oxygen
+                #TODO: fix this hardcoding 22 which is the start number of the helix
+                carbonyl_acceptors.append((chainName, f'{obj} and chain {chain} and resi {res+22} and name O'))
         # get all of the chainName combinations
         combinations = [[chainNames[i], chainNames[j]] for i in range(len(chainNames)) for j in range(i+1, len(chainNames))]
         # loop through the chain combinations and get the hydrogen bond donors and acceptors
@@ -118,7 +137,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
                         distance = cmd.distance('distance', 'donor', 'acceptor')
                         if distance < hbondDist:
                             hbonds += 1
-                        f.write(f'{donor} to {acceptor} distance: {distance}\n')
+                        f.write(f'{donor}, {acceptor}, {distance}\n')
         # loop through the carbonyl acceptors and get the number of hydrogen bonds
         for donor_obj in all_donors:
             for carbonyl_acceptor in carbonyl_acceptors:
@@ -134,7 +153,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
                     distance = cmd.distance('distance', 'donor', 'acceptor')
                     if distance < hbondDist:
                         hbonds += 1
-                    f.write(f'{donor} to {carbonyl_acceptor[1]} distance: {distance}\n')
+                    f.write(f'{donor}, {carbonyl_acceptor[1]}, {distance}\n')
         for combo in combinations:
             #cmd.select(f'{combo[1]}_donors', f'donors_{combo[1]} within {hbondDist} of acceptors_{combo[0]}')
             # initialize the number of donors and acceptors
