@@ -4,11 +4,11 @@ hydrogen bonds that are possible based on a given distance cutoff, and it output
 
 
 hbondAnalysis
-codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/hbondAnalysis/code
-psedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/2024-2-12_noCutoff/interfacePdbs/pse/
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/hbondAnalysis/2024-2-12_analysis_noCutoff
+codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/hbondAnalysis/code
+psedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/figureMaking/2024-2-12_noCutoff/interfacePdbs/pse/
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/hbondAnalysis/2024-2-12_analysis_noCutoff
 hbondfile = hbondFile
 plotdatafile = plotDataFile
-datafile = /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/2024-2-12_noCutoff/wt_merge_leu.csv
-requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+datafile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/figureMaking/2024-2-12_noCutoff/wt_merge_leu.csv
+requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
 hbonddistance = 3
