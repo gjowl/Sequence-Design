@@ -93,13 +93,16 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
                 # get the donor and acceptor atoms for the amino acid
                 donor_atoms, acceptor_atom = [], ''
                 if resName == 'SER':
-                    donor_atoms.append('OG'), donor_atoms.append('HG1')
+                    #donor_atoms.append('OG'), donor_atoms.append('HG1')
+                    donor_atoms.append('OG')
                     acceptor_atom = 'OG'
                 elif resName == 'THR':
-                    donor_atoms.append('OG1'), donor_atoms.append('HG1')
+                    #donor_atoms.append('OG1'), donor_atoms.append('HG1')
+                    donor_atoms.append('OG1')
                     acceptor_atom = 'OG1'
                 elif resName == 'TYR':
-                    donor_atoms.append('OH'), donor_atoms.append('HH')
+                    #donor_atoms.append('OH'), donor_atoms.append('HH')
+                    donor_atoms.append('OH')
                     acceptor_atom = 'OH'
                 # get the oxygen atoms for the amino acid
                 for atom in donor_atoms:
