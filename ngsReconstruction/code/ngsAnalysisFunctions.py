@@ -356,22 +356,22 @@ def getPercentDifference(list_df, list_of_hours, seqs, segments, inputDir, outpu
     #TODO: this only gets number for one df; they should be the same, but it may need to be moved
     #numReplicates = getNumberReplicates(list_df[0])
     numReplicates = 3
-    if len(os.listdir(outputDir)) == 0:
-        # list to hold the output df: the first output is for LB and the second is for M9
-        # after the loop, it uses both to calculate the percent difference 
-        outputDfs = []
-        for df, hourList in zip(list_df, list_of_hours):
-            outputDf = getMeanPercent(numReplicates, hourList, df, inputDir, outputDir)
-            outputDfs.append(outputDf)
-        df_percentDiff = calculatePercentDifference(outputDfs[0], outputDfs[1])
-        outputDfs.append(df_percentDiff)
-        nameList = ['LBPercents.csv', 'M9Percents.csv', 'percentDifference.csv']
-        for df, name in zip(outputDfs, nameList):
-            outputAnalysisDfToCsv(df, seqs, segments, outputDir, name)
-    else:
-        print('Percent difference file exists, loading it into dataframe...')
-        df_percentDiff = pd.read_csv(outputDir+'percentDifference.csv')
-        print('dataframe loaded; If want to remake fluorescence difference file, delete all files in: ', outputDir)
+    #if len(os.listdir(outputDir)) == 0:
+    # list to hold the output df: the first output is for LB and the second is for M9
+    # after the loop, it uses both to calculate the percent difference 
+    outputDfs = []
+    for df, hourList in zip(list_df, list_of_hours):
+        outputDf = getMeanPercent(numReplicates, hourList, df, inputDir, outputDir)
+        outputDfs.append(outputDf)
+    df_percentDiff = calculatePercentDifference(outputDfs[0], outputDfs[1])
+    outputDfs.append(df_percentDiff)
+    nameList = ['LBPercents.csv', 'M9Percents.csv', 'percentDifference.csv']
+    for df, name in zip(outputDfs, nameList):
+        outputAnalysisDfToCsv(df, seqs, segments, outputDir, name)
+    #else:
+    #    print('Percent difference file exists, loading it into dataframe...')
+    #    df_percentDiff = pd.read_csv(outputDir+'percentDifference.csv')
+    #    print('dataframe loaded; If want to remake fluorescence difference file, delete all files in: ', outputDir)
     return df_percentDiff
 
 # get percent change for LB and M9 sequences
@@ -388,7 +388,7 @@ def getMeanPercent(numReplicates, listHours, df, inputDir, outputDir):
         mean = dfHour.mean(axis=1)
         colLength = len(dfAvg.columns)
         dfAvg.insert(colLength, hour, mean)
-    dfAvg = dfAvg.replace(np.nan, 0)
+    #dfAvg = dfAvg.replace(np.nan, 0)
     # add in sequence column to first column, then convert to index
     return dfAvg
 
@@ -399,12 +399,12 @@ def calculatePercentDifference(dfLB, dfM9):
     for LBcol in dfLB.columns:
         LB = dfLB[LBcol]
         # to prevent dividing by 0, replace all 0 values with 1
-        LB = LB.replace(0, 1)
+        LB = LB.replace(0, np.nan)
         # loop through the columns in the M9 dataframe
         for M9col in dfM9.columns:
             M9 = dfM9[M9col]
             # to differentiate between LB having a sequence and M9 not having it
-            M9 = M9.replace(0, 1000000)
+            M9 = M9.replace(0, np.nan)
             subtract = M9.subtract(LB)
             percentDiff = subtract.divide(LB)*100
             numColumns = len(dfDiff.columns)
