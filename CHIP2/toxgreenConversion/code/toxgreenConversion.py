@@ -50,7 +50,8 @@ requirementsFile        = f'{inputDir}/{config["requirementsFile"]}'
 wtSequenceFile          = f'{inputDir}/{config["wtSequenceComputationFile"]}'
 mutantSequenceFile      = f'{inputDir}/{config["mutantSequenceComputationFile"]}'
 controlFlowFile         = f'{inputDir}/{config["controlFlowFile"]}'
-reconstructionFile      = f'{inputDir}/{config["reconstructionFile"]}'
+#reconstructionFile      = f'{inputDir}/{config["reconstructionFile"]}'
+reconstructionFile      = f'{config["reconstructionFile"]}'
 
 # scripts to run
 scriptDir               = config["scriptDir"]
