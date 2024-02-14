@@ -38,6 +38,8 @@ if __name__ == '__main__':
     cols = ['hbonds', 'hbondDonors', 'hbondAcceptors', 'c-alphaDonors', 'c-alphaAcceptors']
 
     # loop through the different design regions
+    all_df_hbonds = pd.DataFrame()
+    all_df_hbonds_high = pd.DataFrame()
     for sample in df['Sample'].unique():
         df_sample = df[df['Sample'] == sample]
         # make the sample directory if it doesn't exist
@@ -48,6 +50,20 @@ if __name__ == '__main__':
             xhigh = df_sample[col].max() 
             # keep only the sequence with the highest number of potential hydrogen bonds
             df_sample = df_sample.sort_values(col, ascending=False).drop_duplicates('Sequence').sort_index()
+            # if col is hbonds
+            if col == 'hbonds':
+                # get the number of sequences with each unique number of potential hydrogen bonds
+                df_hbonds = df_sample[col].value_counts().reset_index()
+                # count the number of sequences with each unique number of potential hydrogen bonds above 40 PercentGpA
+                df_hbonds_high = df_sample[df_sample['PercentGpA'] > 0.4][col].value_counts().reset_index()
+                df_hbonds.columns = ['hbonds', 'count']
+                # add the sample column to the dataframe
+                df_hbonds_high.columns = ['hbonds', 'count']
+                # add the sample column to the dataframe
+                df_hbonds['Sample'] = sample
+                df_hbonds_high['Sample'] = sample
+                all_df_hbonds = pd.concat([all_df_hbonds, df_hbonds])
+                all_df_hbonds_high = pd.concat([all_df_hbonds_high, df_hbonds_high])
             for yaxis in yaxes:
                 # plot the data
                 plt.scatter(df_sample[col], df_sample[yaxis])
@@ -65,4 +81,5 @@ if __name__ == '__main__':
                 plt.close()
                 # output the dataframe to a csv file without the index
                 df_sample.to_csv(f'{sampleDir}/{outputFile}_{yaxis}_{col}.csv', index=False)
-            
+    all_df_hbonds.to_csv(f'{outputDir}/hbonds.csv', index=False)
+    all_df_hbonds_high.to_csv(f'{outputDir}/hbonds_high.csv', index=False)
