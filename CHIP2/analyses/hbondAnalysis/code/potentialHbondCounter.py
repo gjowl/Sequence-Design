@@ -71,48 +71,47 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
             chainNames.append(chainName)
             cmd.select(chainName, f'{obj} and chain {chain}')
             # loop through the amino acids
-            donors, acceptors = [], []
-            donor_atoms, acceptor_atom = [], ''
+            start_offset = 22 # start of the helix is 23
             for aa in hbondAAs:
-                # check if the amino acid is in the chain
-                if not cmd.select(f'{obj} and chain {chain} and resn {aa}'):
+                # find the letters in the sequence that correspond to the amino acids
+                resNumber = sequence.find(aa)
+                # if the amino acid is not found, continue through the loop to the next amino acid
+                if resNumber == -1:
                     continue
-                # loop through the number of residues in the chain
-                #TODO: fix this so it's not slow
-                for res in range(1, cmd.count_atoms(f'{obj} and chain {chain} and name CA')):
-                    # get the residue name 
-                    # check the letter in the sequence
-                    letter = sequence[res-1]
-                    resName = ''
-                    if letter == 'S':
-                        resName = 'SER'
-                    elif letter == 'T':
-                        resName = 'THR'
-                    elif letter == 'Y':
-                        resName = 'TYR'
-                    if resName == '':
-                        continue
-                    elif resName == 'SER':
-                        donor_atoms.append('OG'), donor_atoms.append('HG1')
-                        acceptor_atom = 'OG'
-                    elif resName == 'THR':
-                        donor_atoms.append('OG1'), donor_atoms.append('HG1')
-                        acceptor_atom = 'OG1'
-                    elif resName == 'TYR':
-                        donor_atoms.append('OH'), donor_atoms.append('HH')
-                        acceptor_atom = 'OH'
+                else:
+                    resNumber += 1 # to account for the 0-based indexing
+                # get the residue name 
+                resName = ''
+                if aa == 'S':
+                    resName = 'SER'
+                elif aa == 'T':
+                    resName = 'THR'
+                elif aa == 'Y':
+                    resName = 'TYR'
+                # initialize the donors and acceptors lists
+                donors, acceptors = [], []
+                # get the donor and acceptor atoms for the amino acid
+                donor_atoms, acceptor_atom = [], ''
+                if resName == 'SER':
+                    donor_atoms.append('OG'), donor_atoms.append('HG1')
+                    acceptor_atom = 'OG'
+                elif resName == 'THR':
+                    donor_atoms.append('OG1'), donor_atoms.append('HG1')
+                    acceptor_atom = 'OG1'
+                elif resName == 'TYR':
+                    donor_atoms.append('OH'), donor_atoms.append('HH')
+                    acceptor_atom = 'OH'
                 # get the oxygen atoms for the amino acid
                 for atom in donor_atoms:
-                    donors.append(f'{obj} and chain {chain} and resi {res+22} and resn {aa} and name {atom}')
-                acceptors.append(f'{obj} and chain {chain} and resi {res+22} and resn {aa} and name {acceptor_atom}')
+                    donors.append(f'{obj} and chain {chain} and resi {resNumber+start_offset} and resn {resName} and name {atom}')
+                acceptors.append(f'{obj} and chain {chain} and resi {resNumber+start_offset} and resn {resName} and name {acceptor_atom}')
                 all_donors.append((chainName, donors))
                 all_acceptors.append((chainName, acceptors))
             # get the carbonyl acceptors
             # loop through the number of residues in the chain
-            for res in range(1, cmd.count_atoms(f'{obj} and chain {chain} and name CA')):
+            for resNumber in range(1, cmd.count_atoms(f'{obj} and chain {chain} and name CA')):
                 # get the carbonyl oxygen
-                #TODO: fix this hardcoding 22 which is the start number of the helix
-                carbonyl_acceptors.append((chainName, f'{obj} and chain {chain} and resi {res+22} and name O'))
+                carbonyl_acceptors.append((chainName, f'{obj} and chain {chain} and resi {resNumber+start_offset} and name O'))
         # get all of the chainName combinations
         combinations = [[chainNames[i], chainNames[j]] for i in range(len(chainNames)) for j in range(i+1, len(chainNames))]
         # loop through the chain combinations and get the hydrogen bond donors and acceptors
@@ -155,7 +154,6 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
                         hbonds += 1
                     f.write(f'{donor}, {carbonyl_acceptor[1]}, {distance}\n')
         for combo in combinations:
-            #cmd.select(f'{combo[1]}_donors', f'donors_{combo[1]} within {hbondDist} of acceptors_{combo[0]}')
             # initialize the number of donors and acceptors
             calpha_donors, calpha_acceptors = 0, 0
             # define the donors and acceptors for each chain
@@ -171,9 +169,8 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
             # add them to the total count
             calpha_donors = calpha_donors + cmd.count_atoms(f'calpha_donors_{combo[0]}') + cmd.count_atoms(f'calpha_donors_{combo[1]}')
             calpha_acceptors = calpha_acceptors + cmd.count_atoms(f'calpha_acceptors_{combo[0]}') + cmd.count_atoms(f'calpha_acceptors_{combo[1]}')
+            # add the data to the output dataframe using concat
             output_df = pd.concat([output_df, pd.DataFrame({'Sequence': sequence, 'object_name': obj, 'hbonds': hbonds, 'hbondDonors': hbondDonors, 'hbondAcceptors': hbondAcceptors, 'c-alphaDonors':calpha_donors, 'c-alphaAcceptors':calpha_acceptors}, index=[0])])
-            #print(output_df)
-        # add the data to the output dataframe using concat
     # close the hbond distance file
     f.close()
     # save the session file
@@ -198,7 +195,7 @@ def measurePotentialHBonds(raw_data_dir, hbondAAs, ringAAs, output_dir, hbondDis
             
 if __name__ == '__main__':
     # define the hbondAAs and ringAAs (for now it doesn't seem like I'll need these? But I'll take a look again later)
-    hbondAAs = ['SER', 'THR', 'TYR']
+    hbondAAs = ['S', 'T', 'Y']
     ringAAs = ['PHE', 'TYR', 'TRP']
     
     # loop through the pseDir (which contains the directories of pse files for each design region)

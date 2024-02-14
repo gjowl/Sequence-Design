@@ -56,15 +56,15 @@ if __name__ == "__main__":
     # get the hbonddata
     #execGetHbondData = f'python3 {codeDir}/potentialHbondCounter.py -pseDir {pseDir} -outFile {hbondFile} -outDir {outputDir} -hbondDistance 3.3'
     #os.system(execGetHbondData)
-    execGetHbondData = f'python3 {codeDir}/potentialHbondCounter.py -pseDir {pseDir} -outFile {hbondFile} -outDir {outputDir} -hbondDistance {hbondDistance}'
-    os.system(execGetHbondData)
+    #execGetHbondData = f'python3 {codeDir}/potentialHbondCounter.py -pseDir {pseDir} -outFile {hbondFile} -outDir {outputDir} -hbondDistance {hbondDistance}'
+    #os.system(execGetHbondData)
 
+    ### merge the data
+    ##execMergeData = f'python3 {codeDir}/mergeDf.py -inFile {dataFile} -fileToMerge {outputDir}/{hbondFile}.csv -outFile {plotDataFile} -outDir {outputDir}'
+    ##os.system(execMergeData)
     ## merge the data
     #execMergeData = f'python3 {codeDir}/mergeDf.py -inFile {dataFile} -fileToMerge {outputDir}/{hbondFile}.csv -outFile {plotDataFile} -outDir {outputDir}'
     #os.system(execMergeData)
-    # merge the data
-    execMergeData = f'python3 {codeDir}/mergeDf.py -inFile {dataFile} -fileToMerge {outputDir}/{hbondFile}.csv -outFile {plotDataFile} -outDir {outputDir}'
-    os.system(execMergeData)
 
     # makes plots of the data
     execMakePlots = f'python3 {codeDir}/plotHbondData.py -inFile {outputDir}/{plotDataFile}.csv -outDir {outputDir}'

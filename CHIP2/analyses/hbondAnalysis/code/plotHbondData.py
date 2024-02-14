@@ -48,6 +48,10 @@ if __name__ == '__main__':
             xhigh = df_sample[col].max() 
             # keep only the sequence with the highest number of potential hydrogen bonds
             df_sample = df_sample.sort_values(col, ascending=False).drop_duplicates('Sequence').sort_index()
+            # count the number of points by the column value
+            count = df_sample[col].value_counts()
+            # count the number of points by the column value above 40 PercentGpA
+            count_cutoff = df_sample[df_sample['PercentGpA'] > 0.4][col].value_counts()
             for yaxis in yaxes:
                 # plot the data
                 plt.scatter(df_sample[col], df_sample[yaxis])
@@ -59,9 +63,17 @@ if __name__ == '__main__':
                 plt.xticks(range(0, int(xhigh)+1, 1))
                 # set the yaxis limit to be 1/10 more than the max value
                 plt.ylim(0, df[yaxis].max() + df[yaxis].max()/10)
+                # write the number of points for each value of the column
+                for i in range(len(count)):
+                    try:
+                        plt.text(count.index[i], df_sample[yaxis].max()+df_sample[yaxis].max()/100, f'{count[i]}')
+                        plt.text(count.index[i], df_sample[yaxis].max()+df_sample[yaxis].max()/10, f'{count_cutoff[i]}', color='red')
+                    except KeyError:
+                        pass
                 plt.title(f'{yaxis} vs {col}')
                 plt.savefig(f'{sampleDir}/{outputFile}_{yaxis}_{col}.png')
                 plt.savefig(f'{sampleDir}/{outputFile}_{yaxis}_{col}.svg')
                 plt.close()
                 # output the dataframe to a csv file without the index
                 df_sample.to_csv(f'{sampleDir}/{outputFile}_{yaxis}_{col}.csv', index=False)
+            
