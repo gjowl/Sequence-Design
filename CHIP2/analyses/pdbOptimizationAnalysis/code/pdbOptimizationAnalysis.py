@@ -100,11 +100,18 @@ if __name__ == "__main__":
     execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py -inFile {outputDir}/{dataFile}.csv -toxgreenFile {outputDir}/{strippedSequenceFile}.csv -outFile {outputFile} -outDir {outputDir}' 
     #os.system(execAddPercentGpA)
 
-    ## keep only the data passing the maltose test
+    ## keep only the data passing the maltose test for both the sequence and mutant files
     maltosePassingFile = f'{outputFile}_maltose'
     execKeepMaltoseData = f'python3 {codeDir}/keepMaltoseData.py -inFile {outputDir}/{outputFile}.csv -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {maltosePassingFile} -outDir {outputDir}'
-    #os.system(execKeepMaltoseData)
-
+    os.system(execKeepMaltoseData)
+    # keep the maltose data for the sequence and mutant files 
+    sequence_maltosePassingFile = f'sequenceFile_maltosePassing'
+    mutant_maltosePassingFile = f'mutantFile_maltosePassing'
+    execKeepMaltoseDataSeqFile = f'python3 {codeDir}/keepMaltoseData.py -inFile {sequenceFile} -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {sequence_maltosePassingFile} -outDir {outputDir}'
+    os.system(execKeepMaltoseDataSeqFile)
+    execKeepMaltoseDataMutFile = f'python3 {codeDir}/keepMaltoseData.py -inFile {mutantFile} -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {mutant_maltosePassingFile} -outDir {outputDir} -sequenceColumn Mutant'
+    os.system(execKeepMaltoseDataMutFile)
+    
     # check if you want to analyze clash data
     if clashData:
         for number_of_mutants_cutoff in number_of_mutants_cutoffs:
@@ -113,8 +120,8 @@ if __name__ == "__main__":
                     # convert the cutoffs to integers
                     mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
                     clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
-                    execclashCheck = f'python3 {clashScript} -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
-                    #os.system(execclashCheck)
+                    execclashCheck = f'python3 {clashScript} -seqFile {outputDir}/{sequence_maltosePassingFile}.csv -mutFile {outputDir}/{mutant_maltosePassingFile}.csv -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
+                    os.system(execclashCheck)
                     # loop through the files in the clashOutputDir
                     for filename in os.listdir(clashOutputDir):
                         # check if the file is a csv
@@ -123,14 +130,14 @@ if __name__ == "__main__":
                         file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
                         #execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{outputFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
                         execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{maltosePassingFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
-                        #os.system(execAnalyzeclash)
+                        os.system(execAnalyzeclash)
                         file_to_analyze = 'lowestEnergySequences' # made in analyzeData.py
                         # plot kde plots of geometries
                         execPlotKde = f'python3 {codeDir}/makeKdePlots.py -kdeFile {kdeFile} -dataFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
-                        #os.system(execPlotKde)
+                        os.system(execPlotKde)
                     # convert to delta G
-                    #execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
-                    #os.system(execConvertToDeltaG)
+                    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
+                    os.system(execConvertToDeltaG)
 
                     # graph the delta G
                     execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py -inFile {file_outputDir}/{file_to_analyze}_deltaG.csv -outDir {file_outputDir}'
