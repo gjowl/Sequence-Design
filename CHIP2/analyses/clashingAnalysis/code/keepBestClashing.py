@@ -65,15 +65,15 @@ if __name__ == '__main__':
         if len(clash) < numberMutants:
             continue # skip if less than the desired number the clash mutants are present
         tmp_mut = tmp_mut.sort_values(by=[sort_col], ascending=sortAscending)
-        # get the mutant sequence
-        mutant_seq = tmp_mut['Mutant'].values[0]
+        # get the mutant sequence with the highest Fluor Difference
+        mutant_seq = clash.sort_values(by=['Fluor Difference'], ascending=False)['Mutant'].values[0]
         # add it to the tmp_wt dataframe
         #tmp_wt['PercentGpA_mutant'] = mutant_fluor 
         #tmp_wt['Fluor Difference'] = wt_mutant_diff
         tmp_wt['Clash Mutant'] = mutant_seq
         wt_seq = tmp_wt['Sequence'].values[0]
         tmp_mut['WT Sequence'] =  wt_seq
-        tmp_wt['Mutant Type'] = tmp_mut['Mutant Type'].values[0]
+        tmp_wt['Mutant Type'] = clash['Mutant Type'].values[0]
         # add the sequence to the output dataframe
         output_df = pd.concat([output_df, tmp_wt], axis=0)
         output_mutant_df = pd.concat([output_mutant_df, tmp_mut], axis=0)

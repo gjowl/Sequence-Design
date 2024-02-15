@@ -157,11 +157,11 @@ if __name__ == '__main__':
     regression_degrees = [1, 2, 3, 4]
 
     # TRIMMING THE DATAFRAME
-    df = df[df['PercentGpA'] < 2]
+    #df = df[df['PercentGpA'] < 2]
     df = df[df['PercentGpA'] - df['PercentStd'] > 0]
-    df = df[df['PercentStd'] < .15]
-    df = df[df['Sample'].notnull()]
-    df = df[df['PercentGpA'] > 0]
+    df = df[df['PercentStd'] < .5]
+    #df = df[df['Sample'].notnull()]
+    #df = df[df['PercentGpA'] > 0]
 
     # add energy differences to the dataframe
     cols = ['VDW', 'HBOND', 'IMM1']

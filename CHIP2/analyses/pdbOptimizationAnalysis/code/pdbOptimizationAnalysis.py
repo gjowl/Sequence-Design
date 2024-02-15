@@ -82,23 +82,23 @@ if __name__ == "__main__":
     # write README file 
     writeReadMe(globalConfig, outputDir)
     # install the requirements
-    execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
-    os.system(execInstallRequirements)
+    #execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
+    #os.system(execInstallRequirements)
 
     # strip the sequence ends (the first and last 3 amino acids) from the sequence file since some of the sequences have alanine vs leucine ends (overwrites the strippedSequenceFile if it already exists)
     execStripSequenceEnds = f'python3 {codeDir}/stripSequenceEnds.py -inFile {toxgreenFile} -outFile {strippedSequenceFile} -outDir {outputDir}'
-    #os.system(execStripSequenceEnds)
+    os.system(execStripSequenceEnds)
 
     # compile the energy files (overwrites the dataFile if it already exists)
     execCompileEnergyFiles = f'python3 {codeDir}/compileFilesFromDirectories.py -inDir {rawDataDir} -outFile {dataFile} -outDir {outputDir}'
-    #os.system(execCompileEnergyFiles) 
+    os.system(execCompileEnergyFiles) 
 
     ## get the dataFile name without the extension
     dataFilename = os.path.splitext(dataFile)[0]
     outputFile = f'{dataFilename}_percentGpa'
     # add the percent gpa to the dataframe
     execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py -inFile {outputDir}/{dataFile}.csv -toxgreenFile {outputDir}/{strippedSequenceFile}.csv -outFile {outputFile} -outDir {outputDir}' 
-    #os.system(execAddPercentGpA)
+    os.system(execAddPercentGpA)
 
     ## keep only the data passing the maltose test for both the sequence and mutant files
     maltosePassingFile = f'{outputFile}_maltose'

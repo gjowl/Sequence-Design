@@ -40,13 +40,8 @@ if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
 
-def filterExperimentDataframes(input_df, maltose_col, maltose_cutoff, maltose_limit, percent_error_cutoff, fluor_cutoff,
- filter_maltose, filter_percent_error, filter_fluor):
+def filterExperimentDataframes(input_df, percent_error_cutoff, fluor_cutoff, filter_percent_error, filter_fluor):
     output_df = input_df.copy()
-    ## filter out by maltose
-    if filter_maltose:
-        output_df = output_df[output_df[maltose_col] > maltose_cutoff]
-        output_df = output_df[output_df[maltose_col] < maltose_limit]
     ## filter out by percent error
     if filter_percent_error:
         output_df = output_df[output_df['std_adjusted'] < percent_error_cutoff]
@@ -85,9 +80,6 @@ def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     df_mut.rename(columns={'Mutant': 'Sequence'}, inplace=True)
     df_fluor_mutant = df_fluor_mutant.merge(df_mut[['Sequence', 'Mutant Type']], on='Sequence', how='left')
     df_fluor_mutant = df_fluor_mutant.drop_duplicates(subset='Sequence', keep='first')
-    #print(len(df_fluor))
-    #print(len(df_fluor_seqs))
-    #print(len(df_fluor_mutant))
     # merge the dataframes
     df_fluor_labeled = pd.concat([df_fluor_seqs, df_fluor_mutant])
     # keep the data for sequences that fluoresce
@@ -122,7 +114,7 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
     df_no_fluor['mean_transformed'] = 0
     return df_sequence_no_fluor, df_mutant_no_fluor, df_no_fluor
 
-# TODO: currently comparing energies between L designs and A designs; fix
+# as of 2024-2-15, this file barely does anything other than decreasing the number of columns, renaming columns, and outputting the dataframes
 if __name__ == '__main__':
     gpa = 'LIIFGVMAGVIGT'
     g83i = 'LIIFGVMAIVIGT'
@@ -134,25 +126,25 @@ if __name__ == '__main__':
     
     # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
     # check if wt_seq is a column in the dataframe
-    cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'Fluorescence', 'FluorStdDev', 'Percent GpA']
+    cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'Fluorescence', 'FluorStdDev', 'PercentGpA_reconstructed_GpA']
     if 'wt_seq' in df_fluor.columns:
-        cols_to_add = ['Sequence', 'PercentGpA_transformed', 'std_adjusted', 'Sample', 'LB-12H_M9-36H', 'wt_seq', 'Fluorescence', 'FluorStdDev', 'Percent GpA']
+        cols_to_add.append('wt_seq')
+    # check if all of the columns are in the dataframe
+    if not all([col in df_fluor.columns for col in cols_to_add]):
+        # keep only the columns that are in the dataframe
+        cols_to_add = [col for col in cols_to_add if col in df_fluor.columns]
     
     # filtering variables
-    maltose_col = 'LB-12H_M9-36H'
-    maltose_cutoff = -97
-    maltose_limit = 10000000
     percent_error_cutoff = 0.30
     fluor_cutoff = 120 # percent GpA
-    filter_maltose = False
     filter_percent_error = False
     filter_fluor = False 
     transform_col = [col for col in df_fluor.columns if 'transformed' in col][0]
     
     # Filtering
-    df_fluor = filterExperimentDataframes(df_fluor, maltose_col, maltose_cutoff, maltose_limit, percent_error_cutoff, fluor_cutoff, filter_maltose, filter_percent_error, filter_fluor)
+    df_fluor = filterExperimentDataframes(df_fluor, percent_error_cutoff, fluor_cutoff, filter_percent_error, filter_fluor)
     
-    # filter the dataframes
+    # filter the dataframes for duplicates
     df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)
     
     # get sequences that don't fluoresce
@@ -167,5 +159,3 @@ if __name__ == '__main__':
     df_no_fluor.to_csv(f'{outputDir}/no_fluor.csv', index=False)
     df_all = pd.concat([df_fluor_labeled, df_no_fluor[['Sequence', 'Type', 'Sample', 'mean_transformed']]])
     df_all.to_csv(f'{outputDir}/all.csv', index=False)
-    print(f'Sequences: {len(df_sequence_no_duplicates)}')
-    print(f'Mutants: {len(df_mutant_no_duplicates)}')

@@ -154,19 +154,21 @@ if __name__ == '__main__':
             df_sample[cols] = df_sample[cols] - noTM_fluor
         # transform the data to toxgreen percent GpA
         df_sample = plot_and_transform(df_control_plot, df_sample, percentGpaCol, cols, sample, 'transformed', percentGpaStd_col, 'std', outputDir)
-        # transform the data to toxgreen fluorescence
-        df_sample = plot_and_transform(df_control_plot, df_sample, toxgreenCol, cols, sample, 'toxgreen', toxgreenStd_col, 'std', outputDir)
         percentGpa_cols = [col for col in df_sample.columns if 'transformed' in col]
-        toxgreen_cols = [col for col in df_sample.columns if 'toxgreen' in col]
         df_sample = calculate_mean_and_std(df_sample, percentGpa_cols, initial_transform_col, 'std_adjusted')
-        df_sample = calculate_mean_and_std(df_sample, toxgreen_cols, 'toxgreen_fluor', 'toxgreen_std')
+        # check if toxgreenCol is in the columns
+        if toxgreenCol in df_control_plot.columns:
+            # transform the data to toxgreen fluorescence
+            df_sample = plot_and_transform(df_control_plot, df_sample, toxgreenCol, cols, sample, 'toxgreen', toxgreenStd_col, 'std', outputDir)
+            toxgreen_cols = [col for col in df_sample.columns if 'toxgreen' in col]
+            df_sample = calculate_mean_and_std(df_sample, toxgreen_cols, 'toxgreen_fluor', 'toxgreen_std')
         # get the index of GpA and G83I from the sequence column
         gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
         # get the fluorescence from the index
         gpaFluor, g83iFluor = gpaIndex[initial_transform_col].values[0], g83iIndex[initial_transform_col].values[0]
         # define the adjusted fluorescence
         df_sample[final_transform_col] = df_sample[initial_transform_col]/gpaFluor
-        df_sample['Percent GpA'] = df_sample[final_transform_col]/gpaFluor*100 
+        df_sample['PercentGpA_reconstructed_GpA'] = df_sample[final_transform_col]/gpaFluor*100 
         # TODO: fix the calculation of uncertainty; still can't figure out the way to do error propagation with a regression line
         gpa_sd = controlFlow_df[controlFlow_df['Sequence'] == gpa][percentGpaStd_col].values[0]
         gpa_error = gpa_sd/gpaFluor
@@ -179,6 +181,8 @@ if __name__ == '__main__':
         # save the filtered data
         df_sample_g83i.to_csv(f'{outputDir}/{sample}_g83i_filtered.csv', index=False)
         # transform each column by the slope and y-intercept
+        # add the reconstruction data to the output dataframe
+
         #df_test = df_sample[cols].copy()
         #print(df_test)
         # TODO: Do I have to transform each replicate individually? I think I likely do, as some of the values 

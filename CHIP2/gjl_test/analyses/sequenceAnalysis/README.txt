@@ -16,13 +16,13 @@ hbondanalysis = hbondAnalysis.py
 
 
 toxgreenConversion
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_test/toxgreenConversion/
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/toxgreenConversion/
 requirementsfile = requirements.txt
-inputdir = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/inputFiles
-reconstructionfile = /mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/reconstructionAllData.csv
+inputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/toxgreenConversion/inputFiles
+reconstructionfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/reconstructionAllData.csv
 wtsequencecomputationfile = chipEnergyFile.csv
 mutantsequencecomputationfile = allMutants.csv
-scriptdir = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/code
+scriptdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/toxgreenConversion/code
 adjustfluorscript = adjustFluorByControlFlow_percentGpA_stdFix_fluor.py
 controlflowfile = 2023-11-4_controlToxgreen.csv
 filteringscript = filterWithComputation_percentGpA_stdFix.py
@@ -40,27 +40,27 @@ rungraphing = true
 
 
 pdbOptimizationAnalysis
-codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_test/analyses/pdbOptimizationAnalysis/
-rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/JC_data/JC_design_data/leucine_ends/
+codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/analyses/pdbOptimizationAnalysis/
+rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/JC_data/JC_design_data/leucine_ends/
 datafile = leu_data
-toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/gjl_test/toxgreenConversion/filtered/all.csv
+toxgreenfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/toxgreenConversion/filtered/all.csv
 strippedsequencefile = strippedSequenceFile
-requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-clashscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
-clashinputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_test/toxgreenConversion/sequenceVsMutant/all
-kdefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
+requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+clashscript = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
+clashinputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/toxgreenConversion/sequenceVsMutant/all
+kdefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
 mutant_cutoff = 0, 0.25, 0.30, 0.35, 0.40
 percent_cutoff = 0, 0.25, 0.5, .75
 number_of_mutants_cutoff = 1, 2
-maltosefile = /mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/maltoseTest/percentDifference.csv
-maltosecol = LB-0H_M9-36H
+maltosefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/maltoseTest/percentDifference.csv
+maltosecol = LB-0H_M9-30H
 
 
 sequenceAnalysis
-codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
-clashdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_test/analyses/pdbOptimizationAnalysis/
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_test/analyses/sequenceAnalysis/
-requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
+clashdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/analyses/pdbOptimizationAnalysis/
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/analyses/sequenceAnalysis/
+requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
 sequencefile = wt/plotData.csv
 mutantfile = mutant/lowestEnergySequences.csv

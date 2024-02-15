@@ -39,7 +39,6 @@ if __name__ == '__main__':
 
     # only keep sequences that pass the maltose test
     maltose_passing_data = maltose[maltose[maltoseCol] >= highest_maltose]
-    maltose_passing_data = maltose_passing_data[maltose_passing_data[maltoseCol] < 99999900] # value set in reconstruction of the maltose data that is the upper limit, anything above isn't present in maltose
 
     # if the sequence column is not the default, change the column name
     if sequenceColumn != 'Sequence':
@@ -53,11 +52,23 @@ if __name__ == '__main__':
     # remove any columns that from the data file that are in the maltose file
     data = data.drop(columns=cols, errors='ignore')
 
-    # keep only the data passing the maltose test
-    data = data[data[sequenceColumn].isin(maltose_passing_sequences)]
+    # check the length of the longest sequence in the data file vs the maltose file
+    max_sequence_length = data[sequenceColumn].str.len().max()
+    max_maltose_sequence_length = maltose_passing_data[sequenceColumn].str.len().max()
+    # if the longest sequence in the maltose file is longer than the longest sequence in the data file, print a warning
+    if max_sequence_length > max_maltose_sequence_length:
+        print('Warning: The longest sequence in the maltose file is longer than the longest sequence in the data file. The sequences in the data file will be truncated to the length of the longest sequence in the maltose file.')
+        # trim the sequences in the data file to the length of the longest sequence in the data file
+        data[sequenceColumn] = [x[3:18] for x in data[sequenceColumn]] # I designed with different ends, so I need to trim the sequence ends off
 
-    # merge the dataframes
+    # keep only the data passing the maltose test and merge the data
+    data = data[data[sequenceColumn].isin(maltose_passing_sequences)]
     data = data.merge(maltose_passing_data, on=sequenceColumn, how='left')
+
+    # check if the original sequence column was changed
+    if max_sequence_length > max_maltose_sequence_length:
+        # add LLL to the sequence at the front and ILI to the sequence column name at the end
+        data[sequenceColumn] = ['LLL' + x + 'ILI' for x in data[sequenceColumn]]
 
     # output the dataframe to a csv file
     data.to_csv(f'{outputDir}/{outputFile}.csv', sep=',', index=False)
