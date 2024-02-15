@@ -1,0 +1,1 @@
+python3 code/makeHbondPses.py -inFile left_hbond_seqs.csv -hbondsDir /mnt/d/github/Sequence-Design/CHIP2/analyses/hbondAnalysis/2024-2-13_analysis_noCutoff_3/distances/ -pseDir /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/2024-2-12_noCutoff/interfacePdbs/pse/L/ -outputDir leftHbond -hbondDistance 3

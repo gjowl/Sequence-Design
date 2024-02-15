@@ -54,7 +54,9 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
     distanceDir = f'{output_dir}/distances'
     os.makedirs(distanceDir, exist_ok=True)
     # open the hbond distance file
-    f = open(f'{distanceDir}/{sequence}_hbondDistances.txt', 'w')
+    f = open(f'{distanceDir}/{sequence}.txt', 'w')
+    f.write('This file contains a list of the selections and the distances between the atoms in the selections in determining hydrogen bonding in a protein.\n')
+    f.write('donor,acceptor,distance\n')
     for obj in cmd.get_names():
         # select this object
         cmd.select(obj)
@@ -139,7 +141,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
                         distance = cmd.distance('distance', 'donor', 'acceptor')
                         if distance < hbondDist:
                             hbonds += 1
-                        f.write(f'{donor}, {acceptor}, {distance}\n')
+                        f.write(f'{donor},{acceptor},{distance}\n')
         # loop through the carbonyl acceptors and get the number of hydrogen bonds
         for donor_obj in all_donors:
             for carbonyl_acceptor in carbonyl_acceptors:
@@ -155,7 +157,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
                     distance = cmd.distance('distance', 'donor', 'acceptor')
                     if distance < hbondDist:
                         hbonds += 1
-                    f.write(f'{donor}, {carbonyl_acceptor[1]}, {distance}\n')
+                    f.write(f'{donor},{carbonyl_acceptor[1]},{distance}\n')
         for combo in combinations:
             # initialize the number of donors and acceptors
             calpha_donors, calpha_acceptors = 0, 0
@@ -177,7 +179,7 @@ def loadPdbAndGetBonds(filename, hbondAAs, ringAAs, output_dir, hbondDist=3.3):
     # close the hbond distance file
     f.close()
     # save the session file
-    cmd.save(f'{output_dir}/{sequence}.pse')
+    #cmd.save(f'{output_dir}/{sequence}.pse')
     # close the pdb file
     cmd.reinitialize()
     return output_df
@@ -207,12 +209,8 @@ if __name__ == '__main__':
         # define the current directory (current design region)
         currDir = f'{inputDir}/{d}'
         if os.path.isdir(currDir):
-            print(currDir)
-            # make the output directory for the pse files
-            pseDir = f'{outputDir}/pse/{d}'
-            os.makedirs(pseDir, exist_ok=True)
             # get the potential hydrogen bonds
-            currHbonds = measurePotentialHBonds(currDir, hbondAAs, ringAAs, pseDir, hbondDist)
+            currHbonds = measurePotentialHBonds(currDir, hbondAAs, ringAAs, outputDir, hbondDist)
             outputDf = pd.concat([outputDf, currHbonds])
     # save the output dataframe to a csv file
     outputDf.to_csv(f'{outputDir}/{outputFile}.csv', index=False)
