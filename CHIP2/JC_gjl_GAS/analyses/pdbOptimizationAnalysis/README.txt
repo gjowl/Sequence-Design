@@ -17,15 +17,15 @@ hbondanalysis = hbondAnalysis.py
 
 
 toxgreenConversion
-outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/JC_gjl_GAS/toxgreenConversion/
+outputdir = /mnt/d/github/Sequence-Design/CHIP2/JC_gjl_GAS/toxgreenConversion/
 requirementsfile = requirements.txt
-inputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/toxgreenConversion/GASright_analysis/inputFiles
-reconstructionfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/reconstructionAllData.csv
+inputdir = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/GASright_analysis/inputFiles
+reconstructionfile = /mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/reconstructionAllData.csv
 wtsequencecomputationfile = allGasRightDesignEnergyFile.csv
 mutantsequencecomputationfile = gasRightMutants.csv
-scriptdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/toxgreenConversion/code
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/toxgreenConversion/code
 adjustfluorscript = adjustFluorByControlFlow_percentGpA_stdFix_fluor.py
-controlflowfile = controlToxgreen.csv
+controlflowfile = 2023-11-4_controlToxgreen.csv
 filteringscript = filterWithComputation_percentGpA_stdFix.py
 filteringdir = filtered
 graphingdir = graphed
@@ -41,27 +41,27 @@ rungraphing = true
 
 
 pdbOptimizationAnalysis
-codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/JC_gjl_GAS/analyses/pdbOptimizationAnalysis/
-rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/JC_gjl_data/JC_design_data/leucine_ends/
+codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+outputdir = /mnt/d/github/Sequence-Design/CHIP2/JC_gjl_GAS/analyses/pdbOptimizationAnalysis/
+rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/JC_gjl_data/JC_design_data/leucine_ends/
 datafile = leu_data
-toxgreenfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/JC_gjl_GAS/toxgreenConversion/filtered/all.csv
+toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/JC_gjl_GAS/toxgreenConversion/filtered/all.csv
 strippedsequencefile = strippedSequenceFile
-requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-clashscript = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
-clashinputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/JC_gjl_GAS/toxgreenConversion/sequenceVsMutant/all
-kdefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
-mutant_cutoff = 0, 0.35
-percent_cutoff = 0, 0.5
-number_of_mutants_cutoff = 1
-maltosefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/ngsReconstruction/JC_maltose_GJL_GASrights_2024-1/reconstructedData/maltoseTest/percentDifference.csv
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+clashscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/clashingAnalysis/code/keepBestClashing.py
+clashinputdir = /mnt/d/github/Sequence-Design/CHIP2/JC_gjl_GAS/toxgreenConversion/sequenceVsMutant/all
+kdefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
+mutant_cutoff = 0, 0.25, 0.30, 0.35, 0.40
+percent_cutoff = 0, 0.25, 0.5, .75
+number_of_mutants_cutoff = 1, 2
+maltosefile = /mnt/d/github/Sequence-Design/ngsReconstruction/JC_maltose_GJL_GASrights_2024-1/reconstructedData/maltoseTest/percentDifference.csv
 maltosecol = LB-0H_M9-30H
 
 
 sequenceAnalysis
-codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
-clashdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/JC_gjl_GAS/analyses/pdbOptimizationAnalysis/
-outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/JC_gjl_GAS/analyses/sequenceAnalysis/
-requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
+clashdir = /mnt/d/github/Sequence-Design/CHIP2/JC_gjl_GAS/analyses/pdbOptimizationAnalysis/
+outputdir = /mnt/d/github/Sequence-Design/CHIP2/JC_gjl_GAS/analyses/sequenceAnalysis/
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
 sequencefile = wt/plotData.csv
 mutantfile = mutant/lowestEnergySequences.csv

@@ -50,8 +50,8 @@ pdbOptimizationAnalysisScript = config['pdbOptimizationAnalysis']
 sequenceAnalysisScript = config['sequenceAnalysis']
 
 # define the main directory
-mainDir = '/home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2'
-#mainDir = '/mnt/d/github/Sequence-Design/CHIP2'
+#mainDir = '/home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2'
+mainDir = '/mnt/d/github/Sequence-Design/CHIP2'
 analysisDir = f'{mainDir}/analyses'
 
 # run the toxgreen conversion script
