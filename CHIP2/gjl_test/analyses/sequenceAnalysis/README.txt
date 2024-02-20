@@ -42,7 +42,7 @@ rungraphing = true
 pdbOptimizationAnalysis
 codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
 outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/analyses/pdbOptimizationAnalysis/
-rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/JC_data/JC_design_data/leucine_ends/
+rawdatadir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2024_DesignData/2024-2-18_pdbBBOptimization_reruns/leu_wts/
 datafile = leu_data
 toxgreenfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/toxgreenConversion/filtered/all.csv
 strippedsequencefile = strippedSequenceFile
@@ -64,3 +64,27 @@ outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/anal
 requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
 sequencefile = wt/plotData.csv
 mutantfile = mutant/lowestEnergySequences.csv
+
+
+figureMaking
+codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/figureMaking/code/
+rawdatadir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/2023-3-7_leu/pdbs
+optimizedpdbdir = /home/loiseau@ad.wisc.edu/senesDrive/General/data/data02/gloiseau/2020-2024_Sequence_Design_Project/2022-2024_DesignData/2024-2-18_pdbBBOptimization_reruns/leu_wts/
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/analyses/figureMaking/
+outputfile = wt_merge
+percentgpacutoff = 0
+sequencefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/pdbOptimizationAnalysis/clash_35_50_1/wt.csv
+datafile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/pdbOptimizationAnalysis/leu_data_percentGpa_maltose.csv
+interfacefile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/figureMaking/inputFiles/interfaceDataFile.csv
+requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+
+
+hbondAnalysis
+codedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/analyses/hbondAnalysis/code
+psedir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/figureMaking/interfacePdbs/pse/
+outputdir = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/hbondAnalysis/
+hbondfile = hbondFile
+plotdatafile = plotDataFile
+datafile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2/gjl_test/figureMaking/wt_merge_leu.csv
+requirementsfile = /home/loiseau@ad.wisc.edu/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+hbonddistance = 3

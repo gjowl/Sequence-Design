@@ -48,7 +48,11 @@ def loadAlternatePdbs(df_sequence, pdbOptimizedDir):
         filename = f'{pdbOptimizedDir}/{dirName}/{pdbName}.pdb'
         # load the pdb file
         cmd.load(filename)
-
+    ## also load the startPdb file (the designed pdb)
+    #cmd.load(f'{pdbOptimizedDir}/{dirName}/startPdb.pdb')
+    ## rename the loaded pdb file to the sequence name
+    #cmd.set_name('startPdb', df_sequence['Sequence'].unique()[0])
+        
 def outputPseFiles(input_df, output_dir, rawDataDir, pdbOptimizedDir):
     # loop through the dataframe
     for sequence in input_df['Sequence'].unique():
@@ -56,19 +60,19 @@ def outputPseFiles(input_df, output_dir, rawDataDir, pdbOptimizedDir):
         df_sequence.reset_index(inplace=True)
         setupSideviewPymol()
         # check if Directory is in the dataframe
-        if 'Directory' in df_sequence.columns:
-            # get the directory name
-            dirName = df_sequence['Directory'].unique()[0]
-            # get the design number by splitting the directory name by _
-            designNum, repNum = dirName.split('_')[1], df_sequence['replicateNumber'].unique()[0]
-            # pdbName
-            pdbName = designNum+'_'+str(repNum)
-            # put together the filename
-            filename = rawDataDir+'/'+pdbName+'.pdb'
-            # load the designed pdb file
-            cmd.load(filename)
-            # rename the loaded pdb file to the sequence name
-            cmd.set_name(pdbName, sequence)
+        #if 'Directory' in df_sequence.columns:
+        #    # get the directory name
+        #    dirName = df_sequence['Directory'].unique()[0]
+        #    # get the design number by splitting the directory name by _
+        #    designNum, repNum = dirName.split('_')[1], df_sequence['replicateNumber'].unique()[0]
+        #    # pdbName
+        #    pdbName = designNum+'_'+str(repNum)
+        #    # put together the filename
+        #    filename = rawDataDir+'/'+pdbName+'.pdb'
+        #    # load the designed pdb file
+        #    cmd.load(filename)
+        #    # rename the loaded pdb file to the sequence name
+        #    cmd.set_name(pdbName, sequence)
         # load through the alternate pdbs made by the pdbOptimization script
         try:
             loadAlternatePdbs(df_sequence, pdbOptimizedDir)
@@ -191,8 +195,8 @@ for sample in df['Sample'].unique():
     os.makedirs(name=sideview_dir, exist_ok=True)
     os.makedirs(name=pse_dir, exist_ok=True)
     df_sample.reset_index(inplace=True)
-    outputFrontview(df_sample, frontview_dir, rawDataDir)
-    outputSideview(df_sample, sideview_dir, rawDataDir)
+    #outputFrontview(df_sample, frontview_dir, rawDataDir)
+    #outputSideview(df_sample, sideview_dir, rawDataDir)
     # save the dataframe
     df_sample.to_csv(f'{outputDir}/{dataFilename}_{sample}.csv', index=False)
     outputPseFiles(df_sample, pse_dir, rawDataDir, pdbOptimizedDir)

@@ -51,8 +51,10 @@ if __name__ == '__main__':
         # reset the index
         df.reset_index(drop=True, inplace=True)
         print(sequence)
+        # get the sample name
+        sample = input_df[input_df['Sequence'] == sequence]['Sample'].values[0]
         # create a pymol session file
-        cmd.load(f'{pseDir}/{sequence}.pse')
+        cmd.load(f'{pseDir}/{sample}/{sequence}.pse')
         setupPymol()
         for index, row in df.iterrows():
             # keep the string up to the 4th 'and' in the row['donor']

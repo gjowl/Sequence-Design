@@ -48,20 +48,30 @@ config = globalConfig[programName]
 toxgreenConversionScript = config['toxgreenConversion']
 pdbOptimizationAnalysisScript = config['pdbOptimizationAnalysis']
 sequenceAnalysisScript = config['sequenceAnalysis']
+figureMakingScript = config['figureMaking']
+hbondAnalysisScript = config['hbondAnalysis']
 
 # define the main directory
-#mainDir = '/home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2'
-mainDir = '/mnt/d/github/Sequence-Design/CHIP2'
+mainDir = '/home/loiseau@ad.wisc.edu/github/Sequence-Design/CHIP2'
+#mainDir = '/mnt/d/github/Sequence-Design/CHIP2'
 analysisDir = f'{mainDir}/analyses'
 
 # run the toxgreen conversion script
 toxgreenConversion = f'python3 {mainDir}/toxgreenConversion/code/{toxgreenConversionScript} {configFile}'
-os.system(toxgreenConversion)
+#os.system(toxgreenConversion)
 
 # run the pdb optimization analysis script
 pdbOptimizationAnalysis = f'python3 {analysisDir}/pdbOptimizationAnalysis/code/{pdbOptimizationAnalysisScript} {configFile}'
-os.system(pdbOptimizationAnalysis)
+#os.system(pdbOptimizationAnalysis)
 
 # run the sequence analysis script
 sequenceAnalysis = f'python3 {analysisDir}/sequenceAnalysis/code/{sequenceAnalysisScript} {configFile}'
-os.system(sequenceAnalysis)
+#os.system(sequenceAnalysis)
+
+# run the figure making script
+figureMaking = f'python3 {analysisDir}/figureMaking/code/{figureMakingScript} {configFile}'
+os.system(figureMaking)
+
+# run the hbond analysis script
+hbondAnalysis = f'python3 {analysisDir}/hbondAnalysis/code/{hbondAnalysisScript} {configFile}'
+os.system(hbondAnalysis)

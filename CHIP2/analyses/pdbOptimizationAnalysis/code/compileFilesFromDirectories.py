@@ -43,23 +43,24 @@ if __name__ == '__main__':
         innerDir = f'{rawDataDir}/{dir}'
         # check if the directory is a directory
         if os.path.isdir(innerDir):
+            currDir = innerDir
             # loop through the files in the directory
-            for dir in os.listdir(innerDir):
-                currDir = f'{innerDir}/{dir}/'
-                for file in os.listdir(currDir):
-                    # check filename
-                    if file == "energyFile.csv":
-                        filename = currDir+file
-                        #print(filename)
-                        # read the csv file into a dataframe
-                        header = pd.read_csv(filename,sep=',',header=None, nrows=1)
-                        # read csv with interface column as string 
-                        df = pd.read_csv(filename, sep=',', header=None, skiprows=1, dtype={2: str})# sets the interface column as a string
-                        df.columns = header.iloc[0]
-                        # add the directory name to the dataframe
-                        df['Directory'] = dir
-                        # combine the dataframes
-                        outputDf = pd.concat([outputDf,df],axis=0)
+            #for dir in os.listdir(innerDir):
+            #    currDir = f'{innerDir}/{dir}/'
+            for file in os.listdir(currDir):
+                # check filename
+                if file == "energyFile.csv":
+                    filename = f'{currDir}/{file}'
+                    #print(filename)
+                    # read the csv file into a dataframe
+                    header = pd.read_csv(filename,sep=',',header=None, nrows=1)
+                    # read csv with interface column as string 
+                    df = pd.read_csv(filename, sep=',', header=None, skiprows=1, dtype={2: str})# sets the interface column as a string
+                    df.columns = header.iloc[0]
+                    # add the directory name to the dataframe
+                    df['Directory'] = dir
+                    # combine the dataframes
+                    outputDf = pd.concat([outputDf,df],axis=0)
     # sort the dataframe by the Total
     outputDf = outputDf.sort_values(by=['Total'])
     # get rid of any empty columns
