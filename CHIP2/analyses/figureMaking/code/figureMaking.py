@@ -64,9 +64,9 @@ if __name__ == '__main__':
 
     # make the interface pdbs figures
     execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirLeu} {optimizedPdbDirLeu} {outputDir}/{outputFile}_leu.csv {outputDir}/interfacePdbs'
-    #os.system(execCreatePses)
-    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirAla} {optimizedPdbDirAla} {outputDir}/{outputFile}_ala.csv {outputDir}/interfacePdbs'
     os.system(execCreatePses)
+    execCreatePses = f'python3 {codeDir}/createPymolSessionFiles.py {rawDataDirAla} {optimizedPdbDirAla} {outputDir}/{outputFile}_ala.csv {outputDir}/interfacePdbs'
+    #os.system(execCreatePses)
     
     # output pngs of the interface pdbs with hbonds and rings highlighted
     #execCreatePses = f'python3 {codeDir}/mutantInterfacePdbs.py {optimizedPdbDir} {outputDir}/{outputFile}.csv {outputDir}/interfacePdbs/highlighted'

@@ -48,10 +48,10 @@ def loadAlternatePdbs(df_sequence, pdbOptimizedDir):
         filename = f'{pdbOptimizedDir}/{dirName}/{pdbName}.pdb'
         # load the pdb file
         cmd.load(filename)
-    ## also load the startPdb file (the designed pdb)
-    #cmd.load(f'{pdbOptimizedDir}/{dirName}/startPdb.pdb')
-    ## rename the loaded pdb file to the sequence name
-    #cmd.set_name('startPdb', df_sequence['Sequence'].unique()[0])
+    # also load the startPdb file (the designed pdb)
+    cmd.load(f'{pdbOptimizedDir}/{dirName}/startPdb.pdb')
+    # rename the loaded pdb file to the sequence name
+    cmd.set_name('startPdb', df_sequence['Sequence'].unique()[0])
         
 def outputPseFiles(input_df, output_dir, rawDataDir, pdbOptimizedDir):
     # loop through the dataframe
