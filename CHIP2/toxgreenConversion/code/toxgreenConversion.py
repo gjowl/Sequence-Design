@@ -49,6 +49,9 @@ os.system(f'cp {configFile} {config["outputDir"]}/rerun.config')
 outputDir               = config["outputDir"]
 # input files
 inputDir                = config["inputDir"]
+# copy the input files to the output directory
+os.system(f'cp {inputDir}/* {outputDir}/inputFiles')
+
 requirementsFile        = f'{inputDir}/{config["requirementsFile"]}'
 wtSequenceFile          = f'{inputDir}/{config["wtSequenceComputationFile"]}'
 mutantSequenceFile      = f'{inputDir}/{config["mutantSequenceComputationFile"]}'
