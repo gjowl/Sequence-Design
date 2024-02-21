@@ -46,14 +46,13 @@ Below is the list of files that must go into the input directory:
 Below is the list of files and directories that this code will create and output for a run:
 -data: 
 -   This will output files by names that will be used for analyzing and organizing data from the runs. Make sure that your filenames are sortable
-    () TODO: make it so that this takes sorted files from the given directory and outputs the names based on the names from a given names file
 -inputFiles: 
 -   allCounts.csv: master csv that holds and organizes all of the counts for sequence, with columns as the bin name or LB/M9 hour and replicate
 -   allPercents.csv: master csv that holds and organizes all of the percents for sequence, with columns as the bin name or LB/M9 hour and replicate
 -analyzedData: self explanatory
 -   maltoseTest: files for maltose test
 -      LBPercents.csv: file containing the percents of a sequence found in the LB timepoint bins 
--      M9Percents.csv: file containing the percents of a sequence found in the M9 timepoint bins #TODO: currently only uses one hardcoded timepoint
+-      M9Percents.csv: file containing the percents of a sequence found in the M9 timepoint bins 
 -      percentDifference.csv: file containing the calculated percent difference per sequence per LB timepoint
 -   reconstruction_by_count: files for reconstructing fluorescence by seq counts
 -      avg files: fluorescence reconstruction average for the specified method of calculating fluorescence
