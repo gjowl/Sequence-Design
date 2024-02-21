@@ -42,16 +42,19 @@ programName = getFilename(__file__)
 globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
-# copy the config file to the output directory
-os.system(f'cp {configFile} {config["outputDir"]}/rerun.config')
 
 # Config file options:
 outputDir               = config["outputDir"]
-# input files
 inputDir                = config["inputDir"]
+
+# Setting up the directory to be able to rerun the program
+# copy the config file to the output directory
+os.system(f'cp {configFile} {outputDir}/rerun.config')
 # copy the input files to the output directory
 os.system(f'cp {inputDir}/* {outputDir}/inputFiles')
 
+# TODO: change the below to be the files in the output directory inputs
+# input files
 requirementsFile        = f'{inputDir}/{config["requirementsFile"]}'
 wtSequenceFile          = f'{inputDir}/{config["wtSequenceComputationFile"]}'
 mutantSequenceFile      = f'{inputDir}/{config["mutantSequenceComputationFile"]}'
@@ -79,6 +82,7 @@ runGraphing              = config["runGraphing"].lower() == 'true'
 
 # check if output directory exists
 os.makedirs(outputDir, exist_ok=True)
+
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
