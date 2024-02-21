@@ -8,7 +8,7 @@ Last Modified: Saturday August 19th 2023 7:22:53 pm
 Modified By: gjowl
 -----
 Description:  
-A driver script for the CHIP2 analysis pipeline.
+A driver script for converting reconstructed fluorescence data to toxgreen fluorescence data.
 -----
 HISTORY:
 Date      	By	Comments
@@ -41,6 +41,9 @@ programName = getFilename(__file__)
 # Read in configuration file:
 globalConfig = read_config(configFile)
 config = globalConfig[programName]
+
+# copy the config file to the output directory
+os.system(f'cp {configFile} {config["outputDir"]}/rerun.config')
 
 # Config file options:
 outputDir               = config["outputDir"]
