@@ -17,6 +17,7 @@ Date      	By	Comments
 
 import sys, os, pandas as pd, numpy as np, matplotlib.pyplot as plt
 import configparser
+from configparser import ConfigParser
 
 # Method to read config file settings
 # Helper file for reading the config file of interest for running the program
@@ -42,36 +43,47 @@ programName = getFilename(__file__)
 globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
+# copy the original config file to the output directory
+os.system(f'cp {configFile} {outputDir}/originalConfig.config')
 
 # Config file options:
 outputDir               = config["outputDir"]
 inputDir                = config["inputDir"]
 
 # Setting up the directory to be able to rerun the program
-# copy the config file to the output directory
-os.system(f'cp {configFile} {outputDir}/rerun.config')
 # copy the input files to the output directory
+newInputDir = f'{outputDir}/inputFiles'
+os.makedirs(f'{outputDir}/inputFiles', exist_ok=True)
 os.system(f'cp {inputDir}/* {outputDir}/inputFiles')
+# copy the reconstruction file to the output directory
+os.system(f'cp {config["reconstructionFile"]} {outputDir}/inputFiles')
+# get just the name of the reconstruction file with the extension
+reconstructionFilename = getFilename(config["reconstructionFile"]) + '.csv'
 
-# TODO: change the below to be the files in the output directory inputs
 # input files
-requirementsFile        = f'{inputDir}/{config["requirementsFile"]}'
-wtSequenceFile          = f'{inputDir}/{config["wtSequenceComputationFile"]}'
-mutantSequenceFile      = f'{inputDir}/{config["mutantSequenceComputationFile"]}'
-controlFlowFile         = f'{inputDir}/{config["controlFlowFile"]}'
-#reconstructionFile      = f'{inputDir}/{config["reconstructionFile"]}'
-reconstructionFile      = f'{config["reconstructionFile"]}'
+requirementsFile        = f'{newInputDir}/{config["requirementsFile"]}'
+wtSequenceFile          = f'{newInputDir}/{config["wtSequenceComputationFile"]}'
+mutantSequenceFile      = f'{newInputDir}/{config["mutantSequenceComputationFile"]}'
+controlFlowFile         = f'{newInputDir}/{config["controlFlowFile"]}'
+reconstructionFile      = f'{newInputDir}/{reconstructionFilename}'
+
+# get the script directory
+scriptDir               = config["scriptDir"]
+# copy the scripts to the output directory
+# make the code directory in the output directory
+newScriptDir = f'{outputDir}/code'
+os.makedirs(f'{newScriptDir}', exist_ok=True)
+os.system(f'cp {scriptDir}/* {newScriptDir}')
 
 # scripts to run
-scriptDir               = config["scriptDir"]
-adjustFluorByControlFlow = f'{scriptDir}/{config["adjustFluorScript"]}'
-filteringScript         = f'{scriptDir}/{config["filteringScript"]}'
-sequenceVsMutantScript  = f'{scriptDir}/{config["sequenceVsMutantScript"]}'
-graphScript             = f'{scriptDir}/{config["graphScript"]}'
-graphScript2            = f'{scriptDir}/{config["graphScript2"]}'
-seqDir                  = f'{outputDir}/{config["seqDir"]}'
-filteringDir            = f'{outputDir}/{config["filteringDir"]}'
-graphingDir            = f'{outputDir}/{config["graphingDir"]}'
+adjustFluorByControlFlow = f'{newScriptDir}/{config["adjustFluorScript"]}'
+filteringScript          = f'{newScriptDir}/{config["filteringScript"]}'
+sequenceVsMutantScript   = f'{newScriptDir}/{config["sequenceVsMutantScript"]}'
+graphScript              = f'{newScriptDir}/{config["graphScript"]}'
+graphScript2             = f'{newScriptDir}/{config["graphScript2"]}'
+seqDir                   = f'{outputDir}/{config["seqDir"]}'
+filteringDir             = f'{outputDir}/{config["filteringDir"]}'
+graphingDir              = f'{outputDir}/{config["graphingDir"]}'
 
 # booleans if you only want to rerun partial
 runAdjustFluor           = config["runAdjustFluor"].lower() == 'true'
@@ -82,7 +94,15 @@ runGraphing              = config["runGraphing"].lower() == 'true'
 
 # check if output directory exists
 os.makedirs(outputDir, exist_ok=True)
-
+# copy the config file to the output directory
+configParser  = ConfigParser()
+configParser.read(configFile)
+configParser.set('toxgreenConversion', 'outputDir', outputDir)
+configParser.set('toxgreenConversion', 'inputDir', newInputDir)
+configParser.set('toxgreenConversion', 'scriptDir', newScriptDir)
+configParser.set('toxgreenConversion', 'reconstructionFile', reconstructionFilename)
+with open(f'{outputDir}/rerun.config', 'w') as configfile:
+    configParser.write(configfile)
 
 if __name__ == '__main__':
     #install required packages for the below programs; these are found in requirements.txt
