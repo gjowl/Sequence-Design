@@ -50,6 +50,30 @@ config = globalConfig[programName]
 codeDir = config['codeDir']
 rawDataDir = config['rawDataDir']
 outputDir = config['outputDir']
+
+'''
+    setting up the directory to be able to rerun the program
+'''
+# copy the original config file to the output directory
+os.system(f'cp {configFile} {outputDir}/originalConfig.config')
+
+# check if the input files directory exists
+newInputDir = f'{outputDir}/inputFiles'
+os.makedirs(newInputDir, exist_ok=True)
+
+# check if the new input directory is empty (if it is, copy the input files to the new input directory)
+if len(os.listdir(newInputDir)) == 0:
+    os.system(f'cp {inputDir}/* {newInputDir}')
+# rename the input directory to the new input directory
+inputDir = newInputDir
+
+# get the script directory
+scriptDir               = config["scriptDir"]
+
+'''
+    reading the config file options
+'''
+# input files
 kdeFile = config['kdeFile']
 dataFile = config['dataFile']
 requirementsFile = config['requirementsFile']
@@ -71,12 +95,16 @@ if clashData:
     sequenceFile = f'{clashInputDir}/sequence_fluor_energy_data.csv'
     mutantFile = f'{clashInputDir}/mutant_fluor_energy_data.csv'
 
-# check if output directory exists
-#if os.path.exists(outputDir):
-#    print(f"Output directory already exists. Delete {outputDir} to rerun.")
-#    sys.exit()
-#else:
 os.makedirs(outputDir, exist_ok=True)
+# copy the config file to the output directory (setting up the rerun.config file for the next run)
+# if this works well, you should just be able to run: python3 PATHTOCODE/PROGRAMNAME rerun.config
+configParser  = ConfigParser()
+configParser.read(configFile)
+configParser.set('pdbOptimizationAnalysis', 'outputDir', outputDir)
+configParser.set('pdbOptimizationAnalysis', 'inputDir', inputDir)
+with open(f'{outputDir}/rerun.config', 'w') as configfile:
+    configParser.write(configfile)
+
 
 if __name__ == "__main__":
     # write README file 
