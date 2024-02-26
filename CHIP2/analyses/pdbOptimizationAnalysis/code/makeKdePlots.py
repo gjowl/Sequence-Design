@@ -27,12 +27,19 @@ def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis, roundToNea
     x = df_data.loc[:, xAxis]
     y = df_data.loc[:, yAxis]
     energies = df_data[dataColumn].values
+    # check if the energies is empty
+    if len(energies) == 0:
+        return # no data to plot
     # get the kde plot for the geometry data
     kdeZScores = getKdePlotZScoresplotKdeOverlayForDfList(df_kde, 'Distance', 'Angle')
+    # if the min and max y values are not specified, calculate them from the data
+    if minY == -100000:
+        minY = int(np.floor(np.min(energies)/5)*roundToNearest)
+        maxY = int(np.ceil(np.max(energies)/5)*roundToNearest)
     # plot the kde plot with an overlay of the input dataset   
-    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir, roundToNearest, minY, maxY, reverseColormap)
+    plotKdeOverlay(kdeZScores, x, y, energies, dataColumn, outputDir, minY, maxY, reverseColormap)
 
-def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, roundToNearest, minY, maxY, reverseColormap):
+def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, minY, maxY, reverseColormap):
     # Plotting code below
     fig, ax = plt.subplots()
     # plotting labels and variables 
@@ -55,10 +62,7 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, roundT
     cmap = plt.cm.Reds
     if reverseColormap:
         cmap = cmap.reversed()
-    # get min and max of the data rounded to the nearest 5
-    if minY == -100000:
-        minY = int(np.floor(np.min(data)/5)*roundToNearest)
-        maxY = int(np.ceil(np.max(data)/5)*roundToNearest)
+    
     # flip the data so that the min is at the top of the colorbar
     norm = matplotlib.colors.Normalize(vmin=minY, vmax=maxY) 
     ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=10, alpha=0.5)

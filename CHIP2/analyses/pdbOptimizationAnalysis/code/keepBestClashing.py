@@ -89,4 +89,4 @@ if __name__ == '__main__':
     output_df.to_csv(f'{outputDir}/wt.csv', index=False)
     output_mutant_df.to_csv(f'{outputDir}/mutant.csv', index=False)
     output_df_all.to_csv(f'{outputDir}/all.csv', index=False)
-    print(f'Number of WT sequences: {len(output_df)}')
+    #print(f'Number of WT sequences: {len(output_df)}')

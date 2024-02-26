@@ -77,6 +77,7 @@ os.system(toxgreenConversion)
 pdbOptimizationAnalysis = f'python3 {cwd}/pdbOptimizationAnalysis/code/{pdbOptimizationAnalysisScript} {configFile}'
 os.system(f'tar -czvf pdbOptimizationAnalysisCode.tar.gz {cwd}/pdbOptimizationAnalysis/code')
 os.system(pdbOptimizationAnalysis)
+exit(0)
 
 # run the sequence analysis script
 sequenceAnalysis = f'python3 {cwd}/sequenceAnalysis/code/{sequenceAnalysisScript} {configFile}'

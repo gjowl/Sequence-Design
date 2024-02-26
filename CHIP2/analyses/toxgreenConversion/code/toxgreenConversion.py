@@ -33,6 +33,51 @@ def getFilename(file):
     filename, programExt = os.path.splitext(programFile)
     return filename
 
+# copy the input files directory to the output directory
+def copyInputFiles(inputDir, outputDir, config):
+    # check if the input files directory exists
+    newInputDir = f'{outputDir}/inputFiles'
+    os.makedirs(newInputDir, exist_ok=True)
+    # copy the input files to the new input directory
+    for option in config:
+        if 'file' in option.lower():
+            file = config[option]
+            # check if the file exists in the new input directory
+            if not os.path.exists(f'{newInputDir}/{file}'):
+                # check if the file is a path (a file from another directory)
+                if os.path.exists(file):
+                    os.system(f'cp {file} {newInputDir}')
+                    # replace the config file option with the new path
+                    filename = getFilename(file) + os.path.splitext(file)[1]
+                    # update the config file option with the updated filename
+                    config[option] = filename
+                else:
+                    inputFile = f'{inputDir}/{file}'
+                    os.system(f'cp {inputFile} {newInputDir}')
+    # rename the input directory to the new input directory
+    return newInputDir, config
+
+# create a tarball of the scripts and delete the directory
+#def copyScripts(scriptDir, outputDir, programName, config):
+#    scriptOutputDir = f'{outputDir}/scripts'
+#    os.makedirs(scriptOutputDir, exist_ok=True)
+#    for option in config:
+#        if 'script' in option.lower():
+#            script = config[option]
+#            # check if the file is a path (a script from another directory)
+#            if os.path.exists(script):
+#                os.system(f'cp {script} {scriptOutputDir}')
+#                # replace the config file option with the path to the script
+#                filename = getFilename(script) + os.path.splitext(script)[1]
+#            else:
+#                inputFile = f'{scriptDir}/{script}'
+#                os.system(f'cp {inputFile} {scriptOutputDir}')
+#    # copy the driver script to the output directory
+#    os.system(f'cp {scriptDir}/{programName}.py {scriptOutputDir}')
+#    # tar the scriptOutputDir and delete the directory (to save space)
+#    os.system(f'tar -cvf {outputDir}/scripts.tar.gz {scriptOutputDir}/*')
+#    os.system(f'rm -r {scriptOutputDir}')
+
 # the input global (multi-part) configuration file
 configFile = sys.argv[1]
 
@@ -53,32 +98,21 @@ inputDir                = config["inputDir"]
 # copy the original config file to the output directory
 os.system(f'cp {configFile} {outputDir}/originalConfig.config')
 
-# check if the input files directory exists
-newInputDir = f'{outputDir}/inputFiles'
-os.makedirs(newInputDir, exist_ok=True)
-
-# check if the new input directory is empty (if it is, copy the input files to the new input directory)
-if len(os.listdir(newInputDir)) == 0:
-    os.system(f'cp {inputDir}/* {newInputDir}')
-    # copy the reconstruction file to the output directory (from the ngsReconstruction data in ngsReconstruction/NAMEOFRECONSTRUCTION/reconstructedData/)
-    os.system(f'cp {config["reconstructionFile"]} {newInputDir}')
-# rename the input directory to the new input directory
-inputDir = newInputDir
+# copy the input files directory to the output directory
+inputDir, config = copyInputFiles(inputDir, outputDir, config) # inputDir is now the new input directory within the output directory, and config has been updated with the new file paths
 
 # get the script directory
-scriptDir               = config["scriptDir"]
+scriptDir = config["scriptDir"]
 
 '''
     reading the config file options
 '''
 # input files
-# get just the name of the reconstruction file with the extension
-reconstructionFilename = getFilename(config["reconstructionFile"]) + '.csv'
 requirementsFile        = f'{inputDir}/{config["requirementsFile"]}'
 wtSequenceFile          = f'{inputDir}/{config["wtSequenceComputationFile"]}'
 mutantSequenceFile      = f'{inputDir}/{config["mutantSequenceComputationFile"]}'
 controlFlowFile         = f'{inputDir}/{config["controlFlowFile"]}'
-reconstructionFile      = f'{inputDir}/{reconstructionFilename}'
+reconstructionFile      = f'{inputDir}/{config["reconstructionFile"]}'
 
 # scripts to run
 adjustFluorByControlFlow = f'{scriptDir}/{config["adjustFluorScript"]}'
@@ -101,13 +135,16 @@ runGraphing              = config["runGraphing"].lower() == 'true'
 os.makedirs(outputDir, exist_ok=True)
 # copy the config file to the output directory (setting up the rerun.config file for the next run)
 # if this works well, you should just be able to run: python3 PATHTOCODE/PROGRAMNAME rerun.config
-configParser  = ConfigParser()
-configParser.read(configFile)
-configParser.set('toxgreenConversion', 'outputDir', outputDir)
-configParser.set('toxgreenConversion', 'inputDir', inputDir)
-configParser.set('toxgreenConversion', 'reconstructionFile', reconstructionFilename)
-with open(f'{outputDir}/rerun.config', 'w') as configfile:
-    configParser.write(configfile)
+config['outputDir'] = outputDir
+config['inputDir'] = inputDir
+# write the config options to rerun configuration file
+with open(f'{outputDir}/rerun.config', 'w') as f:
+    # write the program name
+    f.write(f'[{programName}]\n')
+    for option in config:
+        f.write(f'{option} = {config[option]}\n')
+    # close the file
+    f.close()
 
 if __name__ == '__main__':
     print('Running toxgreenConversion.py...')

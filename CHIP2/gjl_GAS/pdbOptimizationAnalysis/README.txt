@@ -13,7 +13,7 @@ analysiscodedir = /mnt/d/github/Sequence-Design/CHIP2/analyses
 toxgreenconversion = toxgreenConversion.py
 pdboptimizationanalysis = pdbOptimizationAnalysis.py
 sequenceanalysis = sequenceAnalysis.py
-figuremaking = figureMaking.py
+boxplotanalysis = boxplotAnalysis.py
 hbondanalysis = hbondAnalysis.py
 
 
@@ -42,26 +42,31 @@ rungraphing = true
 
 
 pdbOptimizationAnalysis
-codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
 outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/pdbOptimizationAnalysis/
 rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/gjl_data/JC_design_data/leucine_ends/
-datafile = leu_data
-toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/toxgreenConversion/filtered/all.csv
-strippedsequencefile = strippedSequenceFile
-requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-clashscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code/keepBestClashing.py
-clashinputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/toxgreenConversion/filtered/
-kdefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles/2020_09_23_kdeData.csv
+inputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/pdbOptimizationAnalysis//inputFiles
+toxgreenfile = all.csv
+requirementsfile = requirements.txt
+sequencefile = sequence_fluor_energy_data.csv
+mutantfile = mutant_fluor_energy_data.csv
+kdefile = 2020_09_23_kdeData.csv
 mutant_cutoff = 0, 0.25, 0.30, 0.35, 0.40
 percent_cutoff = 0, 0.25, 0.5, .75
 number_of_mutants_cutoff = 1, 2
-maltosefile = /mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/maltoseTest/percentDifference.csv
+maltosefile = percentDifference.csv
 maltosecol = LB-0H_M9-30H
 
 
 sequenceAnalysis
-codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
 clashdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/pdbOptimizationAnalysis/
 outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/sequenceAnalysis/
 requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
 sequencefile = wt/plotData.csv
+
+
+boxplotAnalysis
+
+
+hbondAnalysis
