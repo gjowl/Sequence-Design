@@ -9,16 +9,17 @@ below given options, is found within this directory. Directories named as follow
 
 
 runAllAnalysis
+outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/
 analysiscodedir = /mnt/d/github/Sequence-Design/CHIP2/analyses
 toxgreenconversion = toxgreenConversion.py
 pdboptimizationanalysis = pdbOptimizationAnalysis.py
 sequenceanalysis = sequenceAnalysis.py
 boxplotanalysis = boxplotAnalysis.py
 hbondanalysis = hbondAnalysis.py
+helperscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/helperCode.py
 
 
 toxgreenConversion
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/toxgreenConversion/
 requirementsfile = requirements.txt
 inputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/toxgreenConversion/GASright_analysis/inputFiles
 reconstructionfile = /mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/reconstructionAllData.csv
@@ -43,9 +44,8 @@ rungraphing = true
 
 pdbOptimizationAnalysis
 scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/pdbOptimizationAnalysis/
 rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/gjl_data/JC_design_data/leucine_ends/
-inputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/pdbOptimizationAnalysis//inputFiles
+inputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS//pdbOptimizationAnalysis/inputFiles
 toxgreenfile = all.csv
 requirementsfile = requirements.txt
 sequencefile = sequence_fluor_energy_data.csv
@@ -61,12 +61,25 @@ maltosecol = LB-0H_M9-30H
 sequenceAnalysis
 scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
 clashdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/pdbOptimizationAnalysis/
-outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/sequenceAnalysis/
 requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-sequencefile = wt/plotData.csv
+sequencedir = wt
+mutantdir = mutant
+sequencecsv = plotData.csv
+mutantcsv = lowestEnergySequences.csv
 
 
 boxplotAnalysis
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/boxplotAnalysis/code
+inputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/boxplotAnalysis/inputFiles
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+rawdatadirala = /mnt/d/github/Sequence-Design/CHIP2/2023-3-13_ala/pdbs
+rawdatadirleu = /mnt/d/github/Sequence-Design/CHIP2/2023-3-7_leu/pdbs
+optimizedpdbdir = /mnt/d/2023-8-28_pdbBBRepack/all_leu_wts
+outputfile = wt_merge
+percentgpacutoff = 0.4
+sequencefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun_fluor_maltose/clash_35_50_1/wt.csv
+datafile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun_fluor_maltose/leu_data_percentGpa_maltose.csv
+interfacefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/inputFiles/interfaceDataFile.csv
 
 
 hbondAnalysis

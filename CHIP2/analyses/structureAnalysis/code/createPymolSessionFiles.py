@@ -179,7 +179,7 @@ outputDir = sys.argv[4]
 os.makedirs(name=outputDir, exist_ok=True)
 
 # read into a dataframe
-df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str, 'replicateNumber': int})
+df = pd.read_csv(dataFile, sep=',', header=0, dtype={'Interface': str})
 
 # get the datafile name
 dataFilename = os.path.basename(dataFile).split('.')[0]
@@ -187,12 +187,12 @@ dataFilename = os.path.basename(dataFile).split('.')[0]
 for sample in df['Sample'].unique():
     df_sample = df[df['Sample'] == sample]
     #df_sample = df_sample[df_sample['PercentGpA'] > 0.5]
-    png_dir = f'{outputDir}/png/{sample}'
+    #png_dir = f'{outputDir}/png/{sample}'
     pse_dir = f'{outputDir}/pse/{sample}'
-    frontview_dir = f'{png_dir}/frontview'
-    sideview_dir = f'{png_dir}/sideview'
-    os.makedirs(name=frontview_dir, exist_ok=True)
-    os.makedirs(name=sideview_dir, exist_ok=True)
+    #frontview_dir = f'{png_dir}/frontview'
+    #sideview_dir = f'{png_dir}/sideview'
+    #os.makedirs(name=frontview_dir, exist_ok=True)
+    #os.makedirs(name=sideview_dir, exist_ok=True)
     os.makedirs(name=pse_dir, exist_ok=True)
     df_sample.reset_index(inplace=True)
     #outputFrontview(df_sample, frontview_dir, rawDataDir)

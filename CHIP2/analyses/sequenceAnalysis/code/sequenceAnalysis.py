@@ -1,4 +1,4 @@
-import os, sys, configparser
+import os, sys, configparser, argparse
 import pandas as pd
 
 """
@@ -12,55 +12,60 @@ and analyzes the sequence composition against the fluorescence. Directories are 
     - percent_cutoff: another cutoff for mutants where the mutant fluorescence must be at least this much less than the WT to be accepted
     - number_of_mutants: the number of mutants necessary to be accepted for the WT design to be accepted
 '''
-# Helper file for reading the config file of interest for running the program
-def read_config(configFile):
-    config = configparser.ConfigParser()
-    config.read(configFile)
-    return config
+'''
+    parse the command line arguments
+'''
+# initialize the parser
+parser = argparse.ArgumentParser(description='Adjust the reconstructed fluorescence by the flow fluorescence of the controls')
 
-def writeReadMe(config, outputDir):
-    # loop through all of the config options
-    with open(f'{outputDir}/README.txt', 'w') as f:
-        f.write(description)
-        # write the config options to the README
-        for section in config.sections():
-            f.write(f'\n\n{section}\n')
-            for option in config[section]:
-                f.write(f'{option} = {config[section][option]}\n')
-        # close the file
-        f.close()
+# add the necessary arguments
+parser.add_argument('-config','--config', type=str, help='the input configuration file')
+parser.add_argument('-outputDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-helperScript','--helperScript', type=str, help='the helper script file')
 
-# get filename separate from type and directory
-def getFilename(file):
-    programPath = os.path.realpath(file)
-    programDir, programFile = os.path.split(programPath)
-    filename, programExt = os.path.splitext(programFile)
-    return filename
+# extract the arguments into variables
+args = parser.parse_args()
+configFile = args.config
+helperScript = args.helperScript
+# import the functions from the helper code and get the program name
+exec(open(helperScript).read())
+programName = getFilename(__file__) # toxgreenConversion
+# default value for the output directory (if not given, the current working directory is used + the program name)
+outputDir = f'{os.getcwd()}/{programName}'
+if args.outputDir is not None:
+    outputDir = args.outputDir
+    os.makedirs(outputDir, exist_ok=True)
 
-# get the current directory
-cwd = os.getcwd()
-
-# gets the name of this file to access the config options
-programName = getFilename(__file__)
-
+'''
+    read in the config file options and set up the directory to be able to rerun the program
+'''
 # get the config file options
-configFile = sys.argv[1]
 globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
-# read in the config arguments
-codeDir = config['codeDir']
-clashDir = config['clashDir']
-outputDir = config['outputDir']
-requirementsFile = config['requirementsFile']
-sequenceFile = config['sequenceFile']
-mutantFile = config['mutantFile']
+# Config file options
+#inputDir   = config["inputDir"]
 
-# check if output directory exists
-#if os.path.exists(outputDir):
-#    print(f"Output directory already exists. Saving into new {outputDir}_1.")
-#else:
-os.makedirs(outputDir, exist_ok=True)
+'''
+    copy the input files into the output directory
+'''
+# copy the original config file to the output directory
+os.system(f'cp {configFile} {outputDir}/originalConfig.config')
+
+# copy the input files directory to the output directory
+#inputDir, config = copyInputFiles(inputDir, outputDir, config) # inputDir is now the new input directory within the output directory, and config has been updated with the new file paths
+
+'''
+    reading the config file options
+'''
+# read in the config arguments
+scriptDir = config['scriptDir']
+clashDir = config['clashDir']
+requirementsFile = config['requirementsFile']
+sequenceDir = config['sequenceDir']
+mutantDir = config['mutantDir']
+sequenceCsv = config['sequenceCsv']
+mutantCsv = config['mutantCsv']
 
 if __name__ == "__main__":
     # write README file 
@@ -82,16 +87,19 @@ if __name__ == "__main__":
         outDir = outputDir + '/' + input_dir
 
         # run the script to add the necessary columns to the dataframes
-        execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {clashDir}/{input_dir}/{sequenceFile} -mutFile {clashDir}/{input_dir}/{mutantFile} -outDir {outDir}'
+        sequenceFile = f'{clashDir}/{input_dir}/{sequenceDir}/{sequenceCsv}'
+        mutantFile = f'{clashDir}/{input_dir}/{mutantDir}/{mutantCsv}'
+        print(sequenceFile, mutantFile, outDir)
+        execAddColumns = f'python3 {scriptDir}/addNecessaryColumns.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outDir}'
         os.system(execAddColumns)
 
         # run the voiding script if the voiding data is found in the config file
-        execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
+        execplotBoxplot = f'python3 {scriptDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
         os.system(execplotBoxplot)
 
         # run boxplot script for all of the data
-        execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py -inFile {outDir}/all.csv -outDir {outDir}'
+        execplotBoxplotCombined = f'python3 {scriptDir}/plotBoxplotsCombined.py -inFile {outDir}/all.csv -outDir {outDir}'
         os.system(execplotBoxplotCombined)
 
-        execGraphDeltaFluorescence = f'python3 {codeDir}/graphDeltaFluorescence.py -inFile {outDir}/deltaFluorescence.csv -outDir {outDir}/deltaFluorescence'
+        execGraphDeltaFluorescence = f'python3 {scriptDir}/graphDeltaFluorescence.py -inFile {outDir}/deltaFluorescence.csv -outDir {outDir}/deltaFluorescence'
         os.system(execGraphDeltaFluorescence)

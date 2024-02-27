@@ -1,4 +1,4 @@
-import os, sys, configparser
+import os, sys, configparser, argparse
 import pandas as pd
 
 description = '''
@@ -10,82 +10,51 @@ below given options, is found within this directory. Directories named as follow
     - percent_cutoff: another cutoff for mutants where the mutant fluorescence must be at least this much less than the WT to be accepted
     - number_of_mutants: the number of mutants necessary to be accepted for the WT design to be accepted
 '''
-# Helper file for reading the config file of interest for running the program
-def read_config(configFile):
-    config = configparser.ConfigParser()
-    config.read(configFile)
-    return config
 
-def writeReadMe(config, outputDir):
-    # loop through all of the config options
-    with open(f'{outputDir}/README.txt', 'w') as f:
-        f.write(description)
-        # write the config options to the README
-        for section in config.sections():
-            f.write(f'\n\n{section}\n')
-            for option in config[section]:
-                f.write(f'{option} = {config[section][option]}\n')
-        # close the file
-        f.close()
+'''
+    parse the command line arguments
+'''
+# initialize the parser
+parser = argparse.ArgumentParser(description='Adjust the reconstructed fluorescence by the flow fluorescence of the controls')
 
-# get filename separate from type and directory
-def getFilename(file):
-    programPath = os.path.realpath(file)
-    programDir, programFile = os.path.split(programPath)
-    filename, programExt = os.path.splitext(programFile)
-    return filename
+# add the necessary arguments
+parser.add_argument('-config','--config', type=str, help='the input configuration file')
+parser.add_argument('-outputDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-helperScript','--helperScript', type=str, help='the helper script file')
 
-# copy the input files directory to the output directory
-def copyInputFiles(inputDir, outputDir, config):
-    # check if the input files directory exists
-    newInputDir = f'{outputDir}/inputFiles'
-    os.makedirs(newInputDir, exist_ok=True)
-    # copy the input files to the new input directory
-    for option in config:
-        if 'file' in option.lower():
-            file = config[option]
-            # check if the file exists in the new input directory
-            if not os.path.exists(f'{newInputDir}/{file}'):
-                # check if the file is a path (a file from another directory)
-                if os.path.exists(file):
-                    os.system(f'cp {file} {newInputDir}')
-                    # replace the config file option with the new path
-                    filename = getFilename(file) + os.path.splitext(file)[1]
-                    # update the config file option with the updated filename
-                    config[option] = filename
-                else:
-                    inputFile = f'{inputDir}/{file}'
-                    os.system(f'cp {inputFile} {newInputDir}')
-    # rename the input directory to the new input directory
-    return newInputDir, config
+# extract the arguments into variables
+args = parser.parse_args()
+configFile = args.config
+helperScript = args.helperScript
+# import the functions from the helper code and get the program name
+exec(open(helperScript).read())
+programName = getFilename(__file__) # toxgreenConversion
 
-# get the current directory
-cwd = os.getcwd()
+# default value for the output directory (if not given, the current working directory is used + the program name)
+outputDir = f'{os.getcwd()}/{programName}'
+if args.outputDir is not None:
+    outputDir = args.outputDir
+    os.makedirs(outputDir, exist_ok=True)
 
-# gets the name of this file to access the config options
-programName = getFilename(__file__)
-
+'''
+    read in the config file options and set up the directory to be able to rerun the program
+'''
 # get the config file options
-configFile = sys.argv[1]
 globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
 # Config file options
-outputDir  = config["outputDir"]
 inputDir   = config["inputDir"]
 rawDataDir = config['rawDataDir']
 
 '''
-    setting up the directory to be able to rerun the program
+    copy the input files into the output directory
 '''
 # copy the original config file to the output directory
 os.system(f'cp {configFile} {outputDir}/originalConfig.config')
 
 # copy the input files directory to the output directory
 inputDir, config = copyInputFiles(inputDir, outputDir, config) # inputDir is now the new input directory within the output directory, and config has been updated with the new file paths
-
-# read in the config arguments
-scriptDir = config['scriptDir']
 
 '''
     reading the config file options
@@ -98,6 +67,9 @@ maltoseFile          = f'{inputDir}/{config["maltoseFile"]}'
 sequenceFile         = f'{inputDir}/{config["sequenceFile"]}'
 mutantFile           = f'{inputDir}/{config["mutantFile"]}'
 
+# get the script directory
+scriptDir = config['scriptDir']
+
 # other inputs
 maltoseCol           = config["maltoseCol"] # the column name for the maltose data to use
 
@@ -106,11 +78,8 @@ mutant_cutoffs = [float(x) for x in config['mutant_cutoff'].split(',')]
 percent_cutoffs = [float(x) for x in config['percent_cutoff'].split(',')]
 number_of_mutants_cutoffs = [int(x) for x in config['number_of_mutants_cutoff'].split(',')]
 
-# check if output directory exists
-os.makedirs(outputDir, exist_ok=True)
 # copy the config file to the output directory (setting up the rerun.config file for the next run)
 # if this works well, you should just be able to run: python3 PATHTOCODE/PROGRAMNAME rerun.config
-config['outputDir'] = outputDir
 config['inputDir'] = inputDir
 # write the config options to rerun configuration file
 with open(f'{outputDir}/rerun.config', 'w') as f:
@@ -180,6 +149,7 @@ if __name__ == "__main__":
                     if not filename.endswith('.csv'):
                         continue
                     file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
+                    print(file_outputDir)
                     execAnalyzeclash = f'python3 {scriptDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{maltosePassingFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {scriptDir}'
                     print(f' - Running: {execAnalyzeclash}')
                     os.system(execAnalyzeclash)

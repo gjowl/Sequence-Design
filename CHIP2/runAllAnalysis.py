@@ -19,6 +19,7 @@ def read_config(configFile):
     config = configparser.ConfigParser()
     config.read(configFile)
     return config
+
 def writeReadMe(config, outputDir):
     # loop through all of the config options
     with open(f'{outputDir}/README.txt', 'w') as f:
@@ -30,6 +31,7 @@ def writeReadMe(config, outputDir):
                 f.write(f'{option} = {config[section][option]}\n')
         # close the file
         f.close()
+
 # get filename separate from type and directory
 def getFilename(file):
     programPath = os.path.realpath(file)
@@ -45,12 +47,14 @@ configFile = sys.argv[1]
 globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
+outputDir = config['outputDir']
 analysisCodeDir = config['analysisCodeDir'] # can input an entire directory or just the directory name from current working directory
 toxgreenConversionScript = config['toxgreenConversion'] 
 pdbOptimizationAnalysisScript = config['pdbOptimizationAnalysis']
 sequenceAnalysisScript = config['sequenceAnalysis']
-boxplotAnalysisScript = config['boxplotAnalysis']
+structureAnalysisScript = config['structureAnalysis']
 hbondAnalysisScript = config['hbondAnalysis']
+helperScript = config['helperScript'] # helper functions
 
 # check if the name of the analysis directory is a directory (if it is, use it as the current working directory for the analysis code)
 if os.path.isdir(analysisCodeDir):
@@ -66,30 +70,33 @@ else:
     instead and just using some of the output data from this one. 
     
     The order below is the order that the analyses will be run in. It's kind of set in stone for some parts (ie. toxgreenConversion is needed for the
-    pdbOptimizationAnalysis, which is needed to run sequenceAnalysis and boxplotAnalysis and hbondAnalysis)
+    pdbOptimizationAnalysis, which is needed to run sequenceAnalysis and structureAnalysis and hbondAnalysis)
 '''
+
+# copy the helper script to the output directory
+os.system(f'cp {helperScript} {outputDir}')
+
 # run the toxgreen conversion script
-toxgreenConversion = f'python3 {cwd}/toxgreenConversion/code/{toxgreenConversionScript} {configFile}'
-os.system(f'tar -czvf toxgreenConversionCode.tar.gz {cwd}/toxgreenConversion/code')
-os.system(toxgreenConversion)
+toxgreenConversion = f'python3 {cwd}/toxgreenConversion/code/{toxgreenConversionScript} -config {configFile} -outputDir {outputDir}/toxgreenConversion -helperScript {helperScript}'
+os.system(f'tar -czvf {outputDir}/toxgreenConversionCode.tar.gz {cwd}/toxgreenConversion/code')
+#os.system(toxgreenConversion)
 
 # run the pdb optimization analysis script
-pdbOptimizationAnalysis = f'python3 {cwd}/pdbOptimizationAnalysis/code/{pdbOptimizationAnalysisScript} {configFile}'
-os.system(f'tar -czvf pdbOptimizationAnalysisCode.tar.gz {cwd}/pdbOptimizationAnalysis/code')
-os.system(pdbOptimizationAnalysis)
-exit(0)
+pdbOptimizationAnalysis = f'python3 {cwd}/pdbOptimizationAnalysis/code/{pdbOptimizationAnalysisScript} -config {configFile} -outputDir {outputDir}/pdbOptimizationAnalysis -helperScript {helperScript}'
+os.system(f'tar -czvf {outputDir}/pdbOptimizationAnalysisCode.tar.gz {cwd}/pdbOptimizationAnalysis/code')
+#os.system(pdbOptimizationAnalysis)
 
 # run the sequence analysis script
-sequenceAnalysis = f'python3 {cwd}/sequenceAnalysis/code/{sequenceAnalysisScript} {configFile}'
-os.system(f'tar -czvf sequenceAnalysisCode.tar.gz {cwd}/sequenceAnalysis/code')
-os.system(sequenceAnalysis)
+sequenceAnalysis = f'python3 {cwd}/sequenceAnalysis/code/{sequenceAnalysisScript} -config {configFile} -outputDir {outputDir}/sequenceAnalysis -helperScript {helperScript}'
+os.system(f'tar -czvf {outputDir}/sequenceAnalysisCode.tar.gz {cwd}/sequenceAnalysis/code')
+#os.system(sequenceAnalysis)
 
-# run the boxplot analysis script
-boxplotAnalysis = f'python3 {cwd}/boxplotAnalysis/code/{boxplotAnalysisScript} {configFile}'
-os.system(f'tar -czvf boxplotAnalysisCode.tar.gz {cwd}/boxplotAnalysis/code')
-os.system(boxplotAnalysis)
+# run the structure analysis script
+structureAnalysis = f'python3 {cwd}/structureAnalysis/code/{structureAnalysisScript} -config {configFile} -outputDir {outputDir}/structureAnalysis -helperScript {helperScript}'
+os.system(f'tar -czvf {outputDir}/structureAnalysisCode.tar.gz {cwd}/structureAnalysis/code')
+os.system(structureAnalysis)
 
 # run the hbond analysis script
-hbondAnalysis = f'python3 {cwd}/hbondAnalysis/code/{hbondAnalysisScript} {configFile}'
-os.system(f'tar -czvf hbondAnalysisCode.tar.gz {cwd}/hbondAnalysis/code')
+hbondAnalysis = f'python3 {cwd}/hbondAnalysis/code/{hbondAnalysisScript} -config {configFile} -outputDir {outputDir}/hbondAnalysis -helperScript {helperScript}'
+os.system(f'tar -czvf {outputDir}/hbondAnalysisCode.tar.gz {cwd}/hbondAnalysis/code')
 os.system(hbondAnalysis)

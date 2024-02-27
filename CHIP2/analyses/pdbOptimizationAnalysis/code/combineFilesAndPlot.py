@@ -32,14 +32,18 @@ else:
     # get the columns that are present
     cols = [col for col in cols if col in sequence_df.columns]
     sequence_df = sequence_df[cols]
+print(sequence_df)
 sequence_df['Sequence'] = sequence_df['Sequence'].apply(lambda x: x[3:-3])
 energy_df['Sequence'] = energy_df['Directory'].apply(lambda x: x[3:-3])
+print(sequence_df)
 
 # keep only the sequences that are in the energy file
 sequence_df = sequence_df[sequence_df['Sequence'].isin(energy_df['Sequence'])]
+print(sequence_df)
 df = sequence_df.merge(energy_df, on='Sequence', how='left')
 #df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'}, inplace=True)
 df.to_csv(f'{outputDir}/mergedData.csv', index=False)
+print(df)
 
 execPlot = f'python3 {codeDir}/analyzeData.py  -inFile {outputDir}/mergedData.csv -outDir {outputDir} -percentCutoff {percentGpA_cutoff}'
 os.system(execPlot)
