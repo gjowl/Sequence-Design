@@ -1,0 +1,84 @@
+
+This contains outputs for the sequenceAnalysis code. It takes the data from the reconstructed fluorescence of trimmed datasets
+and analyzes the sequence composition against the fluorescence. Directories are named as follows:
+    - clash: trim by the clashing mutant data
+    - mutant_cutoff: fluorescence cutoff that the mutant must be less than to accept
+    - percent_cutoff: another cutoff for mutants where the mutant fluorescence must be at least this much less than the WT to be accepted
+    - number_of_mutants: the number of mutants necessary to be accepted for the WT design to be accepted
+
+
+runAllAnalysis
+outputdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/
+analysiscodedir = /mnt/d/github/Sequence-Design/CHIP2/analyses
+toxgreenconversion = toxgreenConversion.py
+pdboptimizationanalysis = pdbOptimizationAnalysis.py
+sequenceanalysis = sequenceAnalysis.py
+boxplotanalysis = boxplotAnalysis.py
+hbondanalysis = hbondAnalysis.py
+helperscript = /mnt/d/github/Sequence-Design/CHIP2/analyses/helperCode.py
+
+
+toxgreenConversion
+requirementsfile = requirements.txt
+inputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/toxgreenConversion/GASright_analysis/inputFiles
+reconstructionfile = /mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/reconstructionAllData.csv
+wtsequencecomputationfile = allGasRightDesignEnergyFile.csv
+mutantsequencecomputationfile = gasRightMutants.csv
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/toxgreenConversion/code
+adjustfluorscript = adjustFluorByControlFlow_percentGpA_stdFix_fluor.py
+controlflowfile = 2023-11-4_controlToxgreen.csv
+filteringscript = filterWithComputation_percentGpA_stdFix.py
+filteringdir = filtered
+graphingdir = graphed
+sequencevsmutantscript = sequenceVsMutant.py
+seqdir = sequenceVsMutant
+graphscript = graphComputationVsExperiment.py
+graphscript2 = graphDesignWts.py
+runadjustfluor = true
+runfilterwithcomputation = true
+runsequencevsmutant = true
+runfilterbeforegraphing = true
+rungraphing = true
+
+
+pdbOptimizationAnalysis
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
+rawdatadir = /mnt/d/senesDrive/General/data/data02/gloiseau/gjl_data/JC_design_data/leucine_ends/
+inputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/inputFiles
+toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/toxgreenConversion/filtered/all.csv
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+sequencefile = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/toxgreenConversion/filtered/sequence_fluor_energy_data.csv
+mutantfile = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/toxgreenConversion/filtered/mutant_fluor_energy_data.csv
+kdefile = 2020_09_23_kdeData.csv
+mutant_cutoff = 0, 0.25, 0.30, 0.35, 0.40
+percent_cutoff = 0, 0.25, 0.5, .75
+number_of_mutants_cutoff = 1, 2
+maltosefile = /mnt/d/github/Sequence-Design/ngsReconstruction/CHIP2_rerun_with_maltose/reconstructedData/maltoseTest/percentDifference.csv
+maltosecol = LB-0H_M9-30H
+
+
+sequenceAnalysis
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
+clashdir = /mnt/d/github/Sequence-Design/CHIP2/gjl_GAS/pdbOptimizationAnalysis/
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+sequencedir = wt
+mutantdir = mutant
+sequencecsv = plotData.csv
+mutantcsv = lowestEnergySequences.csv
+
+
+boxplotAnalysis
+scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/boxplotAnalysis/code
+inputdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/boxplotAnalysis/inputFiles
+requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
+rawdatadirala = /mnt/d/github/Sequence-Design/CHIP2/2023-3-13_ala/pdbs
+rawdatadirleu = /mnt/d/github/Sequence-Design/CHIP2/2023-3-7_leu/pdbs
+optimizedpdbdir = /mnt/d/2023-8-28_pdbBBRepack/all_leu_wts
+outputfile = wt_merge
+percentgpacutoff = 0.4
+sequencefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun_fluor_maltose/clash_35_50_1/wt.csv
+datafile = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/leu_clashAnalysis_rerun_fluor_maltose/leu_data_percentGpa_maltose.csv
+interfacefile = /mnt/d/github/Sequence-Design/CHIP2/analyses/figureMaking/inputFiles/interfaceDataFile.csv
+
+
+hbondAnalysis

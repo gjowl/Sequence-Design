@@ -38,8 +38,16 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degrees, output_tit
     plt.ylabel(yAxis)
     plt.title(f'{xAxis} vs {yAxis}')
     plt.tight_layout()
+
+    # check if the input_df[xAxis] is empty
+    if input_df[xAxis].empty:
+        plt.close()
+        plt.clf()
+        return
+
     plt.savefig(f'{png_dir}/scatter_{output_title}.png')
     plt.savefig(f'{svg_dir}/scatter_{output_title}.svg')
+    
     # check if regression_degrees is a list
     for regression_degree in regression_degrees:
         # add a line of best fit and an r^2 value
@@ -93,6 +101,11 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     plt.xlim(xlowLim, xhighLim)
     plt.title(f'{xAxis} vs {yAxis}')
     plt.tight_layout()
+    # check if the input_df[xAxis] is empty
+    if input_df[xAxis].empty:
+        plt.close()
+        plt.clf()
+        return
     plt.savefig(f'{png_dir}/scatter_{output_title}.png')
     plt.savefig(f'{svg_dir}/scatter_{output_title}.svg')
     for regression_degree in regression_degrees:

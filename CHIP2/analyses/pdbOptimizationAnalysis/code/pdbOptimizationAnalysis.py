@@ -1,4 +1,4 @@
-import os, sys, configparser
+import os, sys, configparser, argparse
 import pandas as pd
 
 description = '''
@@ -10,140 +10,166 @@ below given options, is found within this directory. Directories named as follow
     - percent_cutoff: another cutoff for mutants where the mutant fluorescence must be at least this much less than the WT to be accepted
     - number_of_mutants: the number of mutants necessary to be accepted for the WT design to be accepted
 '''
-# Helper file for reading the config file of interest for running the program
-def read_config(configFile):
-    config = configparser.ConfigParser()
-    config.read(configFile)
-    return config
 
-def writeReadMe(config, outputDir):
-    # loop through all of the config options
-    with open(f'{outputDir}/README.txt', 'w') as f:
-        f.write(description)
-        # write the config options to the README
-        for section in config.sections():
-            f.write(f'\n\n{section}\n')
-            for option in config[section]:
-                f.write(f'{option} = {config[section][option]}\n')
-        # close the file
-        f.close()
+'''
+    parse the command line arguments
+'''
+# initialize the parser
+parser = argparse.ArgumentParser(description='Adjust the reconstructed fluorescence by the flow fluorescence of the controls')
 
-# get filename separate from type and directory
-def getFilename(file):
-    programPath = os.path.realpath(file)
-    programDir, programFile = os.path.split(programPath)
-    filename, programExt = os.path.splitext(programFile)
-    return filename
+# add the necessary arguments
+parser.add_argument('-config','--config', type=str, help='the input configuration file')
+parser.add_argument('-outputDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-helperScript','--helperScript', type=str, help='the helper script file')
 
-# get the current directory
-cwd = os.getcwd()
+# extract the arguments into variables
+args = parser.parse_args()
+configFile = args.config
+helperScript = args.helperScript
+# import the functions from the helper code and get the program name
+exec(open(helperScript).read())
+programName = getFilename(__file__) # toxgreenConversion
 
-# gets the name of this file to access the config options
-programName = getFilename(__file__)
+# default value for the output directory (if not given, the current working directory is used + the program name)
+outputDir = f'{os.getcwd()}/{programName}'
+if args.outputDir is not None:
+    outputDir = args.outputDir
+    os.makedirs(outputDir, exist_ok=True)
 
+'''
+    read in the config file options and set up the directory to be able to rerun the program
+'''
 # get the config file options
-configFile = sys.argv[1]
 globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
-# read in the config arguments
-codeDir = config['codeDir']
+# Config file options
+inputDir   = config["inputDir"]
 rawDataDir = config['rawDataDir']
-outputDir = config['outputDir']
-kdeFile = config['kdeFile']
-dataFile = config['dataFile']
-requirementsFile = config['requirementsFile']
-toxgreenFile = config['toxgreenFile']
-strippedSequenceFile = config['strippedSequenceFile']
-clashScript = config['clashScript']
-maltoseFile = config['maltoseFile']
-maltoseCol = config['maltoseCol']
-# check if any of the clashing config options are found in the config file
-clashData = 'clashScript' in config
-if clashData:
-    clashInputDir = config['clashInputDir']
-    clashScript = config['clashScript']
-    # separate the cutoffs by commas
-    mutant_cutoffs = [float(x) for x in config['mutant_cutoff'].split(',')]
-    percent_cutoffs = [float(x) for x in config['percent_cutoff'].split(',')]
-    number_of_mutants_cutoffs = [int(x) for x in config['number_of_mutants_cutoff'].split(',')]
-    # below are hardcoded output names from the fluorescenceAnalysis code that as of 2023-9-11 gets used for clashing
-    sequenceFile = f'{clashInputDir}/sequence_fluor_energy_data.csv'
-    mutantFile = f'{clashInputDir}/mutant_fluor_energy_data.csv'
 
-# check if output directory exists
-#if os.path.exists(outputDir):
-#    print(f"Output directory already exists. Delete {outputDir} to rerun.")
-#    sys.exit()
-#else:
-os.makedirs(outputDir, exist_ok=True)
+'''
+    copy the input files into the output directory
+'''
+# copy the original config file to the output directory
+os.system(f'cp {configFile} {outputDir}/originalConfig.config')
+
+# copy the input files directory to the output directory
+inputDir, config = copyInputFiles(inputDir, outputDir, config) # inputDir is now the new input directory within the output directory, and config has been updated with the new file paths
+
+'''
+    reading the config file options
+'''
+# input files
+kdeFile              = f'{inputDir}/{config["kdeFile"]}'
+requirementsFile     = f'{inputDir}/{config["requirementsFile"]}'
+toxgreenFile         = f'{inputDir}/{config["toxgreenFile"]}'
+maltoseFile          = f'{inputDir}/{config["maltoseFile"]}'
+sequenceFile         = f'{inputDir}/{config["sequenceFile"]}'
+mutantFile           = f'{inputDir}/{config["mutantFile"]}'
+
+# get the script directory
+scriptDir = config['scriptDir']
+
+# other inputs
+maltoseCol           = config["maltoseCol"] # the column name for the maltose data to use
+
+# separate the cutoffs by commas
+mutant_cutoffs = [float(x) for x in config['mutant_cutoff'].split(',')]
+percent_cutoffs = [float(x) for x in config['percent_cutoff'].split(',')]
+number_of_mutants_cutoffs = [int(x) for x in config['number_of_mutants_cutoff'].split(',')]
+
+# copy the config file to the output directory (setting up the rerun.config file for the next run)
+# if this works well, you should just be able to run: python3 PATHTOCODE/PROGRAMNAME rerun.config
+config['inputDir'] = inputDir
+# write the config options to rerun configuration file
+with open(f'{outputDir}/rerun.config', 'w') as f:
+    # write the program name
+    f.write(f'[{programName}]\n')
+    for option in config:
+        f.write(f'{option} = {config[option]}\n')
+    # close the file
+    f.close()
 
 if __name__ == "__main__":
     # write README file 
     writeReadMe(globalConfig, outputDir)
+    print(f'Running {programName}...')
     # install the requirements
     #execInstallRequirements = "pip install -r " + requirementsFile + " | { grep -v 'already satisfied' || :; }" 
     #os.system(execInstallRequirements)
 
     # strip the sequence ends (the first and last 3 amino acids) from the sequence file since some of the sequences have alanine vs leucine ends (overwrites the strippedSequenceFile if it already exists)
-    execStripSequenceEnds = f'python3 {codeDir}/stripSequenceEnds.py -inFile {toxgreenFile} -outFile {strippedSequenceFile} -outDir {outputDir}'
+    strippedSequenceFile = f'strippedSequenceFile'
+    execStripSequenceEnds = f'python3 {scriptDir}/stripSequenceEnds.py -inFile {toxgreenFile} -outFile {strippedSequenceFile} -outDir {outputDir}'
+    print(f' - Running: {execStripSequenceEnds}')
     os.system(execStripSequenceEnds)
 
     # compile the energy files (overwrites the dataFile if it already exists)
-    execCompileEnergyFiles = f'python3 {codeDir}/compileFilesFromDirectories.py -inDir {rawDataDir} -outFile {dataFile} -outDir {outputDir}'
+    dataFile = f'energyData' # defined here so that it can be used in further programs
+    execCompileEnergyFiles = f'python3 {scriptDir}/compileFilesFromDirectories.py -inDir {rawDataDir} -outFile {dataFile} -outDir {outputDir}'
+    print(f' - Running: {execCompileEnergyFiles}')
     os.system(execCompileEnergyFiles) 
 
-    ## get the dataFile name without the extension
+    # get the dataFile name without the extension
     dataFilename = os.path.splitext(dataFile)[0]
     outputFile = f'{dataFilename}_percentGpa'
     # add the percent gpa to the dataframe
-    execAddPercentGpA = f'python3 {codeDir}/addPercentGpaToDf.py -inFile {outputDir}/{dataFile}.csv -toxgreenFile {outputDir}/{strippedSequenceFile}.csv -outFile {outputFile} -outDir {outputDir}' 
+    execAddPercentGpA = f'python3 {scriptDir}/addPercentGpaToDf.py -inFile {outputDir}/{dataFile}.csv -toxgreenFile {outputDir}/{strippedSequenceFile}.csv -outFile {outputFile} -outDir {outputDir}' 
+    print(f' - Running: {execAddPercentGpA}')
     os.system(execAddPercentGpA)
 
     ## keep only the data passing the maltose test for both the sequence and mutant files
     maltosePassingFile = f'{outputFile}_maltose'
-    execKeepMaltoseData = f'python3 {codeDir}/keepMaltoseData.py -inFile {outputDir}/{outputFile}.csv -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {maltosePassingFile} -outDir {outputDir}'
+    execKeepMaltoseData = f'python3 {scriptDir}/keepMaltoseData.py -inFile {outputDir}/{outputFile}.csv -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {maltosePassingFile} -outDir {outputDir}'
+    print(f' - Running: {execKeepMaltoseData}')
     os.system(execKeepMaltoseData)
     # keep the maltose data for the sequence and mutant files 
     sequence_maltosePassingFile = f'sequenceFile_maltosePassing'
     mutant_maltosePassingFile = f'mutantFile_maltosePassing'
-    execKeepMaltoseDataSeqFile = f'python3 {codeDir}/keepMaltoseData.py -inFile {sequenceFile} -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {sequence_maltosePassingFile} -outDir {outputDir}'
+    execKeepMaltoseDataSeqFile = f'python3 {scriptDir}/keepMaltoseData.py -inFile {sequenceFile} -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {sequence_maltosePassingFile} -outDir {outputDir}'
+    print(f' - Running: {execKeepMaltoseDataSeqFile}')
     os.system(execKeepMaltoseDataSeqFile)
-    execKeepMaltoseDataMutFile = f'python3 {codeDir}/keepMaltoseData.py -inFile {mutantFile} -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {mutant_maltosePassingFile} -outDir {outputDir} -sequenceColumn Mutant'
+    execKeepMaltoseDataMutFile = f'python3 {scriptDir}/keepMaltoseData.py -inFile {mutantFile} -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {mutant_maltosePassingFile} -outDir {outputDir} -sequenceColumn Mutant'
+    print(f' - Running: {execKeepMaltoseDataMutFile}')
     os.system(execKeepMaltoseDataMutFile)
     
     # check if you want to analyze clash data
-    if clashData:
-        for number_of_mutants_cutoff in number_of_mutants_cutoffs:
-            for mutant_cutoff in mutant_cutoffs:
-                for percent_cutoff in percent_cutoffs:
-                    # convert the cutoffs to integers
-                    mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
-                    clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
-                    execclashCheck = f'python3 {clashScript} -seqFile {outputDir}/{sequence_maltosePassingFile}.csv -mutFile {outputDir}/{mutant_maltosePassingFile}.csv -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
-                    os.system(execclashCheck)
-                    # loop through the files in the clashOutputDir
-                    for filename in os.listdir(clashOutputDir):
-                        # check if the file is a csv
-                        if not filename.endswith('.csv'):
-                            continue
-                        file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-                        #execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{outputFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
-                        execAnalyzeclash = f'python3 {codeDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{maltosePassingFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {codeDir}'
-                        os.system(execAnalyzeclash)
-                        file_to_analyze = 'lowestEnergySequences' # made in analyzeData.py
-                        # plot kde plots of geometries
-                        execPlotKde = f'python3 {codeDir}/makeKdePlots.py -kdeFile {kdeFile} -dataFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
-                        os.system(execPlotKde)
-                    # convert to delta G
-                    execConvertToDeltaG = f'python3 {codeDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
-                    os.system(execConvertToDeltaG)
+    for number_of_mutants_cutoff in number_of_mutants_cutoffs:
+        for mutant_cutoff in mutant_cutoffs:
+            for percent_cutoff in percent_cutoffs:
+                # convert the cutoffs to integers
+                mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
+                clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
+                execclashCheck = f'python3 {scriptDir}/keepBestClashing.py -seqFile {outputDir}/{sequence_maltosePassingFile}.csv -mutFile {outputDir}/{mutant_maltosePassingFile}.csv -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
+                print(f' - Running: {execclashCheck}')
+                os.system(execclashCheck)
+                # loop through the files in the clashOutputDir
+                for filename in os.listdir(clashOutputDir):
+                    # check if the file is a csv
+                    if not filename.endswith('.csv'):
+                        continue
+                    file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
+                    print(file_outputDir)
+                    execAnalyzeclash = f'python3 {scriptDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{maltosePassingFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {scriptDir}'
+                    print(f' - Running: {execAnalyzeclash}')
+                    os.system(execAnalyzeclash)
+                    file_to_analyze = 'lowestEnergySequences' # made in analyzeData.py
+                    # plot kde plots of geometries
+                    execPlotKde = f'python3 {scriptDir}/makeKdePlots.py -kdeFile {kdeFile} -dataFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
+                    print(f' - Running: {execPlotKde}')
+                    os.system(execPlotKde)
+                # convert to delta G
+                execConvertToDeltaG = f'python3 {scriptDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
+                print(f' - Running: {execConvertToDeltaG}')
+                os.system(execConvertToDeltaG)
 
-                    # graph the delta G
-                    execGraphDeltaG = f'python3 {codeDir}/graphDeltaG.py -inFile {file_outputDir}/{file_to_analyze}_deltaG.csv -outDir {file_outputDir}'
-                    os.system(execGraphDeltaG)
+                # graph the delta G
+                execGraphDeltaG = f'python3 {scriptDir}/graphDeltaG.py -inFile {file_outputDir}/{file_to_analyze}_deltaG.csv -outDir {file_outputDir}'
+                print(f' - Running: {execGraphDeltaG}')
+                os.system(execGraphDeltaG)
 
     # analyze the data
     #execAnalyzeData = f'python3 {codeDir}/analyzeData.py -inFile {outputDir}/{outputFile}.csv -outDir {outputDir}' 
-    execAnalyzeData = f'python3 {codeDir}/analyzeData.py -inFile {outputDir}/{maltosePassingFile}.csv -outDir {outputDir}' 
+    execAnalyzeData = f'python3 {scriptDir}/analyzeData.py -inFile {outputDir}/{maltosePassingFile}.csv -outDir {outputDir}' 
+    print(f' - Running: {execAnalyzeData}')
     os.system(execAnalyzeData)
