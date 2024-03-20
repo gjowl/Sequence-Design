@@ -1,15 +1,18 @@
-#"""
-#File: d:\github\Sequence-Design\ngsReconstruction\code\untarNGSFiles.py
-#Project: d:\github\Sequence-Design\ngsReconstruction\code
-#Created Date: Wednesday November 15th 2023
-#Author: gjowl
-#-----
-#Last Modified: Wednesday November 15th 2023 11:55:17 am
-#Modified By: gjowl
-#-----
-#Description:
-#This script untars the NGS files from the gz version to the fastq version for use in NGSreconstruction.
-#"""
+"""
+File: d:\github\Sequence-Design\ngsReconstruction\code\untarNGSFiles.py
+Project: d:\github\Sequence-Design\ngsReconstruction\code
+Created Date: Wednesday November 15th 2023
+Author: gjowl
+-----
+Last Modified: Wednesday November 15th 2023 11:55:17 am
+Modified By: gjowl
+-----
+Description:
+This script untars the NGS files from the gz version to the fastq version for use in NGSreconstruction.
+    Usage: python3 untarNGSFiles.py <ngsDir> <outputDir>
+    ngsDir: the directory containing the gzipped NGS files
+    outputDir: the directory to output the untarred files
+"""
 
 import os, sys
 
@@ -30,7 +33,8 @@ for f in files:
         # get the file name
         name = f[:-3]
         # untar the file
-        print(f)
-        os.system('gzip -dk '+ngsDir+f)
+        print(f'Untarring {f}...')
+        os.system(f'gzip -dk {ngsDir}/{f}')
         # move the file to the output directory
-        os.system('mv '+ngsDir+name+' '+outputDir+name)
+        cmd = f'mv {ngsDir}/{name} {outputDir}/{name}'
+        os.system(cmd)
