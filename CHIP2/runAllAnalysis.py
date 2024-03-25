@@ -48,13 +48,20 @@ globalConfig = read_config(configFile)
 config = globalConfig[programName]
 
 outputDir = config['outputDir']
-analysisCodeDir = config['analysisCodeDir'] # can input an entire directory or just the directory name from current working directory
+analysisCodeDir = config['analysisCodeDir']
 toxgreenConversionScript = config['toxgreenConversion'] 
 pdbOptimizationAnalysisScript = config['pdbOptimizationAnalysis']
 sequenceAnalysisScript = config['sequenceAnalysis']
 structureAnalysisScript = config['structureAnalysis']
 hbondAnalysisScript = config['hbondAnalysis']
 helperScript = config['helperScript'] # helper functions
+
+# get the boolean for whether or not to run the analysis
+runToxgreenConversion = config['runToxgreenConversion'].lower() == 'true'
+runPdbOptimizationAnalysis = config['runPdbOptimizationAnalysis'].lower() == 'true'
+runSequenceAnalysis = config['runSequenceAnalysis'].lower() == 'true'
+runStructureAnalysis = config['runStructureAnalysis'].lower() == 'true'
+runHbondAnalysis = config['runHbondAnalysis'].lower() == 'true'
 
 # check if the name of the analysis directory is a directory (if it is, use it as the current working directory for the analysis code)
 if os.path.isdir(analysisCodeDir):
@@ -73,30 +80,37 @@ else:
     pdbOptimizationAnalysis, which is needed to run sequenceAnalysis and structureAnalysis and hbondAnalysis)
 '''
 
+# make the output directory if it doesn't exist
+os.makedirs(outputDir, exist_ok=True)
 # copy the helper script to the output directory
 os.system(f'cp {helperScript} {outputDir}')
 
 # run the toxgreen conversion script
-toxgreenConversion = f'python3 {cwd}/toxgreenConversion/code/{toxgreenConversionScript} -config {configFile} -outputDir {outputDir}/toxgreenConversion -helperScript {helperScript}'
-os.system(f'tar -czvf {outputDir}/toxgreenConversionCode.tar.gz {cwd}/toxgreenConversion/code')
-#os.system(toxgreenConversion)
+if runToxgreenConversion:
+    toxgreenConversion = f'python3 {cwd}/toxgreenConversion/code/{toxgreenConversionScript} -config {configFile} -outputDir {outputDir}/toxgreenConversion -helperScript {helperScript}'
+    os.system(toxgreenConversion)
+    os.system(f'tar -czvf {outputDir}/toxgreenConversionCode.tar.gz {cwd}/toxgreenConversion/code')
 
 # run the pdb optimization analysis script
-pdbOptimizationAnalysis = f'python3 {cwd}/pdbOptimizationAnalysis/code/{pdbOptimizationAnalysisScript} -config {configFile} -outputDir {outputDir}/pdbOptimizationAnalysis -helperScript {helperScript}'
-os.system(f'tar -czvf {outputDir}/pdbOptimizationAnalysisCode.tar.gz {cwd}/pdbOptimizationAnalysis/code')
-#os.system(pdbOptimizationAnalysis)
+if runPdbOptimizationAnalysis:
+    pdbOptimizationAnalysis = f'python3 {cwd}/pdbOptimizationAnalysis/code/{pdbOptimizationAnalysisScript} -config {configFile} -outputDir {outputDir}/pdbOptimizationAnalysis -helperScript {helperScript}'
+    os.system(pdbOptimizationAnalysis)
+    os.system(f'tar -czvf {outputDir}/pdbOptimizationAnalysisCode.tar.gz {cwd}/pdbOptimizationAnalysis/code')
 
 # run the sequence analysis script
-sequenceAnalysis = f'python3 {cwd}/sequenceAnalysis/code/{sequenceAnalysisScript} -config {configFile} -outputDir {outputDir}/sequenceAnalysis -helperScript {helperScript}'
-os.system(f'tar -czvf {outputDir}/sequenceAnalysisCode.tar.gz {cwd}/sequenceAnalysis/code')
-#os.system(sequenceAnalysis)
+if runSequenceAnalysis:
+    sequenceAnalysis = f'python3 {cwd}/sequenceAnalysis/code/{sequenceAnalysisScript} -config {configFile} -outputDir {outputDir}/sequenceAnalysis -helperScript {helperScript}'
+    os.system(sequenceAnalysis)
+    os.system(f'tar -czvf {outputDir}/sequenceAnalysisCode.tar.gz {cwd}/sequenceAnalysis/code')
 
 # run the structure analysis script
-structureAnalysis = f'python3 {cwd}/structureAnalysis/code/{structureAnalysisScript} -config {configFile} -outputDir {outputDir}/structureAnalysis -helperScript {helperScript}'
-os.system(f'tar -czvf {outputDir}/structureAnalysisCode.tar.gz {cwd}/structureAnalysis/code')
-os.system(structureAnalysis)
+if runStructureAnalysis:
+    structureAnalysis = f'python3 {cwd}/structureAnalysis/code/{structureAnalysisScript} -config {configFile} -outputDir {outputDir}/structureAnalysis -helperScript {helperScript}'
+    os.system(structureAnalysis)
+    os.system(f'tar -czvf {outputDir}/structureAnalysisCode.tar.gz {cwd}/structureAnalysis/code')
 
 # run the hbond analysis script
-hbondAnalysis = f'python3 {cwd}/hbondAnalysis/code/{hbondAnalysisScript} -config {configFile} -outputDir {outputDir}/hbondAnalysis -helperScript {helperScript}'
-os.system(f'tar -czvf {outputDir}/hbondAnalysisCode.tar.gz {cwd}/hbondAnalysis/code')
-os.system(hbondAnalysis)
+if runHbondAnalysis:
+    hbondAnalysis = f'python3 {cwd}/hbondAnalysis/code/{hbondAnalysisScript} -config {configFile} -outputDir {outputDir}/hbondAnalysis -helperScript {helperScript}'
+    os.system(hbondAnalysis)
+    os.system(f'tar -czvf {outputDir}/hbondAnalysisCode.tar.gz {cwd}/hbondAnalysis/code')

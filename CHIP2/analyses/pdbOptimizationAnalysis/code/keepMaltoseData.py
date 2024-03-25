@@ -8,9 +8,11 @@ parser.add_argument('-inFile','--inputFile', type=str, help='the input csv file'
 parser.add_argument('-maltoseFile','--maltoseFile', type=str, help='the maltose csv file')
 parser.add_argument('-outFile','--outputFile', type=str, help='the output csv file')
 parser.add_argument('-maltoseCol','--maltoseCol', type=str, help='the column to use for maltose trimming')
+
 # add the optional arguments
 parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
 parser.add_argument('-sequenceColumn','--sequenceColumn', type=str, help='the column name for the sequence') # added because the mutant file has a different column name for the sequence of interest
+parser.add_argument('-maltoseSeq','--maltoseSeq', type=str, help='the sequence to use for maltose trimming')
 
 # extract the arguments into variables
 args = parser.parse_args()
@@ -21,12 +23,15 @@ outputFile = args.outputFile
 # default values for the optional arguments
 outputDir = os.getcwd()
 sequenceColumn = 'Sequence'
+maltoseSeq = None
 # if the optional arguments are not specified, use the default values
 if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
 if args.sequenceColumn is not None:
     sequenceColumn = args.sequenceColumn
+if args.maltoseSeq is not None:
+    maltoseSeq = args.maltoseSeq
 
 if __name__ == '__main__':
     # read in the data
@@ -34,8 +39,13 @@ if __name__ == '__main__':
     maltose = pd.read_csv(maltoseFile)
 
     # keep the maltose data for Segments N
-    neg_maltose = maltose[maltose['Segments'] == 'N']
-    highest_maltose = neg_maltose[maltoseCol].max()
+    # if the maltose sequence is specified, use that sequence to filter the data
+    if maltoseSeq is None:
+        neg_maltose = maltose[maltose['Segments'] == 'N']
+        highest_maltose = neg_maltose[maltoseCol].max()
+    else:
+        neg_maltose = maltose[maltose['Sequence'] == maltoseSeq]
+        highest_maltose = neg_maltose[maltoseCol].max()
 
     # only keep sequences that pass the maltose test
     maltose_passing_data = maltose[maltose[maltoseCol] >= highest_maltose]

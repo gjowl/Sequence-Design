@@ -78,6 +78,11 @@ mutant_cutoffs = [float(x) for x in config['mutant_cutoff'].split(',')]
 percent_cutoffs = [float(x) for x in config['percent_cutoff'].split(',')]
 number_of_mutants_cutoffs = [int(x) for x in config['number_of_mutants_cutoff'].split(',')]
 
+# check if there is a sequence for the maltose test
+maltoseSeq = None
+if 'maltoseSeq' in config:
+    maltoseSeq = f'{config["maltoseSeq"]}'
+
 # copy the config file to the output directory (setting up the rerun.config file for the next run)
 # if this works well, you should just be able to run: python3 PATHTOCODE/PROGRAMNAME rerun.config
 config['inputDir'] = inputDir
@@ -120,7 +125,7 @@ if __name__ == "__main__":
 
     ## keep only the data passing the maltose test for both the sequence and mutant files
     maltosePassingFile = f'{outputFile}_maltose'
-    execKeepMaltoseData = f'python3 {scriptDir}/keepMaltoseData.py -inFile {outputDir}/{outputFile}.csv -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -outFile {maltosePassingFile} -outDir {outputDir}'
+    execKeepMaltoseData = f'python3 {scriptDir}/keepMaltoseData.py -inFile {outputDir}/{outputFile}.csv -maltoseFile {maltoseFile} -maltoseCol {maltoseCol} -maltoseSeq {maltoseSeq} -outFile {maltosePassingFile} -outDir {outputDir}'
     print(f' - Running: {execKeepMaltoseData}')
     os.system(execKeepMaltoseData)
     # keep the maltose data for the sequence and mutant files 
