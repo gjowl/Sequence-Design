@@ -21,7 +21,7 @@ lowest = df['OD600'].min()
 df['Normalize'] = df['OD600'] / lowest
 
 # set the amount of uL to add to each well
-wellVolume = 500
+wellVolume = 1000
 
 # normalize the OD600 values to the lowest value by dividing well volume by the normalized value (maybe switch this so cell volume always rounds up)
 df['Cell Volume'] = wellVolume / df['Normalize'] 

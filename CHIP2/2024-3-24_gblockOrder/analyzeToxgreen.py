@@ -1,3 +1,16 @@
+'''
+This file runs analysis for TOXGREEN data. The analysis includes:
+    - merging the label file with the TOXGREEN data
+    - normalizing the data to the NoTM row
+    - calculating the percent Gpa
+    - plotting the data at 512 nm as a bar graph
+    - outputting the data to a csv file
+    - the output directory is optional, if not given, the current working directory is used
+    - the label file and TOXGREEN data are required
+
+Run as: python3 analyzeToxgreen.py -labelFile labelFile.csv -toxgreenFile toxgreenData.csv -outputDir outputDirectory
+'''
+
 import os, sys, argparse, pandas as pd, numpy as np, matplotlib.pyplot as plt
 
 # Parse command line arguments
@@ -72,6 +85,8 @@ if __name__ == '__main__':
 
     # make a bar plot of the data at 512 nm
     print(transformData)
+    # remove any data where percentStd < 0
+    transformData = transformData[transformData[percentStd] > 0]
     plt.bar(transformData['Sample Name'], transformData[percentGpa], yerr=transformData[percentStd])
     plt.xlabel(labelCol)
     # set the labels to a 45 degree angle
