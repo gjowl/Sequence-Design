@@ -33,8 +33,8 @@ os.makedirs(outputDir, exist_ok=True)
 # transform the data into a format that can be used for plotting
 def transform(stdDevData, averageData, noTMData, wavelength, percentGpaCol, percentStdCol):
     outputDf = pd.DataFrame()
-    for sample in stdData['Sample Name']:
-        sampleStd = stdData[stdData['Sample Name'] == sample][wavelength].values[0]
+    for sample in stdDevData['Sample Name']:
+        sampleStd = stdDevData[stdDevData['Sample Name'] == sample][wavelength].values[0]
         sampleVal = averageData[averageData['Sample Name'] == sample][wavelength].values[0]
         sampleGpa = noTMData[noTMData['Sample Name'] == sample][percentGpa].values[0]
         outputDf = outputDf.append({'Sample Name': sample, 'Standard Deviation': sampleStd, wavelength: sampleVal, percentGpaCol: sampleGpa, percentStdCol: (sampleStd / sampleVal) * sampleGpa}, ignore_index=True)
@@ -70,7 +70,6 @@ if __name__ == '__main__':
     # make the index a column
     averageData.reset_index(inplace=True)
     noTM_subtract.reset_index(inplace=True)
-    print(noTM_subtract)
 
     # Calculate the Percent GpA
     gpaVal = noTM_subtract[noTM_subtract['Sample Name'] == gpaCol][wavelength].values[0]
@@ -82,9 +81,13 @@ if __name__ == '__main__':
     
     # transform the data into a format that can be used for plotting
     transformData = transform(stdData, averageData, noTM_subtract, wavelength, percentGpa, percentStd)
+    # output the data to a csv file
+    print(transformData)
+    # add a NoTM subtracted column that subtracts the 512 nm value from the NoTM row
+    transformData['NoTM subtracted'] = transformData[wavelength] - transformData[transformData['Sample Name'] == 'NoTM'][wavelength].values[0]
+    transformData.to_csv(f'{outputDir}/transformData.csv', index=False)
 
     # make a bar plot of the data at 512 nm
-    print(transformData)
     # remove any data where percentStd < 0
     transformData = transformData[transformData[percentStd] > 0]
     plt.bar(transformData['Sample Name'], transformData[percentGpa], yerr=transformData[percentStd])
@@ -95,6 +98,3 @@ if __name__ == '__main__':
     plt.title('Toxgreen data')
     plt.savefig(f'{outputDir}/toxgreenData.png')
     plt.savefig(f'{outputDir}/toxgreenData.svg')
-
-    # output the data to a csv file
-    transformData.to_csv(f'{outputDir}/transformData.csv', index=False)
