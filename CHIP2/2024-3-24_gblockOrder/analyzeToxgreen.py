@@ -60,6 +60,10 @@ if __name__ == '__main__':
     mergedData['Sample Name'] = mergedData[labelCol].str.split('-').str[0]
     mergedData['Replicate'] = mergedData[labelCol].str.split('-').str[1]
 
+    # Combine the data by sample name with sample and wavelength as columns
+    wavelengthData = mergedData.melt(id_vars=['Sample Name', 'Replicate'], value_vars=['512'], var_name='Wavelength', value_name='Absorbance')
+    wavelengthData.to_csv(f'{outputDir}/wavelengthData.csv', index=False)
+    
     # average all the columns by sample name
     averageData = mergedData.groupby('Sample Name').mean()
 
@@ -82,7 +86,6 @@ if __name__ == '__main__':
     # transform the data into a format that can be used for plotting
     transformData = transform(stdData, averageData, noTM_subtract, wavelength, percentGpa, percentStd)
     # output the data to a csv file
-    print(transformData)
     # add a NoTM subtracted column that subtracts the 512 nm value from the NoTM row
     transformData['NoTM subtracted'] = transformData[wavelength] - transformData[transformData['Sample Name'] == 'NoTM'][wavelength].values[0]
     transformData.to_csv(f'{outputDir}/transformData.csv', index=False)
