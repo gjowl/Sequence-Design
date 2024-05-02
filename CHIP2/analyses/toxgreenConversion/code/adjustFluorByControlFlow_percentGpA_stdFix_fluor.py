@@ -43,8 +43,12 @@ def plot_and_transform(df_control_plot, input_df, xaxis, cols, sample, outputCol
     output_df = input_df.copy()
     df_control_plot[y_stdCol] = df_control_plot[cols].std(axis=1)
     for col in cols:
+        print(col)
         # get the standard deviation of the rep columns
         label = f'{sample}_{col}'
+        print(label)
+        print(xaxis)
+        print(col)
         slope, yint = plot_and_get_regression(df_control_plot, xaxis, col, x_stdCol, y_stdCol, label, outputDir)
         transform_col = f'{col}_{outputColName}' 
         tmp_col = ((df_sample[col] - yint) / slope)
@@ -137,6 +141,7 @@ if __name__ == '__main__':
         # get the matching sequences from the control flow dataframe (includes controls and can include any sequences you've run in TOXGREEN individually if it is also in your CHIP)
         df_sample_controls = df_sample[df_sample['Sequence'].isin(controlFlow_df['Sequence'])]
         df_control_plot = controlFlow_df.copy()
+        print(df_control_plot)
 
         # get the columns that contain Rep (the columns with the fluorescence data)
         df_control_plot = df_control_plot.merge(df_sample_controls[['Sequence', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor', 'Sample']], on='Sequence')
