@@ -50,11 +50,12 @@ if __name__ == '__main__':
                         sampleData['Absorbance'] = sampleData['Absorbance'] - noTMReplicate['Absorbance'].values[0]
                         wavelengthData = pd.concat([wavelengthData, sampleData], ignore_index=True)
                 gpaData = wavelengthData[wavelengthData['Sample Name'] == 'Gpa']
+                # get the average Absorbance for GpA
+                gpaVal = gpaData['Absorbance'].mean()
                 allWvlData = pd.concat([allWvlData, wavelengthData], ignore_index=True)
                 for replicate in gpaData['Replicate'].unique():
                     # calculate the percent GpA for each sample
                     replicateData = wavelengthData[wavelengthData['Replicate'] == replicate]
-                    gpaVal = gpaData[gpaData['Replicate'] == replicate]['Absorbance'].values[0]
                     replicateData['Percent GpA'] = replicateData['Absorbance'] / gpaVal * 100
                     outputData = pd.concat([outputData, replicateData], ignore_index=True)       
                 # append the data to the wavelengthData dataframe

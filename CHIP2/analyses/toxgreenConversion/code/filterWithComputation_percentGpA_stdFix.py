@@ -106,9 +106,9 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
     df_no_fluor = pd.concat([df_sequence_no_fluor, df_mutant_no_fluor])
     df_no_fluor['Sample'] = 'none'
     # if Region is GAS, then Sample = G
-    df_no_fluor.loc[df_no_fluor['Region'] == 'GAS', 'Sample'] = 'G'
-    df_no_fluor.loc[df_no_fluor['Region'] == 'Left', 'Sample'] = 'L'
-    df_no_fluor.loc[df_no_fluor['Region'] == 'Right', 'Sample'] = 'R'
+    #df_no_fluor.loc[df_no_fluor['Region'] == 'GAS', 'Sample'] = 'G'
+    #df_no_fluor.loc[df_no_fluor['Region'] == 'Left', 'Sample'] = 'L'
+    #df_no_fluor.loc[df_no_fluor['Region'] == 'Right', 'Sample'] = 'R'
     df_no_fluor = df_no_fluor[~df_no_fluor['Sequence'].isin(df_fluor_labeled['Sequence'])]
     df_no_fluor = df_no_fluor.drop_duplicates(subset='Sequence', keep='first')
     df_no_fluor['mean_transformed'] = 0
