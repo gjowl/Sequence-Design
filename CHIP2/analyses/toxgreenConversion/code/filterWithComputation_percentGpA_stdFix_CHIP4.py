@@ -70,13 +70,17 @@ def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
     #df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x + 'ILI')
     # add ILI to the end of the mutant sequences
-    #df_mutant['Mutant'] = df_mutant['Mutant'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
-    #df_mutant['Sequence'] = df_mutant['Sequence'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
-    #print(df_mutant)
+    df_mutant['Mutant'] = df_mutant['Mutant'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
+    df_mutant['Sequence'] = df_mutant['Sequence'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
+    df_sequence['Sequence'] = df_sequence['Sequence'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
+    print(df_fluor)
+    print(df_sequence)
+    print(df_mutant)
     # get the data for sequences that successfully fluoresce
     df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])].copy()
-    df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])].copy()
-    df_fluor_mutant = df_fluor_mutant[~df_fluor_mutant['Sequence'].isin(df_fluor_seqs['Sequence'])]
+    print(df_fluor_seqs)
+    df_fluor_mutant = df_fluor.copy()
+    #df_fluor_mutant = df_fluor_mutant[~df_fluor_mutant['Sequence'].isin(df_fluor_seqs['Sequence'])]
     df_fluor_seqs['Type'] = 'WT'
     df_fluor_mutant['Type'] = 'Mutant'
     df_mut = df_mutant.copy()
@@ -84,12 +88,13 @@ def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     df_mut.rename(columns={'Mutant': 'Sequence'}, inplace=True)
     df_fluor_mutant = df_fluor_mutant.merge(df_mut[['Sequence', 'Mutant Type']], on='Sequence', how='left')
     df_fluor_mutant = df_fluor_mutant.drop_duplicates(subset='Sequence', keep='first')
+    print(df_fluor_mutant)
     # merge the dataframes
     df_fluor_labeled = pd.concat([df_fluor_seqs, df_fluor_mutant])
     # keep the data for sequences that fluoresce
     df_sequence = df_sequence[df_sequence['Sequence'].isin(df_fluor_seqs['Sequence'])]
     df_mutant = df_mutant[df_mutant['Mutant'].isin(df_fluor_mutant['Sequence'])]
-    df_mutant = df_mutant[~df_mutant['Mutant'].isin(df_sequence['Sequence'])]
+    #df_mutant = df_mutant[~df_mutant['Mutant'].isin(df_sequence['Sequence'])]
     # remove duplicate sequences
     df_sequence_no_duplicates = df_sequence.drop_duplicates(subset='Sequence', keep='first')
     df_mutant_no_duplicates = df_mutant.drop_duplicates(subset='Mutant', keep='first')
@@ -139,8 +144,10 @@ if __name__ == '__main__':
         cols_to_add = [col for col in cols_to_add if col in df_fluor.columns]
     
     # filtering variables
-    percent_error_cutoff = 0.30
-    fluor_cutoff = 120 # percent GpA
+    #percent_error_cutoff = 0.30
+    percent_error_cutoff = 0
+    #fluor_cutoff = 120 # percent GpA
+    fluor_cutoff = 100000 # percent GpA
     filter_percent_error = False
     filter_fluor = False 
     transform_col = [col for col in df_fluor.columns if 'transformed' in col][0]

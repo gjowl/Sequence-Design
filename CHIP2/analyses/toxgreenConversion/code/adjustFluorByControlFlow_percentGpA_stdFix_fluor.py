@@ -141,7 +141,7 @@ if __name__ == '__main__':
         # get the matching sequences from the control flow dataframe (includes controls and can include any sequences you've run in TOXGREEN individually if it is also in your CHIP)
         df_sample_controls = df_sample[df_sample['Sequence'].isin(controlFlow_df['Sequence'])]
         df_control_plot = controlFlow_df.copy()
-        print(df_control_plot)
+        #print(df_control_plot)
 
         # get the columns that contain Rep (the columns with the fluorescence data)
         df_control_plot = df_control_plot.merge(df_sample_controls[['Sequence', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor', 'Sample']], on='Sequence')
@@ -180,7 +180,7 @@ if __name__ == '__main__':
 
         # save the transformed data to a csv
         df_sample.to_csv(f'{dataDir}/{sample}_transformed.csv', index=False)
-        df_sample = df_sample[df_sample[final_transform_col] > 0]
+        #df_sample = df_sample[df_sample[final_transform_col] > 0]
 
         # keep sequences with a higher fluorescence than G83I and save to a csv
         df_sample_g83i = df_sample[df_sample[final_transform_col] > g83iFluor]
