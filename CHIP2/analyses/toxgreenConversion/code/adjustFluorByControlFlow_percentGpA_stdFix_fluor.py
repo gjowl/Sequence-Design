@@ -43,12 +43,8 @@ def plot_and_transform(df_control_plot, input_df, xaxis, cols, sample, outputCol
     output_df = input_df.copy()
     df_control_plot[y_stdCol] = df_control_plot[cols].std(axis=1)
     for col in cols:
-        print(col)
         # get the standard deviation of the rep columns
         label = f'{sample}_{col}'
-        print(label)
-        print(xaxis)
-        print(col)
         slope, yint = plot_and_get_regression(df_control_plot, xaxis, col, x_stdCol, y_stdCol, label, outputDir)
         transform_col = f'{col}_{outputColName}' 
         tmp_col = ((df_sample[col] - yint) / slope)
@@ -159,6 +155,7 @@ if __name__ == '__main__':
         df_sample = calculate_mean_and_std(df_sample, percentGpa_cols, initial_transform_col, 'std_adjusted')
 
         # check if toxgreenCol is in the columns 
+        print(df_control_plot)
         if toxgreenCol in df_control_plot.columns:
             # transform the data to toxgreen fluorescence (to also do the same thing but with raw fluorescence values rather than percent GpA values)
             df_sample = plot_and_transform(df_control_plot, df_sample, toxgreenCol, cols, sample, 'toxgreen', toxgreenStd_col, 'std', correlationDir)
@@ -168,6 +165,7 @@ if __name__ == '__main__':
         # get the index of GpA and G83I from the sequence column and get the fluorescence from the index
         gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
         gpaFluor, g83iFluor = gpaIndex[initial_transform_col].values[0], g83iIndex[initial_transform_col].values[0]
+        print(gpaFluor, g83iFluor)
 
         # define the adjusted fluorescence
         df_sample[final_transform_col] = df_sample[initial_transform_col]/gpaFluor
