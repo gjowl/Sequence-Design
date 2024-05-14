@@ -65,7 +65,9 @@ if __name__ == '__main__':
 
     # define the output directory
     outputDir = currDir + '/nonRedundantPdbs'
-    os.mkdir(outputDir, exist_ok=True)
+    # make directory if it doesn't exist
+    os.makedirs(outputDir, exist_ok=True)
+    # 
     nonredundantPdbs = []
     # get the filename from the path
     for i in range(len(allPdbFiles)):
