@@ -137,6 +137,7 @@ if __name__ == '__main__':
         # get the matching sequences from the control flow dataframe (includes controls and can include any sequences you've run in TOXGREEN individually if it is also in your CHIP)
         df_sample_controls = df_sample[df_sample['Sequence'].isin(controlFlow_df['Sequence'])]
         df_control_plot = controlFlow_df.copy()
+        #print(df_control_plot)
 
         # get the columns that contain Rep (the columns with the fluorescence data)
         df_control_plot = df_control_plot.merge(df_sample_controls[['Sequence', 'Rep1-Fluor', 'Rep2-Fluor', 'Rep3-Fluor', 'Sample']], on='Sequence')
@@ -154,6 +155,7 @@ if __name__ == '__main__':
         df_sample = calculate_mean_and_std(df_sample, percentGpa_cols, initial_transform_col, 'std_adjusted')
 
         # check if toxgreenCol is in the columns 
+        print(df_control_plot)
         if toxgreenCol in df_control_plot.columns:
             # transform the data to toxgreen fluorescence (to also do the same thing but with raw fluorescence values rather than percent GpA values)
             df_sample = plot_and_transform(df_control_plot, df_sample, toxgreenCol, cols, sample, 'toxgreen', toxgreenStd_col, 'std', correlationDir)
@@ -163,6 +165,7 @@ if __name__ == '__main__':
         # get the index of GpA and G83I from the sequence column and get the fluorescence from the index
         gpaIndex, g83iIndex = df_sample[df_sample['Sequence'] == gpa], df_sample[df_sample['Sequence'] == g83i]
         gpaFluor, g83iFluor = gpaIndex[initial_transform_col].values[0], g83iIndex[initial_transform_col].values[0]
+        print(gpaFluor, g83iFluor)
 
         # define the adjusted fluorescence
         df_sample[final_transform_col] = df_sample[initial_transform_col]/gpaFluor
@@ -175,7 +178,7 @@ if __name__ == '__main__':
 
         # save the transformed data to a csv
         df_sample.to_csv(f'{dataDir}/{sample}_transformed.csv', index=False)
-        df_sample = df_sample[df_sample[final_transform_col] > 0]
+        #df_sample = df_sample[df_sample[final_transform_col] > 0]
 
         # keep sequences with a higher fluorescence than G83I and save to a csv
         df_sample_g83i = df_sample[df_sample[final_transform_col] > g83iFluor]

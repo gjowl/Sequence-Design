@@ -68,7 +68,7 @@ def filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add):
     df_fluor = df_fluor[pd.to_numeric(df_fluor['Segments'], errors='coerce').notnull()].copy()
     # check if ILI is at the end of the sequence; if not, add it
     df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x if x[-3:] == 'ILI' else x + 'ILI')
-    #df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x + 'ILI')
+    df_fluor['Sequence'] = df_fluor['Sequence'].apply(lambda x: x + 'ILI')
     # get the data for sequences that successfully fluoresce
     df_fluor_seqs = df_fluor[df_fluor['Sequence'].isin(df_sequence['Sequence'])].copy()
     df_fluor_mutant = df_fluor[df_fluor['Sequence'].isin(df_mutant['Mutant'])].copy()
@@ -106,9 +106,9 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
     df_no_fluor = pd.concat([df_sequence_no_fluor, df_mutant_no_fluor])
     df_no_fluor['Sample'] = 'none'
     # if Region is GAS, then Sample = G
-    df_no_fluor.loc[df_no_fluor['Region'] == 'GAS', 'Sample'] = 'G'
-    df_no_fluor.loc[df_no_fluor['Region'] == 'Left', 'Sample'] = 'L'
-    df_no_fluor.loc[df_no_fluor['Region'] == 'Right', 'Sample'] = 'R'
+    #df_no_fluor.loc[df_no_fluor['Region'] == 'GAS', 'Sample'] = 'G'
+    #df_no_fluor.loc[df_no_fluor['Region'] == 'Left', 'Sample'] = 'L'
+    #df_no_fluor.loc[df_no_fluor['Region'] == 'Right', 'Sample'] = 'R'
     df_no_fluor = df_no_fluor[~df_no_fluor['Sequence'].isin(df_fluor_labeled['Sequence'])]
     df_no_fluor = df_no_fluor.drop_duplicates(subset='Sequence', keep='first')
     df_no_fluor['mean_transformed'] = 0

@@ -80,7 +80,8 @@ if __name__ == '__main__':
     # convert Kd to deltaG
     R = 0.0019872 # kcal/mol/K
     #T = 298.15 # K
-    T = 310 # K
+    #T = 310 # K
+    T = 277 # K (maybe from her paper?)
     df['deltaG'] = np.log(df['Kd']) * R * T
     
     # get the standard deviation of the deltaG
