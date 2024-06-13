@@ -30,7 +30,8 @@ if args.outputDir is not None:
     os.makedirs(outputDir, exist_ok=True)
 if args.sequenceColumn is not None:
     sequenceColumn = args.sequenceColumn
-if args.maltoseSeq is not None:
+# check if maltoseSeq is longer than 4 characters
+if len(args.maltoseSeq) > 4: # I think even when None gets passed as an option, it's a string. Sequences are longer than 4 characters, so this should work
     maltoseSeq = args.maltoseSeq
 
 if __name__ == '__main__':
@@ -41,6 +42,7 @@ if __name__ == '__main__':
     # keep the maltose data for Segments N
     # if the maltose sequence is specified, use that sequence to filter the data
     if maltoseSeq is None:
+        print('No maltose sequence specified, using the highest known maltose value (N in Segments) to filter the data')
         neg_maltose = maltose[maltose['Segments'] == 'N']
         highest_maltose = neg_maltose[maltoseCol].max()
     else:
