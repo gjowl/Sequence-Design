@@ -37,7 +37,7 @@ if __name__ == '__main__':
     toxgreenDf = pd.read_csv(toxgreenFile)
 
     # get the columns of interest
-    cols = ['Sequence','PercentGpA','PercentStd','Sample','LB-12H_M9-36H','toxgreen_fluor','toxgreen_std']
+    cols = ['Sequence','PercentGpA','PercentStd','Sample','toxgreen_fluor','toxgreen_std']
     # check if all the columns are present, otherwise only keep the ones that are present
     if all(col in toxgreenDf.columns for col in cols):
         toxgreenDf = toxgreenDf[cols]

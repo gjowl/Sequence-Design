@@ -24,7 +24,7 @@ sequence_df = pd.read_csv(sequenceFile)
 energy_df = pd.read_csv(energyFile)
 
 # merge the dataframes by sequence
-cols = ['Sequence', 'PercentGpA', 'PercentStd', 'Type', 'Clash Mutant', 'Mutant Type', 'Position', 'Disruptive Mutant', 'PercentGpA_mutant', 'WT Sequence', 'Fluor Difference'] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?
+cols = ['Sequence', 'Design', 'PercentGpA', 'PercentStd', 'Type', 'Clash Mutant', 'Mutant Type', 'Position', 'Disruptive Mutant', 'PercentGpA_mutant', 'WT Sequence', 'Fluor Difference'] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?
 # check if all the columns are present, otherwise only keep the ones that are present
 if all(col in sequence_df.columns for col in cols):
     sequence_df = sequence_df[cols]
@@ -32,18 +32,18 @@ else:
     # get the columns that are present
     cols = [col for col in cols if col in sequence_df.columns]
     sequence_df = sequence_df[cols]
-print(sequence_df)
 sequence_df['Sequence'] = sequence_df['Sequence'].apply(lambda x: x[3:-3])
-energy_df['Sequence'] = energy_df['Directory'].apply(lambda x: x[3:-3])
-print(sequence_df)
+#energy_df['Sequence'] = energy_df['Directory'].apply(lambda x: x[3:-3])
 
 # keep only the sequences that are in the energy file
-sequence_df = sequence_df[sequence_df['Sequence'].isin(energy_df['Sequence'])]
-print(sequence_df)
-df = sequence_df.merge(energy_df, on='Sequence', how='left')
-#df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'}, inplace=True)
+merged_df = sequence_df[sequence_df['Sequence'].isin(energy_df['Sequence'])]
+df = merged_df.merge(energy_df, on='Sequence', how='left')
 df.to_csv(f'{outputDir}/mergedData.csv', index=False)
-print(df)
+
+# keep sequences not in the energy file
+missing = sequence_df[~sequence_df['Sequence'].isin(energy_df['Sequence'])]
+missing.to_csv(f'{outputDir}/missingSeqs.csv', index=False)
+#df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'}, inplace=True)
 
 execPlot = f'python3 {codeDir}/analyzeData.py  -inFile {outputDir}/mergedData.csv -outDir {outputDir} -percentCutoff {percentGpA_cutoff}'
 os.system(execPlot)

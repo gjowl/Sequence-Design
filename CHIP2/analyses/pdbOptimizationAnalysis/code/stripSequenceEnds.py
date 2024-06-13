@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # remove the first and last 6 residues
     df['Sequence'] = df['Sequence'].apply(lambda x: x[3:-3])
     #cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Total','VDWDiff','HBONDDiff','IMM1Diff','Sample','LB-12H_M9-36H']
-    cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Sample','LB-12H_M9-36H','toxgreen_fluor','toxgreen_std']
+    cols = ['Sequence', 'PercentGpA_transformed', 'std_adjusted','Sample','toxgreen_fluor','toxgreen_std']
     # check if all of the columns are in the dataframe
     if not all([col in df.columns for col in cols]):
         print(f'Not all of the columns {cols} are in the dataframe, only using the ones that are present.')

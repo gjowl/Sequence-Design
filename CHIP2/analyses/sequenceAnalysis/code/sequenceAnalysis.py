@@ -59,11 +59,9 @@ os.system(f'cp {configFile} {outputDir}/originalConfig.config')
     reading the config file options
 '''
 # read in the config arguments
-scriptDir = config['scriptDir']
+codeDir = config['codeDir']
 clashDir = config['clashDir']
 requirementsFile = config['requirementsFile']
-sequenceDir = config['sequenceDir']
-mutantDir = config['mutantDir']
 sequenceCsv = config['sequenceCsv']
 mutantCsv = config['mutantCsv']
 
@@ -86,20 +84,20 @@ if __name__ == "__main__":
         # get the input directory name
         outDir = outputDir + '/' + input_dir
 
-        # run the script to add the necessary columns to the dataframes
-        sequenceFile = f'{clashDir}/{input_dir}/{sequenceDir}/{sequenceCsv}'
-        mutantFile = f'{clashDir}/{input_dir}/{mutantDir}/{mutantCsv}'
+        # run the code to add the necessary columns to the dataframes
+        sequenceFile = f'{clashDir}/{input_dir}/{sequenceCsv}'
+        mutantFile = f'{clashDir}/{input_dir}/{mutantCsv}'
         print(sequenceFile, mutantFile, outDir)
-        execAddColumns = f'python3 {scriptDir}/addNecessaryColumns.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outDir}'
+        execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outDir}'
         os.system(execAddColumns)
 
-        # run the voiding script if the voiding data is found in the config file
-        execplotBoxplot = f'python3 {scriptDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
+        # run the voiding code if the voiding data is found in the config file
+        execplotBoxplot = f'python3 {codeDir}/plotBoxplotsPerAAPosition.py {outDir}/wt.csv {outDir}/mutant.csv {outDir}'
         os.system(execplotBoxplot)
 
-        # run boxplot script for all of the data
-        execplotBoxplotCombined = f'python3 {scriptDir}/plotBoxplotsCombined.py -inFile {outDir}/all.csv -outDir {outDir}'
+        # run boxplot code for all of the data
+        execplotBoxplotCombined = f'python3 {codeDir}/plotBoxplotsCombined.py -inFile {outDir}/all.csv -outDir {outDir}'
         os.system(execplotBoxplotCombined)
 
-        execGraphDeltaFluorescence = f'python3 {scriptDir}/graphDeltaFluorescence.py -inFile {outDir}/deltaFluorescence.csv -outDir {outDir}/deltaFluorescence'
+        execGraphDeltaFluorescence = f'python3 {codeDir}/graphDeltaFluorescence.py -inFile {outDir}/deltaFluorescence.csv -outDir {outDir}/deltaFluorescence'
         os.system(execGraphDeltaFluorescence)
