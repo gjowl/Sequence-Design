@@ -22,7 +22,7 @@ if args.percentCutoff is not None:
 # make the output directory if it doesn't exist and the png and svg subdirectories
 os.makedirs(outputDir, exist_ok=True)
 
-colors = ['dimgrey', 'darkorange', 'mediumorchid', 'brown', 'pink', 'gray', 'olive', 'cyan']
+colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
 # plot scatterplot function
 #TODO: could get a standard deviation for the x axis energies now that I have multiple repack energies
 def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degree, output_title, png_dir, svg_dir, sampleType=0, color=0):

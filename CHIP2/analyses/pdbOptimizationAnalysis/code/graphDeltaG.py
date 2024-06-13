@@ -14,7 +14,7 @@ inputFile = args.inputFile
 outputDir = args.outputDir
 os.makedirs(name=outputDir, exist_ok=True)
 
-colors = ['dimgrey', 'darkorange', 'mediumpurple', 'brown', 'pink', 'gray', 'olive', 'cyan']
+colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
 def graphXVsY(input_df, output_file, x_col, y_col, error_col, png_dir, svg_dir):
     # plot the WT sequence fluorescence vs the energy
     plt.scatter(input_df[x_col], input_df[y_col])
