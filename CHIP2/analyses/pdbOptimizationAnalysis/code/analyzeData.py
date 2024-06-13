@@ -109,7 +109,7 @@ def addEnergyDifferencesToDataframe(input_df, cols):
     for col in cols:
         #df[f'{col}Diff'] = df[f'{col}DimerPreOptimize'] - df[f'{col}Monomer']
         #input_df[f'{col}Diff'] = input_df[f'{col}DimerOptimize'] - df[f'{col}Monomer']
-        input_df[f'{col}Diff'] = input_df[f'{col}_Optimize'] - df[f'{col}_Monomer']
+        input_df[f'{col}Diff'] = input_df[f'{col}Optimize'] - df[f'{col}Monomer']
     return input_df
 
 if __name__ == '__main__':
@@ -157,7 +157,9 @@ if __name__ == '__main__':
     lowHbond_df = lowHbond_df[lowHbond_df[xAxis] < 0]
     # save the lowHbond_df to a csv file
     lowHbond_df.to_csv(f'{outputDir}/lowHbond_df.csv', index=False)
-    #df = df[df[xAxis] < 0]
+    # if df[xAxis] > 0, set the x-axis to be 0
+    df.loc[df[xAxis] > 0, xAxis] = 0
+
 
     # save the df to a csv file
     df.to_csv(f'{outputDir}/plotData.csv', index=False)

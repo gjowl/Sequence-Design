@@ -59,6 +59,17 @@ if __name__ == '__main__':
                     df.columns = header.iloc[0]
                     # add the directory name to the dataframe
                     df['Directory'] = dir
+                    # remove NA columns
+                    df = df.dropna(axis=1, how='all')
+                    # replace any of the column names containing _ with basename (fixes the issue with the column names between different versions of the energyFile.csv)
+                    # find _ in the column names and store them in a list
+                    colsWithUnderscore = df.columns[df.columns.str.contains('_')].tolist()
+                    # loop through the columns with _
+                    for col in colsWithUnderscore:
+                        # make sure the first letter after the _ is capitalized
+                        newName = col.split('_')[0] + col.split('_')[1].capitalize()
+                        # rename the column
+                        df.rename(columns={col:newName},inplace=True)
                     # combine the dataframes
                     outputDf = pd.concat([outputDf,df],axis=0)
     # sort the dataframe by the Total

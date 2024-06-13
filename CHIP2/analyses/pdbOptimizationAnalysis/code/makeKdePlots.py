@@ -110,8 +110,8 @@ if __name__ == '__main__':
     df = df.drop_duplicates(subset=['Sequence'], keep='first')
     df = df[df['Total'] < 0]
     #df = df[df['PercentStd'] < 15]
-    xAxis = 'end_xShift'
-    yAxis = 'end_crossingAngle'
+    xAxis = 'endXShift'
+    yAxis = 'endCrossingAngle'
 
     # plot the kde data
     plotGeomKde(kdeDf, df, 'Total', outputDir, xAxis, yAxis, reverseColormap=True)
