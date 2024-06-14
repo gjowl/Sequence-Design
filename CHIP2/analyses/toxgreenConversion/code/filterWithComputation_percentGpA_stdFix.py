@@ -143,6 +143,9 @@ if __name__ == '__main__':
     
     # Filtering
     df_fluor = filterExperimentDataframes(df_fluor, percent_error_cutoff, fluor_cutoff, filter_percent_error, filter_fluor)
+    # gets rid of anything below 0 or with a std above .4
+    df_fluor = df_fluor[df_fluor['PercentGpA_transformed'] - df_fluor['std_adjusted'] > 0]
+    df_fluor = df_fluor[df_fluor['std_adjusted'] < .4]
     
     # filter the dataframes for duplicates
     df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)

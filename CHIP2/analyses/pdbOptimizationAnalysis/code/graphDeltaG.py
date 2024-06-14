@@ -72,7 +72,10 @@ if __name__ == '__main__':
             svg_dir = f'{sample_dir}/svg'
             os.makedirs(name=png_dir, exist_ok=True)
             os.makedirs(name=svg_dir, exist_ok=True)
-            plotScatterplotSingle(df_sample, sample, xaxis, yaxis, error_col, regression_degree, outputFile, png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-60, xhighLim=0, ylowLim=-6.5, yhighLim=0)
+            if xaxis == 'IMM1Diff':
+                plotScatterplotSingle(df_sample, sample, xaxis, yaxis, error_col, regression_degree, outputFile, png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=0, xhighLim=60, ylowLim=-6.5, yhighLim=0)
+            else:
+                plotScatterplotSingle(df_sample, sample, xaxis, yaxis, error_col, regression_degree, outputFile, png_dir, svg_dir, sampleType=sample, color=colors[i], xlowLim=-60, xhighLim=0, ylowLim=-6.5, yhighLim=0)
         # plot a histogram of the deltaG values with edges black
         plt.hist(df_sample['deltaG'], bins=bins, color=colors[i], edgecolor='black', label=f'{sample} ({len(df_sample)})')
         # set the limits of the x-axis

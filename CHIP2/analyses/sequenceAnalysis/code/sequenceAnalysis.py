@@ -64,6 +64,12 @@ clashDir = config['clashDir']
 requirementsFile = config['requirementsFile']
 sequenceCsv = config['sequenceCsv']
 mutantCsv = config['mutantCsv']
+# optional config arguments below
+try:
+    toxgreenFile = config['toxgreenFile']
+except:
+    toxgreenFile = None
+
 
 if __name__ == "__main__":
     # write README file 
@@ -88,7 +94,10 @@ if __name__ == "__main__":
         sequenceFile = f'{clashDir}/{input_dir}/{sequenceCsv}'
         mutantFile = f'{clashDir}/{input_dir}/{mutantCsv}'
         print(sequenceFile, mutantFile, outDir)
-        execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outDir}'
+        if toxgreenFile is None:
+            execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outDir}'
+        else:
+            execAddColumns = f'python3 {codeDir}/addNecessaryColumns.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {outDir} -toxgreenFile {toxgreenFile}'
         os.system(execAddColumns)
 
         # run the voiding code if the voiding data is found in the config file

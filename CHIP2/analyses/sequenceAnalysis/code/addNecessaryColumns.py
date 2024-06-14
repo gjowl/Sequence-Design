@@ -8,6 +8,7 @@ parser.add_argument('-seqFile','--sequenceFile', type=str, help='the input WT de
 parser.add_argument('-mutFile','--mutantFile', type=str, help='the input mutant csv file')
 # add the optional arguments
 parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-toxgreenFile', type=str, help='the toxgreen converted reconstruction data')
 
 # extract the arguments into variables
 args = parser.parse_args()
@@ -15,10 +16,13 @@ sequenceFile = args.sequenceFile
 mutantFile = args.mutantFile
 # default values for the optional arguments
 outputDir = os.getcwd()
+toxgreenFile = None
 # if the optional arguments are not specified, use the default values
 if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
+if args.toxgreenFile is not None:
+    toxgreenFile = args.toxgreenFile
 
 if __name__ == '__main__':
     # read in the input files
@@ -32,9 +36,23 @@ if __name__ == '__main__':
         df_wt['Sequence'] = df_wt.apply(lambda row: 'LLL' + row['Sequence'] + 'ILI', axis=1)
         df_mut['Sequence'] = df_mut.apply(lambda row: 'LLL' + row['Sequence'] + 'ILI', axis=1)
     
+    # add the toxgreen/reconstructed data if not present
+    if toxgreenFile is not None:
+        # read in the reconstructed data
+        df_toxgreen = pd.read_csv(toxgreenFile)
+        # merge the reconstructed data with the wt data
+        df_wt = df_wt.merge(df_toxgreen[['Sequence', 'Sample', 'PercentGpA_transformed', 'std_adjusted', 'toxgreen_fluor', 'toxgreen_std']], on='Sequence', how='left')
+        # merge the reconstructed data with the mutant data
+        df_mut = df_mut.merge(df_toxgreen[['Sequence', 'Sample', 'PercentGpA_transformed', 'std_adjusted', 'toxgreen_fluor', 'toxgreen_std']], on='Sequence', how='left')
+
     # rename the Sequence column to Mutant for the mutant dataframe
     df_mut.rename(columns={'Sequence': 'Mutant'}, inplace=True)
     df_mut.rename(columns={'WT Sequence': 'Sequence'}, inplace=True)
+    
+    # remove redundant sequences from the wt dataframe
+    df_wt = df_wt.drop_duplicates(subset='Sequence')
+    # remove redundant sequence, mutant pairs from the mutant dataframe
+    df_mut = df_mut.drop_duplicates(subset=['Sequence', 'Mutant'])
     
     # get the position of the mutation between the sequence column and disruptive mutant column
     df_wt['Position'] = df_wt.apply(lambda row: [i for i in range(1, len(row['Sequence'])+1) if row['Sequence'][i-1] != row['Clash Mutant'][i-1]][0], axis=1)
@@ -60,11 +78,10 @@ if __name__ == '__main__':
     df_wt.to_csv(f'{outputDir}/wt.csv', index=False)
     df_mut.to_csv(f'{outputDir}/mutant.csv', index=False)
     
-    # check if PercentGpA is a column
+    # check if PercentGpA is a column, else names need to be converted
     if 'PercentGpA' not in df_wt.columns:
         df_wt['PercentGpA'] = df_wt['PercentGpA_transformed']
         df_mut['PercentGpA'] = df_mut['PercentGpA_transformed']
-    if 'PercentStd' not in df_wt.columns:
         df_wt['PercentStd'] = df_wt['std_adjusted']
         df_mut['PercentStd'] = df_mut['std_adjusted']
     

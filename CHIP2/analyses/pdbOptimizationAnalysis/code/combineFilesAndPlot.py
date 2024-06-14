@@ -26,6 +26,7 @@ energy_df = pd.read_csv(energyFile)
 # merge the dataframes by sequence
 cols = ['Sequence', 'Design', 'PercentGpA', 'PercentStd', 'Type', 'Clash Mutant', 'Mutant Type', 'Position', 'Disruptive Mutant', 'PercentGpA_mutant', 'WT Sequence', 'Fluor Difference'] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?
 # check if all the columns are present, otherwise only keep the ones that are present
+og_sequence_df = sequence_df.copy()
 if all(col in sequence_df.columns for col in cols):
     sequence_df = sequence_df[cols]
 else:
@@ -35,15 +36,18 @@ else:
 sequence_df['Sequence'] = sequence_df['Sequence'].apply(lambda x: x[3:-3])
 #energy_df['Sequence'] = energy_df['Directory'].apply(lambda x: x[3:-3])
 
+# keep the data for the sequenceAnalysis script
+sequence_df.to_csv(f'{outputDir}/dataForSeqAnalysis.csv', index=False)
+
 # keep only the sequences that are in the energy file
 merged_df = sequence_df[sequence_df['Sequence'].isin(energy_df['Sequence'])]
 df = merged_df.merge(energy_df, on='Sequence', how='left')
-df.to_csv(f'{outputDir}/mergedData.csv', index=False)
+df.to_csv(f'{outputDir}/mergedEnergyData.csv', index=False)
 
 # keep sequences not in the energy file
 missing = sequence_df[~sequence_df['Sequence'].isin(energy_df['Sequence'])]
 missing.to_csv(f'{outputDir}/missingSeqs.csv', index=False)
 #df.rename(columns={'PercentGpA_transformed': 'PercentGpA', 'std_adjusted': 'PercentStd'}, inplace=True)
 
-execPlot = f'python3 {codeDir}/analyzeData.py  -inFile {outputDir}/mergedData.csv -outDir {outputDir} -percentCutoff {percentGpA_cutoff}'
+execPlot = f'python3 {codeDir}/analyzeData.py  -inFile {outputDir}/mergedEnergyData.csv -outDir {outputDir} -percentCutoff {percentGpA_cutoff}'
 os.system(execPlot)

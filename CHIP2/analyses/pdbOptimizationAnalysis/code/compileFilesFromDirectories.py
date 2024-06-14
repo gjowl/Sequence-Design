@@ -23,7 +23,7 @@ if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
 
-# a BS function to fix the column names for the energyFile.csv files that have different column names (usually from different runs of the program after I changed a small thing in the code)
+# a BS function that standardized the column names for the energyFile.csv files that have different column names (usually from different runs of the program after I changed a small thing in the code)
 def fixColumnNames(input_df):
     # find _ in the column names and store them in a list
     colsWithUnderscore = input_df.columns[input_df.columns.str.contains('_')].tolist()
@@ -47,6 +47,16 @@ def fixColumnNames(input_df):
     colsWithRotation = input_df.columns[input_df.columns.str.contains('rotation')].tolist()
     for col in colsWithRotation:
         newName = col.replace('rotation','Rotation')
+        input_df.rename(columns={col:newName},inplace=True)
+    # for any columns with Dimer, remove
+    colsWithDimer = input_df.columns[input_df.columns.str.contains('Dimer')].tolist()
+    for col in colsWithDimer:
+        newName = col.replace('Dimer','')
+        input_df.rename(columns={col:newName},inplace=True)
+    # capitalize the O in optimize
+    colsWithOptimize = input_df.columns[input_df.columns.str.contains('optimize')].tolist()
+    for col in colsWithOptimize:
+        newName = col.replace('optimize','Optimize')
         input_df.rename(columns={col:newName},inplace=True)
     return input_df
 

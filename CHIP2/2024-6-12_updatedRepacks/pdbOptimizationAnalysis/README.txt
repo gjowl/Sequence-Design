@@ -51,7 +51,7 @@ pdbOptimizationAnalysis
 codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
 inputdir = /mnt/d/github/Sequence-Design/CHIP2/2024-6-12_updatedRepacks//pdbOptimizationAnalysis/inputFiles
 scriptdir = /mnt/d/github/Sequence-Design/CHIP2/analyses/pdbOptimizationAnalysis/code
-rawdatadir = /mnt/d/2024-6-12_CHIP2_optimized_data/CHIP2_wts/
+rawdatadir = /mnt/d/2024-6-12_CHIP2_optimized_data/CHIP2_all/
 datafile = leu_data
 mutantfile = mutant_fluor_energy_data.csv
 sequencefile = sequence_fluor_energy_data.csv
@@ -72,5 +72,6 @@ sequenceAnalysis
 codedir = /mnt/d/github/Sequence-Design/CHIP2/analyses/sequenceAnalysis/code
 clashdir = /mnt/d/github/Sequence-Design/CHIP2/2024-6-12_updatedRepacks/pdbOptimizationAnalysis/
 requirementsfile = /mnt/d/github/Sequence-Design/2022-2023_gblock/calcEnergy/requirements.txt
-sequencecsv = wt/mergedData.csv
-mutantcsv = mutant/mergedData.csv
+sequencecsv = wt/dataForSeqAnalysis.csv
+mutantcsv = mutant/dataForSeqAnalysis.csv
+toxgreenfile = /mnt/d/github/Sequence-Design/CHIP2/2024-6-12_updatedRepacks/toxgreenConversion/filtered/all.csv

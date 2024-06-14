@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
         # save the transformed data to a csv
         df_sample.to_csv(f'{dataDir}/{sample}_transformed.csv', index=False)
-        #df_sample = df_sample[df_sample[final_transform_col] > 0]
+        df_sample = df_sample[df_sample[final_transform_col] > 0]
 
         # keep sequences with a higher fluorescence than G83I and save to a csv
         df_sample_g83i = df_sample[df_sample[final_transform_col] > g83iFluor]
