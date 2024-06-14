@@ -23,7 +23,7 @@ if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
 
-
+# a BS function to fix the column names for the energyFile.csv files that have different column names (usually from different runs of the program after I changed a small thing in the code)
 def fixColumnNames(input_df):
     # find _ in the column names and store them in a list
     colsWithUnderscore = input_df.columns[input_df.columns.str.contains('_')].tolist()
@@ -37,6 +37,16 @@ def fixColumnNames(input_df):
     colsWithShift = input_df.columns[input_df.columns.str.contains('shift')].tolist()
     for col in colsWithShift:
         newName = col.replace('shift','Shift')
+        input_df.rename(columns={col:newName},inplace=True)
+    # for any columns containing angle, make sure the A is capitalized
+    colsWithAngle = input_df.columns[input_df.columns.str.contains('angle')].tolist()
+    for col in colsWithAngle:
+        newName = col.replace('angle','Angle')
+        input_df.rename(columns={col:newName},inplace=True)
+    # for any columns containing rotation, make sure the R is capitalized
+    colsWithRotation = input_df.columns[input_df.columns.str.contains('rotation')].tolist()
+    for col in colsWithRotation:
+        newName = col.replace('rotation','Rotation')
         input_df.rename(columns={col:newName},inplace=True)
     return input_df
 
