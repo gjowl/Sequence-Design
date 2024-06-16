@@ -18,7 +18,6 @@ inputFile = args.inputFile
 inputFilename = os.path.splitext(os.path.basename(inputFile))[0]
 outputFile = f'{inputFilename}_deltaG' 
 outputDir = os.getcwd()
-
 # if the optional arguments are not specified, use the default values
 if args.outputFile is not None:
     outputFile = args.outputFile
@@ -75,7 +74,7 @@ if __name__ == '__main__':
     df['Kd'] = fractionDimerToKd(df['fractionDimer'])
     
     # rid of the negative Kd values
-    #df = df[df['Kd'] > 0]
+    df = df[df['Kd'] > 0]
     
     # convert Kd to deltaG
     R = 0.0019872 # kcal/mol/K

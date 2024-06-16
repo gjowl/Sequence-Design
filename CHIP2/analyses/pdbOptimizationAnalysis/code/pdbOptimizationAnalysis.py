@@ -163,7 +163,7 @@ if __name__ == "__main__":
                         continue
                     # define variables for the analysis
                     file_outputDir = f'{clashOutputDir}/{os.path.splitext(filename)[0]}'
-                    file_to_analyze = 'lowestEnergySequences' # made in analyzeData.py
+                    file_to_analyze = 'lowestEnergySequences' # made in analyzeData.py (which is used by the combineFilesAndPlot.py script which plots scatters; this file gets used for the kde plots)
                     # check if the directory exists and continue if it does
                     #if os.path.isdir(file_outputDir):
                     #    continue
@@ -179,17 +179,18 @@ if __name__ == "__main__":
                     #    execAnalyzeclash = f'python3 {scriptDir}/combineFilesAndPlot.py -seqFile {clashOutputDir}/{filename} -energyFile {outputDir}/{strippedMaltosePassingFile}.csv -outDir {file_outputDir} -percentCutoff {percent_cutoff} -codeDir {scriptDir}'
                     #    print(f' - Running: {execAnalyzeclash}')
                     #    os.system(execAnalyzeclash)
-                    # plot kde plots of geometries
+                    # plot kde plots of geometries from a sequence file made by combineFilesAndPlot.py
                     execPlotKde = f'python3 {scriptDir}/makeKdePlots.py -kdeFile {kdeFile} -dataFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
                     print(f' - Running: {execPlotKde}')
                     os.system(execPlotKde)
                 # convert to delta G
-                execConvertToDeltaG = f'python3 {scriptDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir}'
+                deltaG_outFile = f'{file_to_analyze}_deltaG.csv'
+                execConvertToDeltaG = f'python3 {scriptDir}/convertToDeltaG.py -inFile {file_outputDir}/{file_to_analyze}.csv -outDir {file_outputDir} -outFile {deltaG_outFile}'
                 print(f' - Running: {execConvertToDeltaG}')
                 os.system(execConvertToDeltaG)
 
                 # graph the delta G
-                execGraphDeltaG = f'python3 {scriptDir}/graphDeltaG.py -inFile {file_outputDir}/{file_to_analyze}_deltaG.csv -outDir {file_outputDir}'
+                execGraphDeltaG = f'python3 {scriptDir}/graphDeltaG.py -inFile {file_outputDir}/{deltaG_outFile}.csv -outDir {file_outputDir}'
                 print(f' - Running: {execGraphDeltaG}')
                 os.system(execGraphDeltaG)
 

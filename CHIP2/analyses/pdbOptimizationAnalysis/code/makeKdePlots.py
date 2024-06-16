@@ -21,6 +21,12 @@ if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
 
+# defaults for plotting
+font = 'Arial'
+axis_font_size = 16
+text_font_size = 14
+title_font_size = 18
+
 # Functions
 def plotGeomKde(df_kde, df_data, dataColumn, outputDir, xAxis, yAxis, roundToNearest=5, minY=-100000, maxY=-100000, reverseColormap=False):
     # get the x and y axes data to be plotted from the dataframe
@@ -65,21 +71,31 @@ def plotKdeOverlay(kdeZScores, xAxis, yAxis, data, dataColumn, outputDir, minY, 
     
     # flip the data so that the min is at the top of the colorbar
     norm = matplotlib.colors.Normalize(vmin=minY, vmax=maxY) 
-    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=10, alpha=0.5)
+    ax.scatter(xAxis, yAxis, c=cmap(norm(data)), s=15, alpha=0.5, edgecolors='w', linewidth=0.1)
     sm = plt.cm.ScalarMappable(cmap=cmap, norm=norm)
     # normalize the fluorescent data to the range of the colorbar
     sm.set_array([])  # only needed for matplotlib < 3.1
-    fig.colorbar(sm)
+    # add the colorbar label to the right of the colorbar
+    plt.colorbar(sm).set_label(dataColumn, rotation=0, labelpad=25, fontsize=text_font_size, fontname=font)
     # add the number of datapoints to the plot
-    plt.text(xmin-1, ymax+12, "# Sequences = " + str(len(xAxis)), fontsize=10)
+    plt.text(xmin-1, ymax+12, "# Sequences = " + str(len(xAxis)), fontsize=text_font_size, fontname=font)
+    # set the limits of the x and y axes
     ax.set_xlim([xmin, xmax])
     ax.set_ylim([ymin, ymax])
     ax.set_xticks([6,7,8,9,10,11,12])
     axes = plt.gca()
 
+    # set the font size of the x and y axis
+    plt.xticks(fontsize=axis_font_size, fontname=font)
+    plt.yticks(fontsize=axis_font_size, fontname=font)
+    # set the font size of the axis labels
+    plt.xlabel('Distance (Å)', fontsize=title_font_size, fontname=font)
+    plt.ylabel('Angle (°)', fontsize=title_font_size, fontname=font)
+
     # output the number of sequences in the dataset onto plot
     plt.tight_layout()
     plt.savefig(f'{outputDir}/kdeOverlay_{dataColumn}.png', bbox_inches='tight', dpi=150)
+    plt.savefig(f'{outputDir}/kdeOverlay_{dataColumn}.svg', bbox_inches='tight', dpi=150)
     plt.close()
 
 def getKdePlotZScoresplotKdeOverlayForDfList(df_kde, xAxis, yAxis):
@@ -109,7 +125,6 @@ if __name__ == '__main__':
     # keep only unique sequences, and the unique sequence with the lowest total energy
     df = df.drop_duplicates(subset=['Sequence'], keep='first')
     df = df[df['Total'] < 0]
-    #df = df[df['PercentStd'] < 15]
     xAxis = 'endXShift'
     yAxis = 'endCrossingAngle'
 

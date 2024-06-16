@@ -88,8 +88,8 @@ os.system(f'cp {helperScript} {outputDir}')
 # run the toxgreen conversion script
 if runToxgreenConversion:
     toxgreenConversion = f'python3 {cwd}/toxgreenConversion/code/{toxgreenConversionScript} -config {configFile} -outputDir {outputDir}/toxgreenConversion -helperScript {helperScript}'
-    os.system(toxgreenConversion)
-    os.system(f'tar -czvf {outputDir}/toxgreenConversionCode.tar.gz {cwd}/toxgreenConversion/code')
+    #os.system(toxgreenConversion)
+    #os.system(f'tar -czvf {outputDir}/toxgreenConversionCode.tar.gz {cwd}/toxgreenConversion/code')
 
 # run the pdb optimization analysis script
 if runPdbOptimizationAnalysis:
@@ -100,8 +100,8 @@ if runPdbOptimizationAnalysis:
 # run the sequence analysis script
 if runSequenceAnalysis:
     sequenceAnalysis = f'python3 {cwd}/sequenceAnalysis/code/{sequenceAnalysisScript} -config {configFile} -outputDir {outputDir}/sequenceAnalysis -helperScript {helperScript}'
-    os.system(sequenceAnalysis)
-    os.system(f'tar -czvf {outputDir}/sequenceAnalysisCode.tar.gz {cwd}/sequenceAnalysis/code')
+    #os.system(sequenceAnalysis)
+    #os.system(f'tar -czvf {outputDir}/sequenceAnalysisCode.tar.gz {cwd}/sequenceAnalysis/code')
 
 # run the structure analysis script
 if runStructureAnalysis:

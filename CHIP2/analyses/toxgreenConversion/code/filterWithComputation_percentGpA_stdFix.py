@@ -27,6 +27,7 @@ parser.add_argument('-seqFile','--sequenceFile', type=str, help='the input seque
 parser.add_argument('-mutFile','--mutantFile', type=str, help='the input mutant csv file')
 # add the optional arguments
 parser.add_argument('-outDir','--outputDir', type=str, help='the output directory')
+parser.add_argument('-stdDevCutoff','--stdDevCutoff', type=float, help='the standard deviation cutoff for the fluorescence data')
 
 # extract the arguments into variables
 args = parser.parse_args()
@@ -35,21 +36,13 @@ sequenceFile = args.sequenceFile
 mutantFile = args.mutantFile
 # default values for the optional arguments
 outputDir = os.getcwd()
+std_dev_cutoff = 0.30 # default to 0.3 if not given
 # if the optional arguments are not specified, use the default values
 if args.outputDir is not None:
     outputDir = args.outputDir
     os.makedirs(outputDir, exist_ok=True)
-
-def filterExperimentDataframes(input_df, percent_error_cutoff, fluor_cutoff, filter_percent_error, filter_fluor):
-    output_df = input_df.copy()
-    ## filter out by percent error
-    if filter_percent_error:
-        output_df = output_df[output_df['std_adjusted'] < percent_error_cutoff]
-    ## filter out by percent GpA
-    if filter_fluor:
-        output_df = output_df[output_df['Percent GpA'] < fluor_cutoff]
-    return output_df
-
+if args.stdDevCutoff is not None:
+    std_dev_cutoff = args.stdDevCutoff
 
 def mergeDataframes(df_fluor_seqs, df_fluor_mutant, df_sequence_no_duplicates, df_mutant_no_duplicates, cols_to_add):
     output_df_sequence = df_sequence_no_duplicates.copy()
@@ -118,7 +111,6 @@ def getNonFluorescentSequences(df_sequence, df_mutant, df_sequence_no_duplicates
 if __name__ == '__main__':
     gpa = 'LIIFGVMAGVIGT'
     g83i = 'LIIFGVMAIVIGT'
-    #g83iCutoff = 20000
     
     df_fluor = pd.read_csv(fluorescenceFile)
     df_sequence = pd.read_csv(sequenceFile)
@@ -134,18 +126,11 @@ if __name__ == '__main__':
         # keep only the columns that are in the dataframe
         cols_to_add = [col for col in cols_to_add if col in df_fluor.columns]
     
-    # filtering variables
-    percent_error_cutoff = 0.30
-    fluor_cutoff = 120 # percent GpA
-    filter_percent_error = False
-    filter_fluor = False 
-    transform_col = [col for col in df_fluor.columns if 'transformed' in col][0]
-    
     # Filtering
-    df_fluor = filterExperimentDataframes(df_fluor, percent_error_cutoff, fluor_cutoff, filter_percent_error, filter_fluor)
-    # gets rid of anything below 0 or with a std above .4
+    # gets rid of anything below 0 or with a std_dev above cutoff
+    df_fluor = df_fluor[df_fluor['PercentGpA_transformed'] > 0]
     df_fluor = df_fluor[df_fluor['PercentGpA_transformed'] - df_fluor['std_adjusted'] > 0]
-    df_fluor = df_fluor[df_fluor['std_adjusted'] < .4]
+    df_fluor = df_fluor[df_fluor['std_adjusted'] < std_dev_cutoff]
     
     # filter the dataframes for duplicates
     df_sequence_no_duplicates, df_mutant_no_duplicates, df_fluor_labeled = filterComputationDataframes(df_fluor, df_sequence, df_mutant, cols_to_add)

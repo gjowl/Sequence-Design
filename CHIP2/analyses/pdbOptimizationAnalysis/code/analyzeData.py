@@ -22,7 +22,13 @@ if args.percentCutoff is not None:
 # make the output directory if it doesn't exist and the png and svg subdirectories
 os.makedirs(outputDir, exist_ok=True)
 
+# hardcoded defaults for the program plotting
 colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
+font = 'Arial'
+axis_font_size = 16
+text_font_size = 14
+title_font_size = 18
+
 # plot scatterplot function
 #TODO: could get a standard deviation for the x axis energies now that I have multiple repack energies
 def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degree, output_title, png_dir, svg_dir, sampleType=0, color=0):
@@ -33,9 +39,13 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degree, output_titl
         # plot the standard deviation
         plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
     #plt.legend(loc='upper left', bbox_to_anchor=(1,1))
-    plt.text(0.99, 1.10, f'N = {len(input_df)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
-    plt.xlabel(xAxis)
-    plt.ylabel(yAxis)
+    plt.text(0.99, 1.10, f'N = {len(input_df)}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', horizontalalignment='right')
+    # change the font size of the x and y axis labels and the title
+    plt.xticks(fontsize=axis_font_size, fontname=font)
+    plt.yticks(fontsize=axis_font_size, fontname=font)
+    plt.title(f'{sample} {xAxis} vs {yAxis}', fontsize=title_font_size, fontname=font)
+    plt.xlabel(xAxis, fontsize=title_font_size, fontname=font)
+    plt.ylabel(yAxis, fontsize=title_font_size, fontname=font)
     plt.title(f'{xAxis} vs {yAxis}')
     plt.tight_layout()
 
@@ -58,7 +68,10 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degree, output_titl
     plt.plot(input_df[xAxis], m*input_df[xAxis] + b, color='red')
     # add the r^2 value to the top left of the plot
     r2 = np.corrcoef(input_df[xAxis], input_df[yAxis])[0,1]**2
-    plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+    plt.text(0.01, 1.2, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    # add the regression equation to the top left of the plot
+    plt.text(0.01, 1.15, f'y = {m:.2f}x + {b:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    plt.tight_layout()
     plt.savefig(f'{png_dir}/scatterRegression_{output_title}_{regression_degree}.png')
     plt.savefig(f'{svg_dir}/scatterRegression_{output_title}_{regression_degree}.svg')
     # remove the line of best fit
@@ -79,9 +92,9 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sample, s=5)
     # plot the standard deviation
     plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
-    plt.text(0.99, 1.10, f'N = {len(df_sample)}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right')
-    plt.xlabel(xAxis)
-    plt.ylabel(yAxis)
+    plt.text(0.99, 1.10, f'N = {len(df_sample)}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', horizontalalignment='right')
+    plt.xlabel(xAxis, fontsize=title_font_size, fontname=font)
+    plt.ylabel(yAxis, fontsize=title_font_size, fontname=font)
     # set the y axis limits
     plt.ylim(ylowLim, yhighLim)
     # set the x axis limits
@@ -106,7 +119,14 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     plt.plot(df_sample[xAxis], m*df_sample[xAxis] + b, color='red')
     # add the r^2 value to the top left of the plot
     r2 = np.corrcoef(df_sample[xAxis], df_sample[yAxis])[0,1]**2
-    plt.text(0.01, 1.10, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=14, verticalalignment='top')
+    plt.text(0.01, 1.00, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
+    # add the regression equation to the top left of the plot
+    plt.text(0.01, 1.10, f'y = {m:.2f}x + {b:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
+    # change the font size of the x and y axis labels and the title
+    plt.xticks(fontsize=axis_font_size, fontname=font)
+    plt.yticks(fontsize=axis_font_size, fontname=font)
+    plt.title(f'{sample} {xAxis} vs {yAxis}', fontsize=title_font_size, fontname=font)
+    plt.tight_layout()
     plt.savefig(f'{png_dir}/scatterRegression_{output_title}.png')
     plt.savefig(f'{svg_dir}/scatterRegression_{output_title}.svg')
     # remove the line of best fit
