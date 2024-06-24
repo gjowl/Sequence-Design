@@ -62,3 +62,28 @@ Below is the list of files and directories that this code will create and output
 -      avg files: fluorescence reconstruction average for the specified method of calculating fluorescence
 -      normRep files: this contains the normalization values per sequence per each replicate (column names are bins)
 -      rawFluor files: these contain the raw fluorescence per sequence per each replicate (column names are bins)
+
+main.py Config Options:
+- extractiondir: directory for the extracted fastq NGS to txt files
+- outputdir: main output directory
+- datadir: directory where the unzipped NGS files are found
+- requirementsfile: required libraries
+- fastqtotxt: script used to extract the fastq NGS files to txt files
+- ngsanalysis: script that reconstructs the fluorescence profile
+- percentfile: name for the file containing NGS percents for all sequences
+- countfile: name for the file containing NGS counts for all sequences
+- reffile: the reference sequence file (sequences expected to be found in the NGS data)
+- namesfile: filenames for the extracted fastqs; this file gets read in order, so need to make sure your names for the NGS files are in the same order
+
+ngsAnalysis.py Config Options:
+- inputdir: file where the extracted fastq NGS to txt files are found (should be same as extractiondir above)
+- outputdir: main output directory for the NGS data
+- countfile: same count file as above
+- percentfile: same percent file as above
+- flowfile: file containing the flow percent populations and medians
+- reconstructionfile: final output file name; contains all of the reconstructed fluorescence values for each sequence
+- countdir: output directory for the reconstruction using counts
+- percentdir: output directory for the reconstruction using percents
+- gpa: GpA sequence (LIIFGVMAGVIGT)
+- g83i: G83I sequence (LIIFGVMAIVIGT)
+- maltosetestdir: output directory for the maltose data

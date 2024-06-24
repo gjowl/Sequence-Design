@@ -61,33 +61,34 @@ if __name__ == '__main__':
     # get list of sequences and add to dataframe
     seqIdDf = extractGoodSequenceDataframe(extractionDir, outputDir)
     # save the dataframe to a csv file
-    #seqIdDf.to_csv(outputDir+'seqIdDf.csv', index=False)
+    seqIdDf.to_csv(outputDir+'seqIdDf.csv', index=False)
 
     # get the sequence column (first column) and skip the summary data rows
-    #seqColumn = seqIdDf.iloc[:,0].tolist()
+    seqColumn = seqIdDf.iloc[:,0].tolist()
 
     # compile counts and percents from data files
     # go through all files and save into csv file
-    #outputSequenceCountsCsv(seqColumn, extractionDir, countFile)
-    #outputSequencePercentsCsv(seqColumn, extractionDir, percentFile)
+    outputSequenceCountsCsv(seqColumn, extractionDir, countFile)
+    outputSequencePercentsCsv(seqColumn, extractionDir, percentFile)
 
     # drop duplicates and reset the index
-    #seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
-    #seqIdDf = seqIdDf.reset_index(drop=True)
+    seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
+    seqIdDf = seqIdDf.reset_index(drop=True)
 
     # add the segment number to the counts and percents files to separate sequences by segment number
-    #appendColumnFromInputFile(seqIdDf, 'Segment', countFile)
-    #appendColumnFromInputFile(seqIdDf, 'Segment', percentFile)
+    appendColumnFromInputFile(seqIdDf, 'Segment', countFile)
+    appendColumnFromInputFile(seqIdDf, 'Segment', percentFile)
 
     # execute ngsAnalysis script 
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
     print(execNgsAnalysis)
     os.system(execNgsAnalysis)
 
-    # only execute energy analysis script if boolean to do so is true
-    print(analyzeEnergies)
-    if analyzeEnergies == True:
-        # execute ngsAnalysis script 
-        execEnergyAnalysis = 'python3 '+energyAnalysis+' '+configFile
-        print(execEnergyAnalysis)
-        os.system(execEnergyAnalysis)
+    # REDACTED: I use a different set of scripts for analysis (runAllAnalysis: toxgreenConversion->pdbOptimizationAnalysis->sequenceAnalysis->hbondAnalysis)
+    ## only execute energy analysis script if boolean to do so is true
+    #print(analyzeEnergies)
+    #if analyzeEnergies == True:
+    #    # execute ngsAnalysis script 
+    #    execEnergyAnalysis = 'python3 '+energyAnalysis+' '+configFile
+    #    print(execEnergyAnalysis)
+    #    os.system(execEnergyAnalysis)

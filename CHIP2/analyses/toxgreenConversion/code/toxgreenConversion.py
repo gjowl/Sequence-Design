@@ -129,6 +129,7 @@ if __name__ == '__main__':
         print(f' - Running: {execMutantAnalysis}')
         os.system(execMutantAnalysis)
 
+    # REDACTED: below unused for my final analysis
     # sequence vs mutant analysis
     # graphing code (this was kind of my initial analysis. I likely will not use any of this in the paper, but it's here for reference if I need it as of 2024-2-24)
     #if runSequenceVsMutant:
