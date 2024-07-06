@@ -59,7 +59,8 @@ def reconstructFluorescenceForDfList(dfToReconstruct, reconstructionDirList, inp
         # if the dir is empty, continue
         if len(os.listdir(outputDir)) < 1:
             # remove the non-sorted data (H to distinguish LB and maltose data) from the df
-            dfBins = df.filter(like='H')
+            #dfBins = df.filter(like='H') # switched from this for my hbonding mutant data, which I labeled H
+            dfBins = df.filter(like='o') # switched from this for my hbonding mutant data, which I labeled H
             #dfBins = df.filter(like='E')
             # remove the those bins from the df
             dfBins = df.drop(dfBins.columns, axis=1)

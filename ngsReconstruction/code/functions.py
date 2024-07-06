@@ -225,6 +225,7 @@ def extractGoodSequenceDataframe(input_dir, output_dir):
     output_df = output_df.reset_index(drop=True)
     extractColumnDataFromDataframe(output_df, 'Count', output_dir)
     extractColumnDataFromDataframe(output_df, 'Percentage', output_dir)
+    return output_df
 
 # extracts data for counts and percentages for each replicate
 def extractColumnDataFromDataframe(input_df, col_name, output_dir):

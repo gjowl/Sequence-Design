@@ -21,12 +21,6 @@ maltoseTestDir  = config["maltoseTestDir"]
 countDir        = config["countDir"]
 percentDir      = config["percentDir"]
 reconstructionFile        = config["reconstructionFile"]
-gpaFluorescence = float(config["gpaFluor"])
-g83IFluorescence = float(config["g83iFluor"])
-noTMfluor      = float(config["noTMfluor"])
-maltoseCutoff       = float(config["maltoseCutoff"])
-gpa            = config["gpa"]
-g83i           = config["g83i"]
 
 # make the output directories that these will all output to
 dirList = [outputDir, maltoseTestDir, countDir, percentDir]
@@ -69,7 +63,6 @@ list_dfReconstructedFluor = reconstructFluorescenceForDfList(dfToReconstruct, re
 df_fluor = list_dfReconstructedFluor[0]
 divider = '-Fluor'
 print(df_fluor)
-#calculatePercentGpA(df_fluor, gpa, g83i, noTMfluor, divider, outputDir)
 
 # hardcoded hour lists for LB and M9
 # TODO: make this just search through the dataframe for the hours in the future
@@ -106,33 +99,5 @@ df_fluorAndPercent.insert(2, 'Fluorescence', fluor_column)
 fluor_column = df_fluorAndPercent.pop('StdDev')
 df_fluorAndPercent.insert(3, 'FluorStdDev', fluor_column)
 
-# ADD IN PERCENT GPA ADN STANDARD DEVIATION
-# extract the gpa and g83i fluorescence from the df_fluorAndPercent dataframe
-#gpaFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == gpa, 'Fluorescence'].values[0]
-#g83IFluorescence = df_fluorAndPercent.loc[df_fluorAndPercent['Sequence'] == g83i, 'Fluorescence'].values[0]
-#print(f'GpA Flourescence  = {gpaFluorescence}')
-#print(f'G83I Flourescence = {g83IFluorescence}')
-## calculate percent GpA of fluorescence
-#percentGpaCol = df_fluorAndPercent['Fluorescence']/gpaFluorescence*100
-#percentGpaStdDevCol = df_fluorAndPercent['FluorStdDev']/gpaFluorescence*100
-## add the percent GpA column to the dataframe
-#df_fluorAndPercent.insert(4, 'PercentGpa', percentGpaCol)
-#df_fluorAndPercent.insert(5, 'PercentGpaStdDev', percentGpaStdDevCol)
-
 # WRITE THE DATAFRAMES TO A CSV
 df_fluorAndPercent.to_csv(reconstructionFile, index=False)
-
-# RID OF ANYTHING BELOW G83I FLUORESCENCE (MORE STABLE THAN MONOMER G83I)
-#df_aboveG83I = df_fluorAndPercent[df_fluorAndPercent['Fluorescence'] > g83IFluorescence]
-#g83iCutoffFile = outputDir + 'g83iCutoff.csv'
-#df_aboveG83I.to_csv(g83iCutoffFile, index=False)
-#
-#print(df_fluorAndPercent)
-
-# MALTOSE CUTOFF
-#df_cutoff = df_fluorAndPercent[df_fluorAndPercent['MaltosePercentDiff'] > maltoseCutoff]
-#df_belowCutoff = df_fluorAndPercent[df_fluorAndPercent['MaltosePercentDiff'] < maltoseCutoff]
-#aboveCutoffFile = outputDir +'aboveCutoff.csv'
-#belowCutoffFile = outputDir +'belowCutoff.csv'
-#df_cutoff.to_csv(aboveCutoffFile, index=False)
-#df_belowCutoff.to_csv(belowCutoffFile, index=False)
