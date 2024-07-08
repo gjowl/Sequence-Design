@@ -36,7 +36,7 @@ if len(args.maltoseSeq) > 4: # I think even when None gets passed as an option, 
 
 if __name__ == '__main__':
     # read in the data
-    data = pd.read_csv(dataFile)
+    data = pd.read_csv(dataFile, dtype={'Interface': str})
     maltose = pd.read_csv(maltoseFile)
 
     # keep the maltose data for Segments N

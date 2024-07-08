@@ -145,7 +145,7 @@ def addEnergyDifferencesToDataframe(input_df, cols):
 
 if __name__ == '__main__':
     # read in the data file
-    df = pd.read_csv(inputFile)
+    df = pd.read_csv(inputFile, dtype={'Interface': str})
 
     # prepare the axes for the scatterplots
     xAxis = 'Total'

@@ -17,7 +17,7 @@ os.makedirs(outputDir, exist_ok=True)
 
 # read in the data files
 sequence_df = pd.read_csv(sequenceFile)
-energy_df = pd.read_csv(energyFile)
+energy_df = pd.read_csv(energyFile, dtype={'Interface': str})
 
 # merge the dataframes by sequence
 cols = ['Sequence', 'PercentGpA', 'PercentStd', 'Type', 'Clash Mutant', 'Mutant Type', 'Position', 'Disruptive Mutant', 'PercentGpA_mutant', 'WT Sequence', 'Fluor Difference', 'PercentGpA_transformed', 'std_adjusted,'] #TODO add more to carry over including the diffs; which for some reason are getting calcd again?

@@ -113,8 +113,8 @@ if __name__ == '__main__':
     g83i = 'LIIFGVMAIVIGT'
     
     df_fluor = pd.read_csv(fluorescenceFile)
-    df_sequence = pd.read_csv(sequenceFile)
-    df_mutant = pd.read_csv(mutantFile)
+    df_sequence = pd.read_csv(sequenceFile, dtype={'Interface': str})
+    df_mutant = pd.read_csv(mutantFile, dtype={'Interface': str})
     
     # THIS CODE IS ANNOYING; FIX IT SO THAT YOU DON'T HAVE TO HARDCODE so much
     # check if wt_seq is a column in the dataframe

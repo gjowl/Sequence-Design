@@ -32,8 +32,8 @@ if __name__ == '__main__':
         print('DataFile', outputFile,'exists. To overwrite, delete the file and run again.')
         sys.exit()
 
-    # read in the data files
-    df = pd.read_csv(dataFile)
+    # read in the data files with interface column as string
+    df = pd.read_csv(dataFile, dtype={'Interface': str})
     toxgreenDf = pd.read_csv(toxgreenFile)
 
     # get the columns of interest
