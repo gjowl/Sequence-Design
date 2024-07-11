@@ -1,4 +1,5 @@
 import os, sys, pandas as pd, numpy as np, argparse
+import matplotlib.pyplot as plt
 
 # initialize the parser
 parser = argparse.ArgumentParser(description='Compare the vdw and sasa of mutants to the WT sequence')
@@ -42,8 +43,7 @@ if __name__ == '__main__':
         wt_seq = wt[wt['Sequence'] == seq]
         # get the mutant data
         tmp_mut = mut[mut['Sequence'] == seq]
-        # get the wt VDW and SASA
-        wt_sasa = wt_seq[sasaCol].values[0]
+        #wt_sasa_1 = wt_seq[sasaCol].values[0]
         sample = wt_seq['Sample'].values[0]
         for m in tmp_mut['Mutant']:
             # find the position different between the wt and mutant sequences
@@ -52,9 +52,17 @@ if __name__ == '__main__':
             wt_char = seq[pos[0]]
             mut_char = m[pos[0]]
             wt_mut = f'{wt_char}{mut_char}'
+            # get the wt sasa
+            wt_monomer = tmp_mut[tmp_mut['Mutant'] == m]['WT_MonomerSasa'].values[0]
+            wt_dimer = tmp_mut[tmp_mut['Mutant'] == m]['WT_DimerSasa'].values[0]
+            wt_sasa = wt_monomer - wt_dimer
+            # get the mutant sasa
+            mut_monomer = tmp_mut[tmp_mut['Mutant'] == m]['Mutant_MonomerSasa'].values[0]
+            mut_dimer = tmp_mut[tmp_mut['Mutant'] == m]['Mutant_DimerSasa'].values[0]
+            mut_sasa = mut_monomer - mut_dimer
             # subtract the wt_sasa from the mutant sasa for the current m
-            sasa_diff = tmp_mut[tmp_mut['Mutant'] == m]['DimerSasaDifference'].values[0]
-            output_df = pd.concat([output_df, pd.DataFrame({'WT Sequence': seq, 'Mutant Sequence': m, 'Region': sample, 'WTAA': wt_char, 'MutAA': mut_char, 'WT_MUT': wt_mut, 'Position': pos, 'SASA Difference': sasa_diff})])
+            sasa_perc = mut_sasa / wt_sasa
+            output_df = pd.concat([output_df, pd.DataFrame({'WT Sequence': seq, 'Mutant Sequence': m, 'Region': sample, 'WTAA': wt_char, 'MutAA': mut_char, 'WT_MUT': wt_mut, 'Position': pos, 'SASA Percent': sasa_perc})])
     # save the dataframes
     output_df.to_csv(f'{outputDir}/allDifferences.csv', index=False)
 
@@ -64,8 +72,23 @@ if __name__ == '__main__':
     #clash_counts = clash_df['WT_MUT'].value_counts()
     #clash_counts.to_csv(f'{outputDir}/clashCounts.csv')
     # get the average SASA difference for each unique value in the wt_mut column of the clash dataframe
-    void_avg = void_df.groupby('WT_MUT')['SASA Difference'].mean()
+    void_avg = void_df.groupby('WT_MUT')['SASA Percent'].mean()
     void_avg.to_csv(f'{outputDir}/voidAvg.csv')
+
+    # sort the dataframe by the wt_mut column
+    void_df = void_df.sort_values('WT_MUT')
+    # plot the individual SASA differences for each unique value in the wt_mut column of the clash dataframe
+    void_df.boxplot(column='SASA Percent', by='WT_MUT', rot=90)
+    # plot the points on top of the boxplot in the same order as the boxplot
+    for i in range(len(void_df['WT_MUT'].unique())):
+        y = void_df[void_df['WT_MUT'] == void_df['WT_MUT'].unique()[i]]['SASA Percent']
+        x = np.random.normal(i+1, 0.04, size=len(y))
+        plt.plot(x, y, '.', color='black', markersize=2)
+    plt.title('SASA Difference for Void Mutants')
+    plt.xlabel('WT_MUT')
+    plt.ylabel('Percent SASA of WT')
+    plt.savefig(f'{outputDir}/voidAvgPlot.png')
+    plt.savefig(f'{outputDir}/voidAvgPlot.svg')
 
     # get counts for each unique value in the wt_mut column of the void dataframe
     void_counts = void_df['WT_MUT'].value_counts()
