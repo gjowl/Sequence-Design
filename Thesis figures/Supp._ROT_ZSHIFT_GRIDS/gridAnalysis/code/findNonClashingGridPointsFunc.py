@@ -47,8 +47,8 @@ def plotKde(df, xAxis, yAxis, xAndYDict, outputDir, title):
     xMin, xMax = xAndYDict[xAxis]['min'], xAndYDict[xAxis]['max']
     yMin, yMax = xAndYDict[yAxis]['min'], xAndYDict[yAxis]['max']
 
-    # grid the data for kde plots (split x into 20 bins, y into 12 bins)
-    X, Y = np.mgrid[xMin:xMax:21j, yMin:yMax:13j]
+    # grid the data for kde plots 
+    X, Y = np.mgrid[xMin:xMax:200j, yMin:yMax:100j] # originally split x into 20 bins, y into 12 bins
     
     # round all values to 2 decimal places
     X = np.around(X, 2)
@@ -72,8 +72,7 @@ def plotKde(df, xAxis, yAxis, xAndYDict, outputDir, title):
     plt.ylabel(yAxis)
     plt.title(title)
     ax.use_sticky_edges = False
-    q = ax.imshow(np.rot90(Z), cmap=plt.cm.Blues,
-        extent=[xMin, xMax, yMin, yMax], aspect="auto")
+    q = ax.imshow(np.rot90(Z), cmap=plt.cm.Blues, extent=[xMin, xMax, yMin, yMax], aspect="auto")
     ax.set_xlim([xMin, xMax])
     ax.set_ylim([yMin, yMax])
     axes = plt.gca()
@@ -85,9 +84,19 @@ def plotKde(df, xAxis, yAxis, xAndYDict, outputDir, title):
     outputTitle = xAxis+"_v_"+yAxis+"_"+title
     #sns.kdeplot(x=df[xAxis], y=df[yAxis], shade=False, cbar=True, cmap="inferno_r", levels = 10, thresh=False)
     plt.savefig(outputDir+outputTitle+".png", bbox_inches='tight')
-    
+    plt.savefig(outputDir+outputTitle+".svg", bbox_inches='tight')
     Zout = kernel(positions).T
     acceptGrid = getAcceptGridCsv(Zout, positions, outputDir, outputTitle)
+    plt.close()
+
+    # make a contour plot
+    fig, ax = plt.subplots()
+    ax.contour(X, Y, Z, cmap='Blues')
+    plt.xlabel(xAxis)
+    plt.ylabel(yAxis)
+    plt.title(title)
+    plt.savefig(outputDir+outputTitle+"_contour.png", bbox_inches='tight')
+    plt.savefig(outputDir+outputTitle+"_contour.svg", bbox_inches='tight')
     plt.close()
     return Z, acceptGrid
 

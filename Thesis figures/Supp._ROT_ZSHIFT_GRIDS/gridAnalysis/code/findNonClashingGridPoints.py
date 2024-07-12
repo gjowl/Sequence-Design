@@ -78,7 +78,7 @@ geomDict['crossingAngle']['inc'] = 2
 
 acceptCutoff = 0.8
 randomGeomGrid = pd.DataFrame()
-numGeometries = 200
+numGeometries = 3333
     
 # make kde output dir
 kdeOutputDir = outputDir + "densityPlots/"
