@@ -151,8 +151,8 @@ if __name__ == "__main__":
                 # convert the cutoffs to integers
                 mut, perc, num = int(mutant_cutoff*100), int(percent_cutoff*100), int(number_of_mutants_cutoff)
                 clashOutputDir = f'{outputDir}/clash_{mut}_{perc}_{num}'
-                execclashCheck = f'python3 {scriptDir}/keepBestClashing_v2.py -seqFile {outputDir}/{sequence_maltosePassingFile}.csv -mutFile {outputDir}/{mutant_maltosePassingFile}.csv -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
-                #execclashCheck = f'python3 {scriptDir}/keepBestClashing.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
+                #execclashCheck = f'python3 {scriptDir}/keepBestClashing_v2.py -seqFile {outputDir}/{sequence_maltosePassingFile}.csv -mutFile {outputDir}/{mutant_maltosePassingFile}.csv -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
+                execclashCheck = f'python3 {scriptDir}/keepBestClashing_v2.py -seqFile {sequenceFile} -mutFile {mutantFile} -outDir {clashOutputDir} -mutCutoff {mutant_cutoff} -percentWtCutoff {percent_cutoff} -numMutants {number_of_mutants_cutoff}'
                 print(f' - Running: {execclashCheck}')
                 os.system(execclashCheck)
                 # loop through the files in the clashOutputDir

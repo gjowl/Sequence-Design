@@ -1,6 +1,7 @@
 import os, sys, pandas as pd, matplotlib.pyplot as plt, numpy as np, argparse
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score
+from scipy import stats
 
 # initialize the parser
 parser = argparse.ArgumentParser(description='Plots the data into scatterplots')
@@ -122,6 +123,34 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     plt.text(0.01, 1.00, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
     # add the regression equation to the top left of the plot
     plt.text(0.01, 1.10, f'y = {m:.2f}x + {b:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
+    # get the standard deviation of the line 
+    std_dev = np.sqrt(np.sum((df_sample[yAxis] - (m*df_sample[xAxis] + b))**2) / (len(df_sample) - 2))
+    # get the mean of the line
+    mean = np.mean(df_sample[yAxis] - (m*df_sample[xAxis] + b))
+    ## get the z-score
+    #z = (b-mean) / std_dev
+    ## calculate the p-value
+    #p_value = stats.norm.sf(abs(z))*2
+    # add the standard error of slope
+    # get the residuals
+    residuals = df_sample[yAxis] - (m*df_sample[xAxis] + b)
+    # get the sum of the residuals squared
+    residuals_squared = np.sum(residuals**2)
+    # get the standard error of the slope
+    se = np.sqrt(residuals_squared / (len(df_sample) - 2)) / np.sqrt(np.sum((df_sample[xAxis] - np.mean(df_sample[xAxis]))**2))
+    # add the standard error of the slope to the plot
+    plt.text(0.01, 0.90, f'se_slope = {se}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
+    # get the standard error of the intercept
+    y_mean = np.mean(df_sample[yAxis])
+    se_intercept = se * np.sqrt(np.sum(df_sample[xAxis]**2) / len(df_sample))
+    # add the standard error of the intercept to the plot
+    plt.text(0.01, 0.80, f'se_intercept = {se_intercept}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
+    # calculate the t-score for the slope
+    t_score = m / se
+    # calculate the p-value
+    p_value = stats.t.sf(np.abs(t_score), len(df_sample) - 2)*2
+    # add the p-value to the plot
+    plt.text(0.01, 0.70, f'p-value = {p_value}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
     # change the font size of the x and y axis labels and the title
     plt.xticks(fontsize=axis_font_size, fontname=font)
     plt.yticks(fontsize=axis_font_size, fontname=font)
