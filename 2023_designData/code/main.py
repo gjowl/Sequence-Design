@@ -52,3 +52,5 @@ if __name__ == '__main__':
     for region in regions:
         execCreatePymolSessionFiles = f'python3 {createPseScript} {rawDataDir} {outputDir}/{region}'
         os.system(execCreatePymolSessionFiles)
+
+    # create the csv file for submitting for backbone repacks
