@@ -25,7 +25,7 @@ os.makedirs(outputDir, exist_ok=True)
 
 # hardcoded defaults for the program plotting
 colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
-font = 'Arial'
+font = 'Calibri'
 axis_font_size = 16
 text_font_size = 14
 title_font_size = 18
@@ -109,6 +109,23 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
         return
     plt.savefig(f'{png_dir}/scatter_{output_title}.png')
     plt.savefig(f'{svg_dir}/scatter_{output_title}.svg')
+    # run a rank order correlation test
+    # get the spearman rank order correlation
+    spearman_corr, spearman_p = stats.spearmanr(df_sample[xAxis], df_sample[yAxis])
+    # get the pearson correlation
+    pearson_corr, pearson_p = stats.pearsonr(df_sample[xAxis], df_sample[yAxis])
+    # add the spearman correlation to the plot
+    plt.text(0.01, 1.00, f'Spearman r = {spearman_corr:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    # add the pearson correlation to the plot
+    plt.text(0.01, 0.95, f'Pearson r = {pearson_corr:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    # add the spearman p-value to the plot
+    plt.text(0.01, 0.90, f'Spearman p = {spearman_p:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    # add the pearson p-value to the plot
+    plt.text(0.01, 0.85, f'Pearson p = {pearson_p:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    plt.savefig(f'{png_dir}/scatterCorrelation_{output_title}.png')
+    plt.savefig(f'{svg_dir}/scatterCorrelation_{output_title}.svg')
+    # remove the spearman and pearson correlation values
+    plt.gca().texts.pop()
     # add a line of best fit and an r^2 value
     try:
         m, b = np.polyfit(df_sample[xAxis], df_sample[yAxis], regression_degree)

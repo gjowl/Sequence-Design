@@ -54,3 +54,4 @@ if __name__ == '__main__':
         os.system(execCreatePymolSessionFiles)
 
     # create the csv file for submitting for backbone repacks
+    execMakeBackboneRepackFile = f'python3 {createBackboneRepacksScript} {outputDir}'
