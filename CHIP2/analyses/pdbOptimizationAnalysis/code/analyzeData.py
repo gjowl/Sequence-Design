@@ -25,7 +25,7 @@ os.makedirs(outputDir, exist_ok=True)
 
 # hardcoded defaults for the program plotting
 colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
-font = 'Calibri'
+font = 'Arial'
 axis_font_size = 16
 text_font_size = 14
 title_font_size = 18
@@ -117,11 +117,11 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     # add the spearman correlation to the plot
     plt.text(0.01, 1.00, f'Spearman r = {spearman_corr:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
     # add the pearson correlation to the plot
-    plt.text(0.01, 0.95, f'Pearson r = {pearson_corr:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    #plt.text(0.01, 0.95, f'Pearson r = {pearson_corr:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
     # add the spearman p-value to the plot
-    plt.text(0.01, 0.90, f'Spearman p = {spearman_p:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    plt.text(0.01, 0.90, f'Spearman p = {spearman_p}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
     # add the pearson p-value to the plot
-    plt.text(0.01, 0.85, f'Pearson p = {pearson_p:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    #plt.text(0.01, 0.85, f'Pearson p = {pearson_p}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
     plt.savefig(f'{png_dir}/scatterCorrelation_{output_title}.png')
     plt.savefig(f'{svg_dir}/scatterCorrelation_{output_title}.svg')
     # remove the spearman and pearson correlation values
