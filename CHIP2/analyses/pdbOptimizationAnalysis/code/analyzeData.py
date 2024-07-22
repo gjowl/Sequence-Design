@@ -212,8 +212,6 @@ if __name__ == '__main__':
     df = df.sort_values(by=[xAxis], ascending=True)
     df = df.drop_duplicates(subset=['Sequence'], keep='first')
 
-    # remove any sequences with a total energy > 0
-    df = df[df['Total'] < 0]
     # move the sequence column to the front of the dataframe
     cols = df.columns.tolist()
     cols.insert(0, cols.pop(cols.index('Sequence')))

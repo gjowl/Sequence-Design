@@ -24,17 +24,20 @@ if args.outputDir is not None:
 
 if __name__ == '__main__':
     # check if dataFile exists
-    if os.path.isfile(f'{outputDir}/{outputFile}.csv'):
-        # quit
-        print('DataFile', outputFile,'exists. To overwrite, delete the file and run again.')
-        sys.exit()
+    #if os.path.isfile(f'{outputDir}/{outputFile}.csv'):
+    #    # quit
+    #    print('DataFile', outputFile,'exists. To overwrite, delete the file and run again.')
+    #    sys.exit()
     
     # read the energyFile
     energyDf = pd.read_csv(energyFile)
     # read the experimental data
     expDf = pd.read_csv(expData)
+    # add LLL and ILI to the front and end of the Sequence column in experimental data
+    expDf['Sequence'] = 'LLL' + expDf['Sequence'] + 'ILI'
     # get the columns of interest from the experimental data
-    expDf = expDf[['Sequence', 'toxgreen_fluorescence', 'toxgreen_std', 'deltaG', 'deltaG_std']]
+    expDf = expDf[['Sequence', 'toxgreen_fluor', 'toxgreen_std', 'deltaG', 'std_deltaG']]
+    print(expDf)
     # merge the dataframes
     outputDf = pd.merge(energyDf, expDf, on='Sequence')
     # write the output dataframe to a csv file

@@ -36,13 +36,22 @@ else:
 sequence_df['Sequence'] = sequence_df['Sequence'].apply(lambda x: x[3:-3])
 #energy_df['Sequence'] = energy_df['Directory'].apply(lambda x: x[3:-3])
 
-# keep the data for the sequenceAnalysis script
-sequence_df.to_csv(f'{outputDir}/dataForSeqAnalysis.csv', index=False)
-
 # keep only the sequences that are in the energy file
 merged_df = sequence_df[sequence_df['Sequence'].isin(energy_df['Sequence'])]
 df = merged_df.merge(energy_df, on='Sequence', how='left')
 df.to_csv(f'{outputDir}/mergedEnergyData.csv', index=False)
+
+# check if this is the wt data by checking the output directory
+if 'wt' in outputDir:
+    # keep sequences with total energy < 0 (rid of predictions with > 0 total energy for plotting; although most energies better, some WT designs have positive total energy after repack)
+    df = df[df['Total'] < 0]
+    # only keep sequences found in the energy file
+    sequence_df = sequence_df[sequence_df['Sequence'].isin(df['Sequence'])]
+    # keep the data for the sequenceAnalysis script
+    sequence_df.to_csv(f'{outputDir}/dataForSeqAnalysis.csv', index=False)
+else:
+    # keep the data for the sequenceAnalysis script
+    sequence_df.to_csv(f'{outputDir}/dataForSeqAnalysis.csv', index=False)
 
 # keep sequences not in the energy file
 missing = sequence_df[~sequence_df['Sequence'].isin(energy_df['Sequence'])]

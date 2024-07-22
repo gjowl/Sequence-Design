@@ -110,14 +110,15 @@ if __name__ == '__main__':
     df_void = df_mut[df_mut['Void'] == True]
     df_clash = df_mut[df_mut['Clash'] == True]
     
-    # keep only sequences that are present in both the void and clash dataframes (at least 1 void and 1 clash mutant per sequence)
+    ## keep only sequences that are present in both the void and clash dataframes (at least 1 void and 1 clash mutant per sequence)
     df_c_v = df_void[df_void['Sequence'].isin(df_clash['Sequence'].unique())]
     df_wt_cv = df_wt[df_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
     df_mut_cv = df_mut[df_mut['Sequence'].isin(df_c_v['Sequence'].unique())]
     df_copy_wt_cv = df_copy_wt[df_copy_wt['Sequence'].isin(df_c_v['Sequence'].unique())]
     
     # add the pos_wtAA and pos_mutAA columns
-    output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols], df_copy_wt_cv[cols]])
+    #output_df = pd.concat([df_wt_cv[cols], df_mut_cv[cols], df_copy_wt_cv[cols]])
+    output_df = df_all.copy()
     output_df['pos_wtAA'] = output_df['Position'].astype(str) + output_df['WT_AA']
     output_df['pos_mutAA'] = output_df['Position'].astype(str) + output_df['mut_AA']
     output_df['WT_MUT'] = output_df['WT_AA'] + output_df['mut_AA']
