@@ -25,9 +25,15 @@ if __name__ == '__main__':
     
     # make the design pdb column
     df['PDB'] = df['Directory'].str.split('_').str[1] + '_' + df['replicateNumber'].astype(str) + '.pdb'
+    # add a column true or false for axial rotation if the startAxialRotation is greater than 0
+    df['negRot'] = df['startAxialRotation'].apply(lambda x: 'true' if x < 0 else 'false')
+    # add a column true or false for crossing angle if the startCrossingAngle is greater than 0
+    df['negAngle'] = df['startCrossingAngle'].apply(lambda x: 'true' if x < 0 else 'false')
     # get the necessary columns
-    df = df[['Sequence', 'RotamerValues', 'Interface', 'Directory', 'PDB', 'Region']]
+    df = df[['Sequence', 'Interface', 'startAxialRotation', 'startCrossingAngle', 'startXShift', 'startZShift', 'PDB', 'negRot', 'negAngle', 'Region']]
 
+    # sort by region so can run each region separately
+    df = df.sort_values(by='Region')
     # save the dataframe to a csv file
     outputFile = f'{outputDir}/backboneRepacks.csv'
     df.to_csv(outputFile, index=False)
