@@ -25,6 +25,7 @@ createPseScript = config['createPseScript']
 outputDir = config['outputDir']
 dataFile = config['dataFile']
 numSeqs = config['numSeqs']
+createBackboneRepackScript = config['createBackboneRepackScript']
 
 # check if the output directory exists
 os.makedirs(name=outputDir, exist_ok=True)
@@ -54,4 +55,5 @@ if __name__ == '__main__':
         os.system(execCreatePymolSessionFiles)
 
     # create the csv file for submitting for backbone repacks
-    execMakeBackboneRepackFile = f'python3 {createBackboneRepacksScript} {outputDir}'
+    execMakeBackboneRepackFile = f'python3 {createBackboneRepackScript} -inFile {dataFile} -outDir {outputDir}'
+    os.system(execMakeBackboneRepackFile)

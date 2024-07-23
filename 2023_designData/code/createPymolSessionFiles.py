@@ -14,7 +14,7 @@ bestFiles = [f for f in os.listdir(outputDir) if 'top' in f and f.endswith('.csv
 # loop through the best files
 for file in bestFiles:
     # read into a dataframe
-    print('Reading file', outputDir+'/'+file)
+    #print('Reading file', outputDir+'/'+file)
     df = pd.read_csv(outputDir+'/'+file, sep=',', header=0, dtype={'Interface': str})
     # loop through the entire dataframe
     for i in range(len(df)):
@@ -28,7 +28,7 @@ for file in bestFiles:
         pdbName = designNum+'_'+str(repNum)
         # put together the filename
         filename = rawDataDir+'/'+dirName+'/'+pdbName+'.pdb'
-        print(filename)
+        #print(filename)
         # load the pdb file
         cmd.load(filename)
         # loop through the interface

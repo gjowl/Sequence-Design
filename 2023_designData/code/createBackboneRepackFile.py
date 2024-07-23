@@ -17,15 +17,18 @@ if args.outputDir is not None:
     outputDir = args.outputDir
 
 if __name__ == '__main__':
-    # read in the input file
-    df = pd.read_csv(inputFile)
+    # read in the input file reading the interface column as a string
+    df = pd.read_csv(inputFile, dtype={'Interface': str})
     
     # make the output directory if it doesn't exist
     os.makedirs(outputDir, exist_ok=True)
     
+    # make the design pdb column
+    df['PDB'] = df['Directory'].str.split('_').str[1] + '_' + df['replicateNumber'].astype(str) + '.pdb'
     # get the necessary columns
-    df = df[['Sequence', 'Interface', '', 'std_adjusted', 'toxgreen_fluor', 'toxgreen_std']]
-    
+    df = df[['Sequence', 'RotamerValues', 'Interface', 'Directory', 'PDB', 'Region']]
+
     # save the dataframe to a csv file
-    df.to_csv(f'{outputDir}/backboneRepacks.csv', index=False)
-    print('backbone repack file created in ', outputDir)
+    outputFile = f'{outputDir}/backboneRepacks.csv'
+    df.to_csv(outputFile, index=False)
+    print('backbone repack file created: ', outputFile)
