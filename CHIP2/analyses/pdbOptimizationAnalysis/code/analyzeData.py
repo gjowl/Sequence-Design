@@ -24,7 +24,8 @@ if args.percentCutoff is not None:
 os.makedirs(outputDir, exist_ok=True)
 
 # hardcoded defaults for the program plotting
-colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
+#colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
+colors = ['dimgrey', 'dimgrey', 'dimgrey']
 font = 'Arial'
 axis_font_size = 16
 text_font_size = 14
@@ -38,7 +39,7 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degree, output_titl
         # plot the WT sequence fluorescence vs the energy
         plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
         # plot the standard deviation
-        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=0.5, capsize=2, markersize=3)
     #plt.legend(loc='upper left', bbox_to_anchor=(1,1))
     plt.text(0.99, 1.10, f'N = {len(input_df)}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', horizontalalignment='right')
     # change the font size of the x and y axis labels and the title

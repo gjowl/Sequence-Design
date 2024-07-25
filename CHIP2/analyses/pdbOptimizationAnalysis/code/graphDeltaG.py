@@ -15,7 +15,8 @@ outputDir = args.outputDir
 os.makedirs(name=outputDir, exist_ok=True)
 
 # defaults for the plotting
-colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
+#colors = ['dimgrey', 'darkorange', 'blueviolet', 'brown', 'pink', 'gray', 'olive', 'cyan']
+colors = ['dimgrey', 'dimgrey', 'dimgrey']
 font = 'Arial'
 axis_font_size = 16
 text_font_size = 18
