@@ -1,13 +1,11 @@
-This directory contains all of the analysis that I did for my committee meeting. I have a copy of the reconstructionAllData.csv files
-from the ngsReconstruction of CHIP2 as an input file, which is then used to analyze the fluorescence data 
-(found in CHIP2/fluorescenceAnalysis). I also have analysis of the clashing mutants, GASrights, and a rerun of pdbBBRepack 
-(backbone optimization code) for my structures.
+This directory contains all of the analysis that I did for my paper.
 
-I moved these directories around on 2023-9-5, so if they stop working for some reason, go back to a couple of commits on github 
-before that to figure out why.
+These can be run individually based on the configs found in each directory, or they can mostly be run through the runAllAnalysis.py script.
 
 Directories:
- - fluorescenceAnalysis: contains all of the analysis of the fluorescence data
+ - toxgreenConversion: converts the reconstructed fluorescence data to TOXGREEN fluorescence
  - pdbOptimizationAnalysis: contains all of the analysis of the pdbBBRepack rerun
- - clashingAnalysis: contains analysis and code for determining the clashing mutants
- - sequenceAnalysis: contains analysis and code for analyzing the sequence data
+ - sequenceAnalysis: contains analysis and code for analyzing the mutant vs design sequence data
+ - hbondAnalysis: contains analysis and code for analyzing the hydrogen bond data (not part of runAllAnalysis.py)
+ - structureAnalysis: contains analysis for structures done on 2024-2 (not part of runAllAnalysis.py)
+ - clusterAnalysis: contains analysis for clustering the designs, data not used (not part of runAllAnalysis.py)
