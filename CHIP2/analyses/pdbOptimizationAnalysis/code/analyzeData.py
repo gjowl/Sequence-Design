@@ -39,7 +39,7 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degree, output_titl
         # plot the WT sequence fluorescence vs the energy
         plt.scatter(df_sample[xAxis], df_sample[yAxis], color=colors[i], label=sample, s=5)
         # plot the standard deviation
-        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=0.5, capsize=2, markersize=3)
+        plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=colors[i], ecolor='dimgray', elinewidth=0.4, capsize=1.5, markersize=4)
     #plt.legend(loc='upper left', bbox_to_anchor=(1,1))
     plt.text(0.99, 1.10, f'N = {len(input_df)}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', horizontalalignment='right')
     # change the font size of the x and y axis labels and the title
@@ -93,7 +93,7 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     # plot the WT sequence fluorescence vs the energy
     plt.scatter(df_sample[xAxis], df_sample[yAxis], color=color, label=sample, s=5)
     # plot the standard deviation
-    plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='dimgray', elinewidth=1, capsize=2, markersize=4)
+    plt.errorbar(df_sample[xAxis], df_sample[yAxis], yerr=df_sample[yStd], fmt='o', color=color, ecolor='dimgray', elinewidth=0.4, capsize=1.5, markersize=4)
     plt.text(0.99, 1.10, f'N = {len(df_sample)}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', horizontalalignment='right')
     plt.xlabel(xAxis, fontsize=title_font_size, fontname=font)
     plt.ylabel(yAxis, fontsize=title_font_size, fontname=font)
