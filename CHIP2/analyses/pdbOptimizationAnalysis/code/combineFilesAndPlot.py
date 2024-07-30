@@ -39,12 +39,12 @@ sequence_df['Sequence'] = sequence_df['Sequence'].apply(lambda x: x[3:-3])
 # keep only the sequences that are in the energy file
 merged_df = sequence_df[sequence_df['Sequence'].isin(energy_df['Sequence'])]
 df = merged_df.merge(energy_df, on='Sequence', how='left')
+# keep sequences with total energy < 0 (rid of predictions with > 0 total energy for plotting; although most energies better, some WT designs have positive total energy after repack)
+df = df[df['Total'] < 0]
 df.to_csv(f'{outputDir}/mergedEnergyData.csv', index=False)
 
 # check if this is the wt data by checking the output directory
 if 'wt' in outputDir:
-    # keep sequences with total energy < 0 (rid of predictions with > 0 total energy for plotting; although most energies better, some WT designs have positive total energy after repack)
-    df = df[df['Total'] < 0]
     # only keep sequences found in the energy file
     sequence_df = sequence_df[sequence_df['Sequence'].isin(df['Sequence'])]
     # keep the data for the sequenceAnalysis script
