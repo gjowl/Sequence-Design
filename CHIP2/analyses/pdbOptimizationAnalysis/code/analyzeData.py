@@ -70,9 +70,9 @@ def plotScatterplot(input_df, xAxis, yAxis, yStd, regression_degree, output_titl
     plt.plot(input_df[xAxis], m*input_df[xAxis] + b, color='red')
     # add the r^2 value to the top left of the plot
     r2 = np.corrcoef(input_df[xAxis], input_df[yAxis])[0,1]**2
-    plt.text(0.01, 1.2, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    plt.text(0.01, 1.2, f'r^2 = {r2:.3f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
     # add the regression equation to the top left of the plot
-    plt.text(0.01, 1.15, f'y = {m:.2f}x + {b:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
+    plt.text(0.01, 1.15, f'y = {m:.3f}x + {b:.3f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top')
     plt.tight_layout()
     plt.savefig(f'{png_dir}/scatterRegression_{output_title}_{regression_degree}.png')
     plt.savefig(f'{svg_dir}/scatterRegression_{output_title}_{regression_degree}.svg')
@@ -138,9 +138,9 @@ def plotScatterplotSingle(input_df, sample, xAxis, yAxis, yStd, regression_degre
     plt.plot(df_sample[xAxis], m*df_sample[xAxis] + b, color='red')
     # add the r^2 value to the top left of the plot
     r2 = np.corrcoef(df_sample[xAxis], df_sample[yAxis])[0,1]**2
-    plt.text(0.01, 1.00, f'r^2 = {r2:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
+    plt.text(0.01, 1.00, f'r^2 = {r2:.3f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
     # add the regression equation to the top left of the plot
-    plt.text(0.01, 1.10, f'y = {m:.2f}x + {b:.2f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
+    plt.text(0.01, 1.10, f'y = {m:.3f}x + {b:.3f}', transform=plt.gca().transAxes, fontsize=text_font_size, verticalalignment='top', fontname=font)
     # get the standard deviation of the line 
     std_dev = np.sqrt(np.sum((df_sample[yAxis] - (m*df_sample[xAxis] + b))**2) / (len(df_sample) - 2))
     # get the mean of the line

@@ -91,6 +91,9 @@ if __name__ == '__main__':
     df = df.sort_values(by=['Total'], ascending=True)
     df = df.drop_duplicates(subset=['Sequence'], keep='first')
     
+    # output the df to a csv file
+    df.to_csv(f'{outputDir}/{outputFile}_withNA.csv', sep=',')
+
     # drop any sequences with NA values in the deltaG column
     df = df.dropna(subset=['deltaG'])
     
