@@ -72,9 +72,11 @@ if __name__ == '__main__':
     
     # convert fraction dimer to Kd
     df['Kd'] = fractionDimerToKd(df['fractionDimer'])
+    # set the negative Kd values to NA
+    df.loc[df['Kd'] < 0, 'Kd'] = np.nan
     
     # rid of the negative Kd values
-    df = df[df['Kd'] > 0]
+    #df = df[df['Kd'] > 0]
     
     # convert Kd to deltaG
     R = 0.0019872 # kcal/mol/K

@@ -35,6 +35,9 @@ if __name__ == "__main__":
     # convert the counts to a dataframe
     aaCounts_df = pd.DataFrame.from_dict(aaCounts, orient='index', columns=['Count'])
     aaCounts_df.index.name = 'Amino Acid'
+
+    # remove the non-standard amino acids
+    aaCounts_df = aaCounts_df.drop(['X'], errors='ignore')
     # calculate the percentage of each amino acid
     aaCounts_df['Percentage'] = aaCounts_df['Count'] / aaCounts_df['Count'].sum() * 100
     aaCounts_df.to_csv(f'{outputDir}/aaCounts.csv')
@@ -48,13 +51,17 @@ if __name__ == "__main__":
                 aaPairs[pair] += 1
             else:
                 aaPairs[pair] = 1
+    # remove any pairs containing X
+    aaPairs = {k: v for k, v in aaPairs.items() if 'X' not in k}
 
     # convert the counts to a dataframe
     aaPairs_df = pd.DataFrame.from_dict(aaPairs, orient='index', columns=['Count'])
     aaPairs_df.index.name = 'Amino Acid Pair'
     # calculate the percentage of each amino acid
-    #aaPairs_df['Percentage'] = aaPairs_df['Count'] / aaPairs_df['Count'].sum() * 100
-    aaPairs_df['Percentage'] = aaPairs_df['Count'] / len(allSequences) * 100
+    aaPairs_df['Percentage'] = aaPairs_df['Count'] / aaPairs_df['Count'].sum() * 100
+    #aaPairs_df['Percentage'] = aaPairs_df['Count'] / len(allSequences) * 100
+    # sort by the percentage of the pair
+    aaPairs_df = aaPairs_df.sort_values(by='Percentage', ascending=False)
     aaPairs_df.to_csv(f'{outputDir}/aaPairs.csv')
 
     # find the number of unique sequences that have each pair of amino acids
