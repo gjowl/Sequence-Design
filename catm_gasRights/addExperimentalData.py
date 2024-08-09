@@ -36,7 +36,7 @@ if __name__ == '__main__':
     # add LLL and ILI to the front and end of the Sequence column in experimental data
     expDf['Sequence'] = 'LLL' + expDf['Sequence'] + 'ILI'
     # get the columns of interest from the experimental data
-    expDf = expDf[['Sequence', 'toxgreen_fluor', 'toxgreen_std', 'deltaG', 'std_deltaG']]
+    expDf = expDf[['Sequence', 'PercentGpA', 'PercentStd', 'toxgreen_fluor', 'toxgreen_std', 'deltaG', 'std_deltaG']]
     print(expDf)
     # merge the dataframes
     outputDf = pd.merge(energyDf, expDf, on='Sequence')
