@@ -36,8 +36,15 @@ if __name__ == '__main__':
     # add LLL and ILI to the front and end of the Sequence column in experimental data
     expDf['Sequence'] = 'LLL' + expDf['Sequence'] + 'ILI'
     # get the columns of interest from the experimental data
-    expDf = expDf[['Sequence', 'PercentGpA', 'PercentStd', 'toxgreen_fluor', 'toxgreen_std', 'deltaG', 'std_deltaG']]
-    print(expDf)
+    expDf = expDf[['Sequence', 'Total', 'endAxialRotation', 'endAxialRotationPrime', 'endZShift', 'endZShiftPrime', 'endXShift', 'endCrossingAngle', 'Directory', 'replicateNumber', 'PercentGpA', 'PercentStd', 'toxgreen_fluor', 'toxgreen_std', 'deltaG', 'std_deltaG']]
+    # rename the total column
+    expDf.rename(columns={'Total':'Repack_Total'}, inplace=True)
+    expDf.rename(columns={'endAxialRotation':'Repack_AxialRotation'}, inplace=True)
+    expDf.rename(columns={'endAxialRotationPrime':'Repack_AxialRotationPrime'}, inplace=True)
+    expDf.rename(columns={'endZShift':'Repack_ZShift'}, inplace=True)
+    expDf.rename(columns={'endZShiftPrime':'Repack_ZShiftPrime'}, inplace=True)
+    expDf.rename(columns={'endXShift':'Repack_XShift'}, inplace=True)
+    expDf.rename(columns={'endCrossingAngle':'Repack_CrossingAngle'}, inplace=True)
     # merge the dataframes
     outputDf = pd.merge(energyDf, expDf, on='Sequence')
     # write the output dataframe to a csv file
