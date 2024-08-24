@@ -1,0 +1,4 @@
+Design data for CHIP2. This directory contains that data including:
+- older runs in 2023-2: these were not as well adjusted to the sequence entropy term as the later runs
+- newer runs in 2023-3: these were better adjusted to the sequence entropy term (sequenceEntropyWeight = 10 worked best for diversity of sequences)
+- code used to analyze the data; much of this are older versions of the code used to run the designs

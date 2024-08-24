@@ -5,13 +5,13 @@ To setup, please look at the generateConfig.py file. It contains all of the conf
 options that will be necessary to run this script. Once you are satisfied, run the 
 below to generate the configuration file ngsAnalysis.config.
 
-WARNING: IF YOU CHANGE THE NAME OF THIS DIRECTORY, BE SURE TO CHANGE THE PATH IN THE 
-CONFIG. I've never tried running this after changing the entire directory name, so it
-may crash out.
-python3 generateConfig.py
+I recommend taking the configuration file from the CHIP2_rerun_with_maltose/ dir and changing 
+the options as necessary. (mainly the directory paths)
+ - Sorry in advance, I wanted to make it so that you'd only have to change a single line to change
+ directories...but I don't think I ever got to it.
 
 To then run using your config options:
-python3 main.py
+python3 ngsAnalysis.py
 
 If the below doesn't work, consult the accompanying test sample in the test directory.
 There you can change options and you'll get a better feel for why it's working improperly.
@@ -46,10 +46,7 @@ Below is the list of files that must go into the input directory:
 Below is the list of files and directories that this code will create and output for a run:
 -data: 
 -   This will output files by names that will be used for analyzing and organizing data from the runs. Make sure that your filenames are sortable
--inputFiles: 
--   allCounts.csv: master csv that holds and organizes all of the counts for sequence, with columns as the bin name or LB/M9 hour and replicate
--   allPercents.csv: master csv that holds and organizes all of the percents for sequence, with columns as the bin name or LB/M9 hour and replicate
--analyzedData: self explanatory
+-reconstructedData: self explanatory
 -   maltoseTest: files for maltose test
 -      LBPercents.csv: file containing the percents of a sequence found in the LB timepoint bins 
 -      M9Percents.csv: file containing the percents of a sequence found in the M9 timepoint bins 
@@ -62,12 +59,19 @@ Below is the list of files and directories that this code will create and output
 -      avg files: fluorescence reconstruction average for the specified method of calculating fluorescence
 -      normRep files: this contains the normalization values per sequence per each replicate (column names are bins)
 -      rawFluor files: these contain the raw fluorescence per sequence per each replicate (column names are bins)
+-   reconstructionAllData.csv: all of the reconstructed data; the output used for analysis in my CHIP2 directory
+-   percentGpA.csv: percent GpA of the reconstruction using the GpA in the sort (not used for CHIP2 paper data)
+-   flowFile_normalized.csv: normalized percentages of the flow file to add up to 1
+- Count.csv: counts for all of the NGS sequences separated by file
+- Percentages.csv: percentages for all of the NGS sequences separated by file
+- seqIdDf.csv: dataframe with sequences and counts and ID name of all of the reconstructed sequences
 
-main.py Config Options:
-- extractiondir: directory for the extracted fastq NGS to txt files
+ngsReconstruction.py Config Options:
 - outputdir: main output directory
+- extractiondir: directory for the extracted fastq NGS to txt files
+- requirementsfile: required libraries (it used to work properly, but unsure what happened and it may not work anymore)
+ - if not, you'll have to download whatever packages you need by hand (pip install)
 - datadir: directory where the unzipped NGS files are found
-- requirementsfile: required libraries
 - fastqtotxt: script used to extract the fastq NGS files to txt files
 - ngsanalysis: script that reconstructs the fluorescence profile
 - percentfile: name for the file containing NGS percents for all sequences

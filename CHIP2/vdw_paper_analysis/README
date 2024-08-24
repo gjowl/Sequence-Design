@@ -1,0 +1,7 @@
+Analysis for the data in CHIP2. 
+
+Analysis:
+ - toxgreenConversion: converts the reconstructed fluorescence data to TOXGREEN fluorescence
+ - pdbOptimizationAnalysis: contains all of the analysis of the pdbBBRepack rerun
+ - sequenceAnalysis: contains analysis and code for analyzing the mutant vs design sequence data
+The versions of the code used to analyze this data (and the input files that allowed for the data analysis) are in the tarballs.

@@ -6,6 +6,6 @@ Directories:
  - toxgreenConversion: converts the reconstructed fluorescence data to TOXGREEN fluorescence
  - pdbOptimizationAnalysis: contains all of the analysis of the pdbBBRepack rerun
  - sequenceAnalysis: contains analysis and code for analyzing the mutant vs design sequence data
- - hbondAnalysis: contains analysis and code for analyzing the hydrogen bond data (not part of runAllAnalysis.py)
+ - hbondAnalysis: contains analysis and code for analyzing the hydrogen bond data (not part of runAllAnalysis.py); data for hydrogen bonding mutation choices here
  - structureAnalysis: contains analysis for structures done on 2024-2 (not part of runAllAnalysis.py)
  - clusterAnalysis: contains analysis for clustering the designs, data not used (not part of runAllAnalysis.py)

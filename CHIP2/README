@@ -1,0 +1,8 @@
+Main CHIP2 data in here:
+- 2023-designData: data for the designs in CHIP2
+- vdw_paper_data: finalized data for the CHIP2 designs and for the vdW paper
+- analyses: analysis code for CHIP2 (including hydrogen bond data)
+  - To run:
+    - python3 runAllAnalysis.py -config config/fullAnalysis_2024-7_7_updatedRepacks.config
+      - will need to change the config file arguments that designate paths to run on your own system
+- Cloning: cloning data for CHIP2 library and sequencing of the library
