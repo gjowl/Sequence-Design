@@ -6,6 +6,9 @@ from functions import *
 '''
 This file is the main program for running analysis on design data. It reads in a config file and runs the analysis
 through other files in the code directory
+
+Run as: python3 path/to/main.py {path/to/configFile}
+For testing: python3 path/to/main.py path/to/2023-3-7_leuDesigns.config
 '''
 
 # read in the config file

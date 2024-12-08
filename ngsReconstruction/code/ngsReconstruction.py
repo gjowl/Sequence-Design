@@ -60,20 +60,20 @@ if __name__ == '__main__':
     seqIdDf.to_csv(outputDir+'seqIdDf.csv', index=False)
 
     ## get the sequence column (first column) and skip the summary data rows
-    #seqColumn = seqIdDf.iloc[:,0].tolist()
+    seqColumn = seqIdDf.iloc[:,0].tolist()
 
-    ## compile counts and percents from data files
-    ## go through all files and save into csv file
-    #outputSequenceCountsCsv(seqColumn, extractionDir, countFile)
-    #outputSequencePercentsCsv(seqColumn, extractionDir, percentFile)
+    # compile counts and percents from data files
+    # go through all files and save into csv file
+    outputSequenceCountsCsv(seqColumn, extractionDir, countFile)
+    outputSequencePercentsCsv(seqColumn, extractionDir, percentFile)
 
-    ## drop duplicates and reset the index
-    #seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
-    #seqIdDf = seqIdDf.reset_index(drop=True)
+    # drop duplicates and reset the index
+    seqIdDf = seqIdDf.drop_duplicates(subset='Sequence', keep='first')
+    seqIdDf = seqIdDf.reset_index(drop=True)
 
-    ## add the segment number to the counts and percents files to separate sequences by segment number
-    #appendColumnFromInputFile(seqIdDf, 'Segment', countFile)
-    #appendColumnFromInputFile(seqIdDf, 'Segment', percentFile)
+    # add the segment number to the counts and percents files to separate sequences by segment number
+    appendColumnFromInputFile(seqIdDf, 'Segment', countFile)
+    appendColumnFromInputFile(seqIdDf, 'Segment', percentFile)
 
     # execute ngsAnalysis script 
     execNgsAnalysis = 'python3 '+ngsAnalysis+' '+configFile
