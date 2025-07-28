@@ -1,0 +1,15 @@
+refSeqs-Reference file of sequences present within the dataset
+Columns: Segment #, Protein Sequence, DNA Sequence
+
+Count-Raw counts of each sequence from the NGS for each sorted bin
+Percentage-Raw percentages of each sequences from NGS for each sorted bin
+
+Column naming convention:
+G# = GASright bin number
+L# = Left bin number
+R# = Right bin number
+Bin numbers in ascending order correspond to increasing fluorescence intensity bins
+Rep# = Replicate number
+LB = Luria Broth Growth sample
+M9 = Maltose Broth Growth sample
+#H = # of hours of growth
